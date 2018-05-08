@@ -38,10 +38,13 @@ int get_nth_prime(int n) {
 
   if (n < 0) {
     throw std::out_of_range("non-negative argument required");
-  } else if (static_cast<b::uint32_t>(n) > bm::max_prime) {
+  }
+
+  if (static_cast<b::uint32_t>(n) > bm::max_prime) {
     throw std::out_of_range("argument less than " +
                             std::to_string(bm::max_prime) + " required");
   }
+
   return static_cast<int>(boost::math::prime(static_cast<unsigned>(n)));
 }
 
