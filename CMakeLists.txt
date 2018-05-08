@@ -1,14 +1,8 @@
 cmake_minimum_required(VERSION 3.1)
 project(Template)
 
-include(CMakeToolsHelpers OPTIONAL)
-
 #export compiler flags for code completion engines
 set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
-
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
@@ -44,6 +38,6 @@ enable_testing()
 add_executable(mytest tests/MyTests.cpp)
 target_include_directories(mylib PRIVATE tests)
 target_link_libraries(mytest PRIVATE mylib)
-add_test(mytest)
+add_test(test1 mytest)
 
 

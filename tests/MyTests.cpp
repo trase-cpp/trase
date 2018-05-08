@@ -27,22 +27,24 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// This tells Catch to provide a main() - only do this in one cpp file
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
+
+#include <limits>
+
 #include "MyLibrary.h"
-#include <boost/math/special_functions/prime.hpp>
+using namespace cpp_template;
 
-namespace cpp_template {
-
-int get_nth_prime(int n) {
-  namespace bm = boost::math;
-  namespace b = boost;
-
-  if (n < 0) {
-    throw std::out_of_range("non-negative argument required");
-  } else if (static_cast<b::uint32_t>(n) > bm::max_prime) {
-    throw std::out_of_range("argument less than " +
-                            std::to_string(bm::max_prime) + " required");
-  }
-  return static_cast<int>(boost::math::prime(static_cast<unsigned>(n)));
+TEST_CASE("correct primes are returned", "[primes]") {
+  CHECK(get_nth_prime(0) == 2);
+  CHECK(get_nth_prime(1) == 3);
+  CHECK(get_nth_prime(2) == 5);
+  CHECK(get_nth_prime(854) == 6619);
 }
 
-} // namespace cpp_template
+TEST_CASE("correct out of range exceptions", "[primes]") {
+  CHECK_THROWS_AS(get_nth_prime(-1), std::out_of_range);
+  CHECK_THROWS_AS(get_nth_prime(std::numeric_limits<int>::max()),
+                  std::out_of_range);
+}

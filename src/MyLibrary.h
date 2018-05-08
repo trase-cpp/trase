@@ -27,22 +27,11 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "MyLibrary.h"
-#include <boost/math/special_functions/prime.hpp>
+#ifndef MYLIBRARY_H_
+#define MYLIBRARY_H_
 
 namespace cpp_template {
-
-int get_nth_prime(int n) {
-  namespace bm = boost::math;
-  namespace b = boost;
-
-  if (n < 0) {
-    throw std::out_of_range("non-negative argument required");
-  } else if (static_cast<b::uint32_t>(n) > bm::max_prime) {
-    throw std::out_of_range("argument less than " +
-                            std::to_string(bm::max_prime) + " required");
-  }
-  return static_cast<int>(boost::math::prime(static_cast<unsigned>(n)));
+int get_nth_prime(int n);
 }
 
-} // namespace cpp_template
+#endif // MYLIBRARY_H_
