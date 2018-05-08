@@ -13,6 +13,14 @@ else()
     add_compile_options(-Wall -pedantic)
 endif()
 
+# setup coverage for gcc or clang
+if (CMAKE_COMPILER_IS_GNUCC)
+  option(ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" FALSE)
+  if (ENABLE_COVERAGE)
+    add_compile_options(--coverage -O0)
+  endif()
+endif()
+
 
 add_library(mylib src/MyLibrary.cpp)
 target_include_directories(mylib PUBLIC src)
