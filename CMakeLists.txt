@@ -18,7 +18,6 @@ else()
     add_compile_options(-Wall -pedantic)
 endif()
 
-
 add_library(mylib src/MyLibrary.cpp)
 target_include_directories(mylib PUBLIC src)
 
@@ -42,6 +41,19 @@ if (Template_USE_OPENMP)
     target_link_libraries(mytest PRIVATE "${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
+# Clang tidy as optional static analyzer
+option(Template_USE_CLANG_TIDY "Use clang tidy for static analysis" OFF)
+if (Template_USE_CLANG_TIDY)
+    find_program(CLANG_TIDY_EXE NAMES "clang-tidy" "clang-tidy-6.0" "clang-tidy-5.0" "clang-tidy-4.0"
+                 DOC "Path to clang-tidy executable")
+    if(NOT CLANG_TIDY_EXE)
+      message(STATUS "clang-tidy not found.")
+    else()
+      message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
+      set_target_properties(mylib PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
+    endif()
+endif()
+
 # setup coverage for gcc or clang
 if (CMAKE_COMPILER_IS_GNUCC)
   option(ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" FALSE)
@@ -50,5 +62,3 @@ if (CMAKE_COMPILER_IS_GNUCC)
     target_link_libraries(mylib PUBLIC --coverage)
   endif()
 endif()
-
-
