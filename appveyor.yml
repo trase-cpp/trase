@@ -9,7 +9,7 @@ environment:
   BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib64-msvc-14.0
 
 build_script:
-  - cmd: >-
+- cmd: >-
     mkdir build
 
     cd build
@@ -19,5 +19,5 @@ build_script:
     cmake --build . --config "Debug"
 
 test_script:
-  - cmd: ctest -C Debug
+- cmd: ctest -C Debug
 
