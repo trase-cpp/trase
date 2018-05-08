@@ -1,0 +1,2 @@
+ignore:
+  - "tests/catch.h"  # ignore catch2 header
