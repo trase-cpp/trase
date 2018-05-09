@@ -37,7 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <limits>
 
+#include "Exception.h"
 #include "MyLibrary.h"
+
 using namespace cpp_template;
 
 // This tests the output of the `get_nth_prime` function
@@ -50,9 +52,8 @@ TEST_CASE("correct primes are returned", "[primes]") {
 
 // This tests the correct out_of_range exceptions are generated
 TEST_CASE("correct out of range exceptions", "[primes]") {
-  CHECK_THROWS_AS(get_nth_prime(-1), std::out_of_range);
-  CHECK_THROWS_AS(get_nth_prime(std::numeric_limits<int>::max()),
-                  std::out_of_range);
+  CHECK_THROWS_AS(get_nth_prime(-1), Exception);
+  CHECK_THROWS_AS(get_nth_prime(std::numeric_limits<int>::max()), Exception);
 }
 
 // This does not test our code, but instead tests the result

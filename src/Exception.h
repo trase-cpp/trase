@@ -31,27 +31,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "MyLibrary.h"
+#ifndef _EXCEPTION_H_
+#define _EXCEPTION_H_
 
-#include "Exception.h"
-
-#include <boost/math/special_functions/prime.hpp>
+#include <stdexcept>
 
 namespace cpp_template {
 
-int get_nth_prime(int n) {
-  namespace bm = boost::math;
-  namespace b = boost;
+class Exception : public std::runtime_error {
+public:
+  explicit Exception(const std::string &arg)
+      : std::runtime_error(arg){};
 
-  if (n < 0) {
-    throw Exception("non-negative argument required");
-  }
-
-  if (static_cast<b::uint32_t>(n) > bm::max_prime) {
-    throw Exception("argument less than " + std::to_string(bm::max_prime) + " required");
-  }
-
-  return static_cast<int>(boost::math::prime(static_cast<unsigned>(n)));
-}
+  ~Exception() noexcept override = default;
+};
 
 } // namespace cpp_template
+
+#endif // _EXCEPTION_H_
