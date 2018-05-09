@@ -67,7 +67,7 @@ target_include_directories(mylib PRIVATE "${Boost_INCLUDE_DIR}")
 # OpenMP as an optional component for tests
 option(Template_USE_OPENMP "Use OpenMP for shared memory parallism" OFF)
 if (Template_USE_OPENMP)
-    find_package(OpenMP REQUIRED)
+    find_package(OpenMP REQUIRED CXX)
     target_compile_options(mytest PRIVATE "${OpenMP_CXX_FLAGS}")
     target_link_libraries(mytest PRIVATE "${OpenMP_CXX_LIBRARIES}")
 endif()
