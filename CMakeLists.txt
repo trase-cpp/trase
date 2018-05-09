@@ -87,8 +87,8 @@ endif()
 
 # setup coverage for gcc or clang
 if (CMAKE_COMPILER_IS_GNUCC)
-  option(ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" FALSE)
-  if (ENABLE_COVERAGE)
+  option(Template_ENABLE_COVERAGE "Enable coverage reporting for gcc" FALSE)
+  if (Template_ENABLE_COVERAGE)
     target_compile_options(mylib PUBLIC --coverage -O0)
     target_link_libraries(mylib PUBLIC --coverage)
   endif()
