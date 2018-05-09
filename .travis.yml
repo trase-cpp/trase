@@ -2,6 +2,10 @@ sudo: false
 dist: trusty
 language: cpp
 
+addons:
+  apt:
+    packages:
+
 matrix:
   include:
     # XCode 9.1
@@ -16,6 +20,7 @@ matrix:
           packages:
             - clang-5.0
             - g++-5
+            - libboost-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-5.0
@@ -25,7 +30,10 @@ matrix:
     - env: CXX=g++-5 BUILD_TYPE=Debug
       addons: &gcc5
         apt:
-          packages: g++-5
+          packages: 
+            - g++-5
+            - lcov
+            - libboost-dev
           sources:
             - ubuntu-toolchain-r-test
 
