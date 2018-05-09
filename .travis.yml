@@ -11,9 +11,9 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-5
+      - g++-6
       - lcov
-      - clang-3.8
+      - clang-5.0
       - libboost-dev
 
 before_script:
