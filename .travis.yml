@@ -10,7 +10,7 @@ matrix:
       osx_image: xcode9.1
       compiler: clang
     # Clang 5.0
-    - env: COMPILER=clang++-5.0 BUILD_TYPE=Debug
+    - env: CXX=clang++-5.0 BUILD_TYPE=Debug
       addons: &clang50
         apt:
           packages:
