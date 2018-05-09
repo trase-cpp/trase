@@ -85,6 +85,19 @@ if (Template_USE_CLANG_TIDY)
     endif()
 endif()
 
+# LLVM AddressSanitizer to detecting memory errors
+option(Template_MEMCHECK "Use LLVM AddressSanitizer to detecting memory errors" OFF)
+if (Template_MEMCHECK)
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        message(STATUS "Configuring with LLVM AddressSanitizer")
+        set(Template_MEMCHECK_FLAGS -fno-optimize-sibling-calls -fsanitize=address -fsanitize-address-use-after-scope)
+        target_compile_options(mylib PRIVATE -O1 -g -fno-omit-frame-pointer ${Template_MEMCHECK_FLAGS})
+        target_link_libraries(mylib PRIVATE -g ${Template_MEMCHECK_FLAGS})
+    else()
+        message(FATAL_ERROR "clang compiler required with Template_MEMCHECK: found ${CMAKE_CXX_COMPILER_ID}")
+    endif()
+endif()
+
 # setup coverage for gcc or clang
 if (CMAKE_COMPILER_IS_GNUCC)
   option(Template_ENABLE_COVERAGE "Enable coverage reporting for gcc" FALSE)
