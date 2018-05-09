@@ -69,7 +69,7 @@ option(Template_USE_OPENMP "Use OpenMP for shared memory parallism" OFF)
 if (Template_USE_OPENMP)
     find_package(OpenMP REQUIRED)
     target_compile_options(mytest PRIVATE "${OpenMP_CXX_FLAGS}")
-    target_link_libraries(mytest PRIVATE "${OpenMP_EXE_LINKER_FLAGS}")
+    target_link_libraries(mytest PRIVATE "${OpenMP_CXX_LIBRARIES}")
 endif()
 
 # Clang tidy as optional static analyzer

@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MyLibrary.h"
 using namespace cpp_template;
 
+// This tests the output of the `get_nth_prime` function
 TEST_CASE("correct primes are returned", "[primes]") {
   CHECK(get_nth_prime(0) == 2);
   CHECK(get_nth_prime(1) == 3);
@@ -47,8 +48,25 @@ TEST_CASE("correct primes are returned", "[primes]") {
   CHECK(get_nth_prime(854) == 6619);
 }
 
+// This tests the correct out_of_range exceptions are generated
 TEST_CASE("correct out of range exceptions", "[primes]") {
   CHECK_THROWS_AS(get_nth_prime(-1), std::out_of_range);
   CHECK_THROWS_AS(get_nth_prime(std::numeric_limits<int>::max()),
                   std::out_of_range);
+}
+
+// This does not test our code, but instead tests the result
+// by Bach and Shallit (1996) that the sum of the first N
+// primes is approximatelly equal to 1/2 N^2 ln(N)
+//
+// Bach, E. and Shallit, J. §2.7 in Algorithmic Number Theory, Vol. 1: Efficient
+// Algorithms. Cambridge, MA: MIT Press, 1996.
+TEST_CASE("sum of primes", "[primes]") {
+  const int N = 1000;
+  int sum = 0;
+#pragma omp parallel for reduction(+ : sum)
+  for (int i = 0; i < N; ++i) {
+    sum += get_nth_prime(i);
+  }
+  CHECK(sum == Approx(0.5 * std::pow(N, 2) * std::log(N)).epsilon(0.1));
 }

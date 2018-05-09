@@ -21,7 +21,10 @@ before_script:
 - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.8" CC="clang-3.8"; fi
 
 script:
-  - cmake -D Template_ENABLE_COVERAGE:BOOL=TRUE . 
+  - cmake -D Template_ENABLE_COVERAGE:BOOL=TRUE 
+          -D Template_USE_OPENMP:BOOL=TRUE 
+          -D Template_USE_CLANG_TIDY:BOOL=TRUE 
+          . 
   - cmake --build . -- -j2 
   - ctest -j2 --output-on-failure
 
