@@ -8,42 +8,68 @@ addons:
 
 matrix:
   include:
-    # XCode 9.2
-    - env: CXX=clang++ BUILD_TYPE=Debug
-      os: osx
-      osx_image: xcode9.3
-      compiler: clang
-    # Clang 5.0
-    - env: CXX=clang++-5.0 BUILD_TYPE=Debug
-      addons: &clang50
-        apt:
-          packages:
-            - clang-5.0
-            - g++-5
-            - libboost-dev
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-            - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-4.0 main'
-              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
-    # GCC 5
-    - env: CXX=g++-5 BUILD_TYPE=Debug
-      addons: &gcc5
-        apt:
-          packages: 
-            - g++-5
-            - lcov
-            - libboost-dev
-          sources:
-            - ubuntu-toolchain-r-test
 
+    # GCC 5
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+        - CMAKE_OPTNS="-D Template_ENABLE_COVERAGE:BOOL=TRUE -D Template_USE_OPENMP:BOOL=TRUE -D CMAKE_BUILD_TYPE=Debug"
+
+    # Clang 4.0
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - clang-4.0
+      env:
+        - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
+        - CMAKE_OPTNS="-D Template_USE_CLANG_TIDY:BOOL=TRUE -D Template_USE_OPENMP:BOOL=TRUE -D CMAKE_BUILD_TYPE=Debug"
+
+
+
+
+#    # XCode 9.2
+#    - env: CXX=clang++ BUILD_TYPE=Debug
+#      os: osx
+#      osx_image: xcode9.3
+#      compiler: clang
+#    # Clang 5.0
+#    - env: CXX=clang++-5.0 BUILD_TYPE=Debug
+#      addons: &clang50
+#        apt:
+#          packages:
+#            - clang-5.0
+#            - g++-5
+#            - libboost-dev
+#          sources:
+#            - ubuntu-toolchain-r-test
+#            - llvm-toolchain-trusty-5.0
+#            - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-4.0 main'
+#              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+#    # GCC 5
+#    - env: CXX=g++-5 BUILD_TYPE=Debug
+#      addons: &gcc5
+#        apt:
+#          packages:
+#            - g++-5
+#            - lcov
+#            - libboost-dev
+#          sources:
+#            - ubuntu-toolchain-r-test
+
+before_install:
+  - eval "${MATRIX_EVAL}"
 
 script:
-  - cmake -D Template_ENABLE_COVERAGE:BOOL=TRUE 
-          -D Template_USE_OPENMP:BOOL=TRUE 
-          -D Template_USE_CLANG_TIDY:BOOL=TRUE 
-          -D CMAKE_BUILD_TYPE=$BUILD_TYPE
-          . 
+  - cmake $CMAKE_OPTNS .
   - cmake --build . -- -j2 
   - ctest -j2 --output-on-failure
 
