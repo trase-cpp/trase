@@ -42,14 +42,6 @@ class Exception : public std::runtime_error {
 public:
   explicit Exception(const std::string &arg) : std::runtime_error(arg){};
 
-  Exception(const Exception &arg) noexcept = default;
-
-  Exception(Exception &&arg) noexcept = default;
-
-  Exception &operator=(const Exception &arg) noexcept = default;
-
-  Exception &operator=(Exception &&arg) noexcept = default;
-
   ~Exception() noexcept override = default;
 };
 
