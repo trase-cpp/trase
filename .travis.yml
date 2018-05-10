@@ -55,6 +55,7 @@ script:
   - cmake $CMAKE_OPTNS -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON .
   - cmake --build . -- -j2 
   - ctest -j2 --output-on-failure
+  - ldd mytest
 
 after_success:
   # Creating report
@@ -67,5 +68,3 @@ after_success:
   - lcov --list coverage.info 
   # Uploading report to CodeCov
   - bash <(curl -s https://codecov.io/bash) -X gcov || echo "Codecov did not collect coverage reports"
-  # Info about libstdc++ version
-  - ldd mytest
