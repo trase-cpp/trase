@@ -31,17 +31,17 @@ matrix:
         - CMAKE_OPTNS="-D Template_ENABLE_COVERAGE:BOOL=TRUE 
                        -D CMAKE_BUILD_TYPE=Debug"
 
-    # Clang 4.0
+    # Clang 5.0
     - os: linux
       addons:
         apt:
           sources:
-            - llvm-toolchain-trusty-4.0
+            - llvm-toolchain-trusty-5.0
           packages:
-            - clang-4.0
+            - clang-5.0
             - libboost-dev
       env:
-        - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
         - CMAKE_OPTNS="-D Template_USE_CLANG_TIDY:BOOL=TRUE 
                        -D Template_MEMCHECK:BOOL=TRUE 
                        -D CMAKE_BUILD_TYPE=Debug"
