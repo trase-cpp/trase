@@ -1,6 +1,6 @@
 sudo: false
 dist: trusty
-language: cpp
+language: c
 
 addons:
   apt:
