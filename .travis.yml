@@ -9,6 +9,14 @@ addons:
 matrix:
   include:
 
+    # XCode 9.3
+    - env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++"
+        - CMAKE_OPTNS="-D Template_ENABLE_COVERAGE:BOOL=TRUE -D CMAKE_BUILD_TYPE=Debug"
+      os: osx
+      osx_image: xcode9.3
+      compiler: clang
+
     # GCC 5
     - os: linux
       addons:
@@ -39,11 +47,6 @@ matrix:
 
 
 
-#    # XCode 9.2
-#    - env: CXX=clang++ BUILD_TYPE=Debug
-#      os: osx
-#      osx_image: xcode9.3
-#      compiler: clang
 #    # Clang 5.0
 #    - env: CXX=clang++-5.0 BUILD_TYPE=Debug
 #      addons: &clang50
