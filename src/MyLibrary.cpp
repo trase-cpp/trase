@@ -48,7 +48,8 @@ int get_nth_prime(int n) {
   }
 
   if (static_cast<b::uint32_t>(n) > bm::max_prime) {
-    throw Exception("argument less than " + std::to_string(bm::max_prime) + " required");
+    throw Exception("argument less than " + std::to_string(bm::max_prime) +
+                    " required");
   }
 
   return static_cast<int>(boost::math::prime(static_cast<unsigned>(n)));
