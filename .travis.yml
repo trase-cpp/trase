@@ -53,6 +53,7 @@ before_install:
 script:
   - cmake $CMAKE_OPTNS .
   - cmake --build . -- -j2 
+  - export LSAN_OPTIONS=verbosity=1:log_threads=1
   - ctest -j2 --output-on-failure
 
 after_success:
