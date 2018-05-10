@@ -40,8 +40,9 @@ namespace cpp_template {
 
 class Exception : public std::runtime_error {
 public:
-  explicit Exception(const std::string &arg)
-      : std::runtime_error(arg){};
+  explicit Exception(const std::string &arg) : std::runtime_error(arg){};
+
+  explicit Exception(const char *arg) noexcept : std::runtime_error(arg){};
 
   ~Exception() noexcept override = default;
 };
