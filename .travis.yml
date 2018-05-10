@@ -29,7 +29,7 @@ matrix:
       env:
         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
         - CMAKE_OPTNS="-D Template_ENABLE_COVERAGE:BOOL=TRUE
-                       -D Template_MEMCHECK:BOOL=TRUE
+                       -D Template_USE_CLANG_TIDY:BOOL=TRUE
                        -D CMAKE_BUILD_TYPE=Debug"
 
     # GCC 6
@@ -45,7 +45,7 @@ matrix:
       env:
         - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
         - CMAKE_OPTNS="-D Template_ENABLE_COVERAGE:BOOL=TRUE
-                       -D Template_MEMCHECK:BOOL=TRUE
+                       -D Template_USE_CLANG_TIDY:BOOL=TRUE
                        -D CMAKE_BUILD_TYPE=Debug"
 
     # GCC 7
@@ -61,7 +61,7 @@ matrix:
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
         - CMAKE_OPTNS="-D Template_ENABLE_COVERAGE:BOOL=TRUE
-                       -D Template_MEMCHECK:BOOL=TRUE
+                       -D Template_USE_CLANG_TIDY:BOOL=TRUE
                        -D CMAKE_BUILD_TYPE=Debug"
 
     # Clang 4.0
