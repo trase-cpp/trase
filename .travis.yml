@@ -31,21 +31,6 @@ matrix:
         - CMAKE_OPTNS="-D Template_ENABLE_COVERAGE:BOOL=TRUE
                        -D CMAKE_BUILD_TYPE=Debug"
 
-
-    # GCC 5
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-            - libboost-dev
-            - lcov
-      env:
-        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
-        - CMAKE_OPTNS="-D Template_USE_CLANG_TIDY:BOOL=TRUE -D CMAKE_BUILD_TYPE=Debug"
-
     # GCC 6
     - os: linux
       addons:
