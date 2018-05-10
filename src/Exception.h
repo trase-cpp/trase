@@ -38,11 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cpp_template {
 
-class Exception : public std::runtime_error {
+struct Exception : std::runtime_error {
 public:
   explicit Exception(const std::string &arg) : std::runtime_error(arg){};
-
-  ~Exception() noexcept override = default;
 };
 
 } // namespace cpp_template
