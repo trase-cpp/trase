@@ -82,3 +82,21 @@ and with the following C++ compilers/toolchains:
 ### .clang-tidy
 
 ### AddressSanitizer
+
+There is an optional component enabled via CMake that can use the [LLVM AddressSanitizer](https://clang.llvm.org/docs/AddressSanitizer.html) to detect memory errors.
+This is turned on by default for the clang builds on Travis, so you will see any errors on there if it's configured.
+
+You can also run it yourself, provided you are using the clang compiler, by using the `Template_MEMCHECK` option when running CMake.
+Simply enable the option, then configure, build, and test:
+
+```bash
+cmake -DTemplate_MEMCHECK=TRUE /path/to/project
+make
+ctest
+```
+The test will fail at the first error.
+It is unlikely that you will encounter a false positive when using the address sanitizer, so if you do see an error, best not to ignore it!
+
+## Feedback and suggestions
+
+If you have any feedback or suggestions about this project, please get in touch or open an issue.
