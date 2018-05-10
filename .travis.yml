@@ -33,6 +33,7 @@ matrix:
 
     # Clang 5.0
     - os: linux
+      sudo: required
       addons:
         apt:
           sources:
@@ -41,7 +42,7 @@ matrix:
             - clang-5.0
             - libboost-dev
       env:
-        - MATRIX_EVAL="LSAN_OPTIONS=verbosity=1:log_threads=1 && CC=clang-5.0 && CXX=clang++-5.0"
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
         - CMAKE_OPTNS="-D Template_USE_CLANG_TIDY:BOOL=TRUE 
                        -D Template_MEMCHECK:BOOL=TRUE 
                        -D CMAKE_BUILD_TYPE=Debug"
@@ -53,7 +54,6 @@ before_install:
 script:
   - cmake $CMAKE_OPTNS .
   - cmake --build . -- -j2 
-  - export LSAN_OPTIONS=verbosity=1:log_threads=1
   - ctest -j2 --output-on-failure
 
 after_success:
