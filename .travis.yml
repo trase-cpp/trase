@@ -56,6 +56,7 @@ script:
   - cmake --build . -- -j2 
   - ctest -j2 --output-on-failure
   - ldd mytest
+  - ls -la /usr/lib/x86_64-linux-gnu/libstdc++.so.6
 
 after_success:
   # Creating report
