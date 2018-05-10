@@ -56,9 +56,3 @@ TEST_CASE("correct out of range exceptions", "[primes]") {
   CHECK_THROWS_AS(get_nth_prime(-1), Exception);
   CHECK_THROWS_AS(get_nth_prime(std::numeric_limits<int>::max()), Exception);
 }
-
-// This is a technical test to verify our exception class is behaving as expected.
-// It does not directly test functionality.
-TEST_CASE("Exception class is nothrow_copy_constructible", "[exception]") {
-    CHECK(std::is_nothrow_copy_constructible<Exception>::value);
-}
