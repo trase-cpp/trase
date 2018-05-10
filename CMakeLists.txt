@@ -78,6 +78,8 @@ if (Template_USE_CLANG_TIDY)
 endif()
 
 # LLVM AddressSanitizer to detecting memory errors
+# Note that there are many other sanitizers in LLVM to help detect errors, see
+# http://travistoptips.blogspot.co.uk/2015/11/sanitize-all-things.html
 option(Template_MEMCHECK "Use LLVM AddressSanitizer to detecting memory errors" OFF)
 if (Template_MEMCHECK)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")

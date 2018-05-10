@@ -41,7 +41,7 @@ matrix:
             - clang-5.0
             - libboost-dev
       env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+        - MATRIX_EVAL="LSAN_OPTIONS=verbosity=1:log_threads=1 && CC=clang-5.0 && CXX=clang++-5.0"
         - CMAKE_OPTNS="-D Template_USE_CLANG_TIDY:BOOL=TRUE 
                        -D Template_MEMCHECK:BOOL=TRUE 
                        -D CMAKE_BUILD_TYPE=Debug"
