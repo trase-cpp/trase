@@ -122,6 +122,22 @@ function throws an exception, which is defined in this file.
 
 ### MyTests.cpp
 
+Write the unit tests for your code here. Our example uses the 
+[Catch](https://github.com/catchorg/Catch2) framework, and includes tests that 
+check the accuracy of the `get_nth_prime` function, and check that the function 
+throws the appropriate exceptions on invalid input.
+
+- *Note1*: You probably will want to change the filename, or add separate files 
+  containing more tests. In this case, make sure to update the filenames in 
+  `CMakeLists.txt`.
+- *Note2*: You probably want to use your C++ code to actually **do** something, 
+  for example running a simulation. One option is to run your simulation through 
+  this testing framework (e.g. you might want to check that your simulation ran 
+  correctly, and you can use Catch's assertions to do this). Alternatively, it 
+  might be more suitable to write an entirely separate executable for your 
+  simulation. You can easily do this by using the `add_executable` CMake 
+  function (in `CMakeLists.txt`), exactly like we have done for `MyTests.cpp`
+
 ### .travis.yml
 
 ### appveyor.yml
