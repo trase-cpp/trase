@@ -52,6 +52,34 @@ and with the following C++ compilers/toolchains:
 
 ### Linux
 
+- Install [CMake](https://cmake.org/download/) and a C++ compiler. E.g. for 
+  Ubuntu you can use the command-line and type:
+
+```bash
+$ sudo apt install build-essential cmake
+```
+
+- Make a build directory and configure the project. E.g. Assuming you are in a 
+  directory containing the template source code:
+
+```bash
+$ mkdir build
+$ cd build
+$ cmake ..
+```
+
+- Compile the project
+
+```bash
+$ make
+```
+
+- Run all the tests using CTest (this is bundled with CMake)
+
+```bash
+$ ctest --output-on-failure
+```
+
 ### macOS
 
 ### Windows
@@ -67,7 +95,31 @@ and with the following C++ compilers/toolchains:
 
 ### MyLibrary.{hpp,cpp}
 
+This template C++ project implements a single function, `get_nth_prime`, within 
+the namespace `cpp_template`. This function returns the $i^{th}$ prime number 
+$p_i$, where both $i$ and $p_i$ are of type `int`. 
+
+- *Note1*: It is good practice in C++ to put all your code within a namespace, 
+  so that definitions in separate projects do not conflict with each other.
+
+- *Note2*: `get_nth_prime` simply wraps the Boost [prime number 
+  implementation](https://www.boost.org/doc/libs/1_64_0/libs/math/doc/html/math_toolkit/number_series/primes.html)(https://www.boost.org/doc/libs/1_64_0/libs/math/doc/html/math_toolkit/number_series/primes.html)
+
+- *Note3*: To start using this template in your own projects, simply replace 
+  these files with your own, and make sure to update the filenames in 
+  `CMakeLists.txt`.
+
 ### Exception.h
+
+The $i$ argument to `get_nth_prime` must be greater than zero, and less than 
+`boost::math::max_prime`. If either of these conditions are not satisfied the 
+function throws an exception, which is defined in this file.
+
+- *Note1*: Throwing an 
+  [exception](http://www.cplusplus.com/doc/tutorial/exceptions/) when an error 
+  is detected allows programs to react to run-time errors. This is in contrast 
+  [asserts](http://www.cplusplus.com/reference/cassert/assert/), which 
+  immediately halt program execution.
 
 ### MyTests.cpp
 
