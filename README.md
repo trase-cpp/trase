@@ -101,8 +101,8 @@ the namespace `cpp_template`.
 - *Note1*: It is good practice in C++ to put all your code within a namespace, 
   so that definitions in separate projects do not conflict with each other.
 
-- *Note2*: `get_nth_prime` simply wraps the Boost [prime number 
-  implementation](https://www.boost.org/doc/libs/1_64_0/libs/math/doc/html/math_toolkit/number_series/primes.html)(https://www.boost.org/doc/libs/1_64_0/libs/math/doc/html/math_toolkit/number_series/primes.html)
+- *Note2*: `get_nth_prime` simply wraps the Boost prime number 
+  [implementation](https://www.boost.org/doc/libs/1_64_0/libs/math/doc/html/math_toolkit/number_series/primes.html)
 
 - *Note3*: To start using this template in your own projects, simply replace 
   these files with your own, and make sure to update the filenames in 
