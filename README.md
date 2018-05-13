@@ -96,8 +96,7 @@ $ ctest --output-on-failure
 ### MyLibrary.{hpp,cpp}
 
 This template C++ project implements a single function, `get_nth_prime`, within 
-the namespace `cpp_template`. This function returns the $i^{th}$ prime number 
-$p_i$, where both $i$ and $p_i$ are of type `int`. 
+the namespace `cpp_template`.
 
 - *Note1*: It is good practice in C++ to put all your code within a namespace, 
   so that definitions in separate projects do not conflict with each other.
@@ -111,7 +110,7 @@ $p_i$, where both $i$ and $p_i$ are of type `int`.
 
 ### Exception.h
 
-The $i$ argument to `get_nth_prime` must be greater than zero, and less than 
+The argument to `get_nth_prime` must be greater than zero, and less than 
 `boost::math::max_prime`. If either of these conditions are not satisfied the 
 function throws an exception, which is defined in this file.
 
