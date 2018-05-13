@@ -131,12 +131,12 @@ throws the appropriate exceptions on invalid input.
   containing more tests. In this case, make sure to update the filenames in 
   `CMakeLists.txt`.
 - *Note2*: You probably want to use your C++ code to actually **do** something, 
-  for example running a simulation. One option is to run your simulation through 
-  this testing framework (e.g. you might want to check that your simulation ran 
+  for example running a simulation. One option is to run this through your 
+  testing framework (e.g. you might want to check that your simulation ran 
   correctly, and you can use Catch's assertions to do this). Alternatively, it 
-  might be more suitable to write an entirely separate executable for your 
-  simulation. You can easily do this by using the `add_executable` CMake 
-  function (in `CMakeLists.txt`), exactly like we have done for `MyTests.cpp`
+  might be more suitable to write an entirely separate executable. You can 
+  easily do this by using the `add_executable` CMake function (in 
+  `CMakeLists.txt`), exactly like we have done for `MyTests.cpp`
 
 ### .travis.yml
 
