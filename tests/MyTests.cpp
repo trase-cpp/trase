@@ -38,8 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <limits>
 #include <type_traits>
 
-#include "Exception.h"
-#include "MyLibrary.h"
+#include "Exception.hpp"
+#include "MyLibrary.hpp"
 
 using namespace cpp_template;
 
