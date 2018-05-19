@@ -84,12 +84,33 @@ $ ctest --output-on-failure
 
 ### Windows
 
-- Install [Visual Studio Community](https://www.visualstudio.com/downloads/)
-- Install [CMake](https://cmake.org/download/)
+First, install the following software:
+- [Visual Studio Community](https://www.visualstudio.com/downloads/)
+- [CMake](https://cmake.org/download/)
+
+Next, we assume the use of Microsoft's C++ package manager, vcpkg, for installing dependencies.
+The following instructions assume you install vcpkg to `C:\vcpkg`:
 - Install and configure [vcpkg](https://github.com/Microsoft/vcpkg)
-- Install boost using vcpkg
-- Open this repository in Visual Studio
-- Build
+- Ensure you have run `vcpkg integrate install`
+- Install boost for 64 bit targets: `vcpkg install boost:x64-windows`
+
+From Visual Studio, configure the project to use the vcpkg toolchain file:
+- Open the project with `File -> Open -> Folder`, and select this project
+- Edit the build configurations: `CMake -> Change CMake Settings -> Template`
+  - We suggest removing both `x86` targets; just keep both `x64` targets
+  - Add the following to both `x64` targets:
+```
+"variables": [
+                {
+                    "name": "CMAKE_TOOLCHAIN_FILE",
+                    "value": "C:\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+                }
+            ],
+```
+
+Build the project and run the tests:
+- `CMake -> Build All`
+- `CMake -> Tests -> Run Template CTests`
 
 ## Documentation
 
