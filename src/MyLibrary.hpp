@@ -34,8 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MYLIBRARY_H_
 #define MYLIBRARY_H_
 
+#include <string>
+
 namespace cpp_template {
 int get_nth_prime(int n);
+std::string rotate_substrings_left(
+	const std::string& original, std::string delimiter, long n);
 }
 
 #endif // MYLIBRARY_H_

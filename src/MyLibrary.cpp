@@ -35,6 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Exception.hpp"
 
+#include <algorithm>
+
+#include <absl/strings/str_join.h>
+#include <absl/strings/str_split.h>
 #include <boost/math/special_functions/prime.hpp>
 
 namespace cpp_template {
@@ -54,5 +58,28 @@ int get_nth_prime(int n) {
 
   return static_cast<int>(boost::math::prime(static_cast<unsigned>(n)));
 }
+
+std::string rotate_substrings_left(
+	const std::string& original,
+	const std::string delimiter,
+	const long n) {
+
+  std::vector<absl::string_view> split = absl::StrSplit(original, delimiter);
+
+  if (split.size() < 2) {
+    return original;
+  }
+
+  const auto pivot = std::abs(n) % split.size();
+  
+  if (n > 0) {
+    std::rotate(std::begin(split), std::begin(split) + pivot, std::end(split));
+  } else {
+    std::rotate(std::rbegin(split), std::rbegin(split) + pivot, std::rend(split));
+  }
+
+  return absl::StrJoin(split, delimiter);
+}
+
 
 } // namespace cpp_template

@@ -61,6 +61,10 @@ target_include_directories(mylib PRIVATE tests)
 target_link_libraries(mytest PRIVATE mylib)
 add_test(test1 mytest)
 
+# configure abseil-cpp from submodule
+add_subdirectory(abseil-cpp)
+target_link_libraries(mylib PRIVATE absl::base absl::strings)
+
 # boost as a required dependency for mylib
 find_package(Boost REQUIRED)
 target_link_libraries(mylib PRIVATE "${Boost_LIBRARIES}")

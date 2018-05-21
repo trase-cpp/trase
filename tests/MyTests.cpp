@@ -56,3 +56,20 @@ TEST_CASE("correct out of range exceptions", "[primes]") {
   CHECK_THROWS_AS(get_nth_prime(-1), Exception);
   CHECK_THROWS_AS(get_nth_prime(std::numeric_limits<int>::max()), Exception);
 }
+
+// This tests the output of the `rotate_substrings_left` function
+TEST_CASE("correct strings are returned", "[substrings]") {
+  const std::string input = "a,b,c,d,e,f,g,h,i,j";
+
+  CHECK(rotate_substrings_left(input, ",", 0) == input);  // no rotation
+  CHECK(rotate_substrings_left(input, ",", 10) == input); // complete rotation left
+  CHECK(rotate_substrings_left(input, ",", -10) == input);  // complete rotation right
+
+  CHECK(rotate_substrings_left(input, ",", 1) == "b,c,d,e,f,g,h,i,j,a");  // one left
+  CHECK(rotate_substrings_left(input, ",", -1) == "j,a,b,c,d,e,f,g,h,i"); // one right
+  CHECK(rotate_substrings_left(rotate_substrings_left(input, ",", 1), ",", -1) == input);  // left then right
+  CHECK(rotate_substrings_left(rotate_substrings_left(input, ",", -1), ",", 1) == input);  // right then left
+
+  CHECK(rotate_substrings_left(input, ",", 15) == "f,g,h,i,j,a,b,c,d,e");  // 15 left (=5 left)
+  CHECK(rotate_substrings_left(input, ",", -13) == "h,i,j,a,b,c,d,e,f,g");  // 13 right (=3 right)
+}
