@@ -31,28 +31,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "MyLibrary.hpp"
+// This tells Catch to provide a main() - only do this in one cpp file
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
 
-#include "Exception.hpp"
+#include <limits>
+#include <type_traits>
 
-#include <boost/math/special_functions/prime.hpp>
+#include "trase.hpp"
 
-namespace cpp_template {
+using namespace trase;
 
-int get_nth_prime(int n) {
-  namespace bm = boost::math;
-  namespace b = boost;
-
-  if (n < 0) {
-    throw Exception("non-negative argument required");
-  }
-
-  if (static_cast<b::uint32_t>(n) > bm::max_prime) {
-    throw Exception("argument less than " + std::to_string(bm::max_prime) +
-                    " required");
-  }
-
-  return static_cast<int>(boost::math::prime(static_cast<unsigned>(n)));
+// This tests the output of the `get_nth_prime` function
+TEST_CASE("figure can be created", "[figure]") {
+  auto fig1 = figure();
+  auto fig2 = figure({800, 600});
 }
-
-} // namespace cpp_template
