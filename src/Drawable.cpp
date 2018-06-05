@@ -39,7 +39,7 @@ template <typename Backend>
 bool Drawable<Backend>::draw(Drawable &parent, Backend &backend) {
   draw_me(parent, backend);
   for (auto &i : m_children) {
-    m_children.draw(*this, backend);
+    m_children->draw(*this, backend);
   }
 }
 

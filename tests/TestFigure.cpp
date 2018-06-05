@@ -44,6 +44,6 @@ using namespace trase;
 
 // This tests the output of the `get_nth_prime` function
 TEST_CASE("figure can be created", "[figure]") {
-  auto fig1 = figure();
-  auto fig2 = figure({800, 600});
+  auto fig1 = figure<BackendGL>();
+  auto fig2 = figure<BackendGL>({800, 600});
 }

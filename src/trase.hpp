@@ -31,11 +31,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef MYLIBRARY_H_
-#define MYLIBRARY_H_
+#ifndef TRASE_H_
+#define TRASE_H_
 
-namespace cpp_template {
-int get_nth_prime(int n);
-}
+#include "Figure.hpp"
 
-#endif // MYLIBRARY_H_
+#endif // TRASE_H_

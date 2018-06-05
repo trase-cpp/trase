@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AXIS_H_
 #define AXIS_H_
 
+#include "Drawable.hpp"
 #include <array>
 
 namespace trase {
@@ -41,10 +42,11 @@ namespace trase {
 template <typename Backend> class Axis : public Drawable<Backend> {
   std::array<float, 4> m_area;   // window area {x_min,y_min,x_max,ymax}
   std::array<float, 4> m_limits; // plot extents {x_min,y_min,x_max,ymax}
-  Axis();
-  virtual void draw_me(Drawable &parent, Backend &backend);
+public:
+  Axis(const std::array<float, 4> &area);
+  virtual void draw_me(Drawable<Backend> &parent, Backend &backend);
 };
 
 } // namespace trase
 
-#endif // FIGURE_H_
+#endif // AXIS_H_

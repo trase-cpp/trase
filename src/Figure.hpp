@@ -34,21 +34,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FIGURE_H_
 #define FIGURE_H_
 
+#include "Axis.hpp"
 #include "BackendGL.hpp"
+#include "Drawable.hpp"
 #include <array>
+#include <memory>
 
 namespace trase {
 
-class Figure : public Drawable {
+template <typename Backend> class Figure : public Drawable<Backend> {
   BackendGL m_backend;
-  Axis m_axis;
+  Axis<Backend> m_axis;
   static int m_num_windows;
-  Figure(std::array<int, 2> pixels = {{1280, 720}});
-  void draw();
-  Axis &axis() { return m_axis; }
+
+public:
+  Figure(const std::array<int, 2> &pixels);
+  virtual void draw_me(Drawable<Backend> &parent, Backend &backend);
+  Axis<Backend> &axis() { return m_axis; }
 };
 
-std::shared_ptr<Figure> figure() { return std::make_shared<Figure>(); }
+template <typename Backend>
+std::shared_ptr<Figure<Backend>>
+figure(std::array<int, 2> pixels = {{1280, 720}}) {
+  return std::make_shared<Figure<Backend>>(pixels);
+}
 } // namespace trase
 
 #endif // FIGURE_H_

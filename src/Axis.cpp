@@ -31,15 +31,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "BackendGL.hpp"
 #include "Figure.hpp"
 
 namespace trase {
 
 template <typename Backend>
-Axis::Axis<Backend>(std::array<float, 4> area)
+Axis<Backend>::Axis(const std::array<float, 4> &area)
     : m_area(area), m_limits{{0, 0, 1, 1}} {}
 
-template <typename Backend> void draw_me(Drawable &parent, Backend &backend) {
+template <typename Backend>
+void Axis<Backend>::draw_me(Drawable<Backend> &parent, Backend &backend) {
   const float &x = m_area[0];
   const float &y = m_area[1];
   const float &w = m_area[2];
@@ -57,7 +59,7 @@ template <typename Backend> void draw_me(Drawable &parent, Backend &backend) {
   backend.line_to(x + w, y + h);
   backend.move_to(x, y + h + lw / 2);
   backend.line_to(x, y);
-  backend.stroke_color(0, 0, 0, 255);
+  backend.stroke_color(RGBA(0, 0, 0, 255));
   backend.stroke_width(lw);
   backend.stroke();
 
@@ -69,7 +71,7 @@ template <typename Backend> void draw_me(Drawable &parent, Backend &backend) {
   backend.line_to(x - lw / 2, y + lw / 2);
   backend.stroke_color(RGBA(0, 0, 0, 20));
   backend.stroke_width(lw);
-  backend.stroke(vg);
+  backend.stroke();
 
   // ticks
   const int ny_ticks = 5;
@@ -94,7 +96,7 @@ template <typename Backend> void draw_me(Drawable &parent, Backend &backend) {
     std::sprintf(buffer, "%1.1f", tick_val);
     backend.text(tick_pos, y + h + tick_len / 2 + 22, buffer, NULL);
   }
-  nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+  backend.text_align(ALIGN_LEFT | ALIGN_MIDDLE);
   for (int i = 0; i < ny_ticks; ++i) {
     const float tick_pos = y + h - (i + 0.5) * tick_dx;
     const float tick_val = ymin + (i + 0.5) * tick_dx_y;
@@ -107,5 +109,7 @@ template <typename Backend> void draw_me(Drawable &parent, Backend &backend) {
   backend.stroke_width(lw / 2);
   backend.stroke();
 }
+
+template class Axis<BackendGL>;
 
 } // namespace trase

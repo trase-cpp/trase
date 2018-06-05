@@ -30,7 +30,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.6)
-project(Template)
+project(trase)
 
 # ensure C++14
 set(CMAKE_CXX_STANDARD 14)
@@ -49,62 +49,112 @@ else()
     add_compile_options(-Wall -pedantic)
 endif()
 
-add_library(mylib src/MyLibrary.cpp 
-                  src/MyLibrary.hpp
-                  src/Exception.hpp)
-target_include_directories(mylib PUBLIC src)
+set(imgui_dir ${trase_SOURCE_DIR}/imgui)
+set(imgui_source
+    ${imgui_dir}/imgui.cpp
+    ${imgui_dir}/imgui.h
+    ${imgui_dir}/imgui_draw.cpp
+    ${imgui_dir}/imgui_demo.cpp
+    ${imgui_dir}/imgui_internal.h
+    ${imgui_dir}/imconfig.h
+    ${imgui_dir}/stb_rect_pack.h
+    ${imgui_dir}/stb_textedit.h
+    ${imgui_dir}/stb_truetype.h
+    ${imgui_dir}/imgui_impl_glfw_gl3.h
+    ${imgui_dir}/imgui_impl_glfw_gl3.cpp
+    )
+
+set(glext_dir ${trase_SOURCE_DIR}/glad)
+set(glext_source
+    ${glext_dir}/glad.c
+    ${glext_dir}/glad/glad.h
+    )
+
+set(nanovg_dir ${trase_SOURCE_DIR}/nanovg)
+set(nanovg_source
+    ${nanovg_dir}/fontstash.h
+    ${nanovg_dir}/nanovg.c
+    ${nanovg_dir}/nanovg_gl.h
+    ${nanovg_dir}/nanovg_gl_utils.h
+    ${nanovg_dir}/nanovg.h
+    ${nanovg_dir}/stb_image.h
+    ${nanovg_dir}/stb_truetype.h
+    )
+
+
+find_package(glfw3 3.2 REQUIRED)
+find_package(OpenGL REQUIRED)
+
+add_library(glext ${glext_source})
+target_include_directories(glext SYSTEM PUBLIC ${glext_dir})
+target_link_libraries(glext PUBLIC ${OPENGL_gl_LIBRARY})
+
+add_library(imgui ${imgui_source})
+target_include_directories(imgui SYSTEM PUBLIC ${imgui_dir})
+target_link_libraries(imgui PUBLIC  glext glfw dl)
+
+add_library(nanovg ${nanovg_source})
+target_include_directories(nanovg SYSTEM PUBLIC ${nanovg_dir})
+target_link_libraries(nanovg PUBLIC ${OPENGL_gl_LIBRARY} glfw dl)
+
+
+add_library(trase src/Figure.cpp
+    src/Figure.hpp
+    src/Axis.cpp
+    src/Axis.hpp
+    src/BackendGL.cpp
+    src/BackendGL.hpp
+    src/Exception.hpp)
+target_include_directories(trase PUBLIC src)
+target_link_libraries(trase PUBLIC glext nanovg imgui)
 
 enable_testing()
 
-add_executable(mytest tests/MyTests.cpp)
-target_include_directories(mylib PRIVATE tests)
-target_link_libraries(mytest PRIVATE mylib)
-add_test(test1 mytest)
+add_executable(figure_test tests/TestFigure.cpp)
+target_include_directories(figure_test PRIVATE tests)
+target_link_libraries(figure_test PRIVATE trase)
+add_test(figure_test figure_test)
 
-# boost as a required dependency for mylib
-find_package(Boost REQUIRED)
-target_link_libraries(mylib PRIVATE "${Boost_LIBRARIES}")
-target_include_directories(mylib PRIVATE "${Boost_INCLUDE_DIR}")
 
 # Clang tidy as optional static analyzer
-option(Template_USE_CLANG_TIDY "Use clang tidy for static analysis" OFF)
-if (Template_USE_CLANG_TIDY)
+option(trase_USE_CLANG_TIDY "Use clang tidy for static analysis" OFF)
+if (trase_USE_CLANG_TIDY)
     find_program(CLANG_TIDY_EXE NAMES "clang-tidy" "clang-tidy-6.0" "clang-tidy-5.0" "clang-tidy-4.0"
-                 DOC "Path to clang-tidy executable")
+        DOC "Path to clang-tidy executable")
     if(NOT CLANG_TIDY_EXE)
-      message(STATUS "clang-tidy not found.")
+        message(STATUS "clang-tidy not found.")
     else()
-      message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
-      set_target_properties(mylib PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
+        message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
+        set_target_properties(mylib PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
     endif()
 endif()
 
 # LLVM AddressSanitizer to detecting memory errors
 # Note that there are many other sanitizers in LLVM to help detect errors, see
 # http://travistoptips.blogspot.co.uk/2015/11/sanitize-all-things.html
-option(Template_MEMCHECK "Use LLVM AddressSanitizer to detecting memory errors" OFF)
-if (Template_MEMCHECK)
+option(trase_MEMCHECK "Use LLVM AddressSanitizer to detecting memory errors" OFF)
+if (trase_MEMCHECK)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         message(STATUS "Configuring with LLVM AddressSanitizer")
-        set(Template_MEMCHECK_FLAGS -fno-optimize-sibling-calls 
-                                    -fsanitize=address 
-                                    -fsanitize-address-use-after-scope
-                                    )
-        target_compile_options(mylib PUBLIC -O1 -g -fno-omit-frame-pointer ${Template_MEMCHECK_FLAGS})
-        target_link_libraries(mylib PUBLIC -g ${Template_MEMCHECK_FLAGS})
+        set(trase_MEMCHECK_FLAGS -fno-optimize-sibling-calls
+            -fsanitize=address
+            -fsanitize-address-use-after-scope
+            )
+        target_compile_options(mylib PUBLIC -O1 -g -fno-omit-frame-pointer ${trase_MEMCHECK_FLAGS})
+        target_link_libraries(mylib PUBLIC -g ${trase_MEMCHECK_FLAGS})
     else()
-        message(FATAL_ERROR "clang compiler required with Template_MEMCHECK: found ${CMAKE_CXX_COMPILER_ID}")
+        message(FATAL_ERROR "clang compiler required with trase_MEMCHECK: found ${CMAKE_CXX_COMPILER_ID}")
     endif()
 endif()
 
 # Setup coverage testing for GCC or Clang
-option(Template_ENABLE_COVERAGE "Enable coverage reporting for GCC or Clang" FALSE)
-if (Template_ENABLE_COVERAGE)
+option(trase_ENABLE_COVERAGE "Enable coverage reporting for GCC or Clang" FALSE)
+if (trase_ENABLE_COVERAGE)
     if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
         message(STATUS "Configuring with coverage")
         target_compile_options(mylib PUBLIC --coverage -O0)
         target_link_libraries(mylib PUBLIC --coverage)
     else()
-        message(FATAL_ERROR "GCC or Clang required with Template_ENABLE_COVERAGE: found ${CMAKE_CXX_COMPILER_ID}")
+        message(FATAL_ERROR "GCC or Clang required with trase_ENABLE_COVERAGE: found ${CMAKE_CXX_COMPILER_ID}")
     endif()
 endif()

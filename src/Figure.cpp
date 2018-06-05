@@ -32,17 +32,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Figure.hpp"
+#include "BackendGL.hpp"
+#include <array>
+#include <string>
 
 namespace trase {
 
-int Figure::m_num_windows = 0;
+template <typename Backend> int Figure<Backend>::m_num_windows = 0;
 
-Figure::Figure(std::array<int, 2> pixels) : m_axis({0.1, 0.1, 0.9, 0.9}) {
+template <typename Backend>
+Figure<Backend>::Figure(const std::array<int, 2> &pixels)
+    : m_axis({0.1, 0.1, 0.9, 0.9}) {
   ++m_num_windows;
   auto name = "Figure " + std::to_string(m_num_windows);
-  m_backend.init(pixels[0], y_pixels[1], name.c_str());
+  m_backend.init(pixels[0], pixels[1], name.c_str());
+  this->m_children.push_back(&m_axis);
 }
 
-void draw_me() {}
+template <typename Backend>
+void Figure<Backend>::draw_me(Drawable<Backend> &parent, Backend &backend) {}
 
+template class Figure<BackendGL>;
 } // namespace trase

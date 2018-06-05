@@ -36,13 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdexcept>
 
-namespace cpp_template {
+namespace trase {
 
 class Exception : public std::runtime_error {
 public:
   explicit Exception(const std::string &arg) : std::runtime_error(arg){};
 };
 
-} // namespace cpp_template
+} // namespace trase
 
 #endif // _EXCEPTION_H_

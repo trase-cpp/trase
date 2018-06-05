@@ -40,14 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <GLFW/glfw3.h>
 
 #include "imgui.h"
-#include "imgui_impl_glfw_gl3.h"
 #include <array>
 #include <iostream>
 #include <stdio.h>
 
 #include "nanovg.h"
-#define NANOVG_GL3_IMPLEMENTATION
-#include "nanovg_gl.h"
+
+#include "Exception.hpp"
 
 namespace trase {
 
@@ -72,6 +71,7 @@ class BackendGL {
   GLFWwindow *m_window;
   NVGcontext *m_vg;
 
+public:
   enum Align {
     // Horizontal align
     ALIGN_LEFT = 1 << 0,   // Default, align text horizontally to left.
@@ -84,21 +84,24 @@ class BackendGL {
     ALIGN_BASELINE = 1 << 6, // Default, align text vertically to baseline.
   };
 
+  void init(int x_pixels, int y_pixels, const char *name);
+  void finalise();
+  void begin_frame();
+  void end_frame();
+
   inline void begin_path() { nvgBeginPath(m_vg); }
   inline void move_to(const float x, const float y) { nvgMoveTo(m_vg, x, y); }
-  inline void line_to(const float x, const float y) {
-    nvgLineTo(m_vg, x + w, y + h);
-  }
+  inline void line_to(const float x, const float y) { nvgLineTo(m_vg, x, y); }
   inline void stroke_color(const RGBA &color) {
-    nvgStrokeColor(m_vg, nvgRGBA(color.r, color.g, color.b, color.a));
+    nvgStrokeColor(m_vg, nvgRGBA(color.m_r, color.m_g, color.m_b, color.m_a));
   }
-  inline void stroke_width(const float lw){nvgStrokeWidth(m_vg, lw)};
+  inline void stroke_width(const float lw) { nvgStrokeWidth(m_vg, lw); }
   inline void stroke() { nvgStroke(m_vg); }
-  inline void font_size(float size) { vgFontSize(m_vg, size); }
+  inline void font_size(float size) { nvgFontSize(m_vg, size); }
   inline void font_face(const char *face) { nvgFontFace(m_vg, face); }
-  inline void text_align(const Align &align) { nvgTextAlign(m_vg, align); }
-  inline void fill_color(const int r, const int g, const int b, const int a) {
-    nvgFillColor(m_vg, nvgRGBA(r, g, b, a));
+  inline void text_align(const int align) { nvgTextAlign(m_vg, align); }
+  inline void fill_color(const RGBA &color) {
+    nvgFillColor(m_vg, nvgRGBA(color.m_r, color.m_g, color.m_b, color.m_a));
   }
 
   inline void text(const float x, const float y, const char *string,
@@ -106,81 +109,12 @@ class BackendGL {
     nvgText(m_vg, x, y, string, end);
   }
 
-  void init(int x_pixels, int y_pixels, const char *name) {
-    m_window = create_window(x_pixels, y_pixels, name);
-    if (!window)
-      throw XX;
-    init_imgui(m_window);
-    m_vg = init_nanovg();
-    if (!m_vg)
-      throw XX;
-  }
-
-  NVGcontext *init_nanovg() {
-    NVGcontext *vg =
-        nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
-    int fontNormal = nvgCreateFont(vg, "sans", "../font/Roboto-Regular.ttf");
-    if (fontNormal == -1) {
-      printf("Could not add font italic.\n");
-      return nullptr;
-    }
-    int fontBold = nvgCreateFont(vg, "sans-bold", "../font/Roboto-Bold.ttf");
-    if (fontBold == -1) {
-      printf("Could not add font bold.\n");
-      return nullptr;
-    }
-    int fontEmoji = nvgCreateFont(vg, "emoji", "../font/NotoEmoji-Regular.ttf");
-    if (fontEmoji == -1) {
-      printf("Could not add font emoji.\n");
-      return nullptr;
-    }
-    nvgAddFallbackFontId(vg, fontNormal, fontEmoji);
-    nvgAddFallbackFontId(vg, fontBold, fontEmoji);
-    return vg;
-  }
-
-  void init_imgui(GLFWwindow *window) {
-    // Setup Dear ImGui binding
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    (void)io;
-    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard
-    // Controls io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable
-    // Gamepad Controls
-    ImGui_ImplGlfwGL3_Init(window, true);
-
-    // Setup style
-    ImGui::StyleColorsDark();
-  }
-
-  GLFWwindow *create_window(int x_pixels, int y_pixels, const char *name) {
-    // Setup window
-    glfwSetErrorCallback(glfw_error_callback);
-    if (!glfwInit())
-      return nullptr;
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#if __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-    GLFWwindow *window =
-        glfwCreateWindow(1280, 720, "C++ Plotting Test", NULL, NULL);
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1); // Enable vsync
-    // gl3wInit();
-    // gladLoadGL();
-    if (!gladLoadGL()) {
-      exit(-1);
-    }
-    std::cout << "OpenGL Version " << GLVersion.major << '.' << GLVersion.minor
-              << std::endl;
-
-    return window;
-  }
-}
+private:
+  NVGcontext *init_nanovg(int x_pixels, int y_pixels);
+  void init_imgui(GLFWwindow *window);
+  GLFWwindow *create_window(int x_pixels, int y_pixels, const char *name);
+};
 
 } // namespace trase
 
-#endif // FIGURE_H_
+#endif // BACKENDGL_H_
