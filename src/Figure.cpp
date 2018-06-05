@@ -42,7 +42,7 @@ template <typename Backend> int Figure<Backend>::m_num_windows = 0;
 
 template <typename Backend>
 Figure<Backend>::Figure(const std::array<int, 2> &pixels)
-    : m_id(++m_num_windows), m_pixels(pixels), m_axis({0.1, 0.1, 0.9, 0.9}) {
+    : m_id(++m_num_windows), m_pixels(pixels), m_axis({0.1, 0.1, 0.8, 0.8}) {
   this->m_children.push_back(&m_axis);
 }
 

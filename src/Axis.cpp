@@ -53,7 +53,7 @@ void Axis<Backend>::draw_me(Drawable<Backend> &parent, Backend &backend) {
   const float &ymax = m_limits[3];
 
   // axis lines
-  const float lw = 5.0f;
+  const float lw = 0.002f;
   backend.begin_path();
   backend.move_to(x - lw / 2, y + h);
   backend.line_to(x + w, y + h);
@@ -78,7 +78,7 @@ void Axis<Backend>::draw_me(Drawable<Backend> &parent, Backend &backend) {
   const float tick_dx = h / ny_ticks;
   const float tick_dx_y = (ymax - ymin) / ny_ticks;
   const int nx_ticks = w / tick_dx;
-  const float tick_len = 15.0f;
+  const float tick_len = 0.02f;
   const float tick_dx_x = (xmax - xmin) / nx_ticks;
 
   backend.begin_path();

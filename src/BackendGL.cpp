@@ -84,6 +84,9 @@ void BackendGL::begin_frame() {
   // glClear(GL_COLOR_BUFFER_BIT);
 
   nvgBeginFrame(m_vg, winWidth, winHeight, pxRatio);
+
+  nvgResetTransform(m_vg);
+  nvgScale(m_vg, winWidth, winHeight);
 }
 
 void BackendGL::end_frame() {
@@ -142,8 +145,6 @@ NVGcontext *BackendGL::init_nanovg(int x_pixels, int y_pixels) {
   }
   nvgAddFallbackFontId(vg, fontNormal, fontEmoji);
   nvgAddFallbackFontId(vg, fontBold, fontEmoji);
-  nvgScale(vg, 1.0 / static_cast<float>(x_pixels),
-           1.0 / static_cast<float>(y_pixels));
   return vg;
 }
 
