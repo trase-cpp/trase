@@ -98,7 +98,10 @@ target_include_directories(nanovg SYSTEM PUBLIC ${nanovg_dir})
 target_link_libraries(nanovg PUBLIC ${OPENGL_gl_LIBRARY} glfw dl)
 
 
-add_library(trase src/Figure.cpp
+add_library(trase
+    src/Drawable.cpp
+    src/Drawable.hpp
+    src/Figure.cpp
     src/Figure.hpp
     src/Axis.cpp
     src/Axis.hpp
@@ -109,6 +112,10 @@ target_include_directories(trase PUBLIC src)
 target_link_libraries(trase PUBLIC glext nanovg imgui)
 
 enable_testing()
+
+add_executable(interactive_test tests/TestInteractive.cpp)
+target_include_directories(interactive_test PRIVATE tests)
+target_link_libraries(interactive_test PRIVATE trase)
 
 add_executable(figure_test tests/TestFigure.cpp)
 target_include_directories(figure_test PRIVATE tests)

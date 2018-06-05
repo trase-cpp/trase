@@ -42,13 +42,31 @@ template <typename Backend> int Figure<Backend>::m_num_windows = 0;
 
 template <typename Backend>
 Figure<Backend>::Figure(const std::array<int, 2> &pixels)
-    : m_axis({0.1, 0.1, 0.9, 0.9}) {
-  ++m_num_windows;
-  auto name = "Figure " + std::to_string(m_num_windows);
-  m_backend.init(pixels[0], pixels[1], name.c_str());
+    : m_id(++m_num_windows), m_pixels(pixels), m_axis({0.1, 0.1, 0.9, 0.9}) {
   this->m_children.push_back(&m_axis);
 }
 
+template <typename Backend> void Figure<Backend>::show() {
+  auto name = "Figure " + std::to_string(m_id);
+  m_backend.init(m_pixels[0], m_pixels[1], name.c_str());
+
+  // Main loop
+  while (!m_backend.should_close()) {
+    m_backend.begin_frame();
+    draw();
+    m_backend.end_frame();
+  }
+  m_backend.finalise();
+}
+
+template <typename Backend> void Figure<Backend>::draw() {
+  // draw_me(parent, backend); do it manually here
+
+  // and draw children
+  for (auto &i : this->m_children) {
+    i->draw(*this, m_backend);
+  }
+}
 template <typename Backend>
 void Figure<Backend>::draw_me(Drawable<Backend> &parent, Backend &backend) {}
 

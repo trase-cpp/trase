@@ -31,16 +31,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Figure.hpp"
+#include "Drawable.hpp"
+#include "BackendGL.hpp"
 
 namespace trase {
 
 template <typename Backend>
-bool Drawable<Backend>::draw(Drawable &parent, Backend &backend) {
+void Drawable<Backend>::draw(Drawable &parent, Backend &backend) {
   draw_me(parent, backend);
   for (auto &i : m_children) {
-    m_children->draw(*this, backend);
+    i->draw(*this, backend);
   }
 }
+
+template class Drawable<BackendGL>;
 
 } // namespace trase

@@ -31,38 +31,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FIGURE_H_
-#define FIGURE_H_
+// This tells Catch to provide a main() - only do this in one cpp file
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
 
-#include "Axis.hpp"
-#include "BackendGL.hpp"
-#include "Drawable.hpp"
-#include <array>
-#include <memory>
+#include <limits>
+#include <type_traits>
 
-namespace trase {
+#include "trase.hpp"
 
-template <typename Backend> class Figure : public Drawable<Backend> {
-  BackendGL m_backend;
-  int m_id;
-  const std::array<int, 2> &m_pixels;
-  Axis<Backend> m_axis;
-  static int m_num_windows;
+using namespace trase;
 
-public:
-  Figure(const std::array<int, 2> &pixels);
-  void show();
-
-  void draw();
-  virtual void draw_me(Drawable<Backend> &parent, Backend &backend);
-  Axis<Backend> &axis() { return m_axis; }
-};
-
-template <typename Backend>
-std::shared_ptr<Figure<Backend>>
-figure(std::array<int, 2> pixels = {{1280, 720}}) {
-  return std::make_shared<Figure<Backend>>(pixels);
+// This tests the output of the `get_nth_prime` function
+TEST_CASE("interactive test (only run by a human)", "[interactive]") {
+  auto fig = figure<BackendGL>();
+  fig->show();
 }
-} // namespace trase
-
-#endif // FIGURE_H_

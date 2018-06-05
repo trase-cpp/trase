@@ -108,6 +108,7 @@ public:
                    const char *end) {
     nvgText(m_vg, x, y, string, end);
   }
+  inline bool should_close() { return glfwWindowShouldClose(m_window); }
 
 private:
   NVGcontext *init_nanovg(int x_pixels, int y_pixels);
