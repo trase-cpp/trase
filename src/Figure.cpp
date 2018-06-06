@@ -42,17 +42,21 @@ template <typename Backend> int Figure<Backend>::m_num_windows = 0;
 
 template <typename Backend>
 Figure<Backend>::Figure(const std::array<int, 2> &pixels)
-    : m_id(++m_num_windows), m_pixels(pixels), m_axis({0.1, 0.1, 0.8, 0.8}) {
+    : Drawable<Backend>(
+          {0, 0, static_cast<float>(pixels[0]), static_cast<float>(pixels[1])}),
+      m_id(++m_num_windows), m_axis({0.1f, 0.1f, 0.8f, 0.8f}) {
   this->m_children.push_back(&m_axis);
 }
 
 template <typename Backend> void Figure<Backend>::show() {
   auto name = "Figure " + std::to_string(m_id);
-  m_backend.init(m_pixels[0], m_pixels[1], name.c_str());
+  m_backend.init(this->m_pixels[2], this->m_pixels[3], name.c_str());
 
   // Main loop
   while (!m_backend.should_close()) {
-    m_backend.begin_frame();
+    auto win_limits = m_backend.begin_frame();
+    this->m_pixels[2] = win_limits[0];
+    this->m_pixels[3] = win_limits[1];
     draw();
     m_backend.end_frame();
   }

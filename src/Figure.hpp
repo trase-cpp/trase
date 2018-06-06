@@ -45,7 +45,6 @@ namespace trase {
 template <typename Backend> class Figure : public Drawable<Backend> {
   BackendGL m_backend;
   int m_id;
-  const std::array<int, 2> &m_pixels;
   Axis<Backend> m_axis;
   static int m_num_windows;
 

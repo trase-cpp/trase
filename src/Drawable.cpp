@@ -37,7 +37,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 template <typename Backend>
+Drawable<Backend>::Drawable(const std::array<float, 4> &area_of_parent)
+    : m_area_of_parent(area_of_parent), m_pixels{} {}
+
+template <typename Backend>
 void Drawable<Backend>::draw(Drawable &parent, Backend &backend) {
+  m_pixels[0] = m_area_of_parent[0] * parent.m_pixels[2] + parent.m_pixels[0];
+  m_pixels[1] = m_area_of_parent[1] * parent.m_pixels[3] + parent.m_pixels[1];
+  m_pixels[2] = m_area_of_parent[2] * parent.m_pixels[2];
+  m_pixels[3] = m_area_of_parent[3] * parent.m_pixels[3];
+
   draw_me(parent, backend);
   for (auto &i : m_children) {
     i->draw(*this, backend);

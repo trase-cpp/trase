@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 template <typename Backend> class Axis : public Drawable<Backend> {
-  std::array<float, 4> m_area;   // window area {x_min,y_min,x_max,ymax}
   std::array<float, 4> m_limits; // plot extents {x_min,y_min,x_max,ymax}
 public:
   Axis(const std::array<float, 4> &area);

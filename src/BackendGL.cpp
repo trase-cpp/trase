@@ -64,7 +64,7 @@ void BackendGL::finalise() {
   glfwTerminate();
 }
 
-void BackendGL::begin_frame() {
+std::array<int, 2> BackendGL::begin_frame() {
   glfwPollEvents();
   ImGui_ImplGlfwGL3_NewFrame();
 
@@ -79,14 +79,15 @@ void BackendGL::begin_frame() {
 
   glViewport(0, 0, fbWidth, fbHeight);
   // glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-  glClearColor(0.3f, 0.3f, 0.32f, 1.0f);
+  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   // glClear(GL_COLOR_BUFFER_BIT);
 
   nvgBeginFrame(m_vg, winWidth, winHeight, pxRatio);
 
-  nvgResetTransform(m_vg);
-  nvgScale(m_vg, winWidth, winHeight);
+  // nvgResetTransform(m_vg);
+  // nvgScale(m_vg, winWidth / 100.0, winHeight / 100.0);
+  return std::array<int, 2>({winWidth, winHeight});
 }
 
 void BackendGL::end_frame() {

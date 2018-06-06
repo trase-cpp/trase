@@ -86,10 +86,17 @@ public:
 
   void init(int x_pixels, int y_pixels, const char *name);
   void finalise();
-  void begin_frame();
+  std::array<int, 2> begin_frame();
   void end_frame();
 
   inline void begin_path() { nvgBeginPath(m_vg); }
+  inline void rounded_rect(const float x, const float y, const float w,
+                           const float h, const float r) {
+    nvgRoundedRect(m_vg, x, y, w, h, r);
+  }
+  inline void rect(const float x, const float y, const float w, const float h) {
+    nvgRect(m_vg, x, y, w, h);
+  }
   inline void move_to(const float x, const float y) { nvgMoveTo(m_vg, x, y); }
   inline void line_to(const float x, const float y) { nvgLineTo(m_vg, x, y); }
   inline void stroke_color(const RGBA &color) {
@@ -97,8 +104,10 @@ public:
   }
   inline void stroke_width(const float lw) { nvgStrokeWidth(m_vg, lw); }
   inline void stroke() { nvgStroke(m_vg); }
+  inline void fill() { nvgFill(m_vg); }
   inline void font_size(float size) { nvgFontSize(m_vg, size); }
   inline void font_face(const char *face) { nvgFontFace(m_vg, face); }
+  inline void font_blur(const float blur) { nvgFontBlur(m_vg, blur); }
   inline void text_align(const int align) { nvgTextAlign(m_vg, align); }
   inline void fill_color(const RGBA &color) {
     nvgFillColor(m_vg, nvgRGBA(color.m_r, color.m_g, color.m_b, color.m_a));
@@ -108,6 +117,11 @@ public:
                    const char *end) {
     nvgText(m_vg, x, y, string, end);
   }
+  inline void text_bounds(const float x, const float y, const char *string,
+                          const char *end, float *bounds) {
+    nvgTextBounds(m_vg, x, y, string, end, bounds);
+  }
+
   inline bool should_close() { return glfwWindowShouldClose(m_window); }
 
 private:

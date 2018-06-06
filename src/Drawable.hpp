@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef DRAWABLE_H_
 #define DRAWABLE_H_
 
+#include <array>
 #include <vector>
 
 namespace trase {
@@ -41,9 +42,11 @@ namespace trase {
 template <typename Backend> class Drawable {
 protected:
   std::vector<Drawable *> m_children;
+  std::array<float, 4> m_area_of_parent;
+  std::array<int, 4> m_pixels;
 
 public:
-  Drawable() {}
+  Drawable(const std::array<float, 4> &area_of_parent);
   void draw(Drawable &parent, Backend &backend);
   virtual void draw_me(Drawable &parent, Backend &backend) = 0;
 };
