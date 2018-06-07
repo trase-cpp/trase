@@ -31,27 +31,61 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef AXIS_H_
-#define AXIS_H_
-
-#include "Drawable.hpp"
-#include <array>
+#include "Plot1D.hpp"
+#include "BackendGL.hpp"
 
 namespace trase {
 
-class Axis : public Drawable {
-  /// plot extents [x_min,y_min,x_max,y_max]
-  std::array<float, 4> m_limits;
+void set_values(const std::vector<float> &x, const std::vector<float> &y) {
+  if (x.size() != y.size()) {
+    throw Exception("x and y vector sizes do not match");
+  }
+  m_x.resize(x.size());
+  std::copy(x.begin(), x.end(), m_x.begin());
+  auto minmax = std::minmax_element(x.begin(), x.end());
+  m_limits[0] = minmax.first;
+  m_limits[2] = minmax.second;
+  m_y.resize(y.size());
+  std::copy(y.begin(), y.end(), m_y.begin());
+  minmax = std::minmax_element(x.begin(), x.end());
+  m_limits[1] = minmax.first;
+  m_limits[3] = minmax.second;
+  m_axis.update_plot_range(m_limits);
+}
 
-public:
-  Axis(const std::array<float, 4> &area);
+template <typename Backend> void Plot1D::draw(Backend &backend) {
+  const float &x = m_pixels[0];
+  const float &y = m_pixels[1];
+  const float &w = m_pixels[2];
+  const float &h = m_pixels[3];
 
-  void add_limits(const std::array<float, 4> limits);
+  const float &xmin = m_limits[0];
+  const float &ymin = m_limits[1];
+  const float &xmax = m_limits[2];
+  const float &ymax = m_limits[3];
 
-  template <typename Backend> void draw(Backend &backend);
+  const float inv_yh = 1.0 / (ymax - ymin);
+  const float inv_xw = 1.0 / (xmax - xmin);
 
-}; // namespace trase
+  auto f_win_x = [&](const auto i) { return x + w * (i - xmin) * inv_xw; };
+  auto f_win_y = [&](const auto i) {
+    return y + h * (1 - (i - ymin) * inv_yh);
+  };
+
+  const float win_x = f_win_x(m_x[0]);
+  const float win_y = f_win_y(m_y[0]);
+  backend.begin_path();
+  backend.move_to(win_x, win_y);
+  for (int i = 1; i < m_x.size(); ++i) {
+    const float win_x = f_win_x(m_x[i]);
+    const float win_y = f_win_y(m_y[i]);
+    backend.line_to(vg, win_x, win_y);
+  }
+  backend.stroke_color(RGBA(0, 50, 100, 200));
+  backend.stroke_width(vg, 3.0f);
+  backend.stroke();
+}
+
+template void Plot1D::draw<BackendGL>(BackendGL &backend);
 
 } // namespace trase
-
-#endif // AXIS_H_

@@ -39,6 +39,8 @@ namespace trase {
 Axis::Axis(const std::array<float, 4> &area)
     : Drawable(area), m_limits{{0, 0, 1, 1}} {}
 
+void Axis::add_limits(const std::array<float, 4> limits) {}
+
 template <typename Backend> void Axis::draw(Backend &backend) {
   const float &x = m_pixels[0];
   const float &y = m_pixels[1];

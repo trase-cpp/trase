@@ -31,23 +31,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef AXIS_H_
-#define AXIS_H_
+#ifndef PLOT1D_H_
+#define PLOT1D_H_
 
 #include "Drawable.hpp"
 #include <array>
 
 namespace trase {
 
-class Axis : public Drawable {
-  /// plot extents [x_min,y_min,x_max,y_max]
+class Plot1D : public Drawable {
+  /// x values
+  std::vector<float> m_x;
+
+  /// y values
+  std::vector<float> m_y;
+
+  /// [xmin, ymin, xmax, ymax]
   std::array<float, 4> m_limits;
 
+  /// parent axis
+  Axis &m_axis;
+
 public:
-  Axis(const std::array<float, 4> &area);
-
-  void add_limits(const std::array<float, 4> limits);
-
+  Plot1D(Axis &axis) : m_axis(axis) {}
+  void set_values(const std::vector<float> &x, const std::vector<float> &y);
   template <typename Backend> void draw(Backend &backend);
 
 }; // namespace trase
