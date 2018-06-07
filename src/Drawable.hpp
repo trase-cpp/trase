@@ -41,8 +41,15 @@ namespace trase {
 
 class Drawable {
 protected:
+  /// a list of Drawables that are children of this object
   std::vector<Drawable *> m_children;
+
+  /// the area of this object as a ratio of its parent object
+  /// [minx, miny, width, height]
   std::array<float, 4> m_area;
+
+  /// the area of this object in raw pixels
+  /// [minx, miny, width, height]
   std::array<float, 4> m_pixels;
 
 public:

@@ -40,7 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 class Axis : public Drawable {
-  std::array<float, 4> m_limits; // plot extents {x_min,y_min,x_max,ymax}
+  /// plot extents [x_min,y_min,x_max,y_max]
+  std::array<float, 4> m_limits;
+
 public:
   Axis(const std::array<float, 4> &area);
 

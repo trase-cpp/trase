@@ -43,8 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 class Figure : public Drawable {
+  /// a unique id for this figure
   int m_id;
+
+  /// the axis object for this figure
   Axis m_axis;
+
+  /// total number of figures currentl created
   static int m_num_windows;
 
 public:
