@@ -39,16 +39,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend> class Drawable {
+class Drawable {
 protected:
   std::vector<Drawable *> m_children;
-  std::array<float, 4> m_area_of_parent;
-  std::array<int, 4> m_pixels;
+  std::array<float, 4> m_area;
+  std::array<float, 4> m_pixels;
 
 public:
-  Drawable(const std::array<float, 4> &area_of_parent);
-  void draw(Drawable &parent, Backend &backend);
-  virtual void draw_me(Drawable &parent, Backend &backend) = 0;
+  Drawable(const std::array<float, 4> &area);
+  void resize(const std::array<float, 4> &parent_pixels);
+  template <typename Backend> void draw(Backend &backend);
 };
 
 } // namespace trase

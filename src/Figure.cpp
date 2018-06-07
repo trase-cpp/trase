@@ -38,41 +38,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend> int Figure<Backend>::m_num_windows = 0;
+int Figure::m_num_windows = 0;
 
-template <typename Backend>
-Figure<Backend>::Figure(const std::array<int, 2> &pixels)
-    : Drawable<Backend>(
+Figure::Figure(const std::array<int, 2> &pixels)
+    : Drawable(
           {0, 0, static_cast<float>(pixels[0]), static_cast<float>(pixels[1])}),
       m_id(++m_num_windows), m_axis({0.1f, 0.1f, 0.8f, 0.8f}) {
   this->m_children.push_back(&m_axis);
 }
 
-template <typename Backend> void Figure<Backend>::show() {
+template <typename Backend> void Figure::show(Backend &backend) {
   auto name = "Figure " + std::to_string(m_id);
-  m_backend.init(this->m_pixels[2], this->m_pixels[3], name.c_str());
+  backend.init(this->m_pixels[2], this->m_pixels[3], name.c_str());
 
   // Main loop
-  while (!m_backend.should_close()) {
-    auto win_limits = m_backend.begin_frame();
-    this->m_pixels[2] = win_limits[0];
-    this->m_pixels[3] = win_limits[1];
-    draw();
-    m_backend.end_frame();
+  while (!backend.should_close()) {
+    auto win_limits = backend.begin_frame();
+    if (win_limits[0] != m_pixels[2] || win_limits[1] != m_pixels[3]) {
+      m_pixels[2] = win_limits[0];
+      m_pixels[3] = win_limits[1];
+      m_axis.resize(m_pixels);
+    }
+    draw(backend);
+    backend.end_frame();
   }
-  m_backend.finalise();
+  backend.finalise();
 }
 
-template <typename Backend> void Figure<Backend>::draw() {
-  // draw_me(parent, backend); do it manually here
-
-  // and draw children
-  for (auto &i : this->m_children) {
-    i->draw(*this, m_backend);
-  }
+template <typename Backend> void Figure::draw(Backend &backend) {
+  m_axis.draw(backend);
 }
-template <typename Backend>
-void Figure<Backend>::draw_me(Drawable<Backend> &parent, Backend &backend) {}
 
-template class Figure<BackendGL>;
+template void Figure::draw<BackendGL>(BackendGL &backend);
+template void Figure::show<BackendGL>(BackendGL &backend);
+
 } // namespace trase

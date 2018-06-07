@@ -36,23 +36,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend>
-Drawable<Backend>::Drawable(const std::array<float, 4> &area_of_parent)
-    : m_area_of_parent(area_of_parent), m_pixels{} {}
+Drawable::Drawable(const std::array<float, 4> &area_of_parent)
+    : m_area(area_of_parent), m_pixels{} {}
 
-template <typename Backend>
-void Drawable<Backend>::draw(Drawable &parent, Backend &backend) {
-  m_pixels[0] = m_area_of_parent[0] * parent.m_pixels[2] + parent.m_pixels[0];
-  m_pixels[1] = m_area_of_parent[1] * parent.m_pixels[3] + parent.m_pixels[1];
-  m_pixels[2] = m_area_of_parent[2] * parent.m_pixels[2];
-  m_pixels[3] = m_area_of_parent[3] * parent.m_pixels[3];
-
-  draw_me(parent, backend);
+void Drawable::resize(const std::array<float, 4> &parent_pixels) {
+  m_pixels[0] = m_area[0] * parent_pixels[2] + parent_pixels[0];
+  m_pixels[1] = m_area[1] * parent_pixels[3] + parent_pixels[1];
+  m_pixels[2] = m_area[2] * parent_pixels[2];
+  m_pixels[3] = m_area[3] * parent_pixels[3];
   for (auto &i : m_children) {
-    i->draw(*this, backend);
+    i->resize(m_pixels);
   }
 }
 
-template class Drawable<BackendGL>;
+template <typename Backend> void Drawable::draw(Backend &backend) {}
+
+template void Drawable::draw<BackendGL>(BackendGL &backend);
 
 } // namespace trase

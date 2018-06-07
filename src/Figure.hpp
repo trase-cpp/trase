@@ -42,26 +42,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend> class Figure : public Drawable<Backend> {
-  BackendGL m_backend;
+class Figure : public Drawable {
   int m_id;
-  Axis<Backend> m_axis;
+  Axis m_axis;
   static int m_num_windows;
 
 public:
   Figure(const std::array<int, 2> &pixels);
-  void show();
 
-  void draw();
-  virtual void draw_me(Drawable<Backend> &parent, Backend &backend);
-  Axis<Backend> &axis() { return m_axis; }
+  Axis &axis() { return m_axis; }
+
+  template <typename Backend> void show(Backend &backend);
+
+  template <typename Backend> void draw(Backend &backend);
 };
 
-template <typename Backend>
-std::shared_ptr<Figure<Backend>>
-figure(std::array<int, 2> pixels = {{1280, 720}}) {
-  return std::make_shared<Figure<Backend>>(pixels);
+inline std::shared_ptr<Figure> figure(std::array<int, 2> pixels = {
+                                          {1280, 720}}) {
+  return std::make_shared<Figure>(pixels);
 }
+
 } // namespace trase
 
 #endif // FIGURE_H_

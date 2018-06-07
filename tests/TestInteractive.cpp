@@ -44,6 +44,7 @@ using namespace trase;
 
 // This tests the output of the `get_nth_prime` function
 TEST_CASE("interactive test (only run by a human)", "[interactive]") {
-  auto fig = figure<BackendGL>();
-  fig->show();
+  auto fig = figure();
+  BackendGL backend;
+  fig->show(backend);
 }

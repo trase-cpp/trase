@@ -36,16 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend>
-Axis<Backend>::Axis(const std::array<float, 4> &area)
-    : Drawable<Backend>(area), m_limits{{0, 0, 1, 1}} {}
+Axis::Axis(const std::array<float, 4> &area)
+    : Drawable(area), m_limits{{0, 0, 1, 1}} {}
 
-template <typename Backend>
-void Axis<Backend>::draw_me(Drawable<Backend> &parent, Backend &backend) {
-  const float &x = this->m_pixels[0];
-  const float &y = this->m_pixels[1];
-  const float &w = this->m_pixels[2];
-  const float &h = this->m_pixels[3];
+template <typename Backend> void Axis::draw(Backend &backend) {
+  const float &x = m_pixels[0];
+  const float &y = m_pixels[1];
+  const float &w = m_pixels[2];
+  const float &h = m_pixels[3];
 
   const float &xmin = m_limits[0];
   const float &ymin = m_limits[1];
@@ -121,6 +119,6 @@ void Axis<Backend>::draw_me(Drawable<Backend> &parent, Backend &backend) {
   backend.stroke();
 }
 
-template class Axis<BackendGL>;
+template void Axis::draw<BackendGL>(BackendGL &backend);
 
 } // namespace trase

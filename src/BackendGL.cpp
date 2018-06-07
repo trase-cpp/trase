@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "imgui_impl_glfw_gl3.h"
 
 namespace trase {
-
 static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Error %d: %s\n", error, description);
 }
@@ -102,6 +101,7 @@ GLFWwindow *BackendGL::create_window(int x_pixels, int y_pixels,
                                      const char *name) {
   // Setup window
   glfwSetErrorCallback(glfw_error_callback);
+  // glfwSetWindowRefreshCallback(m_handle, glfw_window_refresh_callback);
   if (!glfwInit())
     throw Exception("Could not initialise GLFW");
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
