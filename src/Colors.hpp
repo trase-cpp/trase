@@ -31,47 +31,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef PLOT1D_H_
-#define PLOT1D_H_
+#ifndef COLORS_H_
+#define COLORS_H_
 
-// forward declare Plot1D so can be used in Axis
-namespace trase {
-class Plot1D;
-}
-
-#include "Axis.hpp"
-#include "Colors.hpp"
-#include "Drawable.hpp"
-#include "Exception.hpp"
 #include <array>
 
 namespace trase {
 
-class Plot1D : public Drawable {
-  /// x values
-  std::vector<float> m_x;
+struct RGBA {
+  RGBA() {}
+  RGBA(int r, int g, int b, int a) : m_r(r), m_g(g), m_b(b), m_a(a) {}
+  int m_r, m_g, m_b, m_a;
+};
 
-  /// y values
-  std::vector<float> m_y;
-
-  /// [xmin, ymin, xmax, ymax]
-  std::array<float, 4> m_limits;
-
-  RGBA m_color;
-
-  /// parent axis
-  Axis &m_axis;
-
-public:
-  Plot1D(Axis &axis) : Drawable({0, 0, 1, 1}), m_axis(axis) {}
-
-  void set_values(std::vector<float> &&x, std::vector<float> &&y);
-  void set_color(const RGBA &color) { m_color = color; }
-
-  template <typename Backend> void draw(Backend &backend);
-
-}; // namespace trase
+const static float default_alpha = 200;
+const static std::array<RGBA, 10> default_colors = {
+    RGBA(31, 119, 180, default_alpha),  RGBA(255, 127, 14, default_alpha),
+    RGBA(44, 160, 44, default_alpha),   RGBA(214, 39, 40, default_alpha),
+    RGBA(148, 103, 189, default_alpha), RGBA(140, 86, 75, default_alpha),
+    RGBA(227, 119, 194, default_alpha), RGBA(127, 127, 127, default_alpha),
+    RGBA(188, 189, 34, default_alpha),  RGBA(23, 190, 207, default_alpha)};
 
 } // namespace trase
 
-#endif // PLOT1D_H_
+#endif // COLORS_H_

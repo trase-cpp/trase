@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "nanovg.h"
 
+#include "Colors.hpp"
 #include "Exception.hpp"
 
 namespace trase {
@@ -60,11 +61,6 @@ enum Align {
   ALIGN_MIDDLE = 1 << 4,   // Align text vertically to middle.
   ALIGN_BOTTOM = 1 << 5,   // Align text vertically to bottom.
   ALIGN_BASELINE = 1 << 6, // Default, align text vertically to baseline.
-};
-
-struct RGBA {
-  RGBA(int r, int g, int b, int a) : m_r(r), m_g(g), m_b(b), m_a(a) {}
-  int m_r, m_g, m_b, m_a;
 };
 
 class BackendGL {

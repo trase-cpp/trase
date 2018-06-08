@@ -44,15 +44,21 @@ Axis::Axis(const std::array<float, 4> &area)
                                 std::numeric_limits<float>::min()}} {}
 
 void Axis::add_limits(const std::array<float, 4> limits) {
+  const float buffer = 0.05;
+  const float xbuffer = buffer * (limits[2] - limits[0]);
+  const float ybuffer = buffer * (limits[3] - limits[1]);
+  const std::array<float, 4> new_limits = {
+      {limits[0] - xbuffer, limits[1] - ybuffer, limits[2] + xbuffer,
+       limits[3] + xbuffer}};
   // loop over dimensions
   for (int i = 0; i < 2; ++i) {
     // if min limit less then update
-    if (limits[i] < m_limits[i]) {
-      m_limits[i] = limits[i];
+    if (new_limits[i] < m_limits[i]) {
+      m_limits[i] = new_limits[i];
     }
     // if max limit greater then update
-    if (limits[2 + i] > m_limits[2 + i]) {
-      m_limits[2 + i] = limits[2 + i];
+    if (new_limits[2 + i] > m_limits[2 + i]) {
+      m_limits[2 + i] = new_limits[2 + i];
     }
   }
 }
@@ -62,6 +68,7 @@ std::shared_ptr<Plot1D> Axis::plot_impl(std::vector<float> &&x,
   m_plot1d.emplace_back(new Plot1D(*this));
   m_children.push_back(&*m_plot1d.back());
   m_plot1d.back()->set_values(std::move(x), std::move(y));
+  m_plot1d.back()->set_color(default_colors[m_plot1d.size() - 1]);
   return m_plot1d.back();
 }
 
@@ -82,7 +89,8 @@ template <typename Backend> void Axis::draw(Backend &backend) {
   // axis box
   backend.begin_path();
   backend.rect(x, y, w, h);
-  backend.stroke();
+  backend.fill_color(RGBA(0, 0, 0, 20));
+  backend.fill();
 
   // axis lines
   /*

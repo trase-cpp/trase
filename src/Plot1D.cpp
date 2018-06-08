@@ -77,7 +77,7 @@ template <typename Backend> void Plot1D::draw(Backend &backend) {
     const float win_y = f_win_y(m_y[i]);
     backend.line_to(win_x, win_y);
   }
-  backend.stroke_color(RGBA(0, 50, 100, 200));
+  backend.stroke_color(m_color);
   backend.stroke_width(3.0f);
   backend.stroke();
 }

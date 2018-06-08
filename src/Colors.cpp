@@ -31,47 +31,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef PLOT1D_H_
-#define PLOT1D_H_
-
-// forward declare Plot1D so can be used in Axis
-namespace trase {
-class Plot1D;
-}
-
-#include "Axis.hpp"
 #include "Colors.hpp"
-#include "Drawable.hpp"
-#include "Exception.hpp"
-#include <array>
 
-namespace trase {
-
-class Plot1D : public Drawable {
-  /// x values
-  std::vector<float> m_x;
-
-  /// y values
-  std::vector<float> m_y;
-
-  /// [xmin, ymin, xmax, ymax]
-  std::array<float, 4> m_limits;
-
-  RGBA m_color;
-
-  /// parent axis
-  Axis &m_axis;
-
-public:
-  Plot1D(Axis &axis) : Drawable({0, 0, 1, 1}), m_axis(axis) {}
-
-  void set_values(std::vector<float> &&x, std::vector<float> &&y);
-  void set_color(const RGBA &color) { m_color = color; }
-
-  template <typename Backend> void draw(Backend &backend);
-
-}; // namespace trase
-
-} // namespace trase
-
-#endif // PLOT1D_H_
+namespace trase {} // namespace trase
