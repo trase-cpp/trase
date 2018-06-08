@@ -58,8 +58,9 @@ public:
   void add_limits(const std::array<float, 4> limits);
 
   // Container1 and 2 should be std::span in C++20?
-  template <typename Container1, typename Container2>
-  std::shared_ptr<Plot1D> plot(const Container1 &x, const Container2 &y) {
+  template <typename T1, typename T2>
+  std::shared_ptr<Plot1D> plot(const std::vector<T1> &x,
+                               const std::vector<T2> &y) {
     if (x.size() != y.size()) {
       throw Exception("x and y vector sizes do not match");
     }
