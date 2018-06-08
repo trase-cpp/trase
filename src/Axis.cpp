@@ -39,7 +39,27 @@ namespace trase {
 Axis::Axis(const std::array<float, 4> &area)
     : Drawable(area), m_limits{{0, 0, 1, 1}} {}
 
-void Axis::add_limits(const std::array<float, 4> limits) {}
+void Axis::add_limits(const std::array<float, 4> limits) {
+  // loop over dimensions
+  for (int i = 0; i < 2; ++i) {
+    // if min limit less then update
+    if (limits[i] < m_limits[i]) {
+      m_limits[i] = limits[i];
+    }
+    // if max limit greater then update
+    if (limits[2 + i] > m_limits[2 + i]) {
+      m_limits[2 + i] = limits[2 + i];
+    }
+  }
+}
+
+std::shared_ptr<Plot1D> Axis::plot_impl(std::vector<float> &&x,
+                                        std::vector<float> &&y) {
+  m_plot1d.emplace_back(new Plot1D(*this));
+  m_children.push_back(&*m_plot1d.back());
+  m_plot1d.back()->set_values(std::move(x), std::move(y));
+  return m_plot1d.back();
+}
 
 template <typename Backend> void Axis::draw(Backend &backend) {
   const float &x = m_pixels[0];
@@ -119,6 +139,11 @@ template <typename Backend> void Axis::draw(Backend &backend) {
   backend.stroke_color(RGBA(0, 0, 0, 255));
   backend.stroke_width(lw / 2);
   backend.stroke();
+
+  // draw plots
+  for (auto &i : m_plot1d) {
+    i->draw(backend);
+  }
 }
 
 template void Axis::draw<BackendGL>(BackendGL &backend);

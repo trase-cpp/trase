@@ -34,21 +34,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AXIS_H_
 #define AXIS_H_
 
+// forward declare Axis so can be stored in Plot1D
+namespace trase {
+class Axis;
+}
+
 #include "Drawable.hpp"
+#include "Exception.hpp"
+#include "Plot1D.hpp"
 #include <array>
+#include <memory>
 
 namespace trase {
 
 class Axis : public Drawable {
   /// plot extents [x_min,y_min,x_max,y_max]
   std::array<float, 4> m_limits;
+  std::vector<std::shared_ptr<Plot1D>> m_plot1d;
 
 public:
   Axis(const std::array<float, 4> &area);
 
   void add_limits(const std::array<float, 4> limits);
 
+  // Container1 and 2 should be std::span in C++20?
+  template <typename Container1, typename Container2>
+  std::shared_ptr<Plot1D> plot(const Container1 &x, const Container2 &y) {
+    if (x.size() != y.size()) {
+      throw Exception("x and y vector sizes do not match");
+    }
+    std::vector<float> x_copy(x.size());
+    std::vector<float> y_copy(y.size());
+    std::copy(x.begin(), x.end(), x_copy.begin());
+    std::copy(y.begin(), y.end(), y_copy.begin());
+    return plot_impl(std::move(x_copy), std::move(y_copy));
+  }
+
   template <typename Backend> void draw(Backend &backend);
+
+private:
+  std::shared_ptr<Plot1D> plot_impl(std::vector<float> &&x,
+                                    std::vector<float> &&y);
 
 }; // namespace trase
 

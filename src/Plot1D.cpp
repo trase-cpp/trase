@@ -33,24 +33,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Plot1D.hpp"
 #include "BackendGL.hpp"
+#include <algorithm>
 
 namespace trase {
 
-void set_values(const std::vector<float> &x, const std::vector<float> &y) {
-  if (x.size() != y.size()) {
-    throw Exception("x and y vector sizes do not match");
-  }
-  m_x.resize(x.size());
-  std::copy(x.begin(), x.end(), m_x.begin());
-  auto minmax = std::minmax_element(x.begin(), x.end());
-  m_limits[0] = minmax.first;
-  m_limits[2] = minmax.second;
-  m_y.resize(y.size());
-  std::copy(y.begin(), y.end(), m_y.begin());
-  minmax = std::minmax_element(x.begin(), x.end());
-  m_limits[1] = minmax.first;
-  m_limits[3] = minmax.second;
-  m_axis.update_plot_range(m_limits);
+void Plot1D::set_values(std::vector<float> &&x, std::vector<float> &&y) {
+  m_x = x;
+  m_y = y;
+  auto minmax = std::minmax_element(m_x.begin(), m_x.end());
+  m_limits[0] = *minmax.first;
+  m_limits[2] = *minmax.second;
+  minmax = std::minmax_element(m_y.begin(), m_y.end());
+  m_limits[1] = *minmax.first;
+  m_limits[3] = *minmax.second;
+  m_axis.add_limits(m_limits);
 }
 
 template <typename Backend> void Plot1D::draw(Backend &backend) {
@@ -76,13 +72,13 @@ template <typename Backend> void Plot1D::draw(Backend &backend) {
   const float win_y = f_win_y(m_y[0]);
   backend.begin_path();
   backend.move_to(win_x, win_y);
-  for (int i = 1; i < m_x.size(); ++i) {
+  for (size_t i = 1; i < m_x.size(); ++i) {
     const float win_x = f_win_x(m_x[i]);
     const float win_y = f_win_y(m_y[i]);
-    backend.line_to(vg, win_x, win_y);
+    backend.line_to(win_x, win_y);
   }
   backend.stroke_color(RGBA(0, 50, 100, 200));
-  backend.stroke_width(vg, 3.0f);
+  backend.stroke_width(3.0f);
   backend.stroke();
 }
 

@@ -105,6 +105,8 @@ add_library(trase
     src/Figure.hpp
     src/Axis.cpp
     src/Axis.hpp
+    src/Plot1D.cpp
+    src/Plot1D.hpp
     src/BackendGL.cpp
     src/BackendGL.hpp
     src/Exception.hpp)
@@ -117,10 +119,13 @@ add_executable(interactive_test tests/TestInteractive.cpp)
 target_include_directories(interactive_test PRIVATE tests)
 target_link_libraries(interactive_test PRIVATE trase)
 
-add_executable(figure_test tests/TestFigure.cpp)
-target_include_directories(figure_test PRIVATE tests)
-target_link_libraries(figure_test PRIVATE trase)
-add_test(figure_test figure_test)
+add_executable(trase_tests
+    tests/TestFigure.cpp
+    tests/TestPlot1D.cpp
+    )
+target_include_directories(trase_tests PRIVATE tests)
+target_link_libraries(trase_tests PRIVATE trase)
+add_test(tests trase_tests)
 
 
 # Clang tidy as optional static analyzer

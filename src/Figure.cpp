@@ -43,8 +43,8 @@ int Figure::m_num_windows = 0;
 Figure::Figure(const std::array<int, 2> &pixels)
     : Drawable(
           {0, 0, static_cast<float>(pixels[0]), static_cast<float>(pixels[1])}),
-      m_id(++m_num_windows), m_axis({0.1f, 0.1f, 0.8f, 0.8f}) {
-  this->m_children.push_back(&m_axis);
+      m_id(++m_num_windows), m_axis(new Axis({0.1f, 0.1f, 0.8f, 0.8f})) {
+  this->m_children.push_back(&*m_axis);
 }
 
 template <typename Backend> void Figure::show(Backend &backend) {
@@ -57,7 +57,7 @@ template <typename Backend> void Figure::show(Backend &backend) {
     if (win_limits[0] != m_pixels[2] || win_limits[1] != m_pixels[3]) {
       m_pixels[2] = win_limits[0];
       m_pixels[3] = win_limits[1];
-      m_axis.resize(m_pixels);
+      m_axis->resize(m_pixels);
     }
     draw(backend);
     backend.end_frame();
@@ -66,7 +66,7 @@ template <typename Backend> void Figure::show(Backend &backend) {
 }
 
 template <typename Backend> void Figure::draw(Backend &backend) {
-  m_axis.draw(backend);
+  m_axis->draw(backend);
 }
 
 template void Figure::draw<BackendGL>(BackendGL &backend);

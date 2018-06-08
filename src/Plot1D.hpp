@@ -34,7 +34,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PLOT1D_H_
 #define PLOT1D_H_
 
+// forward declare Plot1D so can be used in Axis
+namespace trase {
+class Plot1D;
+}
+
+#include "Axis.hpp"
 #include "Drawable.hpp"
+#include "Exception.hpp"
 #include <array>
 
 namespace trase {
@@ -53,12 +60,14 @@ class Plot1D : public Drawable {
   Axis &m_axis;
 
 public:
-  Plot1D(Axis &axis) : m_axis(axis) {}
-  void set_values(const std::vector<float> &x, const std::vector<float> &y);
+  Plot1D(Axis &axis) : Drawable({0, 0, 1, 1}), m_axis(axis) {}
+
+  void set_values(std::vector<float> &&x, std::vector<float> &&y);
+
   template <typename Backend> void draw(Backend &backend);
 
 }; // namespace trase
 
 } // namespace trase
 
-#endif // AXIS_H_
+#endif // PLOT1D_H_
