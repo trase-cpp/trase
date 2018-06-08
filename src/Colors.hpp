@@ -45,6 +45,9 @@ struct RGBA {
 };
 
 const static float default_alpha = 200;
+
+// default colors taken from d3 category10 color scheme
+// https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
 const static std::array<RGBA, 10> default_colors = {
     RGBA(31, 119, 180, default_alpha),  RGBA(255, 127, 14, default_alpha),
     RGBA(44, 160, 44, default_alpha),   RGBA(214, 39, 40, default_alpha),
