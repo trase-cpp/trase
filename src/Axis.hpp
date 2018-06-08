@@ -49,10 +49,14 @@ namespace trase {
 
 class Axis : public Drawable {
   /// plot extents [x_min,y_min,x_max,y_max]
-  std::array<float, 4> m_limits;
   std::vector<std::shared_ptr<Plot1D>> m_plot1d;
 
+protected:
+  std::array<float, 4> m_limits;
+
 public:
+  friend class Plot1D;
+
   Axis(const std::array<float, 4> &area);
 
   void add_limits(const std::array<float, 4> limits);

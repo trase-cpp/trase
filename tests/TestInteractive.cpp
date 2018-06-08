@@ -45,6 +45,12 @@ using namespace trase;
 // This tests the output of the `get_nth_prime` function
 TEST_CASE("interactive test (only run by a human)", "[interactive]") {
   auto fig = figure();
+  auto ax = fig->axis();
+  auto pl1 = ax->plot(std::vector<float>({0, 0.1, 0.5}),
+                      std::vector<float>({0, 0.1, 0.5}));
+  auto pl2 = ax->plot(std::vector<float>({0.2, 0.4, 0.8}),
+                      std::vector<float>({0, 0.2, 1.0}));
+
   BackendGL backend;
   fig->show(backend);
 }

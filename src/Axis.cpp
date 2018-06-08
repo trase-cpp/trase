@@ -33,11 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BackendGL.hpp"
 #include "Figure.hpp"
+#include <limits>
 
 namespace trase {
 
 Axis::Axis(const std::array<float, 4> &area)
-    : Drawable(area), m_limits{{0, 0, 1, 1}} {}
+    : Drawable(area), m_limits{{std::numeric_limits<float>::max(),
+                                std::numeric_limits<float>::max(),
+                                std::numeric_limits<float>::min(),
+                                std::numeric_limits<float>::min()}} {}
 
 void Axis::add_limits(const std::array<float, 4> limits) {
   // loop over dimensions
