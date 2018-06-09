@@ -55,6 +55,7 @@ protected:
 public:
   Drawable(const std::array<float, 4> &area);
   void resize(const std::array<float, 4> &parent_pixels);
+  const std::array<float, 4> &pixels() { return m_pixels; }
   template <typename Backend> void draw(Backend &backend);
 };
 

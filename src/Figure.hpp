@@ -63,7 +63,7 @@ public:
 };
 
 inline std::shared_ptr<Figure> figure(std::array<int, 2> pixels = {
-                                          {1280, 720}}) {
+                                          {800, 600}}) {
   return std::make_shared<Figure>(pixels);
 }
 

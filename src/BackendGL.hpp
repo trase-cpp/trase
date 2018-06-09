@@ -85,6 +85,16 @@ public:
   std::array<int, 2> begin_frame();
   void end_frame();
 
+  inline bool is_interactive() { return true; }
+  inline bool mouse_dragging() { return ImGui::IsMouseDragging(); }
+
+  std::array<float, 2> mouse_drag_delta() {
+    ImVec2 delta = ImGui::GetMouseDragDelta();
+    return std::array<float, 2>({{delta[0], delta[1]}});
+  }
+
+  inline void mouse_drag_reset_delta() { ImGui::ResetMouseDragDelta(); }
+
   inline void begin_path() { nvgBeginPath(m_vg); }
   inline void rounded_rect(const float x, const float y, const float w,
                            const float h, const float r) {

@@ -59,6 +59,25 @@ template <typename Backend> void Figure::show(Backend &backend) {
       m_pixels[3] = win_limits[1];
       m_axis->resize(m_pixels);
     }
+
+    if (backend.is_interactive()) {
+      if (backend.mouse_dragging()) {
+        auto delta = backend.mouse_drag_delta();
+        // scale by axis pixel area
+        const auto &pixels = m_axis->pixels();
+        delta[0] /= -pixels[2];
+        delta[1] /= pixels[3];
+        // scale by axis limits
+        const auto &limits = m_axis->limits();
+        const float limit_w = limits[2] - limits[0];
+        const float limit_h = limits[3] - limits[1];
+        delta[0] *= limit_w;
+        delta[1] *= limit_h;
+        m_axis->translate_limits(delta);
+        backend.mouse_drag_reset_delta();
+      }
+    }
+
     draw(backend);
     backend.end_frame();
   }

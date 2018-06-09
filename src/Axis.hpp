@@ -61,6 +61,8 @@ public:
   Axis(const std::array<float, 4> &area);
 
   void add_limits(const std::array<float, 4> limits);
+  void translate_limits(const std::array<float, 2> &delta);
+  const std::array<float, 4> &limits() { return m_limits; }
 
   // Container1 and 2 should be std::span in C++20?
   template <typename T1, typename T2>

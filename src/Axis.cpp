@@ -63,6 +63,13 @@ void Axis::add_limits(const std::array<float, 4> limits) {
   }
 }
 
+void Axis::translate_limits(const std::array<float, 2> &delta) {
+  m_limits[0] += delta[0];
+  m_limits[2] += delta[0];
+  m_limits[1] += delta[1];
+  m_limits[3] += delta[1];
+}
+
 std::shared_ptr<Plot1D> Axis::plot_impl(std::vector<float> &&x,
                                         std::vector<float> &&y) {
   m_plot1d.emplace_back(new Plot1D(*this));
