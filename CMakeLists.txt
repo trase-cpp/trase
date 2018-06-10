@@ -49,53 +49,58 @@ else()
     add_compile_options(-Wall -pedantic)
 endif()
 
-set(imgui_dir ${trase_SOURCE_DIR}/imgui)
-set(imgui_source
-    ${imgui_dir}/imgui.cpp
-    ${imgui_dir}/imgui.h
-    ${imgui_dir}/imgui_draw.cpp
-    ${imgui_dir}/imgui_demo.cpp
-    ${imgui_dir}/imgui_internal.h
-    ${imgui_dir}/imconfig.h
-    ${imgui_dir}/stb_rect_pack.h
-    ${imgui_dir}/stb_textedit.h
-    ${imgui_dir}/stb_truetype.h
-    ${imgui_dir}/imgui_impl_glfw_gl3.h
-    ${imgui_dir}/imgui_impl_glfw_gl3.cpp
-    )
 
-set(glext_dir ${trase_SOURCE_DIR}/glad)
-set(glext_source
-    ${glext_dir}/glad.c
-    ${glext_dir}/glad/glad.h
-    )
+option(trase_BUILD_OPENGL "Build OpenGL backend and interactive test" ON)
 
-set(nanovg_dir ${trase_SOURCE_DIR}/nanovg)
-set(nanovg_source
-    ${nanovg_dir}/fontstash.h
-    ${nanovg_dir}/nanovg.c
-    ${nanovg_dir}/nanovg_gl.h
-    ${nanovg_dir}/nanovg_gl_utils.h
-    ${nanovg_dir}/nanovg.h
-    ${nanovg_dir}/stb_image.h
-    ${nanovg_dir}/stb_truetype.h
-    )
+if (trase_BUILD_OPENGL)
+    set(imgui_dir ${trase_SOURCE_DIR}/imgui)
+    set(imgui_source
+        ${imgui_dir}/imgui.cpp
+        ${imgui_dir}/imgui.h
+        ${imgui_dir}/imgui_draw.cpp
+        ${imgui_dir}/imgui_demo.cpp
+        ${imgui_dir}/imgui_internal.h
+        ${imgui_dir}/imconfig.h
+        ${imgui_dir}/stb_rect_pack.h
+        ${imgui_dir}/stb_textedit.h
+        ${imgui_dir}/stb_truetype.h
+        ${imgui_dir}/imgui_impl_glfw_gl3.h
+        ${imgui_dir}/imgui_impl_glfw_gl3.cpp
+        )
+
+    set(glext_dir ${trase_SOURCE_DIR}/glad)
+    set(glext_source
+        ${glext_dir}/glad.c
+        ${glext_dir}/glad/glad.h
+        )
+
+    set(nanovg_dir ${trase_SOURCE_DIR}/nanovg)
+    set(nanovg_source
+        ${nanovg_dir}/fontstash.h
+        ${nanovg_dir}/nanovg.c
+        ${nanovg_dir}/nanovg_gl.h
+        ${nanovg_dir}/nanovg_gl_utils.h
+        ${nanovg_dir}/nanovg.h
+        ${nanovg_dir}/stb_image.h
+        ${nanovg_dir}/stb_truetype.h
+        )
 
 
-find_package(glfw3 3.2 REQUIRED)
-find_package(OpenGL REQUIRED)
+    find_package(glfw3 3.2 REQUIRED)
+    find_package(OpenGL REQUIRED)
 
-add_library(glext ${glext_source})
-target_include_directories(glext SYSTEM PUBLIC ${glext_dir})
-target_link_libraries(glext PUBLIC ${OPENGL_gl_LIBRARY})
+    add_library(glext ${glext_source})
+    target_include_directories(glext SYSTEM PUBLIC ${glext_dir})
+    target_link_libraries(glext PUBLIC ${OPENGL_gl_LIBRARY})
 
-add_library(imgui ${imgui_source})
-target_include_directories(imgui SYSTEM PUBLIC ${imgui_dir})
-target_link_libraries(imgui PUBLIC  glext glfw dl)
+    add_library(imgui ${imgui_source})
+    target_include_directories(imgui SYSTEM PUBLIC ${imgui_dir})
+    target_link_libraries(imgui PUBLIC  glext glfw dl)
 
-add_library(nanovg ${nanovg_source})
-target_include_directories(nanovg SYSTEM PUBLIC ${nanovg_dir})
-target_link_libraries(nanovg PUBLIC ${OPENGL_gl_LIBRARY} glfw dl)
+    add_library(nanovg ${nanovg_source})
+    target_include_directories(nanovg SYSTEM PUBLIC ${nanovg_dir})
+    target_link_libraries(nanovg PUBLIC ${OPENGL_gl_LIBRARY} glfw dl)
+endif(trase_BUILD_OPENGL)
 
 add_library(trase
     src/Drawable.cpp
@@ -109,7 +114,6 @@ add_library(trase
     src/Exception.hpp)
 target_include_directories(trase PUBLIC src)
 
-option(trase_BUILD_OPENGL "Build OpenGL backend and interactive test" ON)
 
 if (trase_BUILD_OPENGL)
     add_library(backendGL
