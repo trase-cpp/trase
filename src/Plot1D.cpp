@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Plot1D.hpp"
-#include "BackendGL.hpp"
 #include <algorithm>
 
 namespace trase {
@@ -48,40 +47,5 @@ void Plot1D::set_values(std::vector<float> &&x, std::vector<float> &&y) {
   m_limits[3] = *minmax.second;
   m_axis.add_limits(m_limits);
 }
-
-template <typename Backend> void Plot1D::draw(Backend &backend) {
-  const float &x = m_pixels[0];
-  const float &y = m_pixels[1];
-  const float &w = m_pixels[2];
-  const float &h = m_pixels[3];
-
-  const float &xmin = m_axis.m_limits[0];
-  const float &ymin = m_axis.m_limits[1];
-  const float &xmax = m_axis.m_limits[2];
-  const float &ymax = m_axis.m_limits[3];
-
-  const float inv_yh = 1.0 / (ymax - ymin);
-  const float inv_xw = 1.0 / (xmax - xmin);
-
-  auto f_win_x = [&](const auto i) { return x + w * (i - xmin) * inv_xw; };
-  auto f_win_y = [&](const auto i) {
-    return y + h * (1 - (i - ymin) * inv_yh);
-  };
-
-  const float win_x = f_win_x(m_x[0]);
-  const float win_y = f_win_y(m_y[0]);
-  backend.begin_path();
-  backend.move_to(win_x, win_y);
-  for (size_t i = 1; i < m_x.size(); ++i) {
-    const float win_x = f_win_x(m_x[i]);
-    const float win_y = f_win_y(m_y[i]);
-    backend.line_to(win_x, win_y);
-  }
-  backend.stroke_color(m_color);
-  backend.stroke_width(3.0f);
-  backend.stroke();
-}
-
-template void Plot1D::draw<BackendGL>(BackendGL &backend);
 
 } // namespace trase

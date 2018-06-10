@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FIGURE_H_
 
 #include "Axis.hpp"
-#include "BackendGL.hpp"
 #include "Drawable.hpp"
 #include <array>
 #include <memory>

@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Figure.hpp"
-#include "BackendGL.hpp"
 #include <array>
 #include <string>
 
@@ -46,49 +45,5 @@ Figure::Figure(const std::array<int, 2> &pixels)
       m_id(++m_num_windows), m_axis(new Axis({0.1f, 0.1f, 0.8f, 0.8f})) {
   this->m_children.push_back(&*m_axis);
 }
-
-template <typename Backend> void Figure::show(Backend &backend) {
-  auto name = "Figure " + std::to_string(m_id);
-  backend.init(this->m_pixels[2], this->m_pixels[3], name.c_str());
-
-  // Main loop
-  while (!backend.should_close()) {
-    auto win_limits = backend.begin_frame();
-    if (win_limits[0] != m_pixels[2] || win_limits[1] != m_pixels[3]) {
-      m_pixels[2] = win_limits[0];
-      m_pixels[3] = win_limits[1];
-      m_axis->resize(m_pixels);
-    }
-
-    if (backend.is_interactive()) {
-      if (backend.mouse_dragging()) {
-        auto delta = backend.mouse_drag_delta();
-        // scale by axis pixel area
-        const auto &pixels = m_axis->pixels();
-        delta[0] /= -pixels[2];
-        delta[1] /= pixels[3];
-        // scale by axis limits
-        const auto &limits = m_axis->limits();
-        const float limit_w = limits[2] - limits[0];
-        const float limit_h = limits[3] - limits[1];
-        delta[0] *= limit_w;
-        delta[1] *= limit_h;
-        m_axis->translate_limits(delta);
-        backend.mouse_drag_reset_delta();
-      }
-    }
-
-    draw(backend);
-    backend.end_frame();
-  }
-  backend.finalise();
-}
-
-template <typename Backend> void Figure::draw(Backend &backend) {
-  m_axis->draw(backend);
-}
-
-template void Figure::draw<BackendGL>(BackendGL &backend);
-template void Figure::show<BackendGL>(BackendGL &backend);
 
 } // namespace trase

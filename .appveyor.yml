@@ -13,7 +13,7 @@ build_script:
 
     cd build
     
-    cmake c:\projects\source -G "Visual Studio 15"
+    cmake c:\projects\source -G "Visual Studio 15" -D trase_BUILD_OPENGL:BOOL=FALSE
     
     cmake --build . --config "Debug"
 

@@ -31,27 +31,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This tells Catch to provide a main() - only do this in one cpp file
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include "Drawable.hpp"
 
-#include <limits>
-#include <type_traits>
+namespace trase {
 
-#include "BackendGL.hpp"
-#include "trase.hpp"
+template <typename Backend> void Drawable::draw(Backend &backend) {}
 
-using namespace trase;
-
-// This tests the output of the `get_nth_prime` function
-TEST_CASE("interactive test (only run by a human)", "[interactive]") {
-  auto fig = figure();
-  auto ax = fig->axis();
-  auto pl1 = ax->plot(std::vector<float>({0, 0.1, 0.5}),
-                      std::vector<float>({0, 0.1, 0.5}));
-  auto pl2 = ax->plot(std::vector<float>({0.2, 0.4, 0.8}),
-                      std::vector<float>({0, 0.2, 1.0}));
-
-  BackendGL backend;
-  fig->show(backend);
-}
+} // namespace trase

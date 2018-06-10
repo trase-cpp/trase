@@ -14,7 +14,8 @@ matrix:
       osx_image: xcode9.3
       env:
         - MATRIX_EVAL="CC=clang && CXX=clang++"
-        - CMAKE_OPTNS="-D CMAKE_BUILD_TYPE=Debug"
+        - CMAKE_OPTNS="-D CMAKE_BUILD_TYPE=Debug
+                       -D trase_BUILD_OPENGL:BOOL=FALSE"
 
     # GCC 5
     - os: linux
@@ -28,8 +29,9 @@ matrix:
             - lcov
       env:
         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
-        - CMAKE_OPTNS="-D Template_ENABLE_COVERAGE:BOOL=TRUE
-                       -D CMAKE_BUILD_TYPE=Debug"
+        - CMAKE_OPTNS="-D trase_ENABLE_COVERAGE:BOOL=TRUE
+                       -D CMAKE_BUILD_TYPE=Debug
+                       -D trase_BUILD_OPENGL:BOOL=FALSE"
 
     # GCC 6
     - os: linux
@@ -43,8 +45,9 @@ matrix:
             - lcov
       env:
         - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
-        - CMAKE_OPTNS="-D Template_ENABLE_COVERAGE:BOOL=TRUE
-                       -D CMAKE_BUILD_TYPE=Debug"
+        - CMAKE_OPTNS="-D trase_ENABLE_COVERAGE:BOOL=TRUE
+                       -D CMAKE_BUILD_TYPE=Debug
+                       -D trase_BUILD_OPENGL:BOOL=FALSE"
 
     # GCC 7
     - os: linux
@@ -58,8 +61,9 @@ matrix:
             - lcov
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
-        - CMAKE_OPTNS="-D Template_ENABLE_COVERAGE:BOOL=TRUE
-                       -D CMAKE_BUILD_TYPE=Debug"
+        - CMAKE_OPTNS="-D trase_ENABLE_COVERAGE:BOOL=TRUE
+                       -D CMAKE_BUILD_TYPE=Debug
+                       -D trase_BUILD_OPENGL:BOOL=FALSE"
 
     # Clang 4.0
     - os: linux
@@ -73,9 +77,10 @@ matrix:
             - libglfw3-dev
       env:
         - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
-        - CMAKE_OPTNS="-D Template_USE_CLANG_TIDY:BOOL=TRUE 
-                       -D Template_MEMCHECK:BOOL=TRUE 
-                       -D CMAKE_BUILD_TYPE=Debug"
+        - CMAKE_OPTNS="-D trase_USE_CLANG_TIDY:BOOL=TRUE 
+                       -D trase_MEMCHECK:BOOL=TRUE 
+                       -D CMAKE_BUILD_TYPE=Debug
+                       -D trase_BUILD_OPENGL:BOOL=FALSE"
 
     # Clang 5.0
     - os: linux
@@ -89,9 +94,10 @@ matrix:
             - libglfw3-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
-        - CMAKE_OPTNS="-D Template_USE_CLANG_TIDY:BOOL=TRUE
-                       -D Template_MEMCHECK:BOOL=TRUE
-                       -D CMAKE_BUILD_TYPE=Debug"
+        - CMAKE_OPTNS="-D trase_USE_CLANG_TIDY:BOOL=TRUE
+                       -D trase_MEMCHECK:BOOL=TRUE
+                       -D CMAKE_BUILD_TYPE=Debug
+                       -D trase_BUILD_OPENGL:BOOL=FALSE"
 
 before_install:
   - eval "${MATRIX_EVAL}"

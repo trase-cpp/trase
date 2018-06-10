@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Drawable.hpp"
-#include "BackendGL.hpp"
 
 namespace trase {
 
@@ -48,9 +47,5 @@ void Drawable::resize(const std::array<float, 4> &parent_pixels) {
     i->resize(m_pixels);
   }
 }
-
-template <typename Backend> void Drawable::draw(Backend &backend) {}
-
-template void Drawable::draw<BackendGL>(BackendGL &backend);
 
 } // namespace trase

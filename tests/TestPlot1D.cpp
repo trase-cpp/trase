@@ -32,26 +32,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 // This tells Catch to provide a main() - only do this in one cpp file
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 #include <limits>
 #include <type_traits>
 
-#include "BackendGL.hpp"
 #include "trase.hpp"
 
 using namespace trase;
 
-// This tests the output of the `get_nth_prime` function
-TEST_CASE("interactive test (only run by a human)", "[interactive]") {
+TEST_CASE("plot1d can be created", "[plot1d]") {
   auto fig = figure();
   auto ax = fig->axis();
   auto pl1 = ax->plot(std::vector<float>({0, 0.1, 0.5}),
                       std::vector<float>({0, 0.1, 0.5}));
-  auto pl2 = ax->plot(std::vector<float>({0.2, 0.4, 0.8}),
-                      std::vector<float>({0, 0.2, 1.0}));
+  auto pl2 =
+      ax->plot(std::vector<int>({0, 1, 2}), std::vector<float>({0, 0.1, 0.5}));
 
-  BackendGL backend;
-  fig->show(backend);
+  auto pl3 = ax->plot(std::vector<int>({0, 1, 2}), std::vector<int>({0, 2, 4}));
+
+  // auto pl4 = ax->plot({0, 1, 2}, {0, 2, 4});
+  //
+  REQUIRE_THROWS_WITH(
+      ax->plot(std::vector<float>({0, 0.1}), std::vector<float>({0, 0.1, 0.5})),
+      Catch::Contains("x and y vector sizes do not match"));
+
+  std::vector<float> x = {0, 0.1, 0.5};
+  std::vector<float> y = {0, 0.1, 0.5};
+
+  auto pl5 = ax->plot(x, y);
 }

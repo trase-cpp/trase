@@ -106,17 +106,32 @@ add_library(trase
     src/Axis.hpp
     src/Plot1D.cpp
     src/Plot1D.hpp
-    src/BackendGL.cpp
-    src/BackendGL.hpp
     src/Exception.hpp)
 target_include_directories(trase PUBLIC src)
-target_link_libraries(trase PUBLIC glext nanovg imgui)
+
+option(trase_BUILD_OPENGL "Build OpenGL backend and interactive test" ON)
+
+if (trase_BUILD_OPENGL)
+    add_library(backendGL
+        src/DrawableDraw.hpp
+        src/FigureDraw.hpp
+        src/AxisDraw.hpp
+        src/Plot1DDraw.hpp
+        src/BackendGL.cpp
+        src/BackendGL.hpp
+        )
+
+    target_include_directories(backendGL PUBLIC src)
+    target_link_libraries(backendGL PUBLIC trase glext nanovg imgui)
+endif()
 
 enable_testing()
 
-add_executable(interactive_test tests/TestInteractive.cpp)
-target_include_directories(interactive_test PRIVATE tests)
-target_link_libraries(interactive_test PRIVATE trase)
+if (trase_BUILD_OPENGL)
+    add_executable(interactive_test tests/TestInteractive.cpp)
+    target_include_directories(interactive_test PRIVATE tests)
+    target_link_libraries(interactive_test PRIVATE trase backendGL)
+endif()
 
 add_executable(trase_tests
     tests/TestFigure.cpp

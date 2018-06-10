@@ -31,27 +31,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This tells Catch to provide a main() - only do this in one cpp file
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include "Figure.hpp"
+#include <array>
+#include <string>
 
-#include <limits>
-#include <type_traits>
+namespace trase {
 
-#include "BackendGL.hpp"
-#include "trase.hpp"
+template <typename Backend> void Figure::show(Backend &backend) {
+  auto name = "Figure " + std::to_string(m_id);
+  backend.init(this->m_pixels[2], this->m_pixels[3], name.c_str());
 
-using namespace trase;
+  // Main loop
+  while (!backend.should_close()) {
+    auto win_limits = backend.begin_frame();
+    if (win_limits[0] != m_pixels[2] || win_limits[1] != m_pixels[3]) {
+      m_pixels[2] = win_limits[0];
+      m_pixels[3] = win_limits[1];
+      m_axis->resize(m_pixels);
+    }
 
-// This tests the output of the `get_nth_prime` function
-TEST_CASE("interactive test (only run by a human)", "[interactive]") {
-  auto fig = figure();
-  auto ax = fig->axis();
-  auto pl1 = ax->plot(std::vector<float>({0, 0.1, 0.5}),
-                      std::vector<float>({0, 0.1, 0.5}));
-  auto pl2 = ax->plot(std::vector<float>({0.2, 0.4, 0.8}),
-                      std::vector<float>({0, 0.2, 1.0}));
+    if (backend.is_interactive()) {
+      if (backend.mouse_dragging()) {
+        auto delta = backend.mouse_drag_delta();
+        // scale by axis pixel area
+        const auto &pixels = m_axis->pixels();
+        delta[0] /= -pixels[2];
+        delta[1] /= pixels[3];
+        // scale by axis limits
+        const auto &limits = m_axis->limits();
+        const float limit_w = limits[2] - limits[0];
+        const float limit_h = limits[3] - limits[1];
+        delta[0] *= limit_w;
+        delta[1] *= limit_h;
+        m_axis->translate_limits(delta);
+        backend.mouse_drag_reset_delta();
+      }
+    }
 
-  BackendGL backend;
-  fig->show(backend);
+    draw(backend);
+    backend.end_frame();
+  }
+  backend.finalise();
 }
+
+template <typename Backend> void Figure::draw(Backend &backend) {
+  m_axis->draw(backend);
+}
+
+} // namespace trase
