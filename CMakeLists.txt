@@ -97,7 +97,6 @@ add_library(nanovg ${nanovg_source})
 target_include_directories(nanovg SYSTEM PUBLIC ${nanovg_dir})
 target_link_libraries(nanovg PUBLIC ${OPENGL_gl_LIBRARY} glfw dl)
 
-
 add_library(trase
     src/Drawable.cpp
     src/Drawable.hpp
@@ -137,7 +136,7 @@ if (trase_USE_CLANG_TIDY)
         message(STATUS "clang-tidy not found.")
     else()
         message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
-        set_target_properties(mylib PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
+        set_target_properties(trase PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
     endif()
 endif()
 
@@ -152,8 +151,8 @@ if (trase_MEMCHECK)
             -fsanitize=address
             -fsanitize-address-use-after-scope
             )
-        target_compile_options(mylib PUBLIC -O1 -g -fno-omit-frame-pointer ${trase_MEMCHECK_FLAGS})
-        target_link_libraries(mylib PUBLIC -g ${trase_MEMCHECK_FLAGS})
+        target_compile_options(trase PUBLIC -O1 -g -fno-omit-frame-pointer ${trase_MEMCHECK_FLAGS})
+        target_link_libraries(trase PUBLIC -g ${trase_MEMCHECK_FLAGS})
     else()
         message(FATAL_ERROR "clang compiler required with trase_MEMCHECK: found ${CMAKE_CXX_COMPILER_ID}")
     endif()
@@ -164,8 +163,8 @@ option(trase_ENABLE_COVERAGE "Enable coverage reporting for GCC or Clang" FALSE)
 if (trase_ENABLE_COVERAGE)
     if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
         message(STATUS "Configuring with coverage")
-        target_compile_options(mylib PUBLIC --coverage -O0)
-        target_link_libraries(mylib PUBLIC --coverage)
+        target_compile_options(trase PUBLIC --coverage -O0)
+        target_link_libraries(trase PUBLIC --coverage)
     else()
         message(FATAL_ERROR "GCC or Clang required with trase_ENABLE_COVERAGE: found ${CMAKE_CXX_COMPILER_ID}")
     endif()
