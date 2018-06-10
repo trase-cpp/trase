@@ -25,7 +25,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-            - libglfw3-dev
             - lcov
       env:
         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
@@ -41,7 +40,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-            - libglfw3-dev
             - lcov
       env:
         - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
@@ -57,7 +55,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
-            - libglfw3-dev
             - lcov
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
@@ -74,7 +71,6 @@ matrix:
             - llvm-toolchain-trusty-4.0
           packages:
             - clang-4.0
-            - libglfw3-dev
       env:
         - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
         - CMAKE_OPTNS="-D trase_USE_CLANG_TIDY:BOOL=TRUE 
@@ -91,7 +87,6 @@ matrix:
             - llvm-toolchain-trusty-5.0
           packages:
             - clang-5.0
-            - libglfw3-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
         - CMAKE_OPTNS="-D trase_USE_CLANG_TIDY:BOOL=TRUE
