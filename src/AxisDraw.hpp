@@ -68,51 +68,32 @@ template <typename Backend> void Axis::draw(Backend &backend) {
 
   // axis box
   backend.begin_path();
-  backend.rect(x, y, w, h);
+  backend.rect(m_pixels);
   backend.fill_color(RGBA(0, 0, 0, 20));
   backend.fill();
 
-  // axis lines
-  /*
-  backend.begin_path();
-  backend.move_to(x - lw / 2, y + h);
-  backend.line_to(x + w, y + h);
-  backend.move_to(x, y + h + lw / 2);
-  backend.line_to(x, y);
-  backend.stroke_color(RGBA(0, 0, 0, 255));
-  backend.stroke_width(lw);
-  backend.stroke();
-  */
-
-  // drop shadow
-  /*
-  backend.begin_path();
-  backend.move_to(x - lw, y + h + lw / 2);
-  backend.line_to(x + w - lw / 2, y + h + lw / 2);
-  backend.move_to(x - lw / 2, y + h + lw);
-  backend.line_to(x - lw / 2, y + lw / 2);
-  backend.stroke_color(RGBA(0, 0, 0, 20));
-  backend.stroke();
-  */
-
   // ticks
-  const int ny_ticks = 5;
+  const auto pixel_delta = m_pixels.delta();
+  const auto limits_delta = m_limits.delta();
+  const int nx_ticks;
+  const vfloat2_t n_ticks(nx_ticks, nx_ticks * pixel_delta[1] / pixel_delta[0]);
   const int sig_digits = 2;
 
   // calculate y tick locations
-  const float tick_min_y = round_off(ymin, 1);
-  const float tick_dx_y = round_off(yh / ny_ticks, sig_digits);
+  const auto tick_min = round_off(m_limits.bmin, 1);
+  const auto tick_dx = round_off(limits_delta() / n_ticks, sig_digits);
   // scale to pixels
-  const float tick_dx_y_pixels = tick_dx_y * h / yh;
-  const float tick_min_y_pixels = y + h * (1 - (tick_min_y - ymin) / yh);
+  const auto tick_dx_pixels = tick_dx * pixel_delta / limits_delta;
 
-  // calculate x tick locations
-  const float tick_min_x = round_off(xmin, 1);
-  const int nx_ticks = w / tick_dx_y_pixels;
-  const float tick_dx_x = round_off(xw / nx_ticks, sig_digits);
-  // scale to pixels
-  const float tick_dx_x_pixels = tick_dx_x * w / xw;
-  const float tick_min_x_pixels = x + w * (tick_min_x - xmin) / xw;
+  auto to_pixel = [&](const vfloat2_t &i) {
+    auto inv_delta = 1.0f / limits_delta;
+    return m_pixels +
+           pixels_delta *
+               vfloat2_t((i[0] - m_limits.bmin[0]) * inv_delta[0],
+                         (1 - (i[1] - m_limits.bmin[1]) * inv_delta[1]));
+  };
+
+  const auto tick_min_pixels = to_pixel(tick_min);
 
   const float tick_len = 10.0f;
 
