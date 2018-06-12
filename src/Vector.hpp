@@ -645,6 +645,6 @@ std::istream &operator>>(std::istream &out, Vector<T, N> &v) {
   return out;
 }
 
-typedef Vector<float, 2> vfloat2;
+typedef Vector<float, 2> vfloat2_t;
 
 #endif /* VECTOR_H_ */

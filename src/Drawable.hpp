@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef DRAWABLE_H_
 #define DRAWABLE_H_
 
+#include "BBox.hpp"
 #include <array>
 #include <vector>
 
@@ -45,17 +46,16 @@ protected:
   std::vector<Drawable *> m_children;
 
   /// the area of this object as a ratio of its parent object
-  /// [minx, miny, width, height]
-  std::array<float, 4> m_area;
+  bfloat2_t m_area;
 
   /// the area of this object in raw pixels
-  /// [minx, miny, width, height]
-  std::array<float, 4> m_pixels;
+  bfloat2_t m_pixels;
 
 public:
-  Drawable(const std::array<float, 4> &area);
-  void resize(const std::array<float, 4> &parent_pixels);
-  const std::array<float, 4> &pixels() { return m_pixels; }
+  Drawable(const bfloat2_t &area);
+  void resize(const bfloat2_t &parent_pixels);
+  const bfloat2_t &pixels() { return m_pixels; }
+  const bfloat2_t &area() { return m_pixels; }
   template <typename Backend> void draw(Backend &backend);
 };
 

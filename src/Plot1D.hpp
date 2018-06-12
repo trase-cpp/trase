@@ -55,7 +55,7 @@ class Plot1D : public Drawable {
   std::vector<float> m_y;
 
   /// [xmin, ymin, xmax, ymax]
-  std::array<float, 4> m_limits;
+  bfloat2_t m_limits;
 
   RGBA m_color;
 
@@ -63,7 +63,8 @@ class Plot1D : public Drawable {
   Axis &m_axis;
 
 public:
-  Plot1D(Axis &axis) : Drawable({0, 0, 1, 1}), m_axis(axis) {}
+  Plot1D(Axis &axis)
+      : Drawable(bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))), m_axis(axis) {}
 
   void set_values(std::vector<float> &&x, std::vector<float> &&y);
   void set_color(const RGBA &color) { m_color = color; }

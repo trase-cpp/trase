@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Figure.hpp"
+#include "Vector.hpp"
 #include <limits>
 
 namespace trase {
@@ -41,33 +42,6 @@ Axis::Axis(const std::array<float, 4> &area)
                                 std::numeric_limits<float>::max(),
                                 std::numeric_limits<float>::min(),
                                 std::numeric_limits<float>::min()}} {}
-
-void Axis::add_limits(const std::array<float, 4> limits) {
-  const float buffer = 0.05;
-  const float xbuffer = buffer * (limits[2] - limits[0]);
-  const float ybuffer = buffer * (limits[3] - limits[1]);
-  const std::array<float, 4> new_limits = {
-      {limits[0] - xbuffer, limits[1] - ybuffer, limits[2] + xbuffer,
-       limits[3] + xbuffer}};
-  // loop over dimensions
-  for (int i = 0; i < 2; ++i) {
-    // if min limit less then update
-    if (new_limits[i] < m_limits[i]) {
-      m_limits[i] = new_limits[i];
-    }
-    // if max limit greater then update
-    if (new_limits[2 + i] > m_limits[2 + i]) {
-      m_limits[2 + i] = new_limits[2 + i];
-    }
-  }
-}
-
-void Axis::translate_limits(const std::array<float, 2> &delta) {
-  m_limits[0] += delta[0];
-  m_limits[2] += delta[0];
-  m_limits[1] += delta[1];
-  m_limits[3] += delta[1];
-}
 
 std::shared_ptr<Plot1D> Axis::plot_impl(std::vector<float> &&x,
                                         std::vector<float> &&y) {

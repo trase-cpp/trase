@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BBOX_H_
 #define BBOX_H_
 
+#include "Vector.hpp"
+
 namespace trase {
 
 ///
@@ -74,6 +76,8 @@ template <typename T, int N> struct bbox {
     }
   }
 
+  vector_t delta() const { return bmax - bmin; }
+
   ///
   /// @return the bounding box covering both input boxes
   ///
@@ -83,6 +87,42 @@ template <typename T, int N> struct bbox {
       bounds.bmin[i] = std::min(bmin[i], arg.bmin[i]);
       bounds.bmax[i] = std::max(bmax[i], arg.bmax[i]);
     }
+    return bounds;
+  }
+
+  ///
+  /// @return translate the bounding box
+  ///
+  inline bbox &operator+=(const vector_t &arg) {
+    bmin += arg;
+    bmax += arg;
+    return *this;
+  }
+
+  ///
+  /// @return translate the bounding box
+  ///
+  inline bbox operator+(const vector_t &arg) {
+    bbox bounds = *this;
+    bounds += arg;
+    return bounds;
+  }
+
+  ///
+  /// @return scale the bounding box
+  ///
+  inline bbox &operator*=(const vector_t &arg) {
+    bmin *= arg;
+    bmax *= arg;
+    return *this;
+  }
+
+  ///
+  /// @return scale the bounding box
+  ///
+  inline bbox operator*(const vector_t &arg) {
+    bbox bounds = *this;
+    bounds *= arg;
     return bounds;
   }
 
@@ -135,6 +175,8 @@ template <typename T, int N>
 std::ostream &operator<<(std::ostream &out, const bbox<T, N> &b) {
   return out << "bbox(" << b.bmin << "<->" << b.bmax << ")";
 }
+
+typedef BBox<float, 2> bfloat2_t;
 
 } // namespace trase
 

@@ -35,14 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-Drawable::Drawable(const std::array<float, 4> &area_of_parent)
+Drawable::Drawable(const bfloat2_t &area_of_parent)
     : m_area(area_of_parent), m_pixels{} {}
 
-void Drawable::resize(const std::array<float, 4> &parent_pixels) {
-  m_pixels[0] = m_area[0] * parent_pixels[2] + parent_pixels[0];
-  m_pixels[1] = m_area[1] * parent_pixels[3] + parent_pixels[1];
-  m_pixels[2] = m_area[2] * parent_pixels[2];
-  m_pixels[3] = m_area[3] * parent_pixels[3];
+void Drawable::resize(const bfloat2_t &parent_pixels) {
+  m_pixels = m_area * parent_pixels;
   for (auto &i : m_children) {
     i->resize(m_pixels);
   }

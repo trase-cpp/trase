@@ -52,18 +52,13 @@ class Axis : public Drawable {
   std::vector<std::shared_ptr<Plot1D>> m_plot1d;
 
   /// plot extents [x_min,y_min,x_max,y_max]
-  std::array<float, 4> m_limits;
-
-  /// x and y ticks
-  std::vector<float> m_xticks;
-  std::vector<float> m_yticks;
+  bfloat2_t m_limits;
 
 public:
-  Axis(const std::array<float, 4> &area);
+  Axis(const bfloat2_t &area);
 
-  void add_limits(const std::array<float, 4> limits);
-  void translate_limits(const std::array<float, 2> &delta);
-  const std::array<float, 4> &limits() { return m_limits; }
+  const bfloat2_t &limits() const { return m_limits; }
+  bfloat2_t &limits() { return m_limits; }
 
   template <typename T1, typename T2>
   std::shared_ptr<Plot1D> plot(const std::vector<T1> &x,

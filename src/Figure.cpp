@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Figure.hpp"
+#include "BBox.hpp"
+#include "Vector.hpp"
 #include <array>
 #include <string>
 
@@ -40,8 +42,7 @@ namespace trase {
 int Figure::m_num_windows = 0;
 
 Figure::Figure(const std::array<int, 2> &pixels)
-    : Drawable(
-          {0, 0, static_cast<float>(pixels[0]), static_cast<float>(pixels[1])}),
+    : Drawable(bfloat2_t(vfloat2_t(0, 0), vfloat2_t(pixels[0], pixels[1]))),
       m_id(++m_num_windows), m_axis(new Axis({0.1f, 0.1f, 0.8f, 0.8f})) {
   this->m_children.push_back(&*m_axis);
 }
