@@ -49,22 +49,22 @@ class Axis;
 namespace trase {
 
 class Axis : public Drawable {
-  /// plot extents [x_min,y_min,x_max,y_max]
   std::vector<std::shared_ptr<Plot1D>> m_plot1d;
 
-protected:
+  /// plot extents [x_min,y_min,x_max,y_max]
   std::array<float, 4> m_limits;
 
-public:
-  friend class Plot1D;
+  /// x and y ticks
+  std::vector<float> m_xticks;
+  std::vector<float> m_yticks;
 
+public:
   Axis(const std::array<float, 4> &area);
 
   void add_limits(const std::array<float, 4> limits);
   void translate_limits(const std::array<float, 2> &delta);
   const std::array<float, 4> &limits() { return m_limits; }
 
-  // Container1 and 2 should be std::span in C++20?
   template <typename T1, typename T2>
   std::shared_ptr<Plot1D> plot(const std::vector<T1> &x,
                                const std::vector<T2> &y) {
@@ -84,6 +84,7 @@ private:
   std::shared_ptr<Plot1D> plot_impl(std::vector<float> &&x,
                                     std::vector<float> &&y);
 
+  void set_auto_ticks();
 }; // namespace trase
 
 } // namespace trase

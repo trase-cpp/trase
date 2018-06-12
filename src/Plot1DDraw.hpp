@@ -42,10 +42,11 @@ template <typename Backend> void Plot1D::draw(Backend &backend) {
   const float &w = m_pixels[2];
   const float &h = m_pixels[3];
 
-  const float &xmin = m_axis.m_limits[0];
-  const float &ymin = m_axis.m_limits[1];
-  const float &xmax = m_axis.m_limits[2];
-  const float &ymax = m_axis.m_limits[3];
+  const auto &axis_limits = m_axis.limits();
+  const float &xmin = axis_limits[0];
+  const float &ymin = axis_limits[1];
+  const float &xmax = axis_limits[2];
+  const float &ymax = axis_limits[3];
 
   const float inv_yh = 1.0 / (ymax - ymin);
   const float inv_xw = 1.0 / (xmax - xmin);
