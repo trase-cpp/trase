@@ -39,19 +39,19 @@ namespace trase {
 
 template <typename Backend> void Figure::show(Backend &backend) {
   auto name = "Figure " + std::to_string(m_id);
-  backend.init(this->m_pixels.bmax, name.c_str());
+  backend.init(this->m_pixels.bmax[0], this->m_pixels.bmax[1], name.c_str());
 
   // Main loop
   while (!backend.should_close()) {
-    auto win_limits = backend.begin_frame();
-    if (win_limits != m_pixels) {
-      m_pixels = win_limits;
+    const vfloat2_t win_limits = backend.begin_frame();
+    if ((win_limits != m_pixels.bmax).any()) {
+      m_pixels.bmax = win_limits;
       m_axis->resize(m_pixels);
     }
 
     if (backend.is_interactive()) {
       if (backend.mouse_dragging()) {
-        auto delta = backend.mouse_drag_delta();
+        vfloat2_t delta = backend.mouse_drag_delta();
 
         // scale by axis pixel area
         delta /= m_axis->pixels().bmax * vfloat2_t(-1, 1);
@@ -59,7 +59,7 @@ template <typename Backend> void Figure::show(Backend &backend) {
         // scale by axis limits
         delta *= m_axis->limits().delta();
 
-        m_axis->translate_limits(delta);
+        m_axis->limits() += delta;
         backend.mouse_drag_reset_delta();
       }
     }

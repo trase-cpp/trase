@@ -40,14 +40,14 @@ namespace trase {
 void Plot1D::set_values(std::vector<float> &&x, std::vector<float> &&y) {
   m_x = x;
   m_y = y;
-  auto minmax = std::minmax_element(m_x.begin(), m_x.end());
-  m_limits[0] = *minmax.first;
-  m_limits[2] = *minmax.second;
-  minmax = std::minmax_element(m_y.begin(), m_y.end());
-  m_limits[1] = *minmax.first;
-  m_limits[3] = *minmax.second;
+  auto minmax_x = std::minmax_element(m_x.begin(), m_x.end());
+  auto minmax_y = std::minmax_element(m_y.begin(), m_y.end());
+  m_limits.bmin[0] = *minmax_x.first;
+  m_limits.bmin[1] = *minmax_y.first;
+  m_limits.bmax[0] = *minmax_x.second;
+  m_limits.bmax[1] = *minmax_y.second;
 
-  const float buffer = 0.05;
+  const float buffer = 1.05;
   m_axis.limits() += m_limits * vfloat2_t(buffer, buffer);
 }
 

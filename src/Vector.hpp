@@ -403,6 +403,34 @@ UNARY_OPERATOR(-)
     return ret;                                                                \
   }                                                                            \
                                                                                \
+  template <int N>                                                             \
+  Vector<float, N> operator the_op(const Vector<float, N> &arg1,               \
+                                   const Vector<float, N> &arg2) {             \
+    Vector<float, N> ret;                                                      \
+    for (size_t i = 0; i < N; ++i) {                                           \
+      ret[i] = arg1[i] the_op arg2[i];                                         \
+    }                                                                          \
+    return ret;                                                                \
+  }                                                                            \
+  template <int N>                                                             \
+  Vector<float, N> operator the_op(const float &arg1,                          \
+                                   const Vector<float, N> &arg2) {             \
+    Vector<float, N> ret;                                                      \
+    for (size_t i = 0; i < N; ++i) {                                           \
+      ret[i] = arg1 the_op arg2[i];                                            \
+    }                                                                          \
+    return ret;                                                                \
+  }                                                                            \
+  template <int N>                                                             \
+  Vector<float, N> operator the_op(const Vector<float, N> &arg1,               \
+                                   const float &arg2) {                        \
+    Vector<float, N> ret;                                                      \
+    for (size_t i = 0; i < N; ++i) {                                           \
+      ret[i] = arg1[i] the_op arg2;                                            \
+    }                                                                          \
+    return ret;                                                                \
+  }                                                                            \
+                                                                               \
   template <int, int, int N>                                                   \
   Vector<int, N> operator the_op(const Vector<int, N> &arg1,                   \
                                  const Vector<int, N> &arg2) {                 \
@@ -507,6 +535,23 @@ COMPARISON(!=)
   }                                                                            \
   template <typename T1, typename T2, int N>                                   \
   Vector<double, N> &operator the_op(Vector<T1, N> &arg1, const T2 &arg2) {    \
+    for (size_t i = 0; i < N; ++i) {                                           \
+      arg1[i] the_op arg2;                                                     \
+    }                                                                          \
+    return arg1;                                                               \
+  }                                                                            \
+                                                                               \
+  template <int N>                                                             \
+  Vector<float, N> &operator the_op(Vector<float, N> &arg1,                    \
+                                    const Vector<float, N> &arg2) {            \
+    for (size_t i = 0; i < N; ++i) {                                           \
+      arg1[i] the_op arg2[i];                                                  \
+    }                                                                          \
+    return arg1;                                                               \
+  }                                                                            \
+  template <int N>                                                             \
+  Vector<float, N> &operator the_op(Vector<float, N> &arg1,                    \
+                                    const float &arg2) {                       \
     for (size_t i = 0; i < N; ++i) {                                           \
       arg1[i] the_op arg2;                                                     \
     }                                                                          \
@@ -622,6 +667,25 @@ inline const Vector<T, N> abs2(const Vector<T, N> &x) {
   return ret;
 }
 
+/// round off to n significant digits
+template <typename T, int N>
+Vector<T, N> round_off(const Vector<T, N> &x, int n) {
+  Vector<T, N> num = x;
+  for (int j = 0; j < N; ++j) {
+    // Counting the no. of digits to the left of decimal point
+    // in the given no.
+    float tmp = num[j];
+    float i;
+    for (i = 0; tmp >= 1; ++i)
+      tmp /= 10;
+
+    // round off to the given number of sig digits
+    const float d = std::pow(10, n - i);
+    num[j] = std::floor(num[j] * d + 0.5) / d;
+  }
+  return num;
+}
+
 /// stream output operator for Vector class
 template <typename T, int N>
 std::ostream &operator<<(std::ostream &out, const Vector<T, N> &v) {
@@ -646,5 +710,7 @@ std::istream &operator>>(std::istream &out, Vector<T, N> &v) {
 }
 
 typedef Vector<float, 2> vfloat2_t;
+
+} // namespace trase
 
 #endif /* VECTOR_H_ */

@@ -63,7 +63,7 @@ void BackendGL::finalise() {
   glfwTerminate();
 }
 
-std::array<int, 2> BackendGL::begin_frame() {
+vfloat2_t BackendGL::begin_frame() {
   glfwPollEvents();
   ImGui_ImplGlfwGL3_NewFrame();
 
@@ -86,7 +86,7 @@ std::array<int, 2> BackendGL::begin_frame() {
 
   // nvgResetTransform(m_vg);
   // nvgScale(m_vg, winWidth / 100.0, winHeight / 100.0);
-  return std::array<int, 2>({winWidth, winHeight});
+  return vfloat2_t(winWidth, winHeight);
 }
 
 void BackendGL::end_frame() {
@@ -110,8 +110,7 @@ GLFWwindow *BackendGL::create_window(int x_pixels, int y_pixels,
 #if __APPLE__
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-  GLFWwindow *window =
-      glfwCreateWindow(1280, 720, "C++ Plotting Test", NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(x_pixels, y_pixels, name, NULL, NULL);
 
   if (!window)
     throw Exception("Could not create GLFW window");

@@ -36,59 +36,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-float round_off(float num, int n) {
-
-  // Counting the no. of digits to the left of decimal point
-  // in the given no.
-  float tmp = num;
-  float i;
-  for (i = 0; tmp >= 1; ++i)
-    tmp /= 10;
-
-  // round off to the given number of sig digits
-  const float d = std::pow(10, n - i);
-  return std::floor(num * d + 0.5) / d;
-}
-
 template <typename Backend> void Axis::draw(Backend &backend) {
-  const float &x = m_pixels[0];
-  const float &y = m_pixels[1];
-  const float &w = m_pixels[2];
-  const float &h = m_pixels[3];
-
-  const float &xmin = m_limits[0];
-  const float &ymin = m_limits[1];
-  const float &xmax = m_limits[2];
-  const float &ymax = m_limits[3];
-  const float yh = ymax - ymin;
-  const float xw = xmax - xmin;
-
   const float lw = 3.0f;
   backend.stroke_width(lw);
 
   // axis box
   backend.begin_path();
   backend.rect(m_pixels);
-  backend.fill_color(RGBA(0, 0, 0, 20));
+  backend.fill_color(RGBA(0, 0, 0, 50));
   backend.fill();
 
   // ticks
   const auto pixel_delta = m_pixels.delta();
   const auto limits_delta = m_limits.delta();
-  const int nx_ticks;
-  const vfloat2_t n_ticks(nx_ticks, nx_ticks * pixel_delta[1] / pixel_delta[0]);
+  const int ny_ticks = 5;
+  const vfloat2_t n_ticks(ny_ticks * pixel_delta[0] / pixel_delta[1], ny_ticks);
   const int sig_digits = 2;
 
   // calculate y tick locations
   const auto tick_min = round_off(m_limits.bmin, 1);
-  const auto tick_dx = round_off(limits_delta() / n_ticks, sig_digits);
+  const auto tick_dx = round_off(limits_delta / n_ticks, sig_digits);
   // scale to pixels
   const auto tick_dx_pixels = tick_dx * pixel_delta / limits_delta;
 
   auto to_pixel = [&](const vfloat2_t &i) {
     auto inv_delta = 1.0f / limits_delta;
-    return m_pixels +
-           pixels_delta *
+    return m_pixels.bmin +
+           pixel_delta *
                vfloat2_t((i[0] - m_limits.bmin[0]) * inv_delta[0],
                          (1 - (i[1] - m_limits.bmin[1]) * inv_delta[1]));
   };
@@ -104,30 +78,50 @@ template <typename Backend> void Axis::draw(Backend &backend) {
   backend.text_align(ALIGN_CENTER | ALIGN_TOP);
   backend.fill_color(RGBA(0, 0, 0, 255));
 
+  // axis ticks
   char buffer[10];
-  for (int i = 0; i < nx_ticks; ++i) {
-    const float tick_pos = tick_min_x_pixels + (i + 0.5) * tick_dx_x_pixels;
-    const float tick_val = tick_min_x + (i + 0.5) * tick_dx_x;
-    backend.move_to(tick_pos, y + h + tick_len / 2);
-    backend.line_to(tick_pos, y + h - tick_len / 2);
+  for (int i = 0; i < n_ticks[0]; ++i) {
+    const float tick_pos = tick_min_pixels[0] + (i + 0.5) * tick_dx_pixels[0];
+    const float tick_val = tick_min[0] + (i + 0.5) * tick_dx[0];
+    backend.move_to(vfloat2_t(tick_pos, m_pixels.bmax[1] + tick_len / 2));
+    backend.line_to(vfloat2_t(tick_pos, m_pixels.bmax[1]));
     std::sprintf(buffer, "%.*g", sig_digits, tick_val);
-    backend.text(tick_pos, y + h + tick_len / 2, buffer, NULL);
+    backend.text(vfloat2_t(tick_pos, m_pixels.bmax[1] + tick_len / 2), buffer,
+                 NULL);
   }
   backend.text_align(ALIGN_RIGHT | ALIGN_MIDDLE);
-  for (int i = 0; i < ny_ticks; ++i) {
-    const float tick_pos = tick_min_y_pixels - (i + 0.5) * tick_dx_y_pixels;
-    const float tick_val = tick_min_y + (i + 0.5) * tick_dx_y;
-    backend.move_to(x - tick_len / 2, tick_pos);
-    backend.line_to(x + tick_len / 2, tick_pos);
+  for (int i = 0; i < n_ticks[1]; ++i) {
+    const float tick_pos = tick_min_pixels[1] - (i + 0.5) * tick_dx_pixels[1];
+    const float tick_val = tick_min[1] + (i + 0.5) * tick_dx[1];
+    backend.move_to(vfloat2_t(m_pixels.bmin[0] - tick_len / 2, tick_pos));
+    backend.line_to(vfloat2_t(m_pixels.bmin[0], tick_pos));
     std::sprintf(buffer, "%.*g", sig_digits, tick_val);
-    backend.text(x - tick_len / 2, tick_pos, buffer, NULL);
+    backend.text(vfloat2_t(m_pixels.bmin[0] - tick_len / 2, tick_pos), buffer,
+                 NULL);
   }
   backend.stroke_color(RGBA(0, 0, 0, 255));
   backend.stroke_width(lw / 2);
   backend.stroke();
 
+  // axis grid lines
+  backend.begin_path();
+  for (int i = 0; i < n_ticks[0]; ++i) {
+    const float tick_pos = tick_min_pixels[0] + (i + 0.5) * tick_dx_pixels[0];
+    backend.move_to(vfloat2_t(tick_pos, m_pixels.bmin[1]));
+    backend.line_to(vfloat2_t(tick_pos, m_pixels.bmax[1]));
+  }
+  backend.text_align(ALIGN_RIGHT | ALIGN_MIDDLE);
+  for (int i = 0; i < n_ticks[1]; ++i) {
+    const float tick_pos = tick_min_pixels[1] - (i + 0.5) * tick_dx_pixels[1];
+    backend.move_to(vfloat2_t(m_pixels.bmin[0], tick_pos));
+    backend.line_to(vfloat2_t(m_pixels.bmax[0], tick_pos));
+  }
+  backend.stroke_color(RGBA(255, 255, 255, 255));
+  backend.stroke_width(lw / 2);
+  backend.stroke();
+
   // draw plots
-  backend.scissor(x, y, w, h);
+  backend.scissor(m_pixels);
   for (auto &i : m_plot1d) {
     i->draw(backend);
   }

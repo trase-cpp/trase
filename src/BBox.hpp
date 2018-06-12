@@ -37,6 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BBOX_H_
 
 #include "Vector.hpp"
+#include <algorithm>
+#include <limits>
 
 namespace trase {
 
@@ -60,8 +62,8 @@ template <typename T, int N> struct bbox {
   vector_t bmax;
 
   inline bbox()
-      : bmin(vector_t::Constant(std::numeric_limits<T>::get_max<double>())),
-        bmax(vector_t::Constant(-std::numeric_limits<T>::get_max<double>())) {}
+      : bmin(vector_t::Constant(std::numeric_limits<T>::max())),
+        bmax(vector_t::Constant(-std::numeric_limits<T>::max())) {}
 
   inline bbox(const vector_t &p)
       : bmin(p), bmax(p + std::numeric_limits<double>::epsilon()) {}
@@ -77,16 +79,26 @@ template <typename T, int N> struct bbox {
   }
 
   vector_t delta() const { return bmax - bmin; }
+  const vector_t &min() const { return bmin; }
+  const vector_t &max() const { return bmax; }
+
+  ///
+  /// @return increase the bounding box to cover both boxes
+  ///
+  inline bbox &operator+=(const bbox &arg) {
+    for (int i = 0; i < N; ++i) {
+      bmin[i] = std::min(bmin[i], arg.bmin[i]);
+      bmax[i] = std::max(bmax[i], arg.bmax[i]);
+    }
+    return *this;
+  }
 
   ///
   /// @return the bounding box covering both input boxes
   ///
   inline bbox operator+(const bbox &arg) {
-    bbox bounds;
-    for (int i = 0; i < N; ++i) {
-      bounds.bmin[i] = std::min(bmin[i], arg.bmin[i]);
-      bounds.bmax[i] = std::max(bmax[i], arg.bmax[i]);
-    }
+    bbox bounds = *this;
+    bounds += arg;
     return bounds;
   }
 
@@ -112,8 +124,8 @@ template <typename T, int N> struct bbox {
   /// @return scale the bounding box
   ///
   inline bbox &operator*=(const vector_t &arg) {
-    bmin *= arg;
-    bmax *= arg;
+    bmin = 0.5 * ((bmax * (1 - arg) + bmin * (1 + arg)));
+    bmax = 0.5 * ((bmax * (1 + arg) + bmin * (1 - arg)));
     return *this;
   }
 
@@ -176,7 +188,7 @@ std::ostream &operator<<(std::ostream &out, const bbox<T, N> &b) {
   return out << "bbox(" << b.bmin << "<->" << b.bmax << ")";
 }
 
-typedef BBox<float, 2> bfloat2_t;
+typedef bbox<float, 2> bfloat2_t;
 
 } // namespace trase
 

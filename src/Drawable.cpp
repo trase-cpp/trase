@@ -39,7 +39,8 @@ Drawable::Drawable(const bfloat2_t &area_of_parent)
     : m_area(area_of_parent), m_pixels{} {}
 
 void Drawable::resize(const bfloat2_t &parent_pixels) {
-  m_pixels = m_area * parent_pixels;
+  m_pixels.bmin = m_area.bmin * parent_pixels.delta() + parent_pixels.min();
+  m_pixels.bmax = m_area.bmax * parent_pixels.delta() + parent_pixels.min();
   for (auto &i : m_children) {
     i->resize(m_pixels);
   }

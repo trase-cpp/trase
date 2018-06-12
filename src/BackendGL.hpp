@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "nanovg.h"
 
+#include "BBox.hpp"
 #include "Colors.hpp"
 #include "Exception.hpp"
 
@@ -82,35 +83,40 @@ public:
 
   void init(int x_pixels, int y_pixels, const char *name);
   void finalise();
-  std::array<int, 2> begin_frame();
+  vfloat2_t begin_frame();
   void end_frame();
 
   inline bool is_interactive() { return true; }
   inline bool mouse_dragging() { return ImGui::IsMouseDragging(); }
 
-  std::array<float, 2> mouse_drag_delta() {
+  vfloat2_t mouse_drag_delta() {
     ImVec2 delta = ImGui::GetMouseDragDelta();
-    return std::array<float, 2>({{delta[0], delta[1]}});
+    return vfloat2_t(delta[0], delta[1]);
   }
 
   inline void mouse_drag_reset_delta() { ImGui::ResetMouseDragDelta(); }
 
-  inline void scissor(float x, float y, float w, float h) {
-    nvgScissor(m_vg, x, y, w, h);
+  inline void scissor(const bfloat2_t &x) {
+    const auto &delta = x.delta();
+    const auto &min = x.min();
+    nvgScissor(m_vg, min[0], min[1], delta[0], delta[1]);
   }
 
   inline void reset_scissor() { nvgResetScissor(m_vg); }
 
   inline void begin_path() { nvgBeginPath(m_vg); }
-  inline void rounded_rect(const float x, const float y, const float w,
-                           const float h, const float r) {
-    nvgRoundedRect(m_vg, x, y, w, h, r);
+  inline void rounded_rect(const bfloat2_t &x, const float r) {
+    const auto &delta = x.delta();
+    const auto &min = x.min();
+    nvgRoundedRect(m_vg, min[0], min[1], delta[0], delta[1], r);
   }
-  inline void rect(const float x, const float y, const float w, const float h) {
-    nvgRect(m_vg, x, y, w, h);
+  inline void rect(const bfloat2_t &x) {
+    const auto &delta = x.delta();
+    const auto &min = x.min();
+    nvgRect(m_vg, min[0], min[1], delta[0], delta[1]);
   }
-  inline void move_to(const float x, const float y) { nvgMoveTo(m_vg, x, y); }
-  inline void line_to(const float x, const float y) { nvgLineTo(m_vg, x, y); }
+  inline void move_to(const vfloat2_t &x) { nvgMoveTo(m_vg, x[0], x[1]); }
+  inline void line_to(const vfloat2_t &x) { nvgLineTo(m_vg, x[0], x[1]); }
   inline void stroke_color(const RGBA &color) {
     nvgStrokeColor(m_vg, nvgRGBA(color.m_r, color.m_g, color.m_b, color.m_a));
   }
@@ -125,13 +131,12 @@ public:
     nvgFillColor(m_vg, nvgRGBA(color.m_r, color.m_g, color.m_b, color.m_a));
   }
 
-  inline void text(const float x, const float y, const char *string,
-                   const char *end) {
-    nvgText(m_vg, x, y, string, end);
+  inline void text(const vfloat2_t &x, const char *string, const char *end) {
+    nvgText(m_vg, x[0], x[1], string, end);
   }
-  inline void text_bounds(const float x, const float y, const char *string,
+  inline void text_bounds(const vfloat2_t &x, const char *string,
                           const char *end, float *bounds) {
-    nvgTextBounds(m_vg, x, y, string, end, bounds);
+    nvgTextBounds(m_vg, x[0], x[1], string, end, bounds);
   }
 
   inline bool should_close() { return glfwWindowShouldClose(m_window); }

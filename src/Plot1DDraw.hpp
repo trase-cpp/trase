@@ -37,33 +37,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 template <typename Backend> void Plot1D::draw(Backend &backend) {
-  const float &x = m_pixels[0];
-  const float &y = m_pixels[1];
-  const float &w = m_pixels[2];
-  const float &h = m_pixels[3];
-
   const auto &axis_limits = m_axis.limits();
-  const float &xmin = axis_limits[0];
-  const float &ymin = axis_limits[1];
-  const float &xmax = axis_limits[2];
-  const float &ymax = axis_limits[3];
+  const auto &axis_pixels = m_axis.pixels();
+  const auto axis_delta = axis_limits.delta();
+  const auto pixel_delta = axis_pixels.delta();
 
-  const float inv_yh = 1.0 / (ymax - ymin);
-  const float inv_xw = 1.0 / (xmax - xmin);
-
-  auto f_win_x = [&](const auto i) { return x + w * (i - xmin) * inv_xw; };
-  auto f_win_y = [&](const auto i) {
-    return y + h * (1 - (i - ymin) * inv_yh);
+  auto to_pixel = [&](const vfloat2_t &i) {
+    auto inv_delta = 1.0f / axis_delta;
+    return m_pixels.bmin +
+           pixel_delta *
+               vfloat2_t((i[0] - axis_limits.bmin[0]) * inv_delta[0],
+                         (1 - (i[1] - axis_limits.bmin[1]) * inv_delta[1]));
   };
 
-  const float win_x = f_win_x(m_x[0]);
-  const float win_y = f_win_y(m_y[0]);
   backend.begin_path();
-  backend.move_to(win_x, win_y);
+  backend.move_to(to_pixel(vfloat2_t(m_x[0], m_y[0])));
   for (size_t i = 1; i < m_x.size(); ++i) {
-    const float win_x = f_win_x(m_x[i]);
-    const float win_y = f_win_y(m_y[i]);
-    backend.line_to(win_x, win_y);
+    backend.line_to(to_pixel(vfloat2_t(m_x[i], m_y[i])));
   }
   backend.stroke_color(m_color);
   backend.stroke_width(3.0f);
