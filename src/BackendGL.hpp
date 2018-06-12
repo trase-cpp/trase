@@ -95,6 +95,12 @@ public:
 
   inline void mouse_drag_reset_delta() { ImGui::ResetMouseDragDelta(); }
 
+  inline void scissor(float x, float y, float w, float h) {
+    nvgScissor(m_vg, x, y, w, h);
+  }
+
+  inline void reset_scissor() { nvgResetScissor(m_vg); }
+
   inline void begin_path() { nvgBeginPath(m_vg); }
   inline void rounded_rect(const float x, const float y, const float w,
                            const float h, const float r) {

@@ -146,9 +146,11 @@ template <typename Backend> void Axis::draw(Backend &backend) {
   backend.stroke();
 
   // draw plots
+  backend.scissor(x, y, w, h);
   for (auto &i : m_plot1d) {
     i->draw(backend);
   }
+  backend.reset_scissor();
 }
 
 } // namespace trase
