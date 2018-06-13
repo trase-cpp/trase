@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 template <typename Backend> void Plot1D::draw(Backend &backend) {
+  const float lw = 3.0f;
   float frame_i_float = get_frame_index();
   int frame_i = std::ceil(frame_i_float);
   const float w2 = frame_i - frame_i_float;
@@ -58,8 +59,49 @@ template <typename Backend> void Plot1D::draw(Backend &backend) {
     }
   }
   backend.stroke_color(m_color);
-  backend.stroke_width(3.0f);
+  backend.stroke_width(lw);
   backend.stroke();
+
+  auto pos = vfloat2_t(std::numeric_limits<float>::max(),
+                       std::numeric_limits<float>::max());
+  if (backend.is_interactive()) {
+    auto mouse_pos = backend.get_mouse_pos();
+    if ((mouse_pos > m_pixels.bmin).all() &&
+        (mouse_pos < m_pixels.bmax).all()) {
+      pos = m_axis.from_pixel(mouse_pos);
+    }
+  }
+
+  const float r2 =
+      std::pow(m_axis.from_pixel(vfloat2_t(m_pixels.bmin[0] + lw, 0))[0], 2);
+  char buffer[20];
+  auto draw_close_point = [&](const vfloat2_t &point) {
+    if ((point - pos).squaredNorm() < r2) {
+      backend.begin_path();
+      auto point_pixel = m_axis.to_pixel(point);
+      backend.circle(point_pixel, lw * 2);
+      backend.fill_color(m_color);
+      backend.fill();
+
+      std::sprintf(buffer, "(%f,%f)", point[0], point[1]);
+      backend.fill_color(RGBA(0, 0, 0, 255));
+      backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
+      backend.text(point_pixel + 2 * vfloat2_t(lw, -lw), buffer, NULL);
+    }
+  };
+
+  if (w2 == 0.0f) {
+    draw_close_point(m_values[frame_i][0]);
+    for (size_t i = 1; i < m_values[0].size(); ++i) {
+      draw_close_point(m_values[frame_i][i]);
+    }
+  } else {
+    draw_close_point(w1 * m_values[frame_i][0] + w2 * m_values[frame_i - 1][0]);
+    for (size_t i = 1; i < m_values[0].size(); ++i) {
+      draw_close_point(w1 * m_values[frame_i][i] +
+                       w2 * m_values[frame_i - 1][i]);
+    }
+  }
 }
 
 } // namespace trase

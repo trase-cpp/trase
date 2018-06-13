@@ -117,10 +117,8 @@ public:
     nvgRect(m_vg, min[0], min[1], delta[0], delta[1]);
   }
 
-  inline void arc(const vfloat2_t &centre, float radius, float angle_begin,
-                  float angle_end, int direction) {
-    nvgArc(m_vg, centre[0], centre[1], radius, angle_begin, angle_end,
-           direction);
+  inline void circle(const vfloat2_t &centre, float radius) {
+    nvgArc(m_vg, centre[0], centre[1], radius, 0, 2 * M_PI, NVG_CW);
   }
 
   inline void move_to(const vfloat2_t &x) { nvgMoveTo(m_vg, x[0], x[1]); }
