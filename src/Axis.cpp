@@ -37,16 +37,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-Axis::Axis(const bfloat2_t &area)
-    : Drawable(area), m_limits(vfloat2_t(std::numeric_limits<float>::max(),
-                                         std::numeric_limits<float>::max()),
-                               vfloat2_t(std::numeric_limits<float>::min(),
-                                         std::numeric_limits<float>::min())) {}
+Axis::Axis(Figure &figure, const bfloat2_t &area)
+    : Drawable(&figure, area),
+      m_limits(vfloat2_t(std::numeric_limits<float>::max(),
+                         std::numeric_limits<float>::max()),
+               vfloat2_t(std::numeric_limits<float>::min(),
+                         std::numeric_limits<float>::min())) {}
 
 std::shared_ptr<Plot1D> Axis::plot_impl(std::vector<vfloat2_t> &&values) {
   m_plot1d.emplace_back(new Plot1D(*this));
   m_children.push_back(&*m_plot1d.back());
-  m_plot1d.back()->set_values(std::move(values));
+  m_plot1d.back()->add_values(std::move(values), 0);
   m_plot1d.back()->set_color(default_colors[m_plot1d.size() - 1]);
   m_plot1d.back()->resize(m_pixels);
   return m_plot1d.back();

@@ -34,6 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FIGURE_H_
 #define FIGURE_H_
 
+// forward declare Figure so can be stored in Axis
+namespace trase {
+class Figure;
+}
+
 #include "Axis.hpp"
 #include "Drawable.hpp"
 #include <array>

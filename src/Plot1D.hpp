@@ -49,7 +49,7 @@ namespace trase {
 
 class Plot1D : public Drawable {
   /// values
-  std::vector<vfloat2_t> m_values;
+  std::vector<std::vector<vfloat2_t>> m_values;
 
   /// [xmin, ymin, xmax, ymax]
   bfloat2_t m_limits;
@@ -60,13 +60,28 @@ class Plot1D : public Drawable {
   Axis &m_axis;
 
 public:
-  Plot1D(Axis &axis)
-      : Drawable(bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))), m_axis(axis) {}
+  Plot1D(Axis &axis);
 
-  void set_values(std::vector<vfloat2_t> &&values);
+  template <typename T1, typename T2>
+  void add_frame(const std::vector<T1> &x, const std::vector<T2> &y,
+                 const float time) {
+    if (x.size() != y.size()) {
+      throw Exception("x and y vector sizes do not match");
+    }
+    std::vector<vfloat2_t> values(x.size());
+    for (size_t i = 0; i < x.size(); ++i) {
+      values[i][0] = x[i];
+      values[i][1] = y[i];
+    }
+    return add_values(std::move(values), time);
+  }
 
-  const std::vector<vfloat2_t> &get_values() const { return m_values; }
-  std::vector<vfloat2_t> &get_values() { return m_values; }
+  void add_values(std::vector<vfloat2_t> &&values, float time);
+
+  const std::vector<vfloat2_t> &get_values(const int i) const {
+    return m_values[i];
+  }
+  std::vector<vfloat2_t> &get_values(const int i) { return m_values[i]; }
 
   void set_color(const RGBA &color) { m_color = color; }
 

@@ -189,6 +189,7 @@ std::ostream &operator<<(std::ostream &out, const bbox<T, N> &b) {
 }
 
 typedef bbox<float, 2> bfloat2_t;
+typedef bbox<float, 1> bfloat1_t;
 
 } // namespace trase
 

@@ -45,15 +45,31 @@ protected:
   /// a list of Drawables that are children of this object
   std::vector<Drawable *> m_children;
 
+  /// parent of this object
+  Drawable *m_parent;
+
   /// the area of this object as a ratio of its parent object
   bfloat2_t m_area;
 
   /// the area of this object in raw pixels
   bfloat2_t m_pixels;
 
+  /// the animation time span
+  float m_time_span;
+
+  /// the animation frame times
+  std::vector<float> m_times;
+
+  /// current animation time
+  float m_time;
+
 public:
-  Drawable(const bfloat2_t &area);
+  Drawable(Drawable *parent, const bfloat2_t &area);
   void resize(const bfloat2_t &parent_pixels);
+  void update_time_span(const float time);
+  void add_frame_time(const float time);
+  float get_frame_index();
+  void set_time(const float time);
   const bfloat2_t &pixels() { return m_pixels; }
   const bfloat2_t &area() { return m_pixels; }
   template <typename Backend> void draw(Backend &backend);

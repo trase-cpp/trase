@@ -37,23 +37,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 template <typename Backend> void Plot1D::draw(Backend &backend) {
-  const auto &axis_limits = m_axis.limits();
-  const auto &axis_pixels = m_axis.pixels();
-  const auto axis_delta = axis_limits.delta();
-  const auto pixel_delta = axis_pixels.delta();
+  float frame_i_float = get_frame_index();
+  int frame_i = std::ceil(frame_i_float);
+  const float w2 = frame_i - frame_i_float;
+  const float w1 = 1.0f - w2;
 
-  auto to_pixel = [&](const vfloat2_t &i) {
-    auto inv_delta = 1.0f / axis_delta;
-    return m_pixels.bmin +
-           pixel_delta *
-               vfloat2_t((i[0] - axis_limits.bmin[0]) * inv_delta[0],
-                         (1 - (i[1] - axis_limits.bmin[1]) * inv_delta[1]));
-  };
-
-  backend.begin_path();
-  backend.move_to(to_pixel(m_values[0]));
-  for (size_t i = 1; i < m_values.size(); ++i) {
-    backend.line_to(to_pixel(m_values[i]));
+  if (w2 == 0.0f) {
+    backend.begin_path();
+    backend.move_to(m_axis.to_pixel(m_values[frame_i][0]));
+    for (size_t i = 1; i < m_values[0].size(); ++i) {
+      backend.line_to(m_axis.to_pixel(m_values[frame_i][i]));
+    }
+  } else {
+    backend.begin_path();
+    backend.move_to(m_axis.to_pixel(w1 * m_values[frame_i][0] +
+                                    w2 * m_values[frame_i - 1][0]));
+    for (size_t i = 1; i < m_values[0].size(); ++i) {
+      backend.line_to(m_axis.to_pixel(w1 * m_values[frame_i][i] +
+                                      w2 * m_values[frame_i - 1][i]));
+    }
   }
   backend.stroke_color(m_color);
   backend.stroke_width(3.0f);

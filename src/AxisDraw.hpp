@@ -124,6 +124,7 @@ template <typename Backend> void Axis::draw(Backend &backend) {
   backend.reset_scissor();
 
   // draw closest point to cursor
+  /*
   if (backend.is_interactive()) {
     auto mouse_pos = backend.get_mouse_pos();
     if ((mouse_pos > m_pixels.bmin).all() &&
@@ -160,6 +161,7 @@ template <typename Backend> void Axis::draw(Backend &backend) {
       }
     }
   }
+  */
 }
 
 } // namespace trase

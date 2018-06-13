@@ -51,6 +51,8 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
                       std::vector<float>({0, 0.1, 0.5}));
   auto pl2 = ax->plot(std::vector<float>({0.2, 0.4, 0.8}),
                       std::vector<float>({0, 0.2, 1.0}));
+  pl1->add_frame(std::vector<float>({1, 1.1, 1.5}),
+                 std::vector<float>({0, 0.1, 0.5}), 1);
 
   BackendGL backend;
   fig->show(backend);

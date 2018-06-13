@@ -81,6 +81,8 @@ public:
 
   inline bool is_interactive() { return true; }
 
+  inline float get_time() { return ImGui::GetTime(); }
+
   inline vfloat2_t get_mouse_pos() {
     auto pos = ImGui::GetMousePos();
     return vfloat2_t(pos[0], pos[1]);

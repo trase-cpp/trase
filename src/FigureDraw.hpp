@@ -49,6 +49,10 @@ template <typename Backend> void Figure::show(Backend &backend) {
       m_axis->resize(m_pixels);
     }
 
+    const float time = backend.get_time();
+    const float looped_time = std::fmod(time, m_time_span);
+    m_axis->set_time(looped_time);
+
     if (backend.is_interactive()) {
       if (backend.mouse_dragging()) {
         vfloat2_t delta = backend.mouse_drag_delta();

@@ -42,9 +42,11 @@ namespace trase {
 int Figure::m_num_windows = 0;
 
 Figure::Figure(const std::array<int, 2> &pixels)
-    : Drawable(bfloat2_t(vfloat2_t(0, 0), vfloat2_t(pixels[0], pixels[1]))),
+    : Drawable(nullptr,
+               bfloat2_t(vfloat2_t(0, 0), vfloat2_t(pixels[0], pixels[1]))),
       m_id(++m_num_windows),
-      m_axis(new Axis(bfloat2_t(vfloat2_t(0.1, 0.1), vfloat2_t(0.9, 0.9)))) {
+      m_axis(new Axis(*this,
+                      bfloat2_t(vfloat2_t(0.1, 0.1), vfloat2_t(0.9, 0.9)))) {
   m_children.push_back(&*m_axis);
   m_pixels = m_area;
   m_axis->resize(m_pixels);

@@ -37,10 +37,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-void Plot1D::set_values(std::vector<vfloat2_t> &&values) {
-  m_values = values;
-  m_limits = std::accumulate(m_values.begin(), m_values.end(), bfloat2_t(),
-                             [](auto a, auto b) { return a + bfloat2_t(b); });
+Plot1D::Plot1D(Axis &axis)
+    : Drawable(&axis, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
+      m_axis(axis) {}
+
+void Plot1D::add_values(std::vector<vfloat2_t> &&values, const float time) {
+  m_values.emplace_back(std::move(values));
+  if (time > 0) {
+    add_frame_time(time);
+  }
+  m_limits =
+      std::accumulate(m_values.back().begin(), m_values.back().end(), m_limits,
+                      [](auto a, auto b) { return a + bfloat2_t(b); });
 
   const float buffer = 1.05;
   m_axis.limits() += m_limits * vfloat2_t(buffer, buffer);

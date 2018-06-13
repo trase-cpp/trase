@@ -42,6 +42,7 @@ class Axis;
 #include "Colors.hpp"
 #include "Drawable.hpp"
 #include "Exception.hpp"
+#include "Figure.hpp"
 #include "Plot1D.hpp"
 #include <array>
 #include <memory>
@@ -55,7 +56,7 @@ class Axis : public Drawable {
   bfloat2_t m_limits;
 
 public:
-  Axis(const bfloat2_t &area);
+  Axis(Figure &figure, const bfloat2_t &area);
 
   const bfloat2_t &limits() const { return m_limits; }
   bfloat2_t &limits() { return m_limits; }
