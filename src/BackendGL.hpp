@@ -64,29 +64,28 @@ enum Align {
   ALIGN_BASELINE = 1 << 6, // Default, align text vertically to baseline.
 };
 
+enum ArcDirection {
+  CLOCKWISE = 1 << 0,
+  COUNTER_CLOCKWISE = 1 << 1,
+};
+
 class BackendGL {
   GLFWwindow *m_window;
   NVGcontext *m_vg;
 
 public:
-  enum Align {
-    // Horizontal align
-    ALIGN_LEFT = 1 << 0,   // Default, align text horizontally to left.
-    ALIGN_CENTER = 1 << 1, // Align text horizontally to center.
-    ALIGN_RIGHT = 1 << 2,  // Align text horizontally to right.
-    // Vertical align
-    ALIGN_TOP = 1 << 3,      // Align text vertically to top.
-    ALIGN_MIDDLE = 1 << 4,   // Align text vertically to middle.
-    ALIGN_BOTTOM = 1 << 5,   // Align text vertically to bottom.
-    ALIGN_BASELINE = 1 << 6, // Default, align text vertically to baseline.
-  };
-
   void init(int x_pixels, int y_pixels, const char *name);
   void finalise();
   vfloat2_t begin_frame();
   void end_frame();
 
   inline bool is_interactive() { return true; }
+
+  inline vfloat2_t get_mouse_pos() {
+    auto pos = ImGui::GetMousePos();
+    return vfloat2_t(pos[0], pos[1]);
+  }
+
   inline bool mouse_dragging() { return ImGui::IsMouseDragging(); }
 
   vfloat2_t mouse_drag_delta() {
@@ -115,6 +114,13 @@ public:
     const auto &min = x.min();
     nvgRect(m_vg, min[0], min[1], delta[0], delta[1]);
   }
+
+  inline void arc(const vfloat2_t &centre, float radius, float angle_begin,
+                  float angle_end, int direction) {
+    nvgArc(m_vg, centre[0], centre[1], radius, angle_begin, angle_end,
+           direction);
+  }
+
   inline void move_to(const vfloat2_t &x) { nvgMoveTo(m_vg, x[0], x[1]); }
   inline void line_to(const vfloat2_t &x) { nvgLineTo(m_vg, x[0], x[1]); }
   inline void stroke_color(const RGBA &color) {
@@ -145,7 +151,7 @@ private:
   NVGcontext *init_nanovg(int x_pixels, int y_pixels);
   void init_imgui(GLFWwindow *window);
   GLFWwindow *create_window(int x_pixels, int y_pixels, const char *name);
-};
+}; // namespace trase
 
 } // namespace trase
 

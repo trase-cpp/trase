@@ -66,18 +66,34 @@ public:
     if (x.size() != y.size()) {
       throw Exception("x and y vector sizes do not match");
     }
-    std::vector<float> x_copy(x.size());
-    std::vector<float> y_copy(y.size());
-    std::copy(x.begin(), x.end(), x_copy.begin());
-    std::copy(y.begin(), y.end(), y_copy.begin());
-    return plot_impl(std::move(x_copy), std::move(y_copy));
+    std::vector<vfloat2_t> values(x.size());
+    for (size_t i = 0; i < x.size(); ++i) {
+      values[i][0] = x[i];
+      values[i][1] = y[i];
+    }
+    return plot_impl(std::move(values));
   }
 
   template <typename Backend> void draw(Backend &backend);
 
+  vfloat2_t from_pixel(const vfloat2_t &i) {
+    auto inv_delta = 1.0f / m_pixels.delta();
+    return m_limits.bmin +
+           m_limits.delta() *
+               vfloat2_t((i[0] - m_pixels.bmin[0]) * inv_delta[0],
+                         (m_pixels.bmax[1] - i[1]) * inv_delta[1]);
+  }
+
+  vfloat2_t to_pixel(const vfloat2_t &i) {
+    auto inv_delta = 1.0f / m_limits.delta();
+    return m_pixels.bmin +
+           m_pixels.delta() *
+               vfloat2_t((i[0] - m_limits.bmin[0]) * inv_delta[0],
+                         (m_limits.bmax[1] - i[1]) * inv_delta[1]);
+  }
+
 private:
-  std::shared_ptr<Plot1D> plot_impl(std::vector<float> &&x,
-                                    std::vector<float> &&y);
+  std::shared_ptr<Plot1D> plot_impl(std::vector<vfloat2_t> &&values);
 
   void set_auto_ticks();
 }; // namespace trase

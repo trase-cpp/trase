@@ -33,19 +33,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Plot1D.hpp"
 #include "Vector.hpp"
-#include <algorithm>
+#include <numeric>
 
 namespace trase {
 
-void Plot1D::set_values(std::vector<float> &&x, std::vector<float> &&y) {
-  m_x = x;
-  m_y = y;
-  auto minmax_x = std::minmax_element(m_x.begin(), m_x.end());
-  auto minmax_y = std::minmax_element(m_y.begin(), m_y.end());
-  m_limits.bmin[0] = *minmax_x.first;
-  m_limits.bmin[1] = *minmax_y.first;
-  m_limits.bmax[0] = *minmax_x.second;
-  m_limits.bmax[1] = *minmax_y.second;
+void Plot1D::set_values(std::vector<vfloat2_t> &&values) {
+  m_values = values;
+  m_limits = std::accumulate(m_values.begin(), m_values.end(), bfloat2_t(),
+                             [](auto a, auto b) { return a + bfloat2_t(b); });
 
   const float buffer = 1.05;
   m_axis.limits() += m_limits * vfloat2_t(buffer, buffer);

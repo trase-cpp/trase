@@ -51,9 +51,9 @@ template <typename Backend> void Plot1D::draw(Backend &backend) {
   };
 
   backend.begin_path();
-  backend.move_to(to_pixel(vfloat2_t(m_x[0], m_y[0])));
-  for (size_t i = 1; i < m_x.size(); ++i) {
-    backend.line_to(to_pixel(vfloat2_t(m_x[i], m_y[i])));
+  backend.move_to(to_pixel(m_values[0]));
+  for (size_t i = 1; i < m_values.size(); ++i) {
+    backend.line_to(to_pixel(m_values[i]));
   }
   backend.stroke_color(m_color);
   backend.stroke_width(3.0f);

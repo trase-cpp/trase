@@ -48,11 +48,8 @@ class Plot1D;
 namespace trase {
 
 class Plot1D : public Drawable {
-  /// x values
-  std::vector<float> m_x;
-
-  /// y values
-  std::vector<float> m_y;
+  /// values
+  std::vector<vfloat2_t> m_values;
 
   /// [xmin, ymin, xmax, ymax]
   bfloat2_t m_limits;
@@ -66,7 +63,11 @@ public:
   Plot1D(Axis &axis)
       : Drawable(bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))), m_axis(axis) {}
 
-  void set_values(std::vector<float> &&x, std::vector<float> &&y);
+  void set_values(std::vector<vfloat2_t> &&values);
+
+  const std::vector<vfloat2_t> &get_values() const { return m_values; }
+  std::vector<vfloat2_t> &get_values() { return m_values; }
+
   void set_color(const RGBA &color) { m_color = color; }
 
   template <typename Backend> void draw(Backend &backend);
