@@ -61,7 +61,7 @@ public:
 
   std::shared_ptr<Axis> axis() { return m_axis; }
 
-  template <typename Backend> void show(Backend &backend);
+  void to_svg(std::osteam &out);
 
   template <typename Backend> void draw(Backend &backend, const float time);
 };

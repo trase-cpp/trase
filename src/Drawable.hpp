@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BBox.hpp"
 #include <array>
+#include <ostream>
 #include <vector>
 
 namespace trase {
@@ -68,8 +69,8 @@ public:
   float get_frame_index(const float time);
   const bfloat2_t &pixels() { return m_pixels; }
   const bfloat2_t &area() { return m_pixels; }
+  template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void draw(Backend &backend, const float time);
-  template <typename Backend> void draw(Backend &backend);
 };
 
 } // namespace trase

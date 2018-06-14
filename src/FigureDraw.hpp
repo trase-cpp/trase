@@ -49,34 +49,30 @@ template <typename Backend> void Figure::show(Backend &backend) {
       m_axis->resize(m_pixels);
     }
 
-    if (backend.is_interactive()) {
-      if (backend.mouse_dragging()) {
-        vfloat2_t delta = backend.mouse_drag_delta();
+    if (backend.mouse_dragging()) {
+      vfloat2_t delta = backend.mouse_drag_delta();
 
-        // scale by axis pixel area
-        delta /= m_axis->pixels().bmax * vfloat2_t(-1, 1);
+      // scale by axis pixel area
+      delta /= m_axis->pixels().bmax * vfloat2_t(-1, 1);
 
-        // scale by axis limits
-        delta *= m_axis->limits().delta();
+      // scale by axis limits
+      delta *= m_axis->limits().delta();
 
-        m_axis->limits() += delta;
-        backend.mouse_drag_reset_delta();
-      }
-      const float time = backend.get_time();
-      const float looped_time = std::fmod(time, m_time_span);
-      draw(backend, looped_time);
-    } else {
-      draw(backend, -1);
+      m_axis->limits() += delta;
+      backend.mouse_drag_reset_delta();
     }
 
-    backend.end_frame();
-  }
-  backend.finalise();
-}
+    const float time = backend.get_time();
+    const float looped_time = std::fmod(time, m_time_span);
+    draw(backend, looped_time);
 
-template <typename Backend>
-void Figure::draw(Backend &backend, const float time) {
-  m_axis->draw(backend, time);
-}
+    backend.end_frame();
+    backend.finalise();
+  }
+
+  template <typename Backend>
+  void Figure::draw(Backend & backend, const float time) {
+    m_axis->draw(backend, time);
+  }
 
 } // namespace trase

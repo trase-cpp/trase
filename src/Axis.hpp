@@ -75,7 +75,7 @@ public:
     return plot_impl(std::move(values));
   }
 
-  template <typename Backend> void draw(Backend &backend);
+  template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void draw(Backend &backend, const float time);
 
   vfloat2_t from_pixel(const vfloat2_t &i) {
@@ -96,6 +96,8 @@ public:
 
 private:
   std::shared_ptr<Plot1D> plot_impl(std::vector<vfloat2_t> &&values);
+
+  template <typename Backend> void draw_common(Backend backend);
 
   void set_auto_ticks();
 }; // namespace trase

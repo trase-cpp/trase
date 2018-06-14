@@ -52,4 +52,12 @@ Figure::Figure(const std::array<int, 2> &pixels)
   m_axis->resize(m_pixels);
 }
 
+void Figure::to_svg(const char *filename) {
+  BackendSVG backend;
+  auto name = "Figure " + std::to_string(m_id);
+  backend.init(filename, name.c_str());
+  m_axis->serialise(backend);
+  backend.finalise();
+}
+
 } // namespace trase

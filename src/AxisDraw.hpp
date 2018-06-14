@@ -39,6 +39,28 @@ namespace trase {
 
 template <typename Backend>
 void Axis::draw(Backend &backend, const float time) {
+  draw_common(backend);
+
+  // draw plots
+  backend.scissor(m_pixels);
+  for (auto &i : m_plot1d) {
+    i->draw(backend, time);
+  }
+  backend.reset_scissor();
+}
+
+template <typename Backend> void Axis::serialise(Backend backend) {
+  draw_common(backend);
+
+  // serialise plots
+  backend.scissor(m_pixels);
+  for (auto &i : m_plot1d) {
+    i->serialise(backend);
+  }
+  backend.reset_scissor();
+}
+
+template <typename Backend> void Axis::draw_common(Backend backend) {
   const float lw = 3.0f;
   backend.stroke_width(lw);
 
@@ -116,13 +138,6 @@ void Axis::draw(Backend &backend, const float time) {
   backend.stroke_color(RGBA(255, 255, 255, 255));
   backend.stroke_width(lw / 2);
   backend.stroke();
-
-  // draw plots
-  backend.scissor(m_pixels);
-  for (auto &i : m_plot1d) {
-    i->draw(backend, time);
-  }
-  backend.reset_scissor();
 }
 
 } // namespace trase

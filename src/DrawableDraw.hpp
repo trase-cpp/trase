@@ -37,6 +37,7 @@ namespace trase {
 
 template <typename Backend>
 void Drawable::draw(Backend &backend, const float time) {}
-template <typename Backend> void Drawable::draw(Backend &backend) {}
+
+template <typename Backend> void Drawable::serialise(Backend &out) {}
 
 } // namespace trase
