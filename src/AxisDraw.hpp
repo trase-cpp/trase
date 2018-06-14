@@ -37,7 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend> void Axis::draw(Backend &backend) {
+template <typename Backend>
+void Axis::draw(Backend &backend, const float time) {
   const float lw = 3.0f;
   backend.stroke_width(lw);
 
@@ -119,49 +120,9 @@ template <typename Backend> void Axis::draw(Backend &backend) {
   // draw plots
   backend.scissor(m_pixels);
   for (auto &i : m_plot1d) {
-    i->draw(backend);
+    i->draw(backend, time);
   }
   backend.reset_scissor();
-
-  // draw closest point to cursor
-  /*
-  if (backend.is_interactive()) {
-    auto mouse_pos = backend.get_mouse_pos();
-    if ((mouse_pos > m_pixels.bmin).all() &&
-        (mouse_pos < m_pixels.bmax).all()) {
-      auto pos = from_pixel(mouse_pos);
-      vfloat2_t closest_dx(std::numeric_limits<float>::max(), 0);
-      float closest_r2 = std::numeric_limits<float>::max();
-      int closest_line;
-      for (size_t line = 0; line < m_plot1d.size(); ++line) {
-        for (const auto &j : m_plot1d[line]->get_values()) {
-          const auto dx = (j - pos);
-          const auto r2 = dx.squaredNorm();
-          if (r2 < closest_r2) {
-            closest_r2 = r2;
-            closest_dx = dx;
-            closest_line = line;
-          }
-        }
-      }
-
-      auto point = pos + closest_dx;
-      if ((point > m_limits.bmin).all() && (point < m_limits.bmax).all()) {
-        backend.begin_path();
-        auto point_pixel = to_pixel(point);
-        backend.arc(point_pixel, lw * 2, 0, 2 * M_PI, CLOCKWISE);
-        backend.fill_color(default_colors[closest_line]);
-        backend.fill();
-
-        std::sprintf(buffer, "(%.*g,%.*g)", sig_digits, point[0], sig_digits,
-                     point[1]);
-        backend.fill_color(RGBA(0, 0, 0, 255));
-        backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
-        backend.text(point_pixel + 2 * vfloat2_t(lw, -lw), buffer, NULL);
-      }
-    }
-  }
-  */
 }
 
 } // namespace trase

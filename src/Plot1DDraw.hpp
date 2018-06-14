@@ -36,21 +36,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend> void Plot1D::draw(Backend &backend) {
+template <typename Backend>
+void Plot1D::draw(Backend &backend, const float time) {
   const float lw = 3.0f;
-  float frame_i_float = get_frame_index();
+
+  // draw plot
+  backend.begin_path();
+
+  float frame_i_float = get_frame_index(time);
   int frame_i = std::ceil(frame_i_float);
   const float w2 = frame_i - frame_i_float;
   const float w1 = 1.0f - w2;
 
   if (w2 == 0.0f) {
-    backend.begin_path();
     backend.move_to(m_axis.to_pixel(m_values[frame_i][0]));
     for (size_t i = 1; i < m_values[0].size(); ++i) {
       backend.line_to(m_axis.to_pixel(m_values[frame_i][i]));
     }
   } else {
-    backend.begin_path();
     backend.move_to(m_axis.to_pixel(w1 * m_values[frame_i][0] +
                                     w2 * m_values[frame_i - 1][0]));
     for (size_t i = 1; i < m_values[0].size(); ++i) {
@@ -58,10 +61,12 @@ template <typename Backend> void Plot1D::draw(Backend &backend) {
                                       w2 * m_values[frame_i - 1][i]));
     }
   }
+
   backend.stroke_color(m_color);
   backend.stroke_width(lw);
   backend.stroke();
 
+  // draw highlighted point
   auto pos = vfloat2_t(std::numeric_limits<float>::max(),
                        std::numeric_limits<float>::max());
   if (backend.is_interactive()) {
@@ -72,8 +77,7 @@ template <typename Backend> void Plot1D::draw(Backend &backend) {
     }
   }
 
-  const float r2 =
-      std::pow(m_axis.from_pixel(vfloat2_t(m_pixels.bmin[0] + lw, 0))[0], 2);
+  const float r2 = std::pow(lw * m_limits.delta()[0] / m_pixels.delta()[0], 2);
   char buffer[20];
   auto draw_close_point = [&](const vfloat2_t &point) {
     if ((point - pos).squaredNorm() < r2) {

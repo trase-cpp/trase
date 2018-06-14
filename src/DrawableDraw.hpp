@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+template <typename Backend>
+void Drawable::draw(Backend &backend, const float time) {}
 template <typename Backend> void Drawable::draw(Backend &backend) {}
 
 } // namespace trase

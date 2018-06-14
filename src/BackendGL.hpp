@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BBox.hpp"
 #include "Colors.hpp"
 #include "Exception.hpp"
+#include "Vector.hpp"
 
 namespace trase {
 

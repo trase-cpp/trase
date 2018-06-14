@@ -38,7 +38,7 @@ namespace trase {
 
 Drawable::Drawable(Drawable *parent, const bfloat2_t &area_of_parent)
     : m_parent(parent), m_area(area_of_parent), m_pixels{}, m_time_span(0),
-      m_times({0}), m_time(0) {}
+      m_times({0}) {}
 
 void Drawable::resize(const bfloat2_t &parent_pixels) {
   m_pixels.bmin = m_area.bmin * parent_pixels.delta() + parent_pixels.min();
@@ -48,15 +48,26 @@ void Drawable::resize(const bfloat2_t &parent_pixels) {
   }
 }
 
-float Drawable::get_frame_index() {
-  int time_index = std::lower_bound(m_times.begin(), m_times.end(), m_time) -
-                   m_times.begin();
+float Drawable::get_frame_index(const float time) {
+  // if time is outside time range clip it
+  float clipped_time;
+  if (time < 0) {
+    clipped_time = 0;
+  } else if (time > m_time_span) {
+    clipped_time = m_time_span;
+  } else {
+    clipped_time = time;
+  }
+
+  int time_index =
+      std::lower_bound(m_times.begin(), m_times.end(), clipped_time) -
+      m_times.begin();
 
   if (time_index == 0) {
     return 0.0f;
   } else {
     const float delta_t = m_times[time_index] - m_times[time_index - 1];
-    const float w1 = (m_time - m_times[time_index - 1]) / delta_t;
+    const float w1 = (clipped_time - m_times[time_index - 1]) / delta_t;
     return static_cast<float>(time_index - 1) + w1;
   }
 }
@@ -76,50 +87,6 @@ void Drawable::update_time_span(const float time) {
   // need to inform parents
   if (m_parent)
     m_parent->update_time_span(time);
-}
-
-void Drawable::set_time(const float time) {
-  m_time = time;
-
-  // if time is outside time range clip it
-  if (m_time < 0) {
-    m_time = 0;
-  } else if (m_time > m_time_span) {
-    m_time = m_time_span;
-  }
-
-  /*
-    // if time is outside time range clip it
-    if (time < m_times[0]) {
-      time = m_times[0];
-      m_time_index = 0;
-    } else if (time >= m_times.back()) {
-      time = m_times.back();
-      m_time_index = m_times.size() - 1;
-    } else if (time > m_times[m_time_index]) {
-      // else loop though times from the current index to find the right
-      // position
-      int time_index = static_cast<int>(m_time_index);
-      for (; time_index < m_times.size() && m_times[time_index] < time;
-           ++time_index)
-        ;
-      // current time is between last and current index
-      m_time_index = (time - m_times[time_index - 1]) /
-                     (m_times[time_index] - m_times[time_index]);
-    } else {
-      // loop from beginning to find the right position
-      int time_index = 0;
-      for (; time_index < m_times.size() && m_times[time_index] < time;
-           ++time_index)
-        ;
-      // current time is between last and current index
-      m_time_index = (time - m_times[time_index - 1]) /
-                     (m_times[time_index] - m_times[time_index]);
-    }
-  */
-  for (auto &i : m_children) {
-    i->set_time(m_time);
-  }
 }
 
 } // namespace trase

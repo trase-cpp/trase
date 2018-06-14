@@ -60,18 +60,15 @@ protected:
   /// the animation frame times
   std::vector<float> m_times;
 
-  /// current animation time
-  float m_time;
-
 public:
   Drawable(Drawable *parent, const bfloat2_t &area);
   void resize(const bfloat2_t &parent_pixels);
   void update_time_span(const float time);
   void add_frame_time(const float time);
-  float get_frame_index();
-  void set_time(const float time);
+  float get_frame_index(const float time);
   const bfloat2_t &pixels() { return m_pixels; }
   const bfloat2_t &area() { return m_pixels; }
+  template <typename Backend> void draw(Backend &backend, const float time);
   template <typename Backend> void draw(Backend &backend);
 };
 

@@ -76,6 +76,7 @@ public:
   }
 
   template <typename Backend> void draw(Backend &backend);
+  template <typename Backend> void draw(Backend &backend, const float time);
 
   vfloat2_t from_pixel(const vfloat2_t &i) {
     auto inv_delta = 1.0f / m_pixels.delta();
