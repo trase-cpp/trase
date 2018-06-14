@@ -77,7 +77,8 @@ void Plot1D::draw(Backend &backend, const float time) {
     }
   }
 
-  const float r2 = std::pow(lw * m_limits.delta()[0] / m_pixels.delta()[0], 2);
+  const float r2 =
+      std::pow(3 * lw * m_limits.delta()[0] / m_pixels.delta()[0], 2);
   char buffer[20];
   auto draw_close_point = [&](const vfloat2_t &point) {
     if ((point - pos).squaredNorm() < r2) {
