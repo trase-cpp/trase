@@ -8,9 +8,9 @@ status](https://ci.appveyor.com/api/projects/status/kfm43tg6qltyjsyl/branch/mast
 
 Trase is a lightweight scientific plotting library for C++ with animation 
 support. It enables you to construct plots, and display them via the OpenGL 
-interface, or write them out to animated SVG files. 
+interface, or write them out to animated svg files. 
 
-For example, the following code writes out an SVG files showing a static plot of 
+For example, the following code writes out an svg files showing a static plot of 
 $y=sin(x)$, and a dynamic plot of $y=sin(\theta x)$ for $1 < \theta < 5$.
 
 ```cpp
@@ -49,6 +49,10 @@ $y=sin(x)$, and a dynamic plot of $y=sin(\theta x)$ for $1 < \theta < 5$.
   out.close();
 ```
 
-This results in the following SVG:
+This results in the following svg:
+
+<p align="center">
+  <img width="800" src="test_figure.svg">
+</p>
 
 ![plotting example](test_figure.svg)
