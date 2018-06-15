@@ -56,4 +56,5 @@ This results in the following svg:
   src="https://raw.githubusercontent.com/martinjrobins/trase/svg/test_figure.svg">
 </p>
 
-![plotting example](test_figure.svg)
+![plotting 
+example](https://cdn.rawgit.com/martinjrobins/trase/svg/test_figure.svg)
