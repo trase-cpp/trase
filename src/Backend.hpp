@@ -55,4 +55,4 @@ enum ArcDirection {
 
 } // namespace trase
 
-#endif // BACKENDGL_H_
+#endif // BACKEND_H_

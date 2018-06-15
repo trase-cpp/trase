@@ -74,8 +74,8 @@ template <typename Backend> void Figure::show(Backend &backend) {
     draw(backend, looped_time);
 
     backend.end_frame();
-    backend.finalise();
   }
+  backend.finalise();
 }
 
 template <typename Backend>

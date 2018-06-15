@@ -102,8 +102,9 @@ GLFWwindow *BackendGL::create_window(int x_pixels, int y_pixels,
   // Setup window
   glfwSetErrorCallback(glfw_error_callback);
   // glfwSetWindowRefreshCallback(m_handle, glfw_window_refresh_callback);
-  if (!glfwInit())
+  if (!glfwInit()) {
     throw Exception("Could not initialise GLFW");
+  }
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -182,6 +183,7 @@ template void Figure::show<BackendGL>(BackendGL &backend);
 
 namespace trase {
 template void Axis::draw<BackendGL>(BackendGL &backend, const float time);
+template void Axis::draw_common<BackendGL>(BackendGL &backend);
 } // namespace trase
 
 #include "Plot1DDraw.hpp"

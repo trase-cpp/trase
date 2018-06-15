@@ -67,7 +67,8 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
   // axis box
   backend.begin_path();
   backend.rect(m_pixels);
-  backend.fill_color(RGBA(0, 0, 0, 50));
+  backend.stroke_color(RGBA(200, 200, 200, 255));
+  backend.fill_color(RGBA(200, 200, 200, 255));
   backend.fill();
 
   // ticks
@@ -104,7 +105,7 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
     const float tick_val = tick_min[0] + i * tick_dx[0];
     backend.move_to(vfloat2_t(tick_pos, m_pixels.bmax[1] + tick_len / 2));
     backend.line_to(vfloat2_t(tick_pos, m_pixels.bmax[1]));
-    std::sprintf(buffer, "%.*g", sig_digits, tick_val);
+    std::sprintf(buffer, "%.*g", sig_digits + 1, tick_val);
     backend.text(vfloat2_t(tick_pos, m_pixels.bmax[1] + tick_len / 2), buffer,
                  NULL);
   }
@@ -114,7 +115,7 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
     const float tick_val = tick_min[1] + i * tick_dx[1];
     backend.move_to(vfloat2_t(m_pixels.bmin[0] - tick_len / 2, tick_pos));
     backend.line_to(vfloat2_t(m_pixels.bmin[0], tick_pos));
-    std::sprintf(buffer, "%.*g", sig_digits, tick_val);
+    std::sprintf(buffer, "%.*g", sig_digits + 1, tick_val);
     backend.text(vfloat2_t(m_pixels.bmin[0] - tick_len / 2, tick_pos), buffer,
                  NULL);
   }

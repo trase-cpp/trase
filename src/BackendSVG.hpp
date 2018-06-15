@@ -55,9 +55,13 @@ class BackendSVG {
   std::string m_font_size;
   std::string m_font_align;
   float m_from_time;
+  int m_nanimate;
+  int m_nframe;
+  bool m_end_of_frames;
 
 public:
-  BackendSVG(std::ostream &out) : m_out(out) {
+  BackendSVG(std::ostream &out)
+      : m_out(out), m_nanimate(0), m_nframe(0), m_end_of_frames(false) {
     stroke_color(RGBA(0, 0, 0, 255));
     fill_color(RGBA(0, 0, 0, 255));
     stroke_width(1);
@@ -76,41 +80,62 @@ public:
     m_path.clear();
     m_path_from.clear();
     m_from_time = 0;
+    m_nframe = 0;
+    m_nanimate++;
   }
   inline void add_frame(const float time) {
-    if (m_path_from.empty()) {
+    std::string frame_id =
+        "id" + std::to_string(m_nanimate) + '_' + std::to_string(m_nframe);
+    std::string prev_frame_id =
+        "id" + std::to_string(m_nanimate) + '_' + std::to_string(m_nframe - 1);
+    std::string last_frame_id = "id" + std::to_string(m_nanimate) + "_end";
+    if (m_end_of_frames) {
+      frame_id = last_frame_id;
+    }
+
+    if (m_nframe == 0 || m_path_from.empty()) {
       // write out start of path
       m_out << "<path d=\"" << m_path << "\" " << m_line_color << ' '
-            << m_linewidth << ">\n ";
+            << m_linewidth << " fill-opacity=\"0\">\n ";
+    } else if (m_nframe == 1) {
+      // write out first animate element
+      m_out << "<animate id=\"" << frame_id
+            << "\" attributeName=\"d\" attributeType=\"XML\" begin=\"1s;"
+            << last_frame_id << ".end\" dur=\"" << time - m_from_time
+            << "s\" fill=\"freeze\" from=\"" << m_path_from << "\" to=\""
+            << m_path << "\" />\n";
     } else {
-      // write out animate element
-      m_out << "<animate attributeName=\"d\" attributeType=\"XML\" begin=\""
-            << m_from_time << "s\" dur=\"" << time - m_from_time
+      // write out other animate element
+      m_out << "<animate id=\"" << frame_id
+            << "\" attributeName=\"d\" attributeType=\"XML\" begin=\""
+            << prev_frame_id << ".end\" dur=\"" << time - m_from_time
             << "s\" fill=\"freeze\" from=\"" << m_path_from << "\" to=\""
             << m_path << "\" />\n";
     }
     m_path_from = m_path;
     m_path.clear();
     m_from_time = time;
+    m_nframe++;
   }
   inline void end_frames(const float time) {
+    m_end_of_frames = true;
     add_frame(time);
+    m_end_of_frames = false;
     m_out << "</path>\n";
   }
-  inline void rounded_rect(const bfloat2_t &x, const float r) {
-    const auto &delta = x.delta();
-    const auto &min = x.min();
-    m_out << "<rect x=\"" << min[0] << "\" y=\"" << min[1] << "\" width=\""
-          << delta[0] << "\" height=\"" << delta[1] << "\" rx=\"" << r << "\" "
-          << m_fill_color << ' ' << m_line_color << ' ' << m_linewidth
-          << "/>\n";
-  }
+  inline void rounded_rect(const bfloat2_t &x, const float r) { rect(x); }
   inline void rect(const bfloat2_t &x) {
     const auto &delta = x.delta();
-    const auto &min = x.min();
-    m_out << "<rect x=\"" << min[0] << "\" y=\"" << min[1] << "\" width=\""
-          << delta[0] << "\" height=\"" << delta[1] << "\" " << m_fill_color
-          << ' ' << m_line_color << ' ' << m_linewidth << "/>\n";
+    vfloat2_t point = x.min();
+    begin_path();
+    move_to(point);
+    point[0] += delta[0];
+    line_to(point);
+    point[1] += delta[1];
+    line_to(point);
+    point[0] -= delta[0];
+    line_to(point);
+    close_path();
   }
 
   inline void circle(const vfloat2_t &centre, float radius) {
@@ -125,17 +150,20 @@ public:
   inline void line_to(const vfloat2_t &x) {
     m_path += " L " + std::to_string(x[0]) + ' ' + std::to_string(x[1]);
   }
+  inline void close_path() { m_path += " Z"; }
+
   inline void stroke_color(const RGBA &color) {
-    m_line_color =
-        std::string("stroke=\"") + color.to_rgb_string() + std::string("\"");
-  }
+    m_line_color = std::string("stroke=\"") + color.to_rgb_string() +
+                   "\" stroke-opacity=\"" + std::to_string(color.m_a / 255.0) +
+                   '\"';
+  };
   inline void stroke_width(const float lw) {
     m_linewidth =
         std::string("stroke-width=\"") + std::to_string(lw) + std::string("\"");
   }
   inline void stroke() {
     m_out << "<path d=\"" << m_path << "\" " << m_line_color << ' '
-          << m_linewidth << "/>\n";
+          << m_linewidth << " fill-opacity=\"0\" />\n";
   }
   inline void fill() {
     m_out << "<path d=\"" << m_path << "\" " << m_fill_color << ' '
@@ -158,10 +186,20 @@ public:
     } else if (align & ALIGN_RIGHT) {
       align_text = "end";
     }
-    m_font_align = "text-anchor=\"" + align_text + '\"';
+    std::string vert_align_text;
+    if (align & ALIGN_TOP) {
+      vert_align_text = "hanging";
+    } else if (align & ALIGN_MIDDLE) {
+      vert_align_text = "middle";
+    } else if (align & ALIGN_BOTTOM) {
+      vert_align_text = "baseline";
+    }
+    m_font_align = "text-anchor=\"" + align_text + "\" alignment-baseline=\"" +
+                   vert_align_text + '\"';
   }
   inline void fill_color(const RGBA &color) {
-    m_fill_color = "fill=\"" + color.to_rgb_string() + std::string("\"");
+    m_fill_color = "fill=\"" + color.to_rgb_string() + "\" fill-opacity=\"" +
+                   std::to_string(color.m_a / 255.0) + '\"';
   }
 
   inline void text(const vfloat2_t &x, const char *string, const char *end) {

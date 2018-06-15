@@ -43,15 +43,35 @@ using namespace trase;
 TEST_CASE("figure can written using SVG backend", "[figure]") {
   auto fig = figure();
   auto ax = fig->axis();
-  auto pl1 = ax->plot(std::vector<float>({0, 0.1, 0.5}),
-                      std::vector<float>({0, 0.1, 0.5}));
-  auto pl2 = ax->plot(std::vector<float>({0.2, 0.4, 0.8}),
-                      std::vector<float>({0, 0.2, 1.0}));
-  pl1->add_frame(std::vector<float>({1, 1.1, 1.5}),
-                 std::vector<float>({0, 0.1, 0.5}), 1);
+  const int n = 100;
+  std::vector<float> x(n);
+  std::vector<float> y(n);
+  for (int i = 0; i < n; ++i) {
+    x[i] = static_cast<float>(i) * 6.28 / n;
+    y[i] = std::sin(x[i]);
+  }
+  auto static_plot = ax->plot(x, y);
+  auto moving_plot = ax->plot(x, y);
+  float time = 0.0;
+
+  auto do_plot = [&](const float theta) {
+    for (int i = 0; i < n; ++i) {
+      y[i] = std::sin(theta * x[i]);
+    }
+    time += 0.3;
+    moving_plot->add_frame(x, y, time);
+  };
+
+  for (int i = 1; i < 6; ++i) {
+    do_plot(i);
+  }
+  for (int i = 5; i >= 1; --i) {
+    do_plot(i);
+  }
 
   std::ofstream out;
-  out.open("figure_create.svg");
+  out.open("test_figure.svg");
   BackendSVG backend(out);
   fig->serialise(backend);
+  out.close();
 }

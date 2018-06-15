@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define COLORS_H_
 
 #include <array>
+#include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -46,7 +48,11 @@ struct RGBA {
   std::string to_rgb_string() const {
     std::stringstream stream;
     stream.precision(2);
-    stream << '#' << std::hex << m_r << m_g << m_b;
+
+    stream << '#' << std::hex << std::setfill('0') << std::setw(2) << m_r
+           << std::setw(2) << m_g << std::setw(2) << m_b;
+    std::cout << "outputting rgba(" << m_r << ',' << m_g << ',' << m_b << ','
+              << m_a << ") as " << stream.str() << std::endl;
     return stream.str();
   }
   int m_r, m_g, m_b, m_a;
