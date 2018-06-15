@@ -52,7 +52,8 @@ $y=sin(x)$, and a dynamic plot of $y=sin(\theta x)$ for $1 < \theta < 5$.
 This results in the following svg:
 
 <p align="center">
-  <img width="800" src="test_figure.svg">
+  <img width="800" 
+  src="https://raw.githubusercontent.com/martinjrobins/trase/svg/test_figure.svg">
 </p>
 
 ![plotting example](test_figure.svg)
