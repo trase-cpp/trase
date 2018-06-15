@@ -97,7 +97,7 @@ public:
 private:
   std::shared_ptr<Plot1D> plot_impl(std::vector<vfloat2_t> &&values);
 
-  template <typename Backend> void draw_common(Backend backend);
+  template <typename Backend> void draw_common(Backend &backend);
 
   void set_auto_ticks();
 }; // namespace trase

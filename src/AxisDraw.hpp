@@ -49,7 +49,7 @@ void Axis::draw(Backend &backend, const float time) {
   backend.reset_scissor();
 }
 
-template <typename Backend> void Axis::serialise(Backend backend) {
+template <typename Backend> void Axis::serialise(Backend &backend) {
   draw_common(backend);
 
   // serialise plots
@@ -60,7 +60,7 @@ template <typename Backend> void Axis::serialise(Backend backend) {
   backend.reset_scissor();
 }
 
-template <typename Backend> void Axis::draw_common(Backend backend) {
+template <typename Backend> void Axis::draw_common(Backend &backend) {
   const float lw = 3.0f;
   backend.stroke_width(lw);
 

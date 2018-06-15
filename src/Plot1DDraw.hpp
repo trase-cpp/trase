@@ -36,10 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend> void serialise(Backend &backend) {
+template <typename Backend> void Plot1D::serialise(Backend &backend) {
+  const float lw = 3.0f;
 
   // draw first frame
-  backend.begin_path(m_times[0]);
+  backend.begin_frames();
   backend.stroke_color(m_color);
   backend.stroke_width(lw);
 
@@ -49,15 +50,15 @@ template <typename Backend> void serialise(Backend &backend) {
   }
 
   // other frames
-  for (int i = 1; i < m_times.size(); ++i) {
-    backend.add_frame(m_times[i]);
-    backend.move_to(m_axis.to_pixel(m_values[i][0]));
+  for (size_t f = 1; f < m_times.size(); ++f) {
+    backend.add_frame(m_times[f - 1]);
+    backend.move_to(m_axis.to_pixel(m_values[f][0]));
     for (size_t i = 1; i < m_values[0].size(); ++i) {
-      backend.line_to(m_axis.to_pixel(m_values[i][i]));
+      backend.line_to(m_axis.to_pixel(m_values[f][i]));
     }
   }
 
-  backend.stroke();
+  backend.end_frames(m_times.back());
 }
 
 template <typename Backend>

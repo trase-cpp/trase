@@ -129,6 +129,17 @@ if (trase_BUILD_OPENGL)
     target_link_libraries(backendGL PUBLIC trase glext nanovg imgui)
 endif()
 
+add_library(backendSVG
+    src/DrawableDraw.hpp
+    src/FigureDraw.hpp
+    src/AxisDraw.hpp
+    src/Plot1DDraw.hpp
+    src/BackendSVG.cpp
+    src/BackendSVG.hpp
+    )
+target_include_directories(backendSVG PUBLIC src)
+target_link_libraries(backendSVG PUBLIC trase)
+
 enable_testing()
 
 if (trase_BUILD_OPENGL)
@@ -140,9 +151,10 @@ endif()
 add_executable(trase_tests
     tests/TestFigure.cpp
     tests/TestPlot1D.cpp
+    tests/TestBackendSVG.cpp
     )
 target_include_directories(trase_tests PRIVATE tests)
-target_link_libraries(trase_tests PRIVATE trase)
+target_link_libraries(trase_tests PRIVATE trase backendSVG)
 add_test(tests trase_tests)
 
 

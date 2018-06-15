@@ -31,50 +31,28 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "BackendSVG.hpp"
+#ifndef BACKEND_H_
+#define BACKEND_H_
 
 namespace trase {
 
-void BackendSVG::init(const float width, const float height, const char *name) {
-  m_out << R"del(<?xml version="1.0" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
-  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-)del";
+enum Align {
+  // Horizontal align
+  ALIGN_LEFT = 1 << 0,   // Default, align text horizontally to left.
+  ALIGN_CENTER = 1 << 1, // Align text horizontally to center.
+  ALIGN_RIGHT = 1 << 2,  // Align text horizontally to right.
+  // Vertical align
+  ALIGN_TOP = 1 << 3,      // Align text vertically to top.
+  ALIGN_MIDDLE = 1 << 4,   // Align text vertically to middle.
+  ALIGN_BOTTOM = 1 << 5,   // Align text vertically to bottom.
+  ALIGN_BASELINE = 1 << 6, // Default, align text vertically to baseline.
+};
 
-  m_out << "<svg width=\"" << width << "px\" height=\"" << height
-        << "px\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n";
-
-  m_out << "<desc>" << name << "</desc>\n";
-}
-
-void BackendSVG::finalise() {
-  m_out << "</svg>\n";
-  m_out.flush();
-}
+enum ArcDirection {
+  CLOCKWISE = 1 << 0,
+  COUNTER_CLOCKWISE = 1 << 1,
+};
 
 } // namespace trase
 
-#include "DrawableDraw.hpp"
-
-namespace trase {
-template void Drawable::serialise<BackendSVG>(BackendSVG &backend);
-} // namespace trase
-
-#include "FigureDraw.hpp"
-
-namespace trase {
-template void Figure::serialise<BackendSVG>(BackendSVG &backend);
-} // namespace trase
-
-#include "AxisDraw.hpp"
-
-namespace trase {
-template void Axis::serialise<BackendSVG>(BackendSVG &backend);
-template void Axis::draw_common<BackendSVG>(BackendSVG &backend);
-} // namespace trase
-
-#include "Plot1DDraw.hpp"
-
-namespace trase {
-template void Plot1D::serialise<BackendSVG>(BackendSVG &backend);
-} // namespace trase
+#endif // BACKENDGL_H_

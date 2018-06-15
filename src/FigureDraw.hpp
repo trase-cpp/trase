@@ -37,6 +37,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+template <typename Backend> void Figure::serialise(Backend &backend) {
+  auto name = "Figure " + std::to_string(m_id);
+  backend.init(m_pixels.bmax[0], m_pixels.bmax[1], name.c_str());
+  m_axis->serialise(backend);
+  backend.finalise();
+}
+
 template <typename Backend> void Figure::show(Backend &backend) {
   auto name = "Figure " + std::to_string(m_id);
   backend.init(this->m_pixels.bmax[0], this->m_pixels.bmax[1], name.c_str());
@@ -69,10 +76,11 @@ template <typename Backend> void Figure::show(Backend &backend) {
     backend.end_frame();
     backend.finalise();
   }
+}
 
-  template <typename Backend>
-  void Figure::draw(Backend & backend, const float time) {
-    m_axis->draw(backend, time);
-  }
+template <typename Backend>
+void Figure::draw(Backend &backend, const float time) {
+  m_axis->draw(backend, time);
+}
 
 } // namespace trase

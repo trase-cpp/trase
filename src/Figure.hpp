@@ -57,16 +57,16 @@ class Figure : public Drawable {
   static int m_num_windows;
 
 public:
-  Figure(const std::array<int, 2> &pixels);
+  Figure(const std::array<float, 2> &pixels);
 
   std::shared_ptr<Axis> axis() { return m_axis; }
 
-  void to_svg(std::osteam &out);
-
+  template <typename Backend> void serialise(Backend &backend);
+  template <typename Backend> void show(Backend &backend);
   template <typename Backend> void draw(Backend &backend, const float time);
 };
 
-inline std::shared_ptr<Figure> figure(std::array<int, 2> pixels = {
+inline std::shared_ptr<Figure> figure(std::array<float, 2> pixels = {
                                           {800, 600}}) {
   return std::make_shared<Figure>(pixels);
 }

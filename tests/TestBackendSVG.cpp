@@ -31,50 +31,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "catch.hpp"
+
+#include <fstream>
+
 #include "BackendSVG.hpp"
+#include "trase.hpp"
 
-namespace trase {
+using namespace trase;
 
-void BackendSVG::init(const float width, const float height, const char *name) {
-  m_out << R"del(<?xml version="1.0" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
-  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-)del";
+TEST_CASE("figure can written using SVG backend", "[figure]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  auto pl1 = ax->plot(std::vector<float>({0, 0.1, 0.5}),
+                      std::vector<float>({0, 0.1, 0.5}));
+  auto pl2 = ax->plot(std::vector<float>({0.2, 0.4, 0.8}),
+                      std::vector<float>({0, 0.2, 1.0}));
+  pl1->add_frame(std::vector<float>({1, 1.1, 1.5}),
+                 std::vector<float>({0, 0.1, 0.5}), 1);
 
-  m_out << "<svg width=\"" << width << "px\" height=\"" << height
-        << "px\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n";
-
-  m_out << "<desc>" << name << "</desc>\n";
+  std::ofstream out;
+  out.open("figure_create.svg");
+  BackendSVG backend(out);
+  fig->serialise(backend);
 }
-
-void BackendSVG::finalise() {
-  m_out << "</svg>\n";
-  m_out.flush();
-}
-
-} // namespace trase
-
-#include "DrawableDraw.hpp"
-
-namespace trase {
-template void Drawable::serialise<BackendSVG>(BackendSVG &backend);
-} // namespace trase
-
-#include "FigureDraw.hpp"
-
-namespace trase {
-template void Figure::serialise<BackendSVG>(BackendSVG &backend);
-} // namespace trase
-
-#include "AxisDraw.hpp"
-
-namespace trase {
-template void Axis::serialise<BackendSVG>(BackendSVG &backend);
-template void Axis::draw_common<BackendSVG>(BackendSVG &backend);
-} // namespace trase
-
-#include "Plot1DDraw.hpp"
-
-namespace trase {
-template void Plot1D::serialise<BackendSVG>(BackendSVG &backend);
-} // namespace trase

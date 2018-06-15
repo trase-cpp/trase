@@ -47,28 +47,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nanovg.h"
 
 #include "BBox.hpp"
+#include "Backend.hpp"
 #include "Colors.hpp"
 #include "Exception.hpp"
 #include "Vector.hpp"
 
 namespace trase {
-
-enum Align {
-  // Horizontal align
-  ALIGN_LEFT = 1 << 0,   // Default, align text horizontally to left.
-  ALIGN_CENTER = 1 << 1, // Align text horizontally to center.
-  ALIGN_RIGHT = 1 << 2,  // Align text horizontally to right.
-  // Vertical align
-  ALIGN_TOP = 1 << 3,      // Align text vertically to top.
-  ALIGN_MIDDLE = 1 << 4,   // Align text vertically to middle.
-  ALIGN_BOTTOM = 1 << 5,   // Align text vertically to bottom.
-  ALIGN_BASELINE = 1 << 6, // Default, align text vertically to baseline.
-};
-
-enum ArcDirection {
-  CLOCKWISE = 1 << 0,
-  COUNTER_CLOCKWISE = 1 << 1,
-};
 
 class BackendGL {
   GLFWwindow *m_window;

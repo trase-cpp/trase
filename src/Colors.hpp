@@ -35,12 +35,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define COLORS_H_
 
 #include <array>
+#include <sstream>
+#include <string>
 
 namespace trase {
 
 struct RGBA {
   RGBA() {}
   RGBA(int r, int g, int b, int a) : m_r(r), m_g(g), m_b(b), m_a(a) {}
+  std::string to_rgb_string() const {
+    std::stringstream stream;
+    stream.precision(2);
+    stream << '#' << std::hex << m_r << m_g << m_b;
+    return stream.str();
+  }
   int m_r, m_g, m_b, m_a;
 };
 

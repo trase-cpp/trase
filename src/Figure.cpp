@@ -41,7 +41,7 @@ namespace trase {
 
 int Figure::m_num_windows = 0;
 
-Figure::Figure(const std::array<int, 2> &pixels)
+Figure::Figure(const std::array<float, 2> &pixels)
     : Drawable(nullptr,
                bfloat2_t(vfloat2_t(0, 0), vfloat2_t(pixels[0], pixels[1]))),
       m_id(++m_num_windows),
@@ -50,14 +50,6 @@ Figure::Figure(const std::array<int, 2> &pixels)
   m_children.push_back(&*m_axis);
   m_pixels = m_area;
   m_axis->resize(m_pixels);
-}
-
-void Figure::to_svg(const char *filename) {
-  BackendSVG backend;
-  auto name = "Figure " + std::to_string(m_id);
-  backend.init(filename, name.c_str());
-  m_axis->serialise(backend);
-  backend.finalise();
 }
 
 } // namespace trase

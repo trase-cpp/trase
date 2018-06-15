@@ -35,93 +35,139 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BACKENDSVG_H_
 
 #include "BBox.hpp"
+#include "Backend.hpp"
 #include "Colors.hpp"
 #include "Exception.hpp"
 #include "Vector.hpp"
 
+#include <ostream>
+
 namespace trase {
 
 class BackendSVG {
-  std::ofstream m_out;
+  std::ostream &m_out;
   std::string m_linewidth;
   std::string m_line_color;
-  std::string m_fill_color; // rgb(255,255,255)
+  std::string m_fill_color;
   std::string m_path;
+  std::string m_path_from;
+  std::string m_font_face;
+  std::string m_font_size;
+  std::string m_font_align;
+  float m_from_time;
 
 public:
-  void init(const char *filename, const char *name);
+  BackendSVG(std::ostream &out) : m_out(out) {
+    stroke_color(RGBA(0, 0, 0, 255));
+    fill_color(RGBA(0, 0, 0, 255));
+    stroke_width(1);
+  }
+  void init(const float width, const float height, const char *name);
   void finalise();
 
   inline bool is_interactive() { return false; }
 
-  inline void scissor(const bfloat2_t &x) {
-    const auto &delta = x.delta();
-    const auto &min = x.min();
-    nvgScissor(m_vg, min[0], min[1], delta[0], delta[1]);
+  inline void scissor(const bfloat2_t &x) {}
+
+  inline void reset_scissor() {}
+
+  inline void begin_path() { m_path.clear(); }
+  inline void begin_frames() {
+    m_path.clear();
+    m_path_from.clear();
+    m_from_time = 0;
   }
-
-  inline void reset_scissor() { nvgResetScissor(m_vg); }
-
-  inline void begin_path() { m_path = "d=\""; }
+  inline void add_frame(const float time) {
+    if (m_path_from.empty()) {
+      // write out start of path
+      m_out << "<path d=\"" << m_path << "\" " << m_line_color << ' '
+            << m_linewidth << ">\n ";
+    } else {
+      // write out animate element
+      m_out << "<animate attributeName=\"d\" attributeType=\"XML\" begin=\""
+            << m_from_time << "s\" dur=\"" << time - m_from_time
+            << "s\" fill=\"freeze\" from=\"" << m_path_from << "\" to=\""
+            << m_path << "\" />\n";
+    }
+    m_path_from = m_path;
+    m_path.clear();
+    m_from_time = time;
+  }
+  inline void end_frames(const float time) {
+    add_frame(time);
+    m_out << "</path>\n";
+  }
   inline void rounded_rect(const bfloat2_t &x, const float r) {
     const auto &delta = x.delta();
     const auto &min = x.min();
     m_out << "<rect x=\"" << min[0] << "\" y=\"" << min[1] << "\" width=\""
-          << delta[0] << "\" height=\"" << delta[1] << "\" rx=\"" << r << "\""
-          << m_fill_color << m_line_color << m_linewidth << "/>\n";
+          << delta[0] << "\" height=\"" << delta[1] << "\" rx=\"" << r << "\" "
+          << m_fill_color << ' ' << m_line_color << ' ' << m_linewidth
+          << "/>\n";
   }
   inline void rect(const bfloat2_t &x) {
     const auto &delta = x.delta();
     const auto &min = x.min();
     m_out << "<rect x=\"" << min[0] << "\" y=\"" << min[1] << "\" width=\""
-          << delta[0] << "\" height=\"" << delta[1] << "\"" << m_fill_color
-          << m_line_color << m_linewidth << "/>\n";
+          << delta[0] << "\" height=\"" << delta[1] << "\" " << m_fill_color
+          << ' ' << m_line_color << ' ' << m_linewidth << "/>\n";
   }
 
   inline void circle(const vfloat2_t &centre, float radius) {
     m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1]
-          << "\" r=\"" << radius << "\"" << m_fill_color << m_line_color
-          << m_linewidth << "/>\n";
+          << "\" r=\"" << radius << "\" " << m_fill_color << ' ' << m_line_color
+          << ' ' << m_linewidth << "/>\n";
   }
 
   inline void move_to(const vfloat2_t &x) {
-    m_path += " M " << x[0] << ' ' << x[1];
+    m_path += " M " + std::to_string(x[0]) + ' ' + std::to_string(x[1]);
   }
   inline void line_to(const vfloat2_t &x) {
-    m_path += " L " << x[0] << ' ' << x[1];
+    m_path += " L " + std::to_string(x[0]) + ' ' + std::to_string(x[1]);
   }
   inline void stroke_color(const RGBA &color) {
-    m_linewidth =
-        std::string("stroke=\"") + color.to_string() + str::string("\"");
+    m_line_color =
+        std::string("stroke=\"") + color.to_rgb_string() + std::string("\"");
   }
   inline void stroke_width(const float lw) {
     m_linewidth =
-        std::string("stroke-width=\"") + std::to_string(lw) + str::string("\"");
+        std::string("stroke-width=\"") + std::to_string(lw) + std::string("\"");
   }
   inline void stroke() {
-    m_path += '\"';
-    m_out << "<path " << m_path << m_line_color << m_linewidth << "/>\n";
+    m_out << "<path d=\"" << m_path << "\" " << m_line_color << ' '
+          << m_linewidth << "/>\n";
   }
   inline void fill() {
-    m_path += '\"';
-    m_out << "<path " << m_path << m_fill_color << m_line_color << m_linewidth
-          << "/>\n";
+    m_out << "<path d=\"" << m_path << "\" " << m_fill_color << ' '
+          << m_line_color << ' ' << m_linewidth << "/>\n";
   }
-  inline void font_size(float size) { nvgFontSize(m_vg, size); }
-  inline void font_face(const char *face) { nvgFontFace(m_vg, face); }
-  inline void font_blur(const float blur) { nvgFontBlur(m_vg, blur); }
-  inline void text_align(const int align) { nvgTextAlign(m_vg, align); }
+  inline void font_size(float size) {
+    m_font_size = "font-size=\"" + std::to_string(size) + '\"';
+  }
+
+  inline void font_face(const char *face) {
+    m_font_face = "font-family=\"" + std::string(face) + '\"';
+  }
+  inline void font_blur(const float blur) {}
+  inline void text_align(const int align) {
+    std::string align_text;
+    if (align & ALIGN_LEFT) {
+      align_text = "start";
+    } else if (align & ALIGN_CENTER) {
+      align_text = "middle";
+    } else if (align & ALIGN_RIGHT) {
+      align_text = "end";
+    }
+    m_font_align = "text-anchor=\"" + align_text + '\"';
+  }
   inline void fill_color(const RGBA &color) {
-    m_fill_color =
-        std::string("\"") + m_line_color.to_string() + str::string("\"");
+    m_fill_color = "fill=\"" + color.to_rgb_string() + std::string("\"");
   }
 
   inline void text(const vfloat2_t &x, const char *string, const char *end) {
-    nvgText(m_vg, x[0], x[1], string, end);
-  }
-  inline void text_bounds(const vfloat2_t &x, const char *string,
-                          const char *end, float *bounds) {
-    nvgTextBounds(m_vg, x[0], x[1], string, end, bounds);
+    m_out << "<text x=\"" << x[0] << "\" y=\"" << x[1] << "\" " << m_font_face
+          << ' ' << m_font_size << ' ' << m_font_align << ' ' << m_fill_color
+          << '>' << string << "</text>\n";
   }
 };
 
