@@ -94,7 +94,7 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
   backend.begin_path();
   backend.font_size(18.0f);
   backend.font_blur(0.0f);
-  backend.font_face("sans-bold");
+  backend.font_face(m_font_face.c_str());
   backend.text_align(ALIGN_CENTER | ALIGN_TOP);
   backend.fill_color(RGBA(0, 0, 0, 255));
 

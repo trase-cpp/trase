@@ -55,6 +55,8 @@ class Axis : public Drawable {
   /// plot extents [x_min,y_min,x_max,y_max]
   bfloat2_t m_limits;
 
+  std::string m_font_face;
+
 public:
   Axis(Figure &figure, const bfloat2_t &area);
 
@@ -92,6 +94,10 @@ public:
            m_pixels.delta() *
                vfloat2_t((i[0] - m_limits.bmin[0]) * inv_delta[0],
                          (m_limits.bmax[1] - i[1]) * inv_delta[1]);
+  }
+
+  void font_face(const std::string& fontFace) {
+    m_font_face = fontFace;
   }
 
 private:

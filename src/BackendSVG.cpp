@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 void BackendSVG::init(const float width, const float height, const char *name) {
-  m_out << R"del(<?xml version="1.0" standalone="no"?>
+  m_out << R"del(<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 )del";
@@ -45,6 +45,10 @@ void BackendSVG::init(const float width, const float height, const char *name) {
         << "px\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n";
 
   m_out << "<desc>" << name << "</desc>\n";
+
+  if (!m_web_font.empty()) {
+    m_out << "<style type=\"text/css\">@import url('" + m_web_font + "');</style>\n";
+  }
 }
 
 void BackendSVG::finalise() {

@@ -42,7 +42,8 @@ Axis::Axis(Figure &figure, const bfloat2_t &area)
       m_limits(vfloat2_t(std::numeric_limits<float>::max(),
                          std::numeric_limits<float>::max()),
                vfloat2_t(std::numeric_limits<float>::min(),
-                         std::numeric_limits<float>::min())) {}
+                         std::numeric_limits<float>::min())),
+      m_font_face("sans-bold") {}
 
 std::shared_ptr<Plot1D> Axis::plot_impl(std::vector<vfloat2_t> &&values) {
   m_plot1d.emplace_back(new Plot1D(*this));

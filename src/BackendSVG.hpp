@@ -54,6 +54,7 @@ class BackendSVG {
   std::string m_font_face;
   std::string m_font_size;
   std::string m_font_align;
+  std::string m_web_font;
   float m_from_time;
   int m_nanimate;
   int m_nframe;
@@ -176,6 +177,11 @@ public:
   inline void font_face(const char *face) {
     m_font_face = "font-family=\"" + std::string(face) + '\"';
   }
+
+  inline void import_web_font(const std::string& url) {
+    m_web_font = url;
+  }
+
   inline void font_blur(const float blur) {}
   inline void text_align(const int align) {
     std::string align_text;
