@@ -65,7 +65,7 @@ $ cd trase
 ```
 
 2. Build and install Trase. This uses an install dir of `$HOME/trase`, change 
-   this to wherever you like. This also builds the OpenGL backend of trase 
+   this to wherever you like. This also builds the OpenGL backend of Trase 
    (requires GLFW installed), switch this to `OFF` if you only want the svg 
    backend.
 
@@ -99,3 +99,10 @@ add_executable(myexe test.cpp)
 target_link_libraries(myexe trase backendGL backendSVG)
 ```
 
+4. When you build your project, you can tell CMake where you installed Trase 
+   using the `CMAKE_PREFIX_PATH` variable
+
+```bash
+$ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/trase ..
+$ make
+```
