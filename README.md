@@ -103,6 +103,6 @@ target_link_libraries(myexe trase backendGL backendSVG)
    using the `CMAKE_PREFIX_PATH` variable
 
 ```bash
-$ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/trase ..
+$ cmake -DCMAKE_PREFIX_PATH=$HOME/trase ..
 $ make
 ```
