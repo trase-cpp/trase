@@ -8,7 +8,7 @@ status](https://ci.appveyor.com/api/projects/status/kfm43tg6qltyjsyl/branch/mast
 
 Trase is a lightweight scientific plotting library for C++ with animation 
 support. It enables you to construct plots, and display them via the OpenGL 
-interface, or write them out to animated svg files. 
+interface, or write them out to animated svg files. The svg backend has no dependencies other than the standard library. The OpenGL backend requires [GLFW](http://www.glfw.org/), and uses [Dear ImGui](https://github.com/ocornut/imgui) and [NanoVG](https://github.com/memononen/nanovg).
 
 
 <p align="center">
