@@ -72,6 +72,7 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   std::ofstream out;
   out.open("test_figure.svg");
   BackendSVG backend(out);
+  backend.import_web_font("https://fonts.googleapis.com/css?family=Indie+Flower");
   fig->serialise(backend);
   out.close();
 }
