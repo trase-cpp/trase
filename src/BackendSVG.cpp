@@ -45,6 +45,10 @@ void BackendSVG::init(const float width, const float height, const char *name) {
         << "px\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n";
 
   m_out << "<desc>" << name << "</desc>\n";
+
+  if (!m_web_font.empty()) {
+    m_out << "<style type=\"text/css\">@import url('" + m_web_font + "');</style>\n";
+  }
 }
 
 void BackendSVG::finalise() {
