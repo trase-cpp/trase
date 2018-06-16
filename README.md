@@ -72,8 +72,7 @@ $ cd trase
 ```bash
 $ mkdir build
 $ cd build
-$ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/trase 
--Dtrase_BUILD_OPENGL=ON ..
+$ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/trase -Dtrase_BUILD_OPENGL=ON ..
 $ make install
 ```
 
