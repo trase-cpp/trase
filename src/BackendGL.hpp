@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BACKENDGL_H_
 #define BACKENDGL_H_
 
-#include <glad/glad.h>
+#include <glad.h>
 // works for you.
 #define GLFW_INCLUDE_GLEXT
 #include <GLFW/glfw3.h>

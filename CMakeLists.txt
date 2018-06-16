@@ -32,6 +32,8 @@
 cmake_minimum_required(VERSION 3.6)
 project(trase)
 
+set(CMAKE_DEBUG_POSTFIX d)
+
 # ensure C++14
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -53,7 +55,7 @@ endif()
 option(trase_BUILD_OPENGL "Build OpenGL backend and interactive test" ON)
 
 if (trase_BUILD_OPENGL)
-    set(imgui_dir ${trase_SOURCE_DIR}/imgui)
+    set(imgui_dir imgui)
     set(imgui_source
         ${imgui_dir}/imgui.cpp
         ${imgui_dir}/imgui.h
@@ -68,13 +70,13 @@ if (trase_BUILD_OPENGL)
         ${imgui_dir}/imgui_impl_glfw_gl3.cpp
         )
 
-    set(glext_dir ${trase_SOURCE_DIR}/glad)
+    set(glext_dir glad)
     set(glext_source
         ${glext_dir}/glad.c
-        ${glext_dir}/glad/glad.h
+        ${glext_dir}/glad.h
         )
 
-    set(nanovg_dir ${trase_SOURCE_DIR}/nanovg)
+    set(nanovg_dir nanovg)
     set(nanovg_source
         ${nanovg_dir}/fontstash.h
         ${nanovg_dir}/nanovg.c
@@ -85,77 +87,113 @@ if (trase_BUILD_OPENGL)
         ${nanovg_dir}/stb_truetype.h
         )
 
+    set(trase_gl_ext_headers
+        ${glext_dir}/glad.h
+        ${imgui_dir}/imgui.h
+        ${imgui_dir}/imconfig.h
+        ${nanovg_dir}/nanovg.h
+        )
 
     find_package(glfw3 3.2 REQUIRED)
     find_package(OpenGL REQUIRED)
 
     add_library(glext ${glext_source})
-    target_include_directories(glext SYSTEM PUBLIC ${glext_dir})
+    target_include_directories(glext SYSTEM PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${glext_dir}> 
+        $<INSTALL_INTERFACE:include>)
     target_link_libraries(glext PUBLIC ${OPENGL_gl_LIBRARY})
 
     add_library(imgui ${imgui_source})
-    target_include_directories(imgui SYSTEM PUBLIC ${imgui_dir})
-    target_link_libraries(imgui PUBLIC  glext glfw dl)
+    target_include_directories(imgui SYSTEM PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${imgui_dir}> 
+        $<INSTALL_INTERFACE:include>)
+    target_link_libraries(imgui PUBLIC glext glfw dl)
 
     add_library(nanovg ${nanovg_source})
-    target_include_directories(nanovg SYSTEM PUBLIC ${nanovg_dir})
+    target_include_directories(nanovg SYSTEM PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${nanovg_dir}> 
+        $<INSTALL_INTERFACE:include>)
     target_link_libraries(nanovg PUBLIC ${OPENGL_gl_LIBRARY} glfw dl)
 endif(trase_BUILD_OPENGL)
 
-add_library(trase
-    src/Drawable.cpp
+set(trase_headers 
     src/Drawable.hpp
-    src/Figure.cpp
     src/Figure.hpp
-    src/Axis.cpp
     src/Axis.hpp
-    src/Plot1D.cpp
     src/Plot1D.hpp
-    src/Exception.hpp)
-target_include_directories(trase PUBLIC src)
+    src/Exception.hpp
+    src/Backend.hpp
+    src/Vector.hpp
+    src/BBox.hpp
+    src/Colors.hpp
+    src/trase.hpp
+    )
 
+set(trase_source
+    src/Drawable.cpp
+    src/Figure.cpp
+    src/Axis.cpp
+    src/Plot1D.cpp
+    )
 
-if (trase_BUILD_OPENGL)
-    add_library(backendGL
-        src/DrawableDraw.hpp
-        src/FigureDraw.hpp
-        src/AxisDraw.hpp
-        src/Plot1DDraw.hpp
-        src/BackendGL.cpp
-        src/BackendGL.hpp
-        )
-
-    target_include_directories(backendGL PUBLIC src)
-    target_link_libraries(backendGL PUBLIC trase glext nanovg imgui)
-endif()
-
-add_library(backendSVG
+set(trase_draw_headers 
     src/DrawableDraw.hpp
     src/FigureDraw.hpp
     src/AxisDraw.hpp
     src/Plot1DDraw.hpp
-    src/BackendSVG.cpp
+    )
+   
+
+add_library(trase
+    ${trase_source}
+    ${trase_headers}
+    )
+#target_include_directories(trase PUBLIC src)
+
+
+if (trase_BUILD_OPENGL)
+    set(trase_gl_headers
+        src/BackendGL.hpp
+        )
+    add_library(backendGL
+        ${trase_draw_headers}
+        ${trase_gl_headers}
+        src/BackendGL.cpp
+        )
+
+    target_include_directories(backendGL PUBLIC 
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src> 
+        $<INSTALL_INTERFACE:include>)
+    target_link_libraries(backendGL PUBLIC trase glext nanovg imgui)
+endif()
+
+set(trase_svg_headers
     src/BackendSVG.hpp
     )
-target_include_directories(backendSVG PUBLIC src)
+add_library(backendSVG
+    ${trase_draw_headers}
+    ${trase_svg_headers}
+    src/BackendSVG.cpp
+    )
+target_include_directories(backendSVG PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src> $<INSTALL_INTERFACE:include>)
 target_link_libraries(backendSVG PUBLIC trase)
 
 enable_testing()
 
 if (trase_BUILD_OPENGL)
-    add_executable(interactive_test tests/TestInteractive.cpp)
-    target_include_directories(interactive_test PRIVATE tests)
-    target_link_libraries(interactive_test PRIVATE trase backendGL)
+    add_executable(interactive_tst tests/TestInteractive.cpp)
+    target_include_directories(interactive_tst PRIVATE tests)
+    target_link_libraries(interactive_tst PRIVATE trase backendGL)
 endif()
 
-add_executable(trase_tests
+add_executable(trase_tst
     tests/TestFigure.cpp
     tests/TestPlot1D.cpp
     tests/TestBackendSVG.cpp
     )
-target_include_directories(trase_tests PRIVATE tests)
-target_link_libraries(trase_tests PRIVATE trase backendSVG)
-add_test(tests trase_tests)
+target_include_directories(trase_tst PRIVATE tests)
+target_link_libraries(trase_tst PRIVATE trase backendSVG)
+add_test(the_trase_tst trase_tst)
 
 
 # Clang tidy as optional static analyzer
@@ -200,3 +238,29 @@ if (trase_ENABLE_COVERAGE)
         message(FATAL_ERROR "GCC or Clang required with trase_ENABLE_COVERAGE: found ${CMAKE_CXX_COMPILER_ID}")
     endif()
 endif()
+
+# install stuff
+set(install-targets trase backendSVG)
+if (trase_BUILD_OPENGL)
+    list(APPEND install-targets backendGL glext nanovg imgui)
+endif()
+
+set(install-headers ${trase_headers} ${trase_svg_headers})
+if (trase_BUILD_OPENGL)
+    list(APPEND install-headers ${trase_gl_headers} ${trase_gl_ext_headers})
+endif()
+
+
+install(TARGETS ${install-targets}
+    EXPORT trase-targets
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+
+install(EXPORT trase-targets
+    FILE trase-config.cmake
+    DESTINATION lib/cmake/trase
+)
+
+install(FILES ${install-headers} DESTINATION include)

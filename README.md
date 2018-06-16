@@ -55,3 +55,48 @@ For example, the above svg image was generated with the following code.
   out.close();
 ```
 
+## Usage
+
+1. Clone this repository
+
+```bash
+$ git clone https://github.com/martinjrobins/trase
+$ cd trase
+```
+
+2. Build and install Trase. This uses an install dir of `$HOME/trase`, change 
+   this to wherever you like. This also builds the OpenGL backend of trase 
+   (requires GLFW installed), switch this to `OFF` if you only want the svg 
+   backend.
+
+```bash
+$ mkdir build
+$ cd build
+$ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/trase 
+-Dtrase_BUILD_OPENGL=ON ..
+$ make install
+```
+
+2. (alternate) If you are using the Xcode or Visual Studio generator, you need 
+   to specify the configuration in build time
+
+```bash
+$ mkdir build
+$ cd build
+$ cmake -DCMAKE_INSTALL_PREFIX=$HOME/trase -Dtrase_BUILD_OPENGL=ON ..
+$ cmake --build . --target install --config Release
+```
+
+3. In your C++ project, you might link against Trase with a `CMakeLists.txt` 
+   file like so (remove `backendGL` if you don't build it):
+
+```cmake
+cmake_minimum_required(VERSION 2.8.12)
+project(test)
+
+find_package(trase REQUIRED)
+
+add_executable(myexe test.cpp)
+target_link_libraries(myexe trase backendGL backendSVG)
+```
+
