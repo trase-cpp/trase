@@ -47,7 +47,8 @@ void BackendSVG::init(const float width, const float height, const char *name) {
   m_out << "<desc>" << name << "</desc>\n";
 
   if (!m_web_font.empty()) {
-    m_out << "<style type=\"text/css\">@import url('" + m_web_font + "');</style>\n";
+    m_out << "<style type=\"text/css\">@import url('" + m_web_font +
+                 "');</style>\n";
   }
 }
 
