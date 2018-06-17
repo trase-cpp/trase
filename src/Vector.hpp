@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VECTOR_H_
 #define VECTOR_H_
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <iostream>
@@ -55,6 +56,11 @@ public:
   using value_type = T;
   const static int size = N;
 
+  using iter = T *;
+  using const_iter = const T *;
+  using reverse_iter = std::reverse_iterator<iter>;
+  using const_reverse_iter = std::reverse_iterator<const_iter>;
+
   /// Constructs an vector and allocates memory
   Vector() = default;
 
@@ -62,13 +68,9 @@ public:
   ///
   /// \param arg1 All the elements of the vector are set to
   /// this value
-  explicit Vector(T arg1) {
-    for (int i = 0; i < N; i++) {
-      mem[i] = arg1;
-    }
-  }
+  explicit Vector(T arg1) { std::fill_n(begin(), N, arg1); }
 
-  /// Constructs an vector with initial values.
+  /// Constructs a vector with initial values.
   ///
   /// \param arg1 The first element is set to this value
   /// \param arg2 The second element is set to this value
@@ -99,6 +101,36 @@ public:
     mem[1] = arg2;
     mem[2] = arg3;
     mem[3] = arg4;
+  }
+
+  Vector(const Vector<T, N> &arg) {
+    for (size_t i = 0; i < N; ++i) {
+      mem[i] = arg.mem[i];
+    }
+  };
+  
+  // Iterators
+  iter begin() noexcept { return iter(data()); }
+  const_iter begin() const noexcept { return const_iter(data()); }
+  iter end() noexcept { return iter(data() + N); }
+  const_iter end() const noexcept { return const_iter(data() + N); }
+  reverse_iter rbegin() noexcept { return reverse_iter(end()); }
+  const_reverse_iter rbegin() const noexcept { return const_reverse_iter(end()); }
+  reverse_iter rend() noexcept { return reverse_iter(begin()); }
+  const_reverse_iter rend() const noexcept { return const_reverse_iter(begin()); }
+  const_iter cbegin() const noexcept { return const_iter(data()); }
+  const_iter cend() const noexcept { return const_iter(data() + N); }
+  const_reverse_iter crbegin() const noexcept { return const_reverse_iter(end()); }
+  const_reverse_iter crend() const noexcept { return const_reverse_iter(begin()); }
+
+
+  /// Vector copy-constructor
+  ///
+  /// \param arg constructs a vector as a copy of this arguement
+  template <typename T2> Vector(const Vector<T2, N> &arg) {
+    for (size_t i = 0; i < N; ++i) {
+      mem[i] = arg[i];
+    }
   }
 
   /// Zero Vector
@@ -287,7 +319,8 @@ public:
   }
 
   /// returns the raw memory array containing the data for the vector
-  T *data() { return mem.data(); }
+  T *data() noexcept { return mem; }
+  T *data() const noexcept { return mem; }
 
   template <class Archive> void serialize(Archive &ar, const int version) {
     (void)version;
