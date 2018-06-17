@@ -186,11 +186,13 @@ if (trase_BUILD_OPENGL)
     target_link_libraries(interactive_tst PRIVATE trase backendGL)
 endif()
 
-add_executable(trase_tst
-    tests/TestFigure.cpp
-    tests/TestPlot1D.cpp
-    tests/TestBackendSVG.cpp
-    )
+add_executable (
+        trase_tst
+        tests/TestFigure.cpp
+        tests/TestPlot1D.cpp
+        tests/TestBackendSVG.cpp
+        tests/TestVector.cpp
+)
 target_include_directories(trase_tst PRIVATE tests)
 target_link_libraries(trase_tst PRIVATE trase backendSVG)
 add_test(the_trase_tst trase_tst)
