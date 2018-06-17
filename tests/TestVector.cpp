@@ -1,0 +1,72 @@
+/*
+Copyright (c) 2018, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of the Oxford RSE C++ Template project.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+#include "catch.hpp"
+
+#include <iterator>
+
+#include "Vector.hpp"
+
+TEST_CASE("vector constructors", "[vector]") {
+
+    trase::Vector<int, 3> a;
+
+    trase::Vector<int, 5> b(123);
+    for (const auto i : b){
+        CHECK(i == 123);
+    }
+}
+
+TEST_CASE("vector iterators", "[vector]") {
+
+    trase::Vector<int, 3> a;
+    a[0] = 123;
+    a[2] = 234;
+
+    CHECK(*a.begin() == 123);
+    CHECK(*(a.end()-1) == 234);
+
+    CHECK(*a.cbegin() == 123);
+    CHECK(*(a.cend()-1) == 234);
+
+    CHECK(*a.rbegin() == 234);
+    CHECK(*(a.rend()-1) == 123);
+
+    CHECK(*a.crbegin() == 234);
+    CHECK(*(a.crend()-1) == 123);
+
+    CHECK(std::distance(a.begin(), a.end()) == 3);
+    CHECK(std::distance(a.cbegin(), a.cend()) == 3);
+    CHECK(std::distance(a.rbegin(), a.rend()) == 3);
+    CHECK(std::distance(a.crbegin(), a.crend()) == 3);
+}
