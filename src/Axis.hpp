@@ -71,8 +71,8 @@ public:
     }
     std::vector<vfloat2_t> values(x.size());
     for (size_t i = 0; i < x.size(); ++i) {
-      values[i][0] = x[i];
-      values[i][1] = y[i];
+      values[i][0] = static_cast<float>(x[i]);
+      values[i][1] = static_cast<float>(y[i]);
     }
     return plot_impl(std::move(values));
   }
