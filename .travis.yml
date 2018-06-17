@@ -103,9 +103,9 @@ script:
   - cmake $CMAKE_OPTNS .
   - cmake --build . -- -j2 
   - ctest -j2 --output-on-failure
-  - if [ "$TEST_SVG" == true ] ;  then
-        pip install --user html5validator
-        ~/.local/bin/html5validator *.svg --also-check-svg
+  - if [ "$TEST_SVG" == true ] ; then
+        pip install --user html5validator;
+        ~/.local/bin/html5validator *.svg --also-check-svg;
     fi
 
 after_success:
