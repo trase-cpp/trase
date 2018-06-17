@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <array>
 #include <cmath>
 #include <iostream>
+#include <iterator>
 
 namespace trase {
 
@@ -320,7 +321,7 @@ public:
 
   /// returns the raw memory array containing the data for the vector
   T *data() noexcept { return mem; }
-  T *data() const noexcept { return mem; }
+  const T *data() const noexcept { return mem; }
 
   template <class Archive> void serialize(Archive &ar, const int version) {
     (void)version;
