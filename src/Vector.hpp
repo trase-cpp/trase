@@ -76,6 +76,7 @@ public:
   /// \param arg1 The first element is set to this value
   /// \param arg2 The second element is set to this value
   Vector(T arg1, T arg2) {
+    static_assert(N > 1, "Vector must have at least 2 elements");
     mem[0] = arg1;
     mem[1] = arg2;
   }
@@ -86,6 +87,7 @@ public:
   /// \param arg2 The second element is set to this value
   /// \param arg3 The third element is set to this value
   Vector(T arg1, T arg2, T arg3) {
+    static_assert(N > 2, "Vector must have at least 3 elements");
     mem[0] = arg1;
     mem[1] = arg2;
     mem[2] = arg3;
@@ -98,6 +100,7 @@ public:
   /// \param arg3 The third element is set to this value
   /// \param arg4 The fourth element is set to this value
   Vector(T arg1, T arg2, T arg3, T arg4) {
+    static_assert(N > 3, "Vector must have at least 4 elements");
     mem[0] = arg1;
     mem[1] = arg2;
     mem[2] = arg3;
