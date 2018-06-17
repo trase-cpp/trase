@@ -120,8 +120,12 @@ template <typename T, int N> struct bbox {
   /// @return scale the bounding box
   ///
   inline bbox &operator*=(const vector_t &arg) {
-    bmin = 0.5 * ((bmax * (1 - arg) + bmin * (1 + arg)));
-    bmax = 0.5 * ((bmax * (1 + arg) + bmin * (1 - arg)));
+    bmin =
+        static_cast<T>(0.5) *
+        ((bmax * (static_cast<T>(1) - arg) + bmin * (static_cast<T>(1) + arg)));
+    bmax =
+        static_cast<T>(0.5) *
+        ((bmax * (static_cast<T>(1) + arg) + bmin * (static_cast<T>(1) - arg)));
     return *this;
   }
 

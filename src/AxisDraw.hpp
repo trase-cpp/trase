@@ -82,7 +82,7 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
   const auto tick_dx = round_off(limits_delta / n_ticks, sig_digits);
   const auto tick_min = ceil(m_limits.bmin / tick_dx) * tick_dx;
   const auto tick_max = floor(m_limits.bmax / tick_dx) * tick_dx;
-  n_ticks = (tick_max - tick_min) / tick_dx + 1;
+  n_ticks = (tick_max - tick_min) / tick_dx + 1.0f;
 
   // scale to pixels
   const auto tick_dx_pixels = tick_dx * pixel_delta / limits_delta;

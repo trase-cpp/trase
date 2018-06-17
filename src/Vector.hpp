@@ -119,19 +119,6 @@ public:
     return ret;
   }
 
-  /// Vector assignment
-  ///
-  /// Assigns a vector with different type `T2` but same length `N` to this
-  /// vector
-  ///
-  /// \param arg Assigns the first N values from arg to this vector.
-  template <typename T2> Vector<T, N> &operator=(const Vector<T2, N> &arg) {
-    for (size_t i = 0; i < N; ++i) {
-      mem[i] = arg[i];
-    }
-    return *this;
-  }
-
 #ifdef HAVE_EIGEN
   /// Eigen Vector assignment
   ///
