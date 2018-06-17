@@ -612,15 +612,15 @@ Vector<T, N> round_off(const Vector<T, N> &x, int n) {
   for (int j = 0; j < N; ++j) {
     // Counting the no. of digits to the left of decimal point
     // in the given no.
-    float tmp = num[j];
+    T tmp = num[j];
     int i;
     for (i = 0; tmp >= 1; ++i) {
       tmp /= 10;
     }
 
     // round off to the given number of sig digits
-    const float d = std::pow(10.0f, n - i);
-    num[j] = std::floor(num[j] * d + 0.5) / d;
+    const T d = std::pow(static_cast<T>(10.0), n - i);
+    num[j] = std::floor(num[j] * d + static_cast<T>(0.5)) / d;
   }
   return num;
 }
