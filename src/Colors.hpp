@@ -58,7 +58,7 @@ struct RGBA {
   int m_r, m_g, m_b, m_a;
 };
 
-const static float default_alpha = 200;
+const static int default_alpha = 200;
 
 // default colors taken from d3 category10 color scheme
 // https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
