@@ -49,7 +49,7 @@ namespace trase {
 /// @tparam D the number of spatial dimensions
 ///
 template <typename T, int N> struct bbox {
-  typedef Vector<T, N> vector_t;
+  using vector_t = Vector<T, N>;
 
   ///
   /// @brief minimum point in the box (i.e. lower left corner for D=2)
@@ -65,18 +65,14 @@ template <typename T, int N> struct bbox {
       : bmin(vector_t::Constant(std::numeric_limits<T>::max())),
         bmax(vector_t::Constant(-std::numeric_limits<T>::max())) {}
 
-  inline bbox(const vector_t &p)
-      : bmin(p), bmax(p + std::numeric_limits<double>::epsilon()) {}
+  inline explicit bbox(const vector_t &p)
+      : bmin(p), bmax(p + std::numeric_limits<T>::epsilon()) {}
 
   inline bbox(const vector_t &min, const vector_t &max)
       : bmin(min), bmax(max) {}
 
-  inline bbox(const double *min, const double *max) {
-    for (int i = 0; i < N; ++i) {
-      bmin[i] = min[i];
-      bmax[i] = max[i];
-    }
-  }
+  inline bbox(const std::array<T, N> &min, const std::array<T, N> &max)
+      : bmin(min), bmax(max) {}
 
   vector_t delta() const { return bmax - bmin; }
   const vector_t &min() const { return bmin; }
@@ -169,8 +165,9 @@ template <typename T, int N> struct bbox {
   ///
   inline bool is_empty() {
     for (int i = 0; i < N; ++i) {
-      if (bmax[i] < bmin[i] + 3 * std::numeric_limits<double>::epsilon())
+      if (bmax[i] < bmin[i] + 3 * std::numeric_limits<double>::epsilon()) {
         return true;
+      }
     }
     return false;
   }
@@ -188,8 +185,8 @@ std::ostream &operator<<(std::ostream &out, const bbox<T, N> &b) {
   return out << "bbox(" << b.bmin << "<->" << b.bmax << ")";
 }
 
-typedef bbox<float, 2> bfloat2_t;
-typedef bbox<float, 1> bfloat1_t;
+using bfloat2_t = bbox<float, 2>;
+using bfloat1_t = bbox<float, 1>;
 
 } // namespace trase
 

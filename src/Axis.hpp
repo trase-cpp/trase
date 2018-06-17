@@ -96,9 +96,7 @@ public:
                          (m_limits.bmax[1] - i[1]) * inv_delta[1]);
   }
 
-  void font_face(const std::string& fontFace) {
-    m_font_face = fontFace;
-  }
+  void font_face(const std::string &fontFace) { m_font_face = fontFace; }
 
 private:
   std::shared_ptr<Plot1D> plot_impl(std::vector<vfloat2_t> &&values);

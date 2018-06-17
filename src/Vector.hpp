@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VECTOR_H_
 #define VECTOR_H_
 
+#include <array>
 #include <cmath>
 #include <iostream>
 
@@ -51,17 +52,17 @@ namespace trase {
 ///
 template <typename T, int N> class Vector {
 public:
-  typedef T value_type;
+  using value_type = T;
   const static int size = N;
 
   /// Constructs an vector and allocates memory
-  Vector() {}
+  Vector() = default;
 
   /// Constructs an vector with initial values.
   ///
   /// \param arg1 All the elements of the vector are set to
   /// this value
-  Vector(T arg1) {
+  explicit Vector(T arg1) {
     for (int i = 0; i < N; i++) {
       mem[i] = arg1;
     }
@@ -100,29 +101,12 @@ public:
     mem[3] = arg4;
   }
 
-  Vector(const Vector<T, N> &arg) {
-    for (size_t i = 0; i < N; ++i) {
-      mem[i] = arg.mem[i];
-    }
-  };
-
-  /// Vector copy-constructor
-  ///
-  /// \param arg constructs a vector as a copy of this arguement
-  template <typename T2> Vector(const Vector<T2, N> &arg) {
-    for (size_t i = 0; i < N; ++i) {
-      mem[i] = arg[i];
-    }
-  }
-
   /// Zero Vector
   ///
   /// Returns a zero vector
   static Vector Zero() {
     Vector ret;
-    for (int i = 0; i < N; ++i) {
-      ret.mem[i] = 0;
-    }
+    std::fill(ret.mem.begin(), ret.mem.end(), 0);
     return ret;
   }
 
@@ -131,9 +115,7 @@ public:
   /// Returns a constant vector
   static Vector Constant(const T &c) {
     Vector ret;
-    for (int i = 0; i < N; ++i) {
-      ret.mem[i] = c;
-    }
+    std::fill(ret.mem.begin(), ret.mem.end(), c);
     return ret;
   }
 
@@ -143,19 +125,7 @@ public:
   /// vector
   ///
   /// \param arg Assigns the first N values from arg to this vector.
-  template <typename T2> Vector<T, N> &operator=(Vector<T2, N> &arg) {
-    for (size_t i = 0; i < N; ++i) {
-      mem[i] = arg[i];
-    }
-    return *this;
-  }
-
-  /// Other Vector assignment
-  ///
-  /// Assigns a vector-like object (arg) to this vector.
-  ///
-  /// \param arg Vector-like object (with index operator)
-  template <typename T2> Vector<T, N> &operator=(T2 *arg) {
+  template <typename T2> Vector<T, N> &operator=(const Vector<T2, N> &arg) {
     for (size_t i = 0; i < N; ++i) {
       mem[i] = arg[i];
     }
@@ -184,14 +154,14 @@ public:
   /// Returns a const reference to the `n`-th element of the vector
   ///
   /// \param n the element number to index
-  const T &operator[](int n) const { return mem[n]; }
+  const T &operator[](const int n) const { return mem[n]; }
 
   /// Index operator
   ///
   /// Returns a reference to the `n`-th element of the vector
   ///
   /// \param n the element number to index
-  T &operator[](int n) { return mem[n]; }
+  T &operator[](const int n) { return mem[n]; }
 
   /// inner product
   ///
@@ -247,8 +217,9 @@ public:
     double ret = std::abs(mem[0]);
     for (int i = 1; i < N; ++i) {
       const double absi = std::abs(mem[i]);
-      if (absi > ret)
+      if (absi > ret) {
         ret = absi;
+      }
     }
     return ret;
   }
@@ -329,14 +300,15 @@ public:
   }
 
   /// returns the raw memory array containing the data for the vector
-  T *data() { return mem; }
+  T *data() { return mem.data(); }
 
   template <class Archive> void serialize(Archive &ar, const int version) {
+    (void)version;
     ar &BOOST_SERIALIZATION_NVP(mem);
   }
 
 private:
-  T mem[N];
+  std::array<T, N> mem;
 };
 
 /// returns arg.pow(exponent)
@@ -626,28 +598,7 @@ Vector<T, 3> cross(const Vector<T, 3> &arg1, const Vector<T, 3> &arg2) {
   return ret;
 }
 
-/* for eigen
- */
-/// returns the input Vector x (for Eigen)
-template <typename T, int N>
-inline const Vector<T, N> &conj(const Vector<T, N> &x) {
-  return x;
-}
-
-/// returns the input Vector x (for Eigen)
-template <typename T, int N>
-inline const Vector<T, N> &real(const Vector<T, N> &x) {
-  return x;
-}
-
-/// returns imaginary component of Vector class (i.e. 0, for Eigen)
-template <typename T, int N>
-inline const Vector<T, N> imag(const Vector<T, N> &x) {
-  return 0;
-}
-
-/// returns new Vector made from element-wise absolute value of input arg (for
-/// Eigen)
+/// returns new Vector made from element-wise absolute value of input arg
 template <typename T, int N>
 inline const Vector<T, N> abs(const Vector<T, N> &x) {
   Vector<T, N> ret;
@@ -675,12 +626,13 @@ Vector<T, N> round_off(const Vector<T, N> &x, int n) {
     // Counting the no. of digits to the left of decimal point
     // in the given no.
     float tmp = num[j];
-    float i;
-    for (i = 0; tmp >= 1; ++i)
+    int i;
+    for (i = 0; tmp >= 1; ++i) {
       tmp /= 10;
+    }
 
     // round off to the given number of sig digits
-    const float d = std::pow(10, n - i);
+    const float d = std::pow(10.0f, n - i);
     num[j] = std::floor(num[j] * d + 0.5) / d;
   }
   return num;
@@ -692,8 +644,9 @@ std::ostream &operator<<(std::ostream &out, const Vector<T, N> &v) {
   out << "(";
   for (size_t i = 0; i < N; ++i) {
     out << v[i];
-    if (i != N - 1)
+    if (i != N - 1) {
       out << ",";
+    }
   }
   return out << ")";
 }
@@ -709,7 +662,7 @@ std::istream &operator>>(std::istream &out, Vector<T, N> &v) {
   return out;
 }
 
-typedef Vector<float, 2> vfloat2_t;
+using vfloat2_t = Vector<float, 2>;
 
 } // namespace trase
 
