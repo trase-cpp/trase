@@ -157,3 +157,12 @@ TEST_CASE("all any none", "[vector]") {
     CHECK(two.any());
     CHECK(!two.none());
 }
+
+TEST_CASE("inner product", "[vector]") {
+
+    trase::Vector<int, 4> a = {1, 2, 3, 4};
+    trase::Vector<int, 4> b = {2, 3, 4, 5};
+
+    CHECK(a.inner_product(b) == 40);
+    CHECK(a.inner_product(b) == b.inner_product(a));
+}

@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <iostream>
 #include <iterator>
+#include <numeric>
 
 namespace trase {
 
@@ -175,12 +176,8 @@ public:
   ///
   /// \return the inner product (dot product) of this vector
   /// with `arg`
-  template <typename T2> double inner_product(const Vector<T2, N> &arg) const {
-    double ret = 0;
-    for (size_t i = 0; i < N; ++i) {
-      ret += arg[i] * mem[i];
-    }
-    return ret;
+  T inner_product(const Vector<T, N> &arg) const noexcept {
+    return std::inner_product(begin(), end(), arg.begin(), static_cast<T>(0));
   }
 
   /// change vector type
