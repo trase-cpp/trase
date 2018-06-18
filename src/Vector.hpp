@@ -264,12 +264,14 @@ public:
   }
 
   /// returns the product of every element in the vector
-  T prod() const {
-    T ret = 1;
-    for (size_t i = 0; i < N; ++i) {
-      ret *= mem[i];
-    }
-    return ret;
+  T prod() const noexcept{
+    return std::accumulate(begin(), end(), static_cast<T>(1),
+                           std::multiplies<T>());
+  }
+
+  /// returns the sum of every element in the vector
+  T sum() const noexcept{
+    return std::accumulate(begin(), end(), static_cast<T>(0));
   }
 
   /// returns the raw memory array containing the data for the vector

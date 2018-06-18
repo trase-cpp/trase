@@ -187,3 +187,11 @@ TEST_CASE("min max", "[vector]") {
   CHECK(a.maxCoeff() == 13);
   CHECK(a.minCoeff() == -2);
 }
+
+TEST_CASE("product and sum", "[vector]") {
+
+  trase::Vector<int, 4> a = {1, -2, 13, 4};
+
+  CHECK(a.prod() == -104);
+  CHECK(a.sum() == 16);
+}
