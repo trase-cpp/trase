@@ -25,9 +25,11 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
+            - openjdk-8-jre
             - lcov
       env:
         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+        - TEST_SVG=true
         - CMAKE_OPTNS="-D trase_ENABLE_COVERAGE:BOOL=TRUE
                        -D CMAKE_BUILD_TYPE=Debug
                        -D trase_BUILD_OPENGL:BOOL=FALSE"
@@ -101,6 +103,10 @@ script:
   - cmake $CMAKE_OPTNS .
   - cmake --build . -- -j2 
   - ctest -j2 --output-on-failure
+  - if [ "$TEST_SVG" == true ] ; then
+        pip install --user html5validator;
+        ~/.local/bin/html5validator *.svg --also-check-svg;
+    fi
 
 after_success:
   # Creating report
