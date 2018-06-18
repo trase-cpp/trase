@@ -59,9 +59,9 @@ float Drawable::get_frame_index(const float time) {
     clipped_time = time;
   }
 
-  int time_index =
-      std::lower_bound(m_times.begin(), m_times.end(), clipped_time) -
-      m_times.begin();
+  auto time_index = std::distance(
+      m_times.begin(),
+      std::lower_bound(m_times.begin(), m_times.end(), clipped_time));
 
   if (time_index == 0) {
     return 0.0f;
