@@ -157,10 +157,18 @@ public:
 
   /// inner product
   ///
-  /// \return the inner product (dot product) of this vector
-  /// with `arg`
+  /// \return the inner product (dot product) of this vector with `arg`
   T inner_product(const Vector<T, N> &arg) const noexcept {
     return std::inner_product(begin(), end(), arg.begin(), static_cast<T>(0));
+  }
+
+  /// dot product
+  ///
+  /// \return The inner product (dot product) of this vector with `arg`
+  ///
+  /// \see inner_product
+  T dot(const Vector<T, N> &arg) const noexcept {
+    return inner_product(arg);
   }
 
   /// change vector type
@@ -172,16 +180,6 @@ public:
     std::transform(begin(), end(), ret.begin(),
                    [](const T &a) { return static_cast<T2>(a); });
     return ret;
-  }
-
-  /// inner product
-  ///
-  /// \return The inner product (dot product) of this vector
-  /// with `arg`
-  ///
-  /// \see inner_product
-  template <typename T2> double dot(const Vector<T2, N> &arg) const {
-    return inner_product(arg);
   }
 
   /// squared norm

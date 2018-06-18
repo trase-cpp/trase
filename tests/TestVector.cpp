@@ -165,6 +165,9 @@ TEST_CASE("inner product", "[vector]") {
 
     CHECK(a.inner_product(b) == 40);
     CHECK(a.inner_product(b) == b.inner_product(a));
+
+    CHECK(a.dot(b) == 40);
+    CHECK(a.dot(b) == b.dot(a));
 }
 
 TEST_CASE("cast", "[vector]") {
