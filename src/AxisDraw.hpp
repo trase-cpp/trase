@@ -162,9 +162,13 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
     const vfloat2_t point = vfloat2_t(
         m_pixels.bmin[0] - 0.05 * (m_pixels.bmax[0] - m_pixels.bmin[0]),
         0.5 * (m_pixels.bmax[1] + m_pixels.bmin[1]));
-    backend.translate(-point);
-    backend.rotate(-3.14 / 2.0);
-    backend.text(vfloat2_t(0.0f, 0.0f), m_ylabel.c_str(), NULL);
+    backend.translate(point);
+    backend.rotate(-3.14 / 10.0);
+    backend.text(vfloat2_t(0, 0), m_ylabel.c_str(), NULL);
+    backend.rotate(-3.14 / 10.0);
+    backend.text(vfloat2_t(0, 0), m_ylabel.c_str(), NULL);
+    backend.rotate(-3.14 / 10.0);
+    backend.text(vfloat2_t(0, 0), m_ylabel.c_str(), NULL);
     backend.reset_transform();
   }
 }

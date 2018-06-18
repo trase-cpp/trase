@@ -169,11 +169,19 @@ public:
   }
   inline void stroke() {
     m_out << "<path d=\"" << m_path << "\" " << m_line_color << ' '
-          << m_linewidth << " fill-opacity=\"0\" />\n";
+          << m_linewidth << " fill-opacity=\"0\"";
+    if (!m_transform.is_identity()) {
+      m_out << ' ' << m_transform.to_string();
+    }
+    m_out << "/>\n";
   }
   inline void fill() {
     m_out << "<path d=\"" << m_path << "\" " << m_fill_color << ' '
-          << m_line_color << ' ' << m_linewidth << "/>\n";
+          << m_line_color << ' ' << m_linewidth;
+    if (!m_transform.is_identity()) {
+      m_out << ' ' << m_transform.to_string();
+    }
+    m_out << "/>\n";
   }
   inline void font_size(float size) {
     m_font_size = "font-size=\"" + std::to_string(size) + '\"';
