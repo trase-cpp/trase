@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <numeric>
@@ -288,140 +289,124 @@ Vector<T, N> pow(Vector<T, N> arg, EXP_T exponent) {
   return arg.pow(exponent);
 }
 
-/*
-template<typename T1,typename T2,int N>
-bool operator ==(const Vector<T1,N> &arg1, const Vector<T2,N> &arg2) {
-    bool ret = true;
-    for (size_t i = 0; i < N; ++i) {
-        ret &= arg1[i] == arg2[i];
-    }
-    return ret;
+/// unary `-` (minus) operator for Vector class
+template <typename T, int N> Vector<T, N> operator-(const Vector<T, N> &a) {
+  Vector<T, N> ret{};
+  std::transform(a.begin(), a.end(), ret.begin(), std::negate<T>());
+  return ret;
 }
-*/
-
-#define UNARY_OPERATOR(the_op)                                                 \
-  template <typename T, int N>                                                 \
-  Vector<double, N> operator the_op(const Vector<T, N> &arg1) {                \
-    Vector<double, N> ret;                                                     \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = the_op arg1[i];                                                 \
-    }                                                                          \
-    return ret;                                                                \
-  }
-
-/// unary `-` operator for Vector class
-UNARY_OPERATOR(-)
-
-#define OPERATOR(the_op)                                                       \
-  template <typename T1, typename T2, int N,                                   \
-            typename =                                                         \
-                typename std::enable_if<std::is_arithmetic<T1>::value>::type>  \
-  Vector<double, N> operator the_op(const T1 &arg1,                            \
-                                    const Vector<T2, N> &arg2) {               \
-    Vector<double, N> ret;                                                     \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = arg1 the_op arg2[i];                                            \
-    }                                                                          \
-    return ret;                                                                \
-  }                                                                            \
-  template <typename T1, typename T2, int N,                                   \
-            typename =                                                         \
-                typename std::enable_if<std::is_arithmetic<T2>::value>::type>  \
-  Vector<double, N> operator the_op(const Vector<T1, N> &arg1,                 \
-                                    const T2 &arg2) {                          \
-    Vector<double, N> ret;                                                     \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = arg1[i] the_op arg2;                                            \
-    }                                                                          \
-    return ret;                                                                \
-  }                                                                            \
-                                                                               \
-  template <typename T1, typename T2, int N>                                   \
-  Vector<double, N> operator the_op(const Vector<T1, N> &arg1,                 \
-                                    const Vector<T2, N> &arg2) {               \
-    Vector<double, N> ret;                                                     \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = arg1[i] the_op arg2[i];                                         \
-    }                                                                          \
-    return ret;                                                                \
-  }                                                                            \
-                                                                               \
-  template <int N>                                                             \
-  Vector<float, N> operator the_op(const Vector<float, N> &arg1,               \
-                                   const Vector<float, N> &arg2) {             \
-    Vector<float, N> ret;                                                      \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = arg1[i] the_op arg2[i];                                         \
-    }                                                                          \
-    return ret;                                                                \
-  }                                                                            \
-  template <int N>                                                             \
-  Vector<float, N> operator the_op(const float &arg1,                          \
-                                   const Vector<float, N> &arg2) {             \
-    Vector<float, N> ret;                                                      \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = arg1 the_op arg2[i];                                            \
-    }                                                                          \
-    return ret;                                                                \
-  }                                                                            \
-  template <int N>                                                             \
-  Vector<float, N> operator the_op(const Vector<float, N> &arg1,               \
-                                   const float &arg2) {                        \
-    Vector<float, N> ret;                                                      \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = arg1[i] the_op arg2;                                            \
-    }                                                                          \
-    return ret;                                                                \
-  }                                                                            \
-                                                                               \
-  template <int, int, int N>                                                   \
-  Vector<int, N> operator the_op(const Vector<int, N> &arg1,                   \
-                                 const Vector<int, N> &arg2) {                 \
-    Vector<int, N> ret;                                                        \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = arg1[i] the_op arg2[i];                                         \
-    }                                                                          \
-    return ret;                                                                \
-  }                                                                            \
-  template <int, int, int N>                                                   \
-  Vector<int, N> operator the_op(const int &arg1,                              \
-                                 const Vector<int, N> &arg2) {                 \
-    Vector<int, N> ret;                                                        \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = arg1 the_op arg2[i];                                            \
-    }                                                                          \
-    return ret;                                                                \
-  }                                                                            \
-  template <int, int, int N>                                                   \
-  Vector<int, N> operator the_op(const Vector<int, N> &arg1,                   \
-                                 const int &arg2) {                            \
-    Vector<int, N> ret;                                                        \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = arg1[i] the_op arg2;                                            \
-    }                                                                          \
-    return ret;                                                                \
-  }
-
-/// binary `+` operator for Vector class
-OPERATOR(+)
-/// binary `-` operator for Vector class
-OPERATOR(-)
-/// binary `/` operator for Vector class
-OPERATOR(/)
-/// binary `*` operator for Vector class
-OPERATOR(*)
 
 /*
-template<typename T1,typename T2,int N>
-Vector<double,N> operator *(const Vector<T1,N*N> &arg1, const Vector<T2,N>
-&arg2) { Vector<double,N> ret; for (size_t i = 0; i < N; ++i) { ret[i] =
-arg1[i*N] * arg2[0]; for (int j = 1; j < N; ++j) { ret[i] += arg1[i*N+j] *
-arg2[j];
-        }
-    }
-    return ret;
+ * Binary operations.
+ *
+ * First four are Vector-Vector elementwise operations (V[i] op U[i] for all i).
+ * Second four are scalar-Vector elementwise operations (k op V[i] for all i).
+ * Third four are Vector-scalar elementwise operations (V[i] op k for all i).
+ */
+
+/// binary `+` (plus) operator for two Vectors
+template <typename T, int N>
+Vector<T, N> operator+(const Vector<T, N> &a, const Vector<T, N> &b) {
+  Vector<T, N> ret{};
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::plus<T>());
+  return ret;
 }
-*/
+
+/// binary `-` (minus) operator for two Vectors
+template <typename T, int N>
+Vector<T, N> operator-(const Vector<T, N> &a, const Vector<T, N> &b) {
+  Vector<T, N> ret{};
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::minus<T>());
+  return ret;
+}
+
+/// binary `*` (multiples) operator for two Vectors
+template <typename T, int N>
+Vector<T, N> operator*(const Vector<T, N> &a, const Vector<T, N> &b) {
+  Vector<T, N> ret{};
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::multiplies<T>());
+  return ret;
+}
+
+/// binary `/` (divides) operator for two Vectors
+template <typename T, int N>
+Vector<T, N> operator/(const Vector<T, N> &a, const Vector<T, N> &b) {
+  Vector<T, N> ret{};
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::divides<T>());
+  return ret;
+}
+
+/// binary `+` (plus) operator for scalar and Vector
+template <typename T, int N>
+Vector<T, N> operator+(const T &a, const Vector<T, N> &b) {
+  Vector<T, N> ret{};
+  std::transform(b.begin(), b.end(), ret.begin(),
+                 std::bind(std::plus<T>(), a, std::placeholders::_1));
+  return ret;
+}
+
+/// binary `-` (minus) operator for scalar and Vector
+template <typename T, int N>
+Vector<T, N> operator-(const T &a, const Vector<T, N> &b) {
+  Vector<T, N> ret{};
+  std::transform(b.begin(), b.end(), ret.begin(),
+                 std::bind(std::minus<T>(), a, std::placeholders::_1));
+  return ret;
+}
+
+/// binary `*` (multiples) operator for scalar and Vector
+template <typename T, int N>
+Vector<T, N> operator*(const T &a, const Vector<T, N> &b) {
+  Vector<T, N> ret{};
+  std::transform(b.begin(), b.end(), ret.begin(),
+                 std::bind(std::multiplies<T>(), a, std::placeholders::_1));
+  return ret;
+}
+
+/// binary `/` (divides) operator for scalar and Vector
+template <typename T, int N>
+Vector<T, N> operator/(const T &a, const Vector<T, N> &b) {
+  Vector<T, N> ret{};
+  std::transform(b.begin(), b.end(), ret.begin(),
+                 std::bind(std::divides<T>(), a, std::placeholders::_1));
+  return ret;
+}
+
+/// binary `+` (plus) operator for Vector and scalar
+template <typename T, int N>
+Vector<T, N> operator+(const Vector<T, N> &b, const T &a) {
+  Vector<T, N> ret{};
+  std::transform(b.begin(), b.end(), ret.begin(),
+                 std::bind(std::plus<T>(), std::placeholders::_1, a));
+  return ret;
+}
+
+/// binary `-` (minus) operator for Vector and scalar
+template <typename T, int N>
+Vector<T, N> operator-(const Vector<T, N> &b, const T &a) {
+  Vector<T, N> ret{};
+  std::transform(b.begin(), b.end(), ret.begin(),
+                 std::bind(std::minus<T>(), std::placeholders::_1, a));
+  return ret;
+}
+
+/// binary `*` (multiples) operator for Vector and scalar
+template <typename T, int N>
+Vector<T, N> operator*(const Vector<T, N> &b, const T &a) {
+  Vector<T, N> ret{};
+  std::transform(b.begin(), b.end(), ret.begin(),
+                 std::bind(std::multiplies<T>(), std::placeholders::_1, a));
+  return ret;
+}
+
+/// binary `/` (divides) operator for Vector and scalar
+template <typename T, int N>
+Vector<T, N> operator/(const Vector<T, N> &b, const T &a) {
+  Vector<T, N> ret{};
+  std::transform(b.begin(), b.end(), ret.begin(),
+                 std::bind(std::divides<T>(), std::placeholders::_1, a));
+  return ret;
+}
 
 // Comparison operators: == != < > <= >=
 

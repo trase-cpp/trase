@@ -195,3 +195,86 @@ TEST_CASE("product and sum", "[vector]") {
   CHECK(a.prod() == -104);
   CHECK(a.sum() == 16);
 }
+
+TEST_CASE("operators", "[vector]") {
+
+  // Unary minus
+  {
+    trase::Vector<int, 4> a = {1, -2, 13, 4};
+    trase::Vector<int, 4> minus_a = {-1, 2, -13, -4};
+
+    CHECK((-a == minus_a).all());
+  }
+
+  // Binary plus
+  {
+    trase::Vector<int, 4> a = {-3, -1, 14, 20};
+    trase::Vector<int, 4> b = {-5, 8, 11, 17};
+    int k = 27;
+
+    trase::Vector<int, 4> vec_vec = b + a;
+    trase::Vector<int, 4> sca_vec = k + a;
+    trase::Vector<int, 4> vec_sca = a + k;
+
+    for (unsigned i = 0; i < 4; ++i)
+    {
+      CHECK(vec_vec[i] == b[i] + a[i]);
+      CHECK(sca_vec[i] == k + a[i]);
+      CHECK(vec_sca[i] == a[i] + k);
+    }
+  }
+
+  // Binary minus
+  {
+    trase::Vector<int, 4> a = {-3, -1, 14, 20};
+    trase::Vector<int, 4> b = {-5, 8, 11, 17};
+    int k = 27;
+
+    trase::Vector<int, 4> vec_vec = b - a;
+    trase::Vector<int, 4> sca_vec = k - a;
+    trase::Vector<int, 4> vec_sca = a - k;
+
+    for (unsigned i = 0; i < 4; ++i)
+    {
+      CHECK(vec_vec[i] == b[i] - a[i]);
+      CHECK(sca_vec[i] == k - a[i]);
+      CHECK(vec_sca[i] == a[i] - k);
+    }
+  }
+
+  // Binary multiplies
+  {
+    trase::Vector<int, 4> a = {-3, -1, 14, 20};
+    trase::Vector<int, 4> b = {-5, 8, 11, 17};
+    int k = 27;
+
+    trase::Vector<int, 4> vec_vec = b * a;
+    trase::Vector<int, 4> sca_vec = k * a;
+    trase::Vector<int, 4> vec_sca = a * k;
+
+    for (unsigned i = 0; i < 4; ++i)
+    {
+      CHECK(vec_vec[i] == b[i] * a[i]);
+      CHECK(sca_vec[i] == k * a[i]);
+      CHECK(vec_sca[i] == a[i] * k);
+    }
+  }
+
+  // Binary divides
+  {
+    trase::Vector<int, 4> a = {-3, -1, 14, 20};
+    trase::Vector<int, 4> b = {-5, 8, 11, 17};
+    int k = 27;
+
+    trase::Vector<int, 4> vec_vec = b / a;
+    trase::Vector<int, 4> sca_vec = k / a;
+    trase::Vector<int, 4> vec_sca = a / k;
+
+    for (unsigned i = 0; i < 4; ++i)
+    {
+      CHECK(vec_vec[i] == b[i] / a[i]);
+      CHECK(sca_vec[i] == k / a[i]);
+      CHECK(vec_sca[i] == a[i] / k);
+    }
+  }
+}
