@@ -279,6 +279,65 @@ public:
   T *data() noexcept { return mem.data(); }
   const T *data() const noexcept { return mem.data(); }
 
+  /*
+   * Compound assignment operators += -= *= /=
+   *
+   * First four are this-Vector elementwise operations (this[i] op other[i] for all i).
+   * Second four are this-scalar elementwise operations (this[i] op k for all i).
+   */
+
+  /// this-Vector compound plus operator
+  Vector<T, N> &operator+=(const Vector<T, N> &a) {
+    std::transform(begin(), end(), a.begin(), begin(), std::plus<T>());
+    return *this;
+  }
+
+  /// this-Vector compound minus operator
+  Vector<T, N> &operator-=(const Vector<T, N> &a) {
+    std::transform(begin(), end(), a.begin(), begin(), std::minus<T>());
+    return *this;
+  }
+
+  /// this-Vector compound multiples operator
+  Vector<T, N> &operator*=(const Vector<T, N> &a) {
+    std::transform(begin(), end(), a.begin(), begin(), std::multiplies<T>());
+    return *this;
+  }
+
+  /// this-Vector compound divides operator
+  Vector<T, N> &operator/=(const Vector<T, N> &a) {
+    std::transform(begin(), end(), a.begin(), begin(), std::divides<T>());
+    return *this;
+  }
+
+  /// this-scalar compound plus operator
+  Vector<T, N> &operator+=(const T &k) {
+    std::transform(begin(), end(), begin(),
+                   std::bind(std::plus<T>(), std::placeholders::_1, k));
+    return *this;
+  }
+
+  /// this-scalar compound minus operator
+  Vector<T, N> &operator-=(const T &k) {
+    std::transform(begin(), end(), begin(),
+                   std::bind(std::minus<T>(), std::placeholders::_1, k));
+    return *this;
+  }
+
+  /// this-scalar compound multiples operator
+  Vector<T, N> &operator*=(const T &k) {
+    std::transform(begin(), end(), begin(),
+                   std::bind(std::multiplies<T>(), std::placeholders::_1, k));
+    return *this;
+  }
+
+  /// this-scalar compound divides operator
+  Vector<T, N> &operator/=(const T &k) {
+    std::transform(begin(), end(), begin(),
+                   std::bind(std::divides<T>(), std::placeholders::_1, k));
+    return *this;
+  }
+
 private:
   std::array<T, N> mem;
 };
@@ -457,66 +516,6 @@ Vector<bool, N> operator>=(const Vector<T, N> &a, const Vector<T, N> &b) {
                  std::greater_equal<T>());
   return ret;
 }
-
-
-#define COMPOUND_ASSIGN(the_op)                                                \
-  template <typename T1, typename T2, int N>                                   \
-  Vector<double, N> &operator the_op(Vector<T1, N> &arg1,                      \
-                                     const Vector<T2, N> &arg2) {              \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      arg1[i] the_op arg2[i];                                                  \
-    }                                                                          \
-    return arg1;                                                               \
-  }                                                                            \
-  template <typename T1, typename T2, int N>                                   \
-  Vector<double, N> &operator the_op(Vector<T1, N> &arg1, const T2 &arg2) {    \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      arg1[i] the_op arg2;                                                     \
-    }                                                                          \
-    return arg1;                                                               \
-  }                                                                            \
-                                                                               \
-  template <int N>                                                             \
-  Vector<float, N> &operator the_op(Vector<float, N> &arg1,                    \
-                                    const Vector<float, N> &arg2) {            \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      arg1[i] the_op arg2[i];                                                  \
-    }                                                                          \
-    return arg1;                                                               \
-  }                                                                            \
-  template <int N>                                                             \
-  Vector<float, N> &operator the_op(Vector<float, N> &arg1,                    \
-                                    const float &arg2) {                       \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      arg1[i] the_op arg2;                                                     \
-    }                                                                          \
-    return arg1;                                                               \
-  }                                                                            \
-                                                                               \
-  template <int, int, int N>                                                   \
-  Vector<int, N> &operator the_op(Vector<int, N> &arg1,                        \
-                                  const Vector<int, N> &arg2) {                \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      arg1[i] the_op arg2[i];                                                  \
-    }                                                                          \
-    return arg1;                                                               \
-  }                                                                            \
-  template <int, int, int N>                                                   \
-  Vector<int, N> &operator the_op(Vector<int, N> &arg1, const int &arg2) {     \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      arg1[i] the_op arg2;                                                     \
-    }                                                                          \
-    return arg1;                                                               \
-  }
-
-/// compound assign `+=` comparison operator for Vector class
-COMPOUND_ASSIGN(+=)
-/// compound assign `-=` comparison operator for Vector class
-COMPOUND_ASSIGN(-=)
-/// compound assign `*=` comparison operator for Vector class
-COMPOUND_ASSIGN(*=)
-/// compound assign `/=` comparison operator for Vector class
-COMPOUND_ASSIGN(/=)
 
 #define UFUNC(the_op)                                                          \
   template <typename T, int N> Vector<T, N> the_op(const Vector<T, N> &arg1) { \

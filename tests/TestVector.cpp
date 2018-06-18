@@ -277,4 +277,72 @@ TEST_CASE("operators", "[vector]") {
       CHECK(vec_sca[i] == a[i] / k);
     }
   }
+
+  // Compound plus
+  {
+    trase::Vector<int, 4> a = {-3, -1, 14, 20};
+    trase::Vector<int, 4> b = {-5, 8, 11, 17};
+    int k = 2;
+
+    auto copy_of_a = a;
+
+    a += b;
+    a += k;
+
+    for (unsigned i = 0; i < 4; ++i)
+    {
+      CHECK(a[i] == (copy_of_a[i] + b[i]) + k);
+    }
+  }
+
+  // Compound minus
+  {
+    trase::Vector<int, 4> a = {-3, -1, 14, 20};
+    trase::Vector<int, 4> b = {-5, 8, 11, 17};
+    int k = 2;
+
+    auto copy_of_a = a;
+
+    a -= b;
+    a -= k;
+
+    for (unsigned i = 0; i < 4; ++i)
+    {
+      CHECK(a[i] == (copy_of_a[i] - b[i]) - k);
+    }
+  }
+
+  // Compound multiples
+  {
+    trase::Vector<int, 4> a = {-3, -1, 14, 20};
+    trase::Vector<int, 4> b = {-5, 8, 11, 17};
+    int k = 2;
+
+    auto copy_of_a = a;
+
+    a *= b;
+    a *= k;
+
+    for (unsigned i = 0; i < 4; ++i)
+    {
+      CHECK(a[i] == (copy_of_a[i] * b[i]) * k);
+    }
+  }
+
+  // Compound divides
+  {
+    trase::Vector<int, 4> a = {-300, -100, 1400, 2000};
+    trase::Vector<int, 4> b = {-5, 8, 11, 17};
+    int k = 2;
+
+    auto copy_of_a = a;
+
+    a /= b;
+    a /= k;
+
+    for (unsigned i = 0; i < 4; ++i)
+    {
+      CHECK(a[i] == (copy_of_a[i] / b[i]) / k);
+    }
+  }
 }
