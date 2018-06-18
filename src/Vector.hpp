@@ -141,23 +141,6 @@ public:
     return ret;
   }
 
-#ifdef HAVE_EIGEN
-  /// Eigen Vector assignment
-  ///
-  /// Assigns an eigen vector object (arg) to this vector.
-  ///
-  template <typename Derived>
-  Vector<T, N> &operator=(const Eigen::DenseBase<Derived> &arg) {
-    static_assert(Eigen::DenseBase<Derived>::RowsAtCompileTime == N ||
-                      Eigen::DenseBase<Derived>::ColsAtCompileTime == N,
-                  "vector assignment has different or dynamic lengths");
-    for (size_t i = 0; i < N; ++i) {
-      mem[i] = arg[i];
-    }
-    return *this;
-  }
-#endif
-
   /// const Index operator
   ///
   /// Returns a const reference to the `n`-th element of the vector
@@ -307,11 +290,6 @@ public:
   /// returns the raw memory array containing the data for the vector
   T *data() noexcept { return mem.data(); }
   const T *data() const noexcept { return mem.data(); }
-
-  template <class Archive> void serialize(Archive &ar, const int version) {
-    (void)version;
-    ar &BOOST_SERIALIZATION_NVP(mem);
-  }
 
 private:
   std::array<T, N> mem;
