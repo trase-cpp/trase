@@ -40,19 +40,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 TEST_CASE("vector constructors", "[vector]") {
 
-    trase::Vector<int, 3> a;
+    // Default construction
+    trase::Vector<int, 3> a{};
 
+    // One arg constructor fills the vector with that value
     trase::Vector<int, 5> b(123);
     for (const auto i : b){
         CHECK(i == 123);
     }
+
+    trase::Vector<int, 2> c(1, 2);
+    CHECK(c[0] == 1);
+    CHECK(c[1] == 2);
+
+    trase::Vector<int, 3> d(1, 2, 3);
+    CHECK(d[0] == 1);
+    CHECK(d[1] == 2);
+    CHECK(d[2] == 3);
+
+    trase::Vector<int, 4> e(1, 2, 3, 4);
+    CHECK(e[0] == 1);
+    CHECK(e[1] == 2);
+    CHECK(e[2] == 3);
+    CHECK(e[3] == 4);
 }
 
 TEST_CASE("vector iterators", "[vector]") {
 
-    trase::Vector<int, 3> a;
-    a[0] = 123;
-    a[2] = 234;
+    trase::Vector<int, 3> a = {123, 0, 234};
 
     CHECK(*a.begin() == 123);
     CHECK(*(a.end()-1) == 234);
