@@ -99,7 +99,7 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
   backend.fill_color(RGBA(0, 0, 0, 255));
 
   // axis ticks
-  char buffer[20];
+  char buffer[100];
   for (int i = 0; i < n_ticks[0]; ++i) {
     const float tick_pos = tick_min_pixels[0] + i * tick_dx_pixels[0];
     const float tick_val = tick_min[0] + i * tick_dx[0];
@@ -130,7 +130,6 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
     backend.move_to(vfloat2_t(tick_pos, m_pixels.bmin[1]));
     backend.line_to(vfloat2_t(tick_pos, m_pixels.bmax[1]));
   }
-  backend.text_align(ALIGN_RIGHT | ALIGN_MIDDLE);
   for (int i = 0; i < n_ticks[1]; ++i) {
     const float tick_pos = tick_min_pixels[1] - i * tick_dx_pixels[1];
     backend.move_to(vfloat2_t(m_pixels.bmin[0], tick_pos));
@@ -139,6 +138,17 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
   backend.stroke_color(RGBA(255, 255, 255, 255));
   backend.stroke_width(lw / 2);
   backend.stroke();
+
+  // axis labels
+  backend.text_align(ALIGN_CENTER | ALIGN_TOP);
+  backend.text(
+      vfloat2_t(0.5 * (m_pixels.bmax[0] + m_pixels.bmin[0]), m_pixels.bmax[1]),
+      m_xlabel.c_str(), NULL);
+
+  backend.text_align(ALIGN_RIGHT | ALIGN_MIDDLE);
+  backend.text(
+      vfloat2_t(m_pixels.bmin[0], 0.5 * (m_pixels.bmax[1] + m_pixels.bmin[1])),
+      m_ylabel.c_str(), NULL);
 }
 
 } // namespace trase
