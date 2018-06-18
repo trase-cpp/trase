@@ -70,3 +70,20 @@ TEST_CASE("vector iterators", "[vector]") {
     CHECK(std::distance(a.rbegin(), a.rend()) == 3);
     CHECK(std::distance(a.crbegin(), a.crend()) == 3);
 }
+TEST_CASE("all any none", "[vector]") {
+    trase::Vector<bool, 2> zero = {false, false};
+    trase::Vector<bool, 2> one = {false, true};
+    trase::Vector<bool, 2> two = {true, true};
+
+    CHECK(!zero.all());
+    CHECK(!zero.any());
+    CHECK(zero.none());
+
+    CHECK(!one.all());
+    CHECK(one.any());
+    CHECK(!one.none());
+
+    CHECK(two.all());
+    CHECK(two.any());
+    CHECK(!two.none());
+}

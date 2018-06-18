@@ -267,27 +267,27 @@ public:
     }
   }
 
-  /// collapse boolean vector using `&` operator
-  /// \return the accumulated `&` of all the vectors elements,
-  ///         i.e. v_1 & v_2 & v3 & ...
-  bool all() const {
-    bool ret = true;
-    for (size_t i = 0; i < N; ++i) {
-      ret &= mem[i];
-    }
-    return ret;
+  /// collapse vector to bool using std::all_of
+  /// \return true if all elements cast to true
+  bool all() const noexcept {
+    return std::all_of(begin(), end(),
+                       [](const T &a) { return static_cast<bool>(a); });
   }
 
-  /// collapse boolean vector using `|` operator
-  /// \return the accumulated `|` of all the vectors elements,
-  ///         i.e. v_1 | v_2 | v3 | ...
-  bool any() const {
-    bool ret = false;
-    for (size_t i = 0; i < N; ++i) {
-      ret |= mem[i];
-    }
-    return ret;
+  /// collapse vector to bool using std::any_of
+  /// \return true if any element casts to true
+  bool any() const noexcept {
+    return std::any_of(begin(), end(),
+                       [](const T &a) { return static_cast<bool>(a); });
   }
+
+  /// collapse vector to bool using std::none_of
+  /// \return true if no element casts to true
+  bool none() const noexcept {
+    return std::none_of(begin(), end(),
+                        [](const T &a) { return static_cast<bool>(a); });
+  }
+
 
   /// find the minimum element of the vector
   /// \return the minimum element of the vector
