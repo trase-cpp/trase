@@ -162,14 +162,14 @@ public:
   /// Returns a const reference to the `n`-th element of the vector
   ///
   /// \param n the element number to index
-  const T &operator[](const int n) const { return mem[n]; }
+  const T &operator[](const int n) const noexcept { return mem[n]; }
 
   /// Index operator
   ///
   /// Returns a reference to the `n`-th element of the vector
   ///
   /// \param n the element number to index
-  T &operator[](const int n) { return mem[n]; }
+  T &operator[](const int n) noexcept { return mem[n]; }
 
   /// inner product
   ///
