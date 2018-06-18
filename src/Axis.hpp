@@ -71,8 +71,8 @@ public:
     }
     std::vector<vfloat2_t> values(x.size());
     for (size_t i = 0; i < x.size(); ++i) {
-      values[i][0] = x[i];
-      values[i][1] = y[i];
+      values[i][0] = static_cast<float>(x[i]);
+      values[i][1] = static_cast<float>(y[i]);
     }
     return plot_impl(std::move(values));
   }
@@ -96,9 +96,7 @@ public:
                          (m_limits.bmax[1] - i[1]) * inv_delta[1]);
   }
 
-  void font_face(const std::string& fontFace) {
-    m_font_face = fontFace;
-  }
+  void font_face(const std::string &fontFace) { m_font_face = fontFace; }
 
 private:
   std::shared_ptr<Plot1D> plot_impl(std::vector<vfloat2_t> &&values);

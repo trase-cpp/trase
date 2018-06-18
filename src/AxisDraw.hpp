@@ -82,7 +82,7 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
   const auto tick_dx = round_off(limits_delta / n_ticks, sig_digits);
   const auto tick_min = ceil(m_limits.bmin / tick_dx) * tick_dx;
   const auto tick_max = floor(m_limits.bmax / tick_dx) * tick_dx;
-  n_ticks = (tick_max - tick_min) / tick_dx + 1;
+  n_ticks = (tick_max - tick_min) / tick_dx + 1.0f;
 
   // scale to pixels
   const auto tick_dx_pixels = tick_dx * pixel_delta / limits_delta;
@@ -105,7 +105,7 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
     const float tick_val = tick_min[0] + i * tick_dx[0];
     backend.move_to(vfloat2_t(tick_pos, m_pixels.bmax[1] + tick_len / 2));
     backend.line_to(vfloat2_t(tick_pos, m_pixels.bmax[1]));
-    std::sprintf(buffer, "%.*g", sig_digits + 1, tick_val);
+    std::snprintf(buffer, sizeof(buffer), "%.*g", sig_digits + 1, tick_val);
     backend.text(vfloat2_t(tick_pos, m_pixels.bmax[1] + tick_len / 2), buffer,
                  NULL);
   }
@@ -115,7 +115,7 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
     const float tick_val = tick_min[1] + i * tick_dx[1];
     backend.move_to(vfloat2_t(m_pixels.bmin[0] - tick_len / 2, tick_pos));
     backend.line_to(vfloat2_t(m_pixels.bmin[0], tick_pos));
-    std::sprintf(buffer, "%.*g", sig_digits + 1, tick_val);
+    std::snprintf(buffer, sizeof(buffer), "%.*g", sig_digits + 1, tick_val);
     backend.text(vfloat2_t(m_pixels.bmin[0] - tick_len / 2, tick_pos), buffer,
                  NULL);
   }

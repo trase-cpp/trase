@@ -44,21 +44,21 @@ using namespace trase;
 TEST_CASE("plot1d can be created", "[plot1d]") {
   auto fig = figure();
   auto ax = fig->axis();
-  auto pl1 = ax->plot(std::vector<float>({0, 0.1, 0.5}),
-                      std::vector<float>({0, 0.1, 0.5}));
-  auto pl2 =
-      ax->plot(std::vector<int>({0, 1, 2}), std::vector<float>({0, 0.1, 0.5}));
+  auto pl1 = ax->plot(std::vector<float>({0.0f, 0.1f, 0.5f}),
+                      std::vector<float>({0.0f, 0.1f, 0.5f}));
+  auto pl2 = ax->plot(std::vector<int>({0, 1, 2}),
+                      std::vector<float>({0.0f, 0.1f, 0.5f}));
 
   auto pl3 = ax->plot(std::vector<int>({0, 1, 2}), std::vector<int>({0, 2, 4}));
 
   // auto pl4 = ax->plot({0, 1, 2}, {0, 2, 4});
   //
-  REQUIRE_THROWS_WITH(
-      ax->plot(std::vector<float>({0, 0.1}), std::vector<float>({0, 0.1, 0.5})),
-      Catch::Contains("x and y vector sizes do not match"));
+  REQUIRE_THROWS_WITH(ax->plot(std::vector<float>({0.0f, 0.1f}),
+                               std::vector<float>({0.0f, 0.1f, 0.5f})),
+                      Catch::Contains("x and y vector sizes do not match"));
 
-  std::vector<float> x = {0, 0.1, 0.5};
-  std::vector<float> y = {0, 0.1, 0.5};
+  std::vector<float> x = {0.0f, 0.1f, 0.5f};
+  std::vector<float> y = {0.0f, 0.1f, 0.5f};
 
   auto pl5 = ax->plot(x, y);
 }

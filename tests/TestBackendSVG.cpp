@@ -47,26 +47,26 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   std::vector<float> x(n);
   std::vector<float> y(n);
   for (int i = 0; i < n; ++i) {
-    x[i] = static_cast<float>(i) * 6.28 / n;
+    x[i] = static_cast<float>(i) * 6.28f / n;
     y[i] = std::sin(x[i]);
   }
   auto static_plot = ax->plot(x, y);
   auto moving_plot = ax->plot(x, y);
-  float time = 0.0;
+  float time = 0.0f;
 
   auto do_plot = [&](const float theta) {
     for (int i = 0; i < n; ++i) {
       y[i] = std::sin(theta * x[i]);
     }
-    time += 0.3;
+    time += 0.3f;
     moving_plot->add_frame(x, y, time);
   };
 
   for (int i = 1; i < 6; ++i) {
-    do_plot(i);
+    do_plot(static_cast<float>(i));
   }
   for (int i = 5; i >= 1; --i) {
-    do_plot(i);
+    do_plot(static_cast<float>(i));
   }
 
   ax->font_face("Indie Flower");
@@ -74,7 +74,8 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   std::ofstream out;
   out.open("test_figure.svg");
   BackendSVG backend(out);
-  backend.import_web_font("https://fonts.googleapis.com/css?family=Indie+Flower");
+  backend.import_web_font(
+      "https://fonts.googleapis.com/css?family=Indie+Flower");
   fig->serialise(backend);
   out.close();
 }

@@ -50,7 +50,7 @@ void Plot1D::add_values(std::vector<vfloat2_t> &&values, const float time) {
       std::accumulate(m_values.back().begin(), m_values.back().end(), m_limits,
                       [](auto a, auto b) { return a + bfloat2_t(b); });
 
-  const float buffer = 1.05;
+  const float buffer = 1.05f;
   m_axis.limits() += m_limits * vfloat2_t(buffer, buffer);
 }
 
