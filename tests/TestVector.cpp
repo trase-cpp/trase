@@ -1,4 +1,3 @@
-* Redistributions of source code must retain the above copyright notice, this
 /*
 Copyright (c) 2018, University of Oxford.
 All rights reserved.
