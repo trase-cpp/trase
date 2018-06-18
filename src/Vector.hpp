@@ -252,27 +252,15 @@ public:
 
 
   /// find the minimum element of the vector
-  /// \return the minimum element of the vector
-  T minCoeff() const {
-    T min = mem[0];
-    for (int i = 1; i < N; ++i) {
-      if (mem[i] < min) {
-        min = mem[i];
-      }
-    }
-    return min;
+  /// \return the value of the minimum element of the vector
+  T minCoeff() const noexcept {
+      return *std::min_element(begin(), end());
   }
 
   /// find the maximum element of the vector
   /// \return the maximum element of the vector
-  T maxCoeff() const {
-    T max = mem[0];
-    for (size_t i = 1; i < N; ++i) {
-      if (mem[i] > max) {
-        max = mem[i];
-      }
-    }
-    return max;
+  T maxCoeff() const noexcept {
+      return *std::max_element(begin(), end());
   }
 
   /// returns the product of every element in the vector

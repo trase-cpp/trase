@@ -179,3 +179,11 @@ TEST_CASE("cast", "[vector]") {
     CHECK(b[i] == static_cast<int>(b[i]));
   }
 }
+
+TEST_CASE("min max", "[vector]") {
+
+  trase::Vector<int, 4> a = {1, -2, 13, 4};
+
+  CHECK(a.maxCoeff() == 13);
+  CHECK(a.minCoeff() == -2);
+}
