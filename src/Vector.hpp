@@ -59,10 +59,10 @@ public:
   using value_type = T;
   const static int size = N;
 
-  using iter = T *;
-  using const_iter = const T *;
-  using reverse_iter = std::reverse_iterator<iter>;
-  using const_reverse_iter = std::reverse_iterator<const_iter>;
+  using iter = typename std::array<T, N>::iterator;
+  using const_iter = typename std::array<T, N>::const_iterator;
+  using reverse_iter = typename std::array<T, N>::reverse_iterator;
+  using const_reverse_iter = typename std::array<T, N>::const_reverse_iterator;
 
   /// Constructs an vector and allocates memory
   Vector() = default;
