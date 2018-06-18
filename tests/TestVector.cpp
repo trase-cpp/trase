@@ -70,6 +70,32 @@ TEST_CASE("vector iterators", "[vector]") {
     CHECK(std::distance(a.rbegin(), a.rend()) == 3);
     CHECK(std::distance(a.crbegin(), a.crend()) == 3);
 }
+
+TEST_CASE("comparison operators", "[vector]") {
+
+  trase::Vector<int, 4> a = {123, 234, 345, 456};
+  CHECK((a == a).all());
+  CHECK((a <= a).all());
+  CHECK((a >= a).all());
+  CHECK((a != a).none());
+  CHECK((a < a).none());
+  CHECK((a > a).none());
+
+  trase::Vector<int, 4> b = {0, 1, 2, 3};
+  CHECK((a == b).none());
+  CHECK((a <= b).none());
+  CHECK((a >= b).all());
+  CHECK((a != b).all());
+  CHECK((a < b).none());
+  CHECK((a > b).all());
+
+  trase::Vector<int, 4> c = {0, 234, 345, 0};
+  trase::Vector<bool, 4> mask = {false, true, true, false};
+  CHECK(((a == c) == mask).all());
+  CHECK(((a != c) == mask).none());
+  CHECK(((a <= c) == mask).all());
+}
+
 TEST_CASE("all any none", "[vector]") {
     trase::Vector<bool, 2> zero = {false, false};
     trase::Vector<bool, 2> one = {false, true};

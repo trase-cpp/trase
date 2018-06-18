@@ -476,49 +476,56 @@ arg2[j];
 }
 */
 
-#define COMPARISON(the_op)                                                     \
-  template <typename T1, typename T2, int N>                                   \
-  Vector<bool, N> operator the_op(const Vector<T1, N> &arg1,                   \
-                                  const Vector<T2, N> &arg2) {                 \
-    Vector<bool, N> ret;                                                       \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = arg1[i] the_op arg2[i];                                         \
-    }                                                                          \
-    return ret;                                                                \
-  }                                                                            \
-  template <typename T1, typename T2, int N,                                   \
-            typename =                                                         \
-                typename std::enable_if<std::is_arithmetic<T2>::value>::type>  \
-  Vector<bool, N> operator the_op(const Vector<T1, N> &arg1, const T2 &arg2) { \
-    Vector<bool, N> ret;                                                       \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = arg1[i] the_op arg2;                                            \
-    }                                                                          \
-    return ret;                                                                \
-  }                                                                            \
-  /*                                                                           \
-  template<typename T1,typename T2,int N>                                      \
-  Vector<bool,N> operator the_op(const T1 &arg1, const T2 &arg2) {             \
-      Vector<bool,N> ret;                                                      \
-      for (size_t i = 0; i < N; ++i) {                                         \
-          ret[i] = arg1 the_op arg2;                                           \
-      }                                                                        \
-      return ret;                                                              \
-  }                                                                            \
-  */
+// Comparison operators: == != < > <= >=
 
-/// binary `>` comparison operator for Vector class
-COMPARISON(>)
-/// binary `<` comparison operator for Vector class
-COMPARISON(<)
-/// binary `<=` comparison operator for Vector class
-COMPARISON(<=)
-/// binary `>=` comparison operator for Vector class
-COMPARISON(>=)
-/// binary `==` comparison operator for Vector class
-COMPARISON(==)
-/// binary `!=` comparison operator for Vector class
-COMPARISON(!=)
+template <typename T, int N>
+Vector<bool, N> operator==(const Vector<T, N> &a, const Vector<T, N> &b) {
+  Vector<bool, N> ret{};
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
+                 std::equal_to<T>());
+  return ret;
+}
+
+template <typename T, int N>
+Vector<bool, N> operator!=(const Vector<T, N> &a, const Vector<T, N> &b) {
+  Vector<bool, N> ret{};
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
+                 std::not_equal_to<T>());
+  return ret;
+}
+
+template <typename T, int N>
+Vector<bool, N> operator<(const Vector<T, N> &a, const Vector<T, N> &b) {
+  Vector<bool, N> ret{};
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
+                 std::less<T>());
+  return ret;
+}
+
+template <typename T, int N>
+Vector<bool, N> operator>(const Vector<T, N> &a, const Vector<T, N> &b) {
+  Vector<bool, N> ret{};
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
+                 std::greater<T>());
+  return ret;
+}
+
+template <typename T, int N>
+Vector<bool, N> operator<=(const Vector<T, N> &a, const Vector<T, N> &b) {
+  Vector<bool, N> ret{};
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
+                 std::less_equal<T>());
+  return ret;
+}
+
+template <typename T, int N>
+Vector<bool, N> operator>=(const Vector<T, N> &a, const Vector<T, N> &b) {
+  Vector<bool, N> ret{};
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
+                 std::greater_equal<T>());
+  return ret;
+}
+
 
 #define COMPOUND_ASSIGN(the_op)                                                \
   template <typename T1, typename T2, int N>                                   \
