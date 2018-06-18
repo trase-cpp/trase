@@ -168,10 +168,9 @@ public:
   /// \return A new vector with each element `static_cast` to
   /// `T2`
   template <typename T2> Vector<T2, N> cast() {
-    Vector<T2, N> ret;
-    for (size_t i = 0; i < N; ++i) {
-      ret[i] = static_cast<T2>(mem[i]);
-    }
+    Vector<T2, N> ret{};
+    std::transform(begin(), end(), ret.begin(),
+                   [](const T &a) { return static_cast<T2>(a); });
     return ret;
   }
 

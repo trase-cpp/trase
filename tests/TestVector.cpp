@@ -166,3 +166,13 @@ TEST_CASE("inner product", "[vector]") {
     CHECK(a.inner_product(b) == 40);
     CHECK(a.inner_product(b) == b.inner_product(a));
 }
+
+TEST_CASE("cast", "[vector]") {
+
+  trase::Vector<double, 4> a = {1.2, 2.4, 3.6, 4.8};
+  trase::Vector<int, 4> b = a.cast<int>();
+
+  for (unsigned i = 0; i < 4; ++i) {
+    CHECK(b[i] == static_cast<int>(b[i]));
+  }
+}
