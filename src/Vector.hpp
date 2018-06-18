@@ -106,12 +106,6 @@ public:
     mem[2] = arg3;
     mem[3] = arg4;
   }
-
-  Vector(const Vector<T, N> &arg) {
-    for (size_t i = 0; i < N; ++i) {
-      mem[i] = arg.mem[i];
-    }
-  };
   
   // Iterators
   iter begin() noexcept { return iter(mem.begin()); }
@@ -127,15 +121,6 @@ public:
   const_reverse_iter crbegin() const noexcept { return const_reverse_iter(end()); }
   const_reverse_iter crend() const noexcept { return const_reverse_iter(begin()); }
 
-
-  /// Vector copy-constructor
-  ///
-  /// \param arg constructs a vector as a copy of this arguement
-  template <typename T2> Vector(const Vector<T2, N> &arg) {
-    for (size_t i = 0; i < N; ++i) {
-      mem[i] = arg[i];
-    }
-  }
 
   /// Zero Vector
   ///

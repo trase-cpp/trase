@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 
 #include <iterator>
+#include <type_traits>
 
 #include "Vector.hpp"
 
@@ -70,6 +71,34 @@ TEST_CASE("vector iterators", "[vector]") {
     CHECK(std::distance(a.rbegin(), a.rend()) == 3);
     CHECK(std::distance(a.crbegin(), a.crend()) == 3);
 }
+
+TEST_CASE("rule of five", "[vector]") {
+
+    trase::Vector<int, 4> ref = {123, 234, 345, 456};
+
+    // Copy constructor
+    {
+        trase::Vector<int, 4> a = {123, 234, 345, 456};
+        trase::Vector<int, 4> b(a);
+        CHECK((a == ref).all());
+        CHECK((b == ref).all());
+    }
+
+    // Copy assignment
+    {
+        trase::Vector<int, 4> a = {123, 234, 345, 456};
+        trase::Vector<int, 4> b = a;
+        CHECK((a == ref).all());
+        CHECK((b == ref).all());
+    }
+
+    // Vector is trivially copyable so no need to check move constructor or move assignment
+    CHECK(std::is_trivially_copyable<trase::Vector<int, 2>>::value);
+    CHECK(std::is_trivially_copyable<trase::Vector<int, 3>>::value);
+    CHECK(std::is_trivially_copyable<trase::Vector<float, 2>>::value);
+    CHECK(std::is_trivially_copyable<trase::Vector<float, 3>>::value);
+}
+
 
 TEST_CASE("comparison operators", "[vector]") {
 
