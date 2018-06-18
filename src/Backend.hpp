@@ -59,16 +59,33 @@ struct Transform {
     c = e = b = f = 0.0;
   }
   void translate(const vfloat2_t &t) {
-    e += a * t[0] + c * t[1];
-    f += b * t[0] + d * t[1];
+    // pre-mult
+    e += t[0];
+    f += t[1];
+    /*
+      // post-mult
+      e += a * t[0] + c * t[1];
+      f += b * t[0] + d * t[1];
+      */
   }
   void rotate(float angle) {
     const float cos_t = std::cos(angle);
     const float sin_t = std::sin(angle);
+
+    // pre-mult
+    a = a * cos_t - b * sin_t;
+    b = a * sin_t + b * cos_t;
+    c = c * cos_t - d * sin_t;
+    d = c * sin_t + d * cos_t;
+    e = e * cos_t - f * sin_t;
+    f = e * sin_t + f * cos_t;
+    /*
+    // post-mult
     a = a * cos_t + c * sin_t;
     b = b * cos_t + d * sin_t;
     c = -a * sin_t + c * cos_t;
     d = -b * sin_t + d * cos_t;
+    */
   }
 
   std::string to_string() {
