@@ -34,7 +34,50 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BACKEND_H_
 #define BACKEND_H_
 
+#include <cmath>
+#include <sstream>
+
 namespace trase {
+
+/// a transform matrix in the form
+///
+/// [a c e]
+/// [b d f]
+/// [0 0 1]
+///
+struct Transform {
+  float a, b, c, d, e, f;
+
+  Transform() : a(1), b(0), c(0), d(1), e(0), f(0) {}
+
+  bool is_identity() {
+    return a == 1.0f && b == 0.0f && c == 0.0f && d == 1.0f && e == 0.0f &&
+           f == 0.0f;
+  }
+  void clear() {
+    a = d = 1.0;
+    c = e = b = f = 0.0;
+  }
+  void translate(const vfloat2_t &t) {
+    e += a * t[0] + c * t[1];
+    f += b * t[0] + d * t[1];
+  }
+  void rotate(float angle) {
+    const float cos_t = std::cos(angle);
+    const float sin_t = std::sin(angle);
+    a = a * cos_t + c * sin_t;
+    b = b * cos_t + d * sin_t;
+    c = -a * sin_t + c * cos_t;
+    d = -b * sin_t + d * cos_t;
+  }
+
+  std::string to_string() {
+    std::stringstream stream;
+    stream << "transform=\"matrix(" << a << ' ' << b << ' ' << c << ' ' << d
+           << ' ' << e << ' ' << f << ")\"";
+    return stream.str();
+  }
+};
 
 enum Align {
   // Horizontal align

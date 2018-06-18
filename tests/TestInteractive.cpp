@@ -76,6 +76,10 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
     do_plot(theta);
   }
 
+  ax->xlabel("x");
+  ax->ylabel("y");
+  ax->title("the interactive test");
+
   BackendGL backend;
   fig->show(backend);
 }

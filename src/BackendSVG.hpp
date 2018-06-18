@@ -59,6 +59,7 @@ class BackendSVG {
   int m_nanimate;
   int m_nframe;
   bool m_end_of_frames;
+  Transform m_transform;
 
 public:
   BackendSVG(std::ostream &out)
@@ -75,6 +76,10 @@ public:
   inline void scissor(const bfloat2_t &x) {}
 
   inline void reset_scissor() {}
+
+  inline void rotate(const float angle) { m_transform.rotate(angle); }
+  inline void reset_transform() { m_transform.clear(); }
+  inline void translate(const vfloat2_t &v) { m_transform.translate(v); }
 
   inline void begin_path() { m_path.clear(); }
   inline void begin_frames() {
@@ -208,8 +213,11 @@ public:
 
   inline void text(const vfloat2_t &x, const char *string, const char *end) {
     m_out << "<text x=\"" << x[0] << "\" y=\"" << x[1] << "\" " << m_font_face
-          << ' ' << m_font_size << ' ' << m_font_align << ' ' << m_fill_color
-          << '>' << string << "</text>\n";
+          << ' ' << m_font_size << ' ' << m_font_align << ' ' << m_fill_color;
+    if (!m_transform.is_identity()) {
+      m_out << ' ' << m_transform.to_string();
+    }
+    m_out << '>' << string << "</text>\n";
   }
 };
 

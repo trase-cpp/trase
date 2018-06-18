@@ -90,6 +90,10 @@ public:
 
   inline void reset_scissor() { nvgResetScissor(m_vg); }
 
+  inline void rotate(const float angle) { nvgRotate(m_vg, angle); }
+  inline void translate(const vfloat2_t &v) { nvgTranslate(m_vg, v[0], v[1]); }
+  inline void reset_transform() { nvgResetTransform(m_vg); }
+
   inline void begin_path() { nvgBeginPath(m_vg); }
   inline void rounded_rect(const bfloat2_t &x, const float r) {
     const auto &delta = x.delta();

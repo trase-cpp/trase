@@ -58,6 +58,7 @@ class Axis : public Drawable {
   std::string m_font_face;
   std::string m_xlabel;
   std::string m_ylabel;
+  std::string m_title;
 
 public:
   Axis(Figure &figure, const bfloat2_t &area);
@@ -75,6 +76,7 @@ public:
   }
   void xlabel(const char *string) { m_xlabel.assign(string); }
   void ylabel(const char *string) { m_ylabel.assign(string); }
+  void title(const char *string) { m_title.assign(string); }
 
   template <typename T1, typename T2>
   std::shared_ptr<Plot1D> plot(const std::vector<T1> &x,

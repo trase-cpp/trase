@@ -70,6 +70,9 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   }
 
   ax->font_face("Indie Flower");
+  ax->xlabel("x");
+  ax->ylabel("y");
+  ax->title("the svg test");
 
   std::ofstream out;
   out.open("test_figure.svg");
