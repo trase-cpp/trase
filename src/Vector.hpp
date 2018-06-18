@@ -114,16 +114,16 @@ public:
   };
   
   // Iterators
-  iter begin() noexcept { return iter(data()); }
-  const_iter begin() const noexcept { return const_iter(data()); }
-  iter end() noexcept { return iter(data() + N); }
-  const_iter end() const noexcept { return const_iter(data() + N); }
+  iter begin() noexcept { return iter(mem.begin()); }
+  const_iter begin() const noexcept { return const_iter(mem.begin()); }
+  iter end() noexcept { return iter(mem.end()); }
+  const_iter end() const noexcept { return const_iter(mem.end()); }
   reverse_iter rbegin() noexcept { return reverse_iter(end()); }
   const_reverse_iter rbegin() const noexcept { return const_reverse_iter(end()); }
   reverse_iter rend() noexcept { return reverse_iter(begin()); }
   const_reverse_iter rend() const noexcept { return const_reverse_iter(begin()); }
-  const_iter cbegin() const noexcept { return const_iter(data()); }
-  const_iter cend() const noexcept { return const_iter(data() + N); }
+  const_iter cbegin() const noexcept { return const_iter(mem.begin()); }
+  const_iter cend() const noexcept { return const_iter(mem.end()); }
   const_reverse_iter crbegin() const noexcept { return const_reverse_iter(end()); }
   const_reverse_iter crend() const noexcept { return const_reverse_iter(begin()); }
 
@@ -323,8 +323,8 @@ public:
   }
 
   /// returns the raw memory array containing the data for the vector
-  T *data() noexcept { return mem; }
-  const T *data() const noexcept { return mem; }
+  T *data() noexcept { return mem.data(); }
+  const T *data() const noexcept { return mem.data(); }
 
   template <class Archive> void serialize(Archive &ar, const int version) {
     (void)version;
