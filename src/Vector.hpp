@@ -111,9 +111,9 @@ public:
   
   // Iterators
   iter begin() noexcept { return iter(mem.begin()); }
-  const_iter begin() const noexcept { return const_iter(mem.begin()); }
+  const_iter begin() const noexcept { return const_iter(mem.cbegin()); }
   iter end() noexcept { return iter(mem.end()); }
-  const_iter end() const noexcept { return const_iter(mem.end()); }
+  const_iter end() const noexcept { return const_iter(mem.cend()); }
   reverse_iter rbegin() noexcept { return reverse_iter(end()); }
   const_reverse_iter rbegin() const noexcept { return const_reverse_iter(end()); }
   reverse_iter rend() noexcept { return reverse_iter(begin()); }
