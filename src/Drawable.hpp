@@ -62,11 +62,11 @@ protected:
   std::vector<float> m_times;
 
 public:
-  Drawable(Drawable *parent, const bfloat2_t &area);
+  Drawable(Drawable *parent, const bfloat2_t &area_of_parent);
   void resize(const bfloat2_t &parent_pixels);
-  void update_time_span(const float time);
-  void add_frame_time(const float time);
-  float get_frame_index(const float time);
+  void update_time_span(float time);
+  void add_frame_time(float time);
+  float get_frame_index(float time);
   const bfloat2_t &pixels() { return m_pixels; }
   const bfloat2_t &area() { return m_pixels; }
   template <typename Backend> void serialise(Backend &backend);
