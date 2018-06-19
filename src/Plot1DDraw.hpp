@@ -116,7 +116,7 @@ void Plot1D::draw(Backend &backend, const float time) {
       std::sprintf(buffer, "(%f,%f)", point[0], point[1]);
       backend.fill_color(RGBA(0, 0, 0, 255));
       backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
-      backend.text(point_pixel + 2 * vfloat2_t(lw, -lw), buffer, NULL);
+      backend.text(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer, NULL);
     }
   };
 

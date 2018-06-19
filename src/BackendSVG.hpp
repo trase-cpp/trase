@@ -178,9 +178,7 @@ public:
     m_font_face = "font-family=\"" + std::string(face) + '\"';
   }
 
-  inline void import_web_font(const std::string& url) {
-    m_web_font = url;
-  }
+  inline void import_web_font(const std::string &url) { m_web_font = url; }
 
   inline void font_blur(const float blur) {}
   inline void text_align(const int align) {
