@@ -37,7 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <sstream>
 
+#include "Vector.hpp"
+
 namespace trase {
+
+// pi constant
+const float pi = 3.1415926535897932384626433832795;
 
 /// a transform matrix in the form
 ///

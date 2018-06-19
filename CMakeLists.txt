@@ -192,6 +192,7 @@ add_executable (
         tests/TestPlot1D.cpp
         tests/TestBackendSVG.cpp
         tests/TestVector.cpp
+        tests/TestTransform.cpp
 )
 target_include_directories(trase_tst PRIVATE tests)
 target_link_libraries(trase_tst PRIVATE trase backendSVG)
