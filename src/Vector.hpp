@@ -182,7 +182,7 @@ public:
   /// \return A new vector with each element `static_cast` to
   /// `T2`
   template <typename T2> Vector<T2, N> cast() {
-    Vector<T2, N> ret{};
+    Vector<T2, N> ret;
     std::transform(begin(), end(), ret.begin(),
                    [](const T &a) { return static_cast<T2>(a); });
     return ret;
@@ -351,7 +351,7 @@ Vector<T, N> pow(Vector<T, N> arg, EXP_T exponent) {
 
 /// unary `-` (minus) operator for Vector class
 template <typename T, int N> Vector<T, N> operator-(const Vector<T, N> &a) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(a.begin(), a.end(), ret.begin(), std::negate<T>());
   return ret;
 }
@@ -367,7 +367,7 @@ template <typename T, int N> Vector<T, N> operator-(const Vector<T, N> &a) {
 /// binary `+` (plus) operator for two Vectors
 template <typename T, int N>
 Vector<T, N> operator+(const Vector<T, N> &a, const Vector<T, N> &b) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::plus<T>());
   return ret;
 }
@@ -375,7 +375,7 @@ Vector<T, N> operator+(const Vector<T, N> &a, const Vector<T, N> &b) {
 /// binary `-` (minus) operator for two Vectors
 template <typename T, int N>
 Vector<T, N> operator-(const Vector<T, N> &a, const Vector<T, N> &b) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::minus<T>());
   return ret;
 }
@@ -383,7 +383,7 @@ Vector<T, N> operator-(const Vector<T, N> &a, const Vector<T, N> &b) {
 /// binary `*` (multiples) operator for two Vectors
 template <typename T, int N>
 Vector<T, N> operator*(const Vector<T, N> &a, const Vector<T, N> &b) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::multiplies<T>());
   return ret;
@@ -392,7 +392,7 @@ Vector<T, N> operator*(const Vector<T, N> &a, const Vector<T, N> &b) {
 /// binary `/` (divides) operator for two Vectors
 template <typename T, int N>
 Vector<T, N> operator/(const Vector<T, N> &a, const Vector<T, N> &b) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::divides<T>());
   return ret;
 }
@@ -400,7 +400,7 @@ Vector<T, N> operator/(const Vector<T, N> &a, const Vector<T, N> &b) {
 /// binary `+` (plus) operator for scalar and Vector
 template <typename T, int N>
 Vector<T, N> operator+(const T &a, const Vector<T, N> &b) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::plus<T>(), a, std::placeholders::_1));
   return ret;
@@ -409,7 +409,7 @@ Vector<T, N> operator+(const T &a, const Vector<T, N> &b) {
 /// binary `-` (minus) operator for scalar and Vector
 template <typename T, int N>
 Vector<T, N> operator-(const T &a, const Vector<T, N> &b) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::minus<T>(), a, std::placeholders::_1));
   return ret;
@@ -418,7 +418,7 @@ Vector<T, N> operator-(const T &a, const Vector<T, N> &b) {
 /// binary `*` (multiples) operator for scalar and Vector
 template <typename T, int N>
 Vector<T, N> operator*(const T &a, const Vector<T, N> &b) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::multiplies<T>(), a, std::placeholders::_1));
   return ret;
@@ -427,7 +427,7 @@ Vector<T, N> operator*(const T &a, const Vector<T, N> &b) {
 /// binary `/` (divides) operator for scalar and Vector
 template <typename T, int N>
 Vector<T, N> operator/(const T &a, const Vector<T, N> &b) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::divides<T>(), a, std::placeholders::_1));
   return ret;
@@ -436,7 +436,7 @@ Vector<T, N> operator/(const T &a, const Vector<T, N> &b) {
 /// binary `+` (plus) operator for Vector and scalar
 template <typename T, int N>
 Vector<T, N> operator+(const Vector<T, N> &b, const T &a) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::plus<T>(), std::placeholders::_1, a));
   return ret;
@@ -445,7 +445,7 @@ Vector<T, N> operator+(const Vector<T, N> &b, const T &a) {
 /// binary `-` (minus) operator for Vector and scalar
 template <typename T, int N>
 Vector<T, N> operator-(const Vector<T, N> &b, const T &a) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::minus<T>(), std::placeholders::_1, a));
   return ret;
@@ -454,7 +454,7 @@ Vector<T, N> operator-(const Vector<T, N> &b, const T &a) {
 /// binary `*` (multiples) operator for Vector and scalar
 template <typename T, int N>
 Vector<T, N> operator*(const Vector<T, N> &b, const T &a) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::multiplies<T>(), std::placeholders::_1, a));
   return ret;
@@ -463,7 +463,7 @@ Vector<T, N> operator*(const Vector<T, N> &b, const T &a) {
 /// binary `/` (divides) operator for Vector and scalar
 template <typename T, int N>
 Vector<T, N> operator/(const Vector<T, N> &b, const T &a) {
-  Vector<T, N> ret{};
+  Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::divides<T>(), std::placeholders::_1, a));
   return ret;
@@ -473,7 +473,7 @@ Vector<T, N> operator/(const Vector<T, N> &b, const T &a) {
 
 template <typename T, int N>
 Vector<bool, N> operator==(const Vector<T, N> &a, const Vector<T, N> &b) {
-  Vector<bool, N> ret{};
+  Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::equal_to<T>());
   return ret;
@@ -481,7 +481,7 @@ Vector<bool, N> operator==(const Vector<T, N> &a, const Vector<T, N> &b) {
 
 template <typename T, int N>
 Vector<bool, N> operator!=(const Vector<T, N> &a, const Vector<T, N> &b) {
-  Vector<bool, N> ret{};
+  Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::not_equal_to<T>());
   return ret;
@@ -489,21 +489,21 @@ Vector<bool, N> operator!=(const Vector<T, N> &a, const Vector<T, N> &b) {
 
 template <typename T, int N>
 Vector<bool, N> operator<(const Vector<T, N> &a, const Vector<T, N> &b) {
-  Vector<bool, N> ret{};
+  Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::less<T>());
   return ret;
 }
 
 template <typename T, int N>
 Vector<bool, N> operator>(const Vector<T, N> &a, const Vector<T, N> &b) {
-  Vector<bool, N> ret{};
+  Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::greater<T>());
   return ret;
 }
 
 template <typename T, int N>
 Vector<bool, N> operator<=(const Vector<T, N> &a, const Vector<T, N> &b) {
-  Vector<bool, N> ret{};
+  Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::less_equal<T>());
   return ret;
@@ -511,7 +511,7 @@ Vector<bool, N> operator<=(const Vector<T, N> &a, const Vector<T, N> &b) {
 
 template <typename T, int N>
 Vector<bool, N> operator>=(const Vector<T, N> &a, const Vector<T, N> &b) {
-  Vector<bool, N> ret{};
+  Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::greater_equal<T>());
   return ret;

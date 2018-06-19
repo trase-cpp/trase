@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 Drawable::Drawable(Drawable *parent, const bfloat2_t &area_of_parent)
-    : m_parent(parent), m_area(area_of_parent), m_pixels{}, m_time_span(0),
+    : m_parent(parent), m_area(area_of_parent), m_time_span(0),
       m_times({0}) {}
 
 void Drawable::resize(const bfloat2_t &parent_pixels) {
@@ -65,11 +65,11 @@ float Drawable::get_frame_index(const float time) {
 
   if (time_index == 0) {
     return 0.0f;
-  } else {
-    const float delta_t = m_times[time_index] - m_times[time_index - 1];
-    const float w1 = (clipped_time - m_times[time_index - 1]) / delta_t;
-    return static_cast<float>(time_index - 1) + w1;
   }
+
+  const float delta_t = m_times[time_index] - m_times[time_index - 1];
+  const float w1 = (clipped_time - m_times[time_index - 1]) / delta_t;
+  return static_cast<float>(time_index - 1) + w1;
 }
 
 void Drawable::add_frame_time(const float time) {
@@ -81,12 +81,14 @@ void Drawable::add_frame_time(const float time) {
 }
 
 void Drawable::update_time_span(const float time) {
-  if (time > m_time_span)
+  if (time > m_time_span) {
     m_time_span = time;
+  }
 
   // need to inform parents
-  if (m_parent)
+  if (m_parent != nullptr) {
     m_parent->update_time_span(time);
+  }
 }
 
 } // namespace trase
