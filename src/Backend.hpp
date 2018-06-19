@@ -34,7 +34,94 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BACKEND_H_
 #define BACKEND_H_
 
+#include <cmath>
+#include <sstream>
+
+#include "Vector.hpp"
+
 namespace trase {
+
+// pi constant
+const float pi =
+    3.141592653589793238462643383279502884197169399375105820974944592307816406286f;
+
+/// a transform matrix in the form
+///
+/// [a c e]
+/// [b d f]
+/// [0 0 1]
+///
+struct Transform {
+  float a, b, c, d, e, f;
+
+  Transform() : a(1), b(0), c(0), d(1), e(0), f(0) {}
+
+  bool is_identity() {
+    return a == 1.0f && b == 0.0f && c == 0.0f && d == 1.0f && e == 0.0f &&
+           f == 0.0f;
+  }
+  void clear() {
+    a = d = 1.0;
+    c = e = b = f = 0.0;
+  }
+  void translate(const vfloat2_t &t) {
+    /*
+  /// [1 0 tx]   [a c e]    [a' c' e']
+  /// [0 1 ty] * [b d f]  = [b' d' f']
+  /// [0 0  1]   [0 0 1]    [0  0  1]
+
+  // pre-mult
+  e += t[0];
+  f += t[1];
+  */
+    // post-mult
+    /// [a c e]   [1 0 tx]   [a' c' e']
+    /// [b d f] * [0 1 ty] = [b' d' f']
+    /// [0 0 1]   [0 0  1]   [0  0  1]
+
+    e += a * t[0] + c * t[1];
+    f += b * t[0] + d * t[1];
+  }
+  void rotate(float angle) {
+    const float cos_t = std::cos(angle);
+    const float sin_t = std::sin(angle);
+
+    /*
+    // pre-mult
+    ///  [cost -sint 0]   [a c e]   [a' c' e']
+    ///  [sint cost  0] * [b d f] = [b' d' f']
+    ///  [0     0    1]   [0 0 1]   [0  0   1]
+
+    const float a0 = a * cos_t - b * sin_t;
+    b = a * sin_t + b * cos_t;
+    const float c0 = c * cos_t - d * sin_t;
+    d = c * sin_t + d * cos_t;
+    const float e0 = e * cos_t - f * sin_t;
+    f = e * sin_t + f * cos_t;
+    a = a0;
+    c = c0;
+    e = e0;
+    */
+    // post-mult
+    /// [a c e]   [cost -sint 0]   [a' c' e']
+    /// [b d f] * [sint cost  0] = [b' d' f']
+    /// [0 0 1]   [0     0    1]   [0  0   1]
+
+    const float a0 = a * cos_t + c * sin_t;
+    c = -a * sin_t + c * cos_t;
+    const float b0 = b * cos_t + d * sin_t;
+    d = -b * sin_t + d * cos_t;
+    a = a0;
+    b = b0;
+  }
+
+  std::string to_string() {
+    std::stringstream stream;
+    stream << "transform=\"matrix(" << a << ' ' << b << ' ' << c << ' ' << d
+           << ' ' << e << ' ' << f << ")\"";
+    return stream.str();
+  }
+};
 
 enum Align {
   // Horizontal align

@@ -56,12 +56,27 @@ class Axis : public Drawable {
   bfloat2_t m_limits;
 
   std::string m_font_face;
+  std::string m_xlabel;
+  std::string m_ylabel;
+  std::string m_title;
 
 public:
   Axis(Figure &figure, const bfloat2_t &area);
 
   const bfloat2_t &limits() const { return m_limits; }
   bfloat2_t &limits() { return m_limits; }
+
+  void xlim(std::array<float, 2> xlimits) {
+    m_limits.bmin[0] = xlimits[0];
+    m_limits.bmax[0] = xlimits[1];
+  }
+  void ylim(std::array<float, 2> xlimits) {
+    m_limits.bmin[1] = xlimits[0];
+    m_limits.bmax[1] = xlimits[1];
+  }
+  void xlabel(const char *string) { m_xlabel.assign(string); }
+  void ylabel(const char *string) { m_ylabel.assign(string); }
+  void title(const char *string) { m_title.assign(string); }
 
   template <typename T1, typename T2>
   std::shared_ptr<Plot1D> plot(const std::vector<T1> &x,

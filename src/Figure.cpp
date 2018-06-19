@@ -45,8 +45,7 @@ Figure::Figure(const std::array<float, 2> &pixels)
     : Drawable(nullptr,
                bfloat2_t(vfloat2_t(0, 0), vfloat2_t(pixels[0], pixels[1]))),
       m_id(++m_num_windows),
-      m_axis(new Axis(
-          *this, bfloat2_t(vfloat2_t(0.1f, 0.1f), vfloat2_t(0.9f, 0.9f)))) {
+      m_axis(new Axis(*this, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f}))) {
   m_children.push_back(&*m_axis);
   m_pixels = m_area;
   m_axis->resize(m_pixels);

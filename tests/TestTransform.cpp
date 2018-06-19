@@ -31,55 +31,95 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This tells Catch to provide a main() - only do this in one cpp file
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include <limits>
+#include <iterator>
 #include <type_traits>
 
-#include "BackendGL.hpp"
-#include "trase.hpp"
+#include "Backend.hpp"
 
-using namespace trase;
+TEST_CASE("constructors", "[transform]") {
 
-// This tests the output of the `get_nth_prime` function
-TEST_CASE("interactive test (only run by a human)", "[interactive]") {
+  // Default construction
+  trase::Transform t;
 
-  auto fig = figure();
-  auto ax = fig->axis();
-  const int n = 100;
-  std::vector<float> x(n);
-  std::vector<float> y(n);
-  for (int i = 0; i < n; ++i) {
-    x[i] = static_cast<float>(i) * 6.28 / n;
-    y[i] = std::sin(5 * x[i]);
-  }
-  auto static_plot = ax->plot(x, y);
-  auto moving_plot = ax->plot(x, y);
-  float time = 0.0;
+  // check identity
+  CHECK(t.is_identity() == true);
 
-  auto do_plot = [&](const float theta) {
-    for (int i = 0; i < n; ++i) {
-      y[i] = std::sin(theta * x[i]);
-    }
-    time += 0.3;
-    moving_plot->add_frame(x, y, time);
-  };
+  /// [a c e]   [1 0 0]
+  /// [b d f] = [0 1 0]
+  /// [0 0 1]   [0 0 1]
 
-  for (int i = 0; i < 5; ++i) {
-    const float theta = 5 - i;
-    do_plot(theta);
-  }
-  for (int i = 4; i >= 0; --i) {
-    const float theta = 5 - i;
-    do_plot(theta);
-  }
+  CHECK(t.a == 1.f);
+  CHECK(t.b == 0.f);
+  CHECK(t.c == 0.f);
+  CHECK(t.d == 1.f);
+  CHECK(t.e == 0.f);
+  CHECK(t.f == 0.f);
+}
 
-  ax->xlabel("x");
-  ax->ylabel("y");
-  ax->title("the interactive test");
+TEST_CASE("to_string", "[transform]") {
 
-  BackendGL backend;
-  fig->show(backend);
+  // Default construction
+  trase::Transform t;
+
+  CHECK(t.to_string() == "transform=\"matrix(1 0 0 1 0 0)\"");
+}
+
+TEST_CASE("translations", "[transform]") {
+
+  trase::Transform t;
+
+  /// [a c e]   [1 0 0]
+  /// [b d f] = [0 1 1]
+  /// [0 0 1]   [0 0 1]
+  t.translate({0.f, 1.f});
+
+  CHECK(t.a == 1.f);
+  CHECK(t.b == 0.f);
+  CHECK(t.c == 0.f);
+  CHECK(t.d == 1.f);
+  CHECK(t.e == 0.f);
+  CHECK(t.f == 1.f);
+
+  /// [a c e]   [1 0 1]
+  /// [b d f] = [0 1 1]
+  /// [0 0 1]   [0 0 1]
+  t.translate({1.f, 0.f});
+
+  CHECK(t.a == 1.f);
+  CHECK(t.b == 0.f);
+  CHECK(t.c == 0.f);
+  CHECK(t.d == 1.f);
+  CHECK(t.e == 1.f);
+  CHECK(t.f == 1.f);
+}
+
+TEST_CASE("rotations", "[transform]") {
+
+  trase::Transform t;
+
+  /// [a c e]   [-1 0 0]
+  /// [b d f] = [0 -1 0]
+  /// [0 0 1]   [0 0  1]
+  t.rotate(trase::pi);
+
+  CHECK(t.a == Approx(-1.f));
+  CHECK(t.b == Approx(0.0f).margin(1e-7));
+  CHECK(t.c == Approx(0.0f).margin(1e-7));
+  CHECK(t.d == Approx(-1.f));
+  CHECK(t.e == Approx(0.f));
+  CHECK(t.f == Approx(0.f));
+
+  /// [a c e]   [1 0 0]
+  /// [b d f] = [0 1 0]
+  /// [0 0 1]   [0 0 1]
+  t.rotate(-trase::pi);
+
+  CHECK(t.a == Approx(1.f));
+  CHECK(t.b == Approx(0.f));
+  CHECK(t.c == Approx(0.f));
+  CHECK(t.d == Approx(1.f));
+  CHECK(t.e == Approx(0.f));
+  CHECK(t.f == Approx(0.f));
 }

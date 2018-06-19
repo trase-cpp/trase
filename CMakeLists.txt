@@ -99,24 +99,24 @@ if (trase_BUILD_OPENGL)
 
     add_library(glext ${glext_source})
     target_include_directories(glext SYSTEM PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${glext_dir}> 
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${glext_dir}>
         $<INSTALL_INTERFACE:include>)
     target_link_libraries(glext PUBLIC ${OPENGL_gl_LIBRARY})
 
     add_library(imgui ${imgui_source})
     target_include_directories(imgui SYSTEM PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${imgui_dir}> 
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${imgui_dir}>
         $<INSTALL_INTERFACE:include>)
     target_link_libraries(imgui PUBLIC glext glfw dl)
 
     add_library(nanovg ${nanovg_source})
     target_include_directories(nanovg SYSTEM PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${nanovg_dir}> 
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${nanovg_dir}>
         $<INSTALL_INTERFACE:include>)
     target_link_libraries(nanovg PUBLIC ${OPENGL_gl_LIBRARY} glfw dl)
 endif(trase_BUILD_OPENGL)
 
-set(trase_headers 
+set(trase_headers
     src/Drawable.hpp
     src/Figure.hpp
     src/Axis.hpp
@@ -136,13 +136,13 @@ set(trase_source
     src/Plot1D.cpp
     )
 
-set(trase_draw_headers 
+set(trase_draw_headers
     src/DrawableDraw.hpp
     src/FigureDraw.hpp
     src/AxisDraw.hpp
     src/Plot1DDraw.hpp
     )
-   
+
 
 add_library(trase
     ${trase_source}
@@ -161,8 +161,8 @@ if (trase_BUILD_OPENGL)
         src/BackendGL.cpp
         )
 
-    target_include_directories(backendGL PUBLIC 
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src> 
+    target_include_directories(backendGL PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<INSTALL_INTERFACE:include>)
     target_link_libraries(backendGL PUBLIC trase glext nanovg imgui)
 endif()
@@ -187,12 +187,14 @@ if (trase_BUILD_OPENGL)
 endif()
 
 add_executable (
-        trase_tst
-        tests/TestFigure.cpp
-        tests/TestPlot1D.cpp
-        tests/TestBackendSVG.cpp
-        tests/TestVector.cpp
-)
+    trase_tst
+    tests/TestFigure.cpp
+    tests/TestAxis.cpp
+    tests/TestPlot1D.cpp
+    tests/TestBackendSVG.cpp
+    tests/TestVector.cpp
+    tests/TestTransform.cpp
+    )
 target_include_directories(trase_tst PRIVATE tests)
 target_link_libraries(trase_tst PRIVATE trase backendSVG)
 add_test(the_trase_tst trase_tst)
@@ -258,11 +260,11 @@ install(TARGETS ${install-targets}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
-)
+    )
 
 install(EXPORT trase-targets
     FILE trase-config.cmake
     DESTINATION lib/cmake/trase
-)
+    )
 
 install(FILES ${install-headers} DESTINATION include)

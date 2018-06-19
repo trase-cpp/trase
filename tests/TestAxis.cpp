@@ -31,55 +31,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This tells Catch to provide a main() - only do this in one cpp file
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 #include <limits>
 #include <type_traits>
 
-#include "BackendGL.hpp"
 #include "trase.hpp"
 
 using namespace trase;
 
-// This tests the output of the `get_nth_prime` function
-TEST_CASE("interactive test (only run by a human)", "[interactive]") {
+TEST_CASE("axis can be created", "[axis]") {
+  auto fig = figure({800, 600});
 
+  Axis ax(*fig, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f}));
+}
+
+TEST_CASE("check limit setting", "[axis]") {
   auto fig = figure();
   auto ax = fig->axis();
-  const int n = 100;
-  std::vector<float> x(n);
-  std::vector<float> y(n);
-  for (int i = 0; i < n; ++i) {
-    x[i] = static_cast<float>(i) * 6.28 / n;
-    y[i] = std::sin(5 * x[i]);
-  }
-  auto static_plot = ax->plot(x, y);
-  auto moving_plot = ax->plot(x, y);
-  float time = 0.0;
+  CHECK(ax->limits().is_empty() == true);
+  ax->xlim({0.0f, 1.0f});
+  CHECK(ax->limits().is_empty() == true);
+  CHECK(ax->limits().bmin[0] == 0.0f);
+  CHECK(ax->limits().bmax[0] == 1.0f);
+  ax->ylim({-1.0f, 1.0f});
+  CHECK(ax->limits().is_empty() == false);
+  CHECK(ax->limits().bmin[1] == -1.0f);
+  CHECK(ax->limits().bmax[1] == 1.0f);
+}
 
-  auto do_plot = [&](const float theta) {
-    for (int i = 0; i < n; ++i) {
-      y[i] = std::sin(theta * x[i]);
-    }
-    time += 0.3;
-    moving_plot->add_frame(x, y, time);
-  };
-
-  for (int i = 0; i < 5; ++i) {
-    const float theta = 5 - i;
-    do_plot(theta);
-  }
-  for (int i = 4; i >= 0; --i) {
-    const float theta = 5 - i;
-    do_plot(theta);
-  }
-
-  ax->xlabel("x");
-  ax->ylabel("y");
-  ax->title("the interactive test");
-
-  BackendGL backend;
-  fig->show(backend);
+TEST_CASE("to/from pixel coordinates", "[axis]") {
+  // axis will be 80 x 80 pixels from 10 - 90 each dim
+  auto fig = figure({100, 100});
+  auto ax = fig->axis();
+  CHECK(ax->pixels().bmin[0] == 10.f);
+  CHECK(ax->pixels().bmin[1] == 10.f);
+  CHECK(ax->pixels().bmax[0] == 90.f);
+  CHECK(ax->pixels().bmax[1] == 90.f);
+  ax->xlim({0.0f, 1.0f});
+  ax->ylim({0.0f, 1.0f});
+  auto middle1 = ax->to_pixel({0.5f, 0.5f});
+  CHECK(middle1[0] == 50.f);
+  CHECK(middle1[1] == 50.f);
+  auto middle2 = ax->from_pixel(middle1);
+  CHECK(middle2[0] == 0.5f);
+  CHECK(middle2[1] == 0.5f);
 }

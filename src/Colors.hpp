@@ -51,8 +51,6 @@ struct RGBA {
 
     stream << '#' << std::hex << std::setfill('0') << std::setw(2) << m_r
            << std::setw(2) << m_g << std::setw(2) << m_b;
-    std::cout << "outputting rgba(" << m_r << ',' << m_g << ',' << m_b << ','
-              << m_a << ") as " << stream.str() << std::endl;
     return stream.str();
   }
   int m_r, m_g, m_b, m_a;

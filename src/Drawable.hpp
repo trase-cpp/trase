@@ -70,7 +70,7 @@ public:
   const bfloat2_t &pixels() { return m_pixels; }
   const bfloat2_t &area() { return m_pixels; }
   template <typename Backend> void serialise(Backend &backend);
-  template <typename Backend> void draw(Backend &backend, const float time);
+  template <typename Backend> void draw(Backend &backend, float time);
 };
 
 } // namespace trase

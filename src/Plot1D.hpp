@@ -86,7 +86,7 @@ public:
   void set_color(const RGBA &color) { m_color = color; }
 
   template <typename Backend> void serialise(Backend &backend);
-  template <typename Backend> void draw(Backend &backend, const float time);
+  template <typename Backend> void draw(Backend &backend, float time);
 
 }; // namespace trase
 

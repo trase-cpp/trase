@@ -69,13 +69,16 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
     do_plot(static_cast<float>(i));
   }
 
-  ax->font_face("Indie Flower");
+  // ax->font_face("Indie Flower");
+  ax->xlabel("x");
+  ax->ylabel("y");
+  ax->title("the svg test");
 
   std::ofstream out;
   out.open("test_figure.svg");
   BackendSVG backend(out);
-  backend.import_web_font(
-      "https://fonts.googleapis.com/css?family=Indie+Flower");
+  // backend.import_web_font(
+  //    "https://fonts.googleapis.com/css?family=Indie+Flower");
   fig->serialise(backend);
   out.close();
 }

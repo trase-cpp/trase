@@ -108,21 +108,28 @@ public:
     mem[2] = arg3;
     mem[3] = arg4;
   }
-  
+
   // Iterators
   iter begin() noexcept { return iter(mem.begin()); }
   const_iter begin() const noexcept { return const_iter(mem.begin()); }
   iter end() noexcept { return iter(mem.end()); }
   const_iter end() const noexcept { return const_iter(mem.end()); }
   reverse_iter rbegin() noexcept { return reverse_iter(end()); }
-  const_reverse_iter rbegin() const noexcept { return const_reverse_iter(end()); }
+  const_reverse_iter rbegin() const noexcept {
+    return const_reverse_iter(end());
+  }
   reverse_iter rend() noexcept { return reverse_iter(begin()); }
-  const_reverse_iter rend() const noexcept { return const_reverse_iter(begin()); }
+  const_reverse_iter rend() const noexcept {
+    return const_reverse_iter(begin());
+  }
   const_iter cbegin() const noexcept { return const_iter(mem.begin()); }
   const_iter cend() const noexcept { return const_iter(mem.end()); }
-  const_reverse_iter crbegin() const noexcept { return const_reverse_iter(end()); }
-  const_reverse_iter crend() const noexcept { return const_reverse_iter(begin()); }
-
+  const_reverse_iter crbegin() const noexcept {
+    return const_reverse_iter(end());
+  }
+  const_reverse_iter crend() const noexcept {
+    return const_reverse_iter(begin());
+  }
 
   /// Zero Vector
   ///
@@ -168,9 +175,7 @@ public:
   /// \return The inner product (dot product) of this vector with `arg`
   ///
   /// \see inner_product
-  T dot(const Vector<T, N> &arg) const noexcept {
-    return inner_product(arg);
-  }
+  T dot(const Vector<T, N> &arg) const noexcept { return inner_product(arg); }
 
   /// change vector type
   ///
@@ -251,27 +256,22 @@ public:
                         [](const T &a) { return static_cast<bool>(a); });
   }
 
-
   /// find the minimum element of the vector
   /// \return the value of the minimum element of the vector
-  T minCoeff() const noexcept {
-      return *std::min_element(begin(), end());
-  }
+  T minCoeff() const noexcept { return *std::min_element(begin(), end()); }
 
   /// find the maximum element of the vector
   /// \return the maximum element of the vector
-  T maxCoeff() const noexcept {
-      return *std::max_element(begin(), end());
-  }
+  T maxCoeff() const noexcept { return *std::max_element(begin(), end()); }
 
   /// returns the product of every element in the vector
-  T prod() const noexcept{
+  T prod() const noexcept {
     return std::accumulate(begin(), end(), static_cast<T>(1),
                            std::multiplies<T>());
   }
 
   /// returns the sum of every element in the vector
-  T sum() const noexcept{
+  T sum() const noexcept {
     return std::accumulate(begin(), end(), static_cast<T>(0));
   }
 
@@ -282,8 +282,9 @@ public:
   /*
    * Compound assignment operators += -= *= /=
    *
-   * First four are this-Vector elementwise operations (this[i] op other[i] for all i).
-   * Second four are this-scalar elementwise operations (this[i] op k for all i).
+   * First four are this-Vector elementwise operations (this[i] op other[i] for
+   * all i). Second four are this-scalar elementwise operations (this[i] op k
+   * for all i).
    */
 
   /// this-Vector compound plus operator
@@ -383,7 +384,8 @@ Vector<T, N> operator-(const Vector<T, N> &a, const Vector<T, N> &b) {
 template <typename T, int N>
 Vector<T, N> operator*(const Vector<T, N> &a, const Vector<T, N> &b) {
   Vector<T, N> ret{};
-  std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::multiplies<T>());
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
+                 std::multiplies<T>());
   return ret;
 }
 
@@ -488,16 +490,14 @@ Vector<bool, N> operator!=(const Vector<T, N> &a, const Vector<T, N> &b) {
 template <typename T, int N>
 Vector<bool, N> operator<(const Vector<T, N> &a, const Vector<T, N> &b) {
   Vector<bool, N> ret{};
-  std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
-                 std::less<T>());
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::less<T>());
   return ret;
 }
 
 template <typename T, int N>
 Vector<bool, N> operator>(const Vector<T, N> &a, const Vector<T, N> &b) {
   Vector<bool, N> ret{};
-  std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
-                 std::greater<T>());
+  std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::greater<T>());
   return ret;
 }
 
