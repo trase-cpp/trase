@@ -31,24 +31,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Figure.hpp"
-#include "BBox.hpp"
-#include "Vector.hpp"
-#include <array>
-#include <string>
+#include "catch.hpp"
 
-namespace trase {
+#include <limits>
+#include <type_traits>
 
-int Figure::m_num_windows = 0;
+#include "trase.hpp"
 
-Figure::Figure(const std::array<float, 2> &pixels)
-    : Drawable(nullptr,
-               bfloat2_t(vfloat2_t(0, 0), vfloat2_t(pixels[0], pixels[1]))),
-      m_id(++m_num_windows),
-      m_axis(new Axis(*this, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f}))) {
-  m_children.push_back(&*m_axis);
-  m_pixels = m_area;
-  m_axis->resize(m_pixels);
+using namespace trase;
+
+TEST_CASE("axis can be created", "[axis]") {
+  auto fig = figure({800, 600});
+
+  Axis ax(*fig, bfloat2_t({0.1, 0.1}, {0.9, 0.9}));
 }
 
-} // namespace trase
+TEST_CASE("check limit setting", "[axis]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  CHECK(ax->limits().is_empty() == true);
+  ax->xlim({0.0f, 1.0f});
+  CHECK(ax->limits().is_empty() == true);
+  CHECK(ax->limits().bmin[0] == 0.0f);
+  CHECK(ax->limits().bmax[0] == 1.0f);
+  ax->ylim({-1.0f, 1.0f});
+  CHECK(ax->limits().is_empty() == false);
+  CHECK(ax->limits().bmin[1] == -1.0f);
+  CHECK(ax->limits().bmax[1] == 1.0f);
+}
+
+TEST_CASE("to/from pixel coordinates", "[axis]") {
+  // axis will be 80 x 80 pixels from 10 - 90 each dim
+  auto fig = figure({100, 100});
+  auto ax = fig->axis();
+  CHECK(ax->pixels().bmin[0] == 10.f);
+  CHECK(ax->pixels().bmin[1] == 10.f);
+  CHECK(ax->pixels().bmax[0] == 90.f);
+  CHECK(ax->pixels().bmax[1] == 90.f);
+  ax->xlim({0.0f, 1.0f});
+  ax->ylim({0.0f, 1.0f});
+  auto middle1 = ax->to_pixel({0.5f, 0.5f});
+  CHECK(middle1[0] == 50.f);
+  CHECK(middle1[1] == 50.f);
+  auto middle2 = ax->from_pixel(middle1);
+  CHECK(middle2[0] == 0.5f);
+  CHECK(middle2[1] == 0.5f);
+}

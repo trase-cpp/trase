@@ -71,9 +71,6 @@ template <typename T, int N> struct bbox {
   inline bbox(const vector_t &min, const vector_t &max)
       : bmin(min), bmax(max) {}
 
-  inline bbox(const std::array<T, N> &min, const std::array<T, N> &max)
-      : bmin(min), bmax(max) {}
-
   vector_t delta() const { return bmax - bmin; }
   const vector_t &min() const { return bmin; }
   const vector_t &max() const { return bmax; }

@@ -136,35 +136,35 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
     backend.line_to(vfloat2_t(m_pixels.bmax[0], tick_pos));
   }
   backend.stroke_color(RGBA(255, 255, 255, 255));
-  backend.stroke_width(lw / 2);
+  backend.stroke_width(lw / 2.f);
   backend.stroke();
 
   // axis title
   if (!m_title.empty()) {
     backend.text_align(ALIGN_CENTER | ALIGN_BOTTOM);
-    backend.text(vfloat2_t(0.5 * (m_pixels.bmax[0] + m_pixels.bmin[0]),
+    backend.text(vfloat2_t(0.5f * (m_pixels.bmax[0] + m_pixels.bmin[0]),
                            m_pixels.bmin[1] -
-                               0.05 * (m_pixels.bmax[1] - m_pixels.bmin[1])),
+                               0.05f * (m_pixels.bmax[1] - m_pixels.bmin[1])),
                  m_title.c_str(), NULL);
   }
 
   // axis labels
   if (!m_xlabel.empty()) {
     backend.text_align(ALIGN_CENTER | ALIGN_TOP);
-    backend.text(vfloat2_t(0.5 * (m_pixels.bmax[0] + m_pixels.bmin[0]),
+    backend.text(vfloat2_t(0.5f * (m_pixels.bmax[0] + m_pixels.bmin[0]),
                            m_pixels.bmax[1] +
-                               0.05 * (m_pixels.bmax[1] - m_pixels.bmin[1])),
+                               0.05f * (m_pixels.bmax[1] - m_pixels.bmin[1])),
                  m_xlabel.c_str(), NULL);
   }
 
   if (!m_ylabel.empty()) {
     backend.text_align(ALIGN_CENTER | ALIGN_BOTTOM);
     const vfloat2_t point = vfloat2_t(
-        m_pixels.bmin[0] - 0.05 * (m_pixels.bmax[0] - m_pixels.bmin[0]),
-        0.5 * (m_pixels.bmax[1] + m_pixels.bmin[1]));
+        m_pixels.bmin[0] - 0.05f * (m_pixels.bmax[0] - m_pixels.bmin[0]),
+        0.5f * (m_pixels.bmax[1] + m_pixels.bmin[1]));
     backend.translate(point);
-    backend.rotate(-pi / 2.0);
-    backend.text(vfloat2_t(0, 0), m_ylabel.c_str(), NULL);
+    backend.rotate(-pi / 2.0f);
+    backend.text(vfloat2_t(0.f, 0.f), m_ylabel.c_str(), NULL);
     backend.reset_transform();
   }
 }
