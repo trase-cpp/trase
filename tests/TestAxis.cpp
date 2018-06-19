@@ -43,7 +43,7 @@ using namespace trase;
 TEST_CASE("axis can be created", "[axis]") {
   auto fig = figure({800, 600});
 
-  Axis ax(*fig, bfloat2_t({0.1, 0.1}, {0.9, 0.9}));
+  Axis ax(*fig, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f}));
 }
 
 TEST_CASE("check limit setting", "[axis]") {
