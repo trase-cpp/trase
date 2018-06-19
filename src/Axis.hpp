@@ -60,6 +60,9 @@ class Axis : public Drawable {
   std::string m_ylabel;
   std::string m_title;
 
+  /// true if legend is visible
+  bool m_legend;
+
 public:
   Axis(Figure &figure, const bfloat2_t &area);
 
@@ -77,10 +80,12 @@ public:
   void xlabel(const char *string) { m_xlabel.assign(string); }
   void ylabel(const char *string) { m_ylabel.assign(string); }
   void title(const char *string) { m_title.assign(string); }
+  void legend() { m_legend = true; }
 
   template <typename T1, typename T2>
   std::shared_ptr<Plot1D> plot(const std::vector<T1> &x,
-                               const std::vector<T2> &y) {
+                               const std::vector<T2> &y,
+                               const std::string &label = std::string()) {
     if (x.size() != y.size()) {
       throw Exception("x and y vector sizes do not match");
     }
@@ -89,7 +94,7 @@ public:
       values[i][0] = static_cast<float>(x[i]);
       values[i][1] = static_cast<float>(y[i]);
     }
-    return plot_impl(std::move(values));
+    return plot_impl(std::move(values), label);
   }
 
   template <typename Backend> void serialise(Backend &backend);
@@ -114,7 +119,8 @@ public:
   void font_face(const std::string &fontFace) { m_font_face = fontFace; }
 
 private:
-  std::shared_ptr<Plot1D> plot_impl(std::vector<vfloat2_t> &&values);
+  std::shared_ptr<Plot1D> plot_impl(std::vector<vfloat2_t> &&values,
+                                    const std::string &label);
 
   template <typename Backend> void draw_common(Backend &backend);
 

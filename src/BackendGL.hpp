@@ -129,9 +129,16 @@ public:
   inline void text(const vfloat2_t &x, const char *string, const char *end) {
     nvgText(m_vg, x[0], x[1], string, end);
   }
-  inline void text_bounds(const vfloat2_t &x, const char *string,
-                          const char *end, float *bounds) {
-    nvgTextBounds(m_vg, x[0], x[1], string, end, bounds);
+
+  inline bfloat2_t text_bounds(const vfloat2_t &x, const char *string) {
+    bfloat2_t ret;
+    float bounds[4];
+    nvgTextBounds(m_vg, x[0], x[1], string, nullptr, bounds);
+    ret.bmin[0] = bounds[0];
+    ret.bmin[1] = bounds[1];
+    ret.bmax[0] = bounds[2];
+    ret.bmax[1] = bounds[3];
+    return ret;
   }
 
   inline bool should_close() { return glfwWindowShouldClose(m_window); }
