@@ -51,7 +51,8 @@ TEST_CASE("find fonts", "[font manager]") {
   font = fm.find_font("SomeCrazyFontThatCantExist", "");
   CHECK(font.empty());
 
-  fm.set_font_dir("nonexistant_dir");
+  fm.clear_font_dirs();
+  fm.add_font_dir("nonexistant_dir");
   font = fm.find_font("Roboto-Regular", "");
   CHECK(font.empty());
 }

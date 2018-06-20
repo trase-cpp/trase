@@ -162,6 +162,15 @@ add_library(trase
 if (WIN32)
     target_link_libraries(trase PUBLIC dirent)
 endif()
+
+set(trase_fonts
+    font/entypo.ttf  
+    font/NotoEmoji-Regular.ttf  
+    font/Roboto-Bold.ttf  
+    font/Roboto-Light.ttf  
+    font/Roboto-Regular.ttf
+    )
+target_compile_definitions(trase PRIVATE TRASE_SOURCE_DIR="${trase_SOURCE_DIR}" TRASE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}")
 #target_include_directories(trase PUBLIC dirent)
 
 
@@ -286,3 +295,4 @@ install(EXPORT trase-targets
     )
 
 install(FILES ${install-headers} DESTINATION include)
+install(FILES ${trase_fonts} DESTINATION font)

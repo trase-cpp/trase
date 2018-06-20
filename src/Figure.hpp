@@ -63,7 +63,7 @@ public:
 
   template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void show(Backend &backend);
-  template <typename Backend> void draw(Backend &backend, const float time);
+  template <typename Backend> void draw(Backend &backend, float time);
 };
 
 inline std::shared_ptr<Figure> figure(std::array<float, 2> pixels = {

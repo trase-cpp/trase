@@ -43,7 +43,7 @@ Axis::Axis(Figure &figure, const bfloat2_t &area)
                          std::numeric_limits<float>::max()),
                vfloat2_t(std::numeric_limits<float>::min(),
                          std::numeric_limits<float>::min())),
-      m_font_face("sans-bold") {}
+      m_font_face("Roboto-Regular") {}
 
 std::shared_ptr<Plot1D> Axis::plot_impl(std::vector<vfloat2_t> &&values) {
   m_plot1d.emplace_back(new Plot1D(*this));
