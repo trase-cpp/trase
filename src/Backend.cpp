@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Backend.hpp"
+#include <cctype>
 #include <dirent.h>
 
 namespace trase {
