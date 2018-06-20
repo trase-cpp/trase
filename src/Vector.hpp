@@ -570,7 +570,7 @@ Vector<T, N> round_off(const Vector<T, N> &arg, int n) {
     // Number of digits to the left of the decimal point
     const int num_digits = 1 + static_cast<int>(std::log10(a));
     //\todo: this does not work for all but small integers!
-    const T d = std::pow(static_cast<T>(10), n - num_digits);
+    const auto d = static_cast<T>(std::pow(10.0, n - num_digits));
     return std::floor(a * d + static_cast<T>(0.5)) / d;
   });
   return ret;
