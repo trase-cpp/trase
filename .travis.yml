@@ -98,8 +98,6 @@ matrix:
 
 before_install:
   - eval "${MATRIX_EVAL}"
-  - ls /usr/share/fonts
-  - ls /usr/share/fonts/truetype
 
 script:
   - cmake $CMAKE_OPTNS .
