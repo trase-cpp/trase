@@ -261,7 +261,7 @@ endif()
 # install stuff
 set(install-targets trase backendSVG)
 if (WIN32)
-    list(APPEND dirent)
+    list(APPEND install-targets dirent)
 endif()
 if (trase_BUILD_OPENGL)
     list(APPEND install-targets backendGL glext nanovg imgui)
