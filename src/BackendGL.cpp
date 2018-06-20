@@ -132,15 +132,18 @@ NVGcontext *BackendGL::init_nanovg(int x_pixels, int y_pixels) {
       nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
   if (!vg)
     throw Exception("trase: Cannot init NanoVG");
-  int fontNormal = nvgCreateFont(vg, "sans", "../font/Roboto-Regular.ttf");
+  auto filename = m_fm.find_font("Roboto-Regular", "");
+  int fontNormal = nvgCreateFont(vg, "Roboto", filename.c_str());
   if (fontNormal == -1) {
-    throw Exception("Could not add font italic");
+    throw Exception("Could not add font Roboto");
   }
-  int fontBold = nvgCreateFont(vg, "sans-bold", "../font/Roboto-Bold.ttf");
+  filename = m_fm.find_font("Roboto-Bold", "");
+  int fontBold = nvgCreateFont(vg, "Roboto-Bold", filename.c_str());
   if (fontBold == -1) {
     throw Exception("Could not add font bold");
   }
-  int fontEmoji = nvgCreateFont(vg, "emoji", "../font/NotoEmoji-Regular.ttf");
+  filename = m_fm.find_font("NotoEmoji-Regular", "");
+  int fontEmoji = nvgCreateFont(vg, "NotoEmoji-Regular", filename.c_str());
   if (fontEmoji == -1) {
     throw Exception("Could not add font emoji");
   }

@@ -158,16 +158,37 @@ TEST_CASE("all any none", "[vector]") {
     CHECK(!two.none());
 }
 
-TEST_CASE("inner product", "[vector]") {
+TEST_CASE("inner product and norms", "[vector]") {
 
     trase::Vector<int, 4> a = {1, 2, 3, 4};
     trase::Vector<int, 4> b = {2, 3, 4, 5};
+
+    trase::Vector<double, 4> c = {-1.2, 2.3, -5.2, 1.2};
 
     CHECK(a.inner_product(b) == 40);
     CHECK(a.inner_product(b) == b.inner_product(a));
 
     CHECK(a.dot(b) == 40);
     CHECK(a.dot(b) == b.dot(a));
+
+    CHECK(a.squaredNorm() == 30);
+    CHECK(b.squaredNorm() == 54);
+    CHECK(c.squaredNorm() == 1.2 * 1.2 + 2.3 * 2.3 + 5.2 * 5.2 + 1.2 * 1.2);
+
+    CHECK(a.norm() == std::sqrt(30));
+    CHECK(b.norm() == std::sqrt(54));
+    CHECK(c.norm() == std::sqrt(1.2 * 1.2 + 2.3 * 2.3 + 5.2 * 5.2 + 1.2 * 1.2));
+
+    CHECK(a.inf_norm() == 4);
+    CHECK(b.inf_norm() == 5);
+    CHECK(c.inf_norm() == 5.2);
+
+    CHECK(a.inf_norm() == (-a).inf_norm());
+    CHECK(b.inf_norm() == (-b).inf_norm());
+    CHECK(c.inf_norm() == (-c).inf_norm());
+
+    c.normalize();
+    CHECK(c.norm() == Approx(1.0));
 }
 
 TEST_CASE("cast", "[vector]") {
@@ -345,4 +366,52 @@ TEST_CASE("operators", "[vector]") {
       CHECK(a[i] == (copy_of_a[i] / b[i]) / k);
     }
   }
+}
+
+TEST_CASE("power", "[vector]") {
+
+  trase::Vector<int, 4> a = {1, -2, 13, 4};
+  trase::Vector<int, 4> a_squared = {1, 4, 169, 16};
+
+  CHECK((a.pow<int>(2) == a_squared).all());
+
+  trase::Vector<long double, 3> b = {2.3l, 3.4l, 4.5l};
+  const float exp = 0.678f;
+  trase::Vector<long double, 3> b_pow = {
+      std::pow(2.3l, exp), std::pow(3.4l, exp), std::pow(4.5l, exp)};
+
+  CHECK((b.pow<float>(exp) == b_pow).all());
+  CHECK((trase::pow<long double, 3, float>(b, exp) == b_pow).all());
+  CHECK((trase::pow(b, exp) == b_pow).all());
+}
+
+TEST_CASE("floor ceil round abs abs2", "[vector]") {
+
+  trase::Vector<double, 3> a = {1.4, 2.5, 3.6};
+
+  trase::Vector<double, 3> floor = {1.0, 2.0, 3.0};
+  trase::Vector<double, 3> ceil = {2.0, 3.0, 4.0};
+  trase::Vector<double, 3> round = {1.0, 3.0, 4.0};
+
+  CHECK((trase::floor(a) == floor).all());
+  CHECK((trase::ceil(a) == ceil).all());
+  CHECK((trase::round(a) == round).all());
+
+  trase::Vector<int, 3> b = {-2, -3, 4};
+
+  trase::Vector<int, 3> abs = {2, 3, 4};
+  trase::Vector<int, 3> abs2 = {4, 9, 16};
+
+  CHECK((trase::abs(b) == abs).all());
+  CHECK((trase::abs2(b) == abs2).all());
+}
+
+TEST_CASE("cross product", "[vector]") {
+
+  trase::Vector<int, 3> a = {1, 2, 3};
+  trase::Vector<int, 3> b = {12, -6, 97};
+
+  trase::Vector<int, 3> a_cross_b = {212, -61, -30};
+
+  CHECK((trase::cross(a, b) == a_cross_b).all());
 }

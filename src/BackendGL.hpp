@@ -57,6 +57,7 @@ namespace trase {
 class BackendGL {
   GLFWwindow *m_window;
   NVGcontext *m_vg;
+  FontManager m_fm;
 
 public:
   void init(int x_pixels, int y_pixels, const char *name);
@@ -119,7 +120,19 @@ public:
   inline void stroke() { nvgStroke(m_vg); }
   inline void fill() { nvgFill(m_vg); }
   inline void font_size(float size) { nvgFontSize(m_vg, size); }
-  inline void font_face(const char *face) { nvgFontFace(m_vg, face); }
+  inline void font_face(const char *face) {
+    if (nvgFindFont(m_vg, face) == -1) {
+      auto filename = m_fm.find_font(face, "");
+      if (filename == "") {
+        throw Exception("Could not find font" + std::string(face));
+      }
+      int font_id = nvgCreateFont(m_vg, face, filename.c_str());
+      if (font_id == -1) {
+        throw Exception("Could not add font" + filename);
+      }
+    }
+    nvgFontFace(m_vg, face);
+  }
   inline void font_blur(const float blur) { nvgFontBlur(m_vg, blur); }
   inline void text_align(const int align) { nvgTextAlign(m_vg, align); }
   inline void fill_color(const RGBA &color) {
