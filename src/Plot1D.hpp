@@ -51,6 +51,9 @@ class Plot1D : public Drawable {
   /// values
   std::vector<std::vector<vfloat2_t>> m_values;
 
+  /// label
+  std::string m_label;
+
   /// [xmin, ymin, xmax, ymax]
   bfloat2_t m_limits;
 
@@ -84,6 +87,9 @@ public:
   std::vector<vfloat2_t> &get_values(const int i) { return m_values[i]; }
 
   void set_color(const RGBA &color) { m_color = color; }
+  void set_label(const std::string &label) { m_label = label; }
+  const std::string &get_label() const { return m_label; }
+  const RGBA &get_color() const { return m_color; }
 
   template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void draw(Backend &backend, float time);

@@ -55,8 +55,8 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
     x[i] = static_cast<float>(i) * 6.28 / n;
     y[i] = std::sin(5 * x[i]);
   }
-  auto static_plot = ax->plot(x, y);
-  auto moving_plot = ax->plot(x, y);
+  auto static_plot = ax->plot(x, y, "static");
+  auto moving_plot = ax->plot(x, y, "moving");
   float time = 0.0;
 
   auto do_plot = [&](const float theta) {
@@ -79,6 +79,7 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
   ax->xlabel("x");
   ax->ylabel("y");
   ax->title("the interactive test");
+  ax->legend();
 
   BackendGL backend;
   fig->show(backend);
