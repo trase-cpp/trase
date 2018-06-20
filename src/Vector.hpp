@@ -564,24 +564,17 @@ Vector<T, 3> cross(const Vector<T, 3> &arg1, const Vector<T, 3> &arg2) {
 
 /// round off to n significant digits
 template <typename T, int N>
-Vector<T, N> round_off(const Vector<T, N> &x, int n) {
-  Vector<T, N> num = x;
-  for (int j = 0; j < N; ++j) {
-    // Counting the no. of digits to the left of decimal point
-    // in the given no.
-    T tmp = num[j];
-    int i;
-    for (i = 0; tmp >= 1; ++i) {
-      tmp /= 10;
-    }
-
-    // round off to the given number of sig digits
-    const T d = std::pow(static_cast<T>(10.0), n - i);
-    num[j] = std::floor(num[j] * d + static_cast<T>(0.5)) / d;
-  }
-  return num;
+Vector<T, N> round_off(const Vector<T, N> &arg, int n) {
+  Vector<T, N> ret;
+  std::transform(arg.begin(), arg.end(), ret.begin(), [&n](const T &a) {
+    // Number of digits to the left of the decimal point
+    const int num_digits = 1 + static_cast<int>(std::log10(a));
+    //\todo: this does not work for all but small integers!
+    const T d = std::pow(static_cast<T>(10), n - num_digits);
+    return std::floor(a * d + static_cast<T>(0.5)) / d;
+  });
+  return ret;
 }
-
 
 /// stream output operator for Vector class
 template <typename T, int N>

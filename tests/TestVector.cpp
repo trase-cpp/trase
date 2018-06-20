@@ -415,3 +415,20 @@ TEST_CASE("cross product", "[vector]") {
 
   CHECK((trase::cross(a, b) == a_cross_b).all());
 }
+
+TEST_CASE("round off", "[vector]") {
+
+  trase::Vector<double, 3> a = {1.234567, 2.345678, 3.7};
+  trase::Vector<double, 3> a4 = {1.235, 2.346, 3.7};
+  trase::Vector<double, 3> a3 = {1.23, 2.35, 3.7};
+  trase::Vector<double, 3> a2 = {1.2, 2.3, 3.7};
+  trase::Vector<double, 3> a1 = {1.0, 2.0, 4.0};
+
+  CHECK((trase::round_off(a, 4) == a4).all());
+  CHECK((trase::round_off(a, 3) == a3).all());
+  CHECK((trase::round_off(a, 2) == a2).all());
+  CHECK((trase::round_off(a, 1) == a1).all());
+
+  trase::Vector<int, 4> b = {1, 2, 3, 5};
+  CHECK((trase::round_off(b, 1) == b).all());
+}
