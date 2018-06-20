@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
 #include <sstream>
+#include <vector>
 
 #include "Vector.hpp"
 
@@ -138,6 +139,42 @@ enum Align {
 enum ArcDirection {
   CLOCKWISE = 1 << 0,
   COUNTER_CLOCKWISE = 1 << 1,
+};
+
+class FontManager {
+public:
+  std::vector<std::string> m_list_of_available_fonts;
+  std::string m_font_dir;
+#ifdef _WIN32
+  const std::string m_default_font_dir = "c:\\Windows\\Fonts";
+#elif __APPLE__
+  const std::string m_default_font_dir = "/Library/Fonts/";
+#elif __linux__
+  const std::string m_default_font_dir = "/usr/share/fonts/";
+#elif __unix__ // all unices not caught above
+  const std::string m_default_font_dir = "/usr/share/fonts/";
+#elif defined(_POSIX_VERSION)
+  const std::string m_default_font_dir = "/usr/share/fonts/";
+#else
+#error "Unknown system"
+#endif
+
+  FontManager() { set_font_dir(m_default_font_dir); }
+
+  /// finds a font with name containing substring name1 (case sensitive), and
+  /// optionally substring name2 (case insensitive) e.g.
+  ///  find_font("Roboto","");
+  ///  find_font("Roboto","bold");
+  std::string find_font(const std::string &name1, const std::string &name2);
+
+  void set_font_dir(const std::string &path) {
+    m_font_dir = path;
+    m_list_of_available_fonts.clear();
+    list_fonts(m_font_dir);
+  }
+
+private:
+  void list_fonts(const std::string &path);
 };
 
 } // namespace trase

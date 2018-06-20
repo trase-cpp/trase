@@ -116,6 +116,15 @@ if (trase_BUILD_OPENGL)
     target_link_libraries(nanovg PUBLIC ${OPENGL_gl_LIBRARY} glfw dl)
 endif(trase_BUILD_OPENGL)
 
+if (WIN32)
+    set(dirent_headers dirent/dirent.h)
+    add_library(dirent INTERFACE)
+    #target_sources(dirent INTERFACE dirent/dirent.h)
+    target_include_directories(dirent INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dirent>
+        $<INSTALL_INTERFACE:include>)
+endif()
+
 set(trase_headers
     src/Drawable.hpp
     src/Figure.hpp
@@ -134,6 +143,7 @@ set(trase_source
     src/Figure.cpp
     src/Axis.cpp
     src/Plot1D.cpp
+    src/Backend.cpp
     )
 
 set(trase_draw_headers
@@ -148,7 +158,11 @@ add_library(trase
     ${trase_source}
     ${trase_headers}
     )
-#target_include_directories(trase PUBLIC src)
+
+if (WIN32)
+    target_link_libraries(trase PUBLIC dirent)
+endif()
+#target_include_directories(trase PUBLIC dirent)
 
 
 if (trase_BUILD_OPENGL)
@@ -194,6 +208,7 @@ add_executable (
     tests/TestBackendSVG.cpp
     tests/TestVector.cpp
     tests/TestTransform.cpp
+    tests/TestFontManager.cpp
     )
 target_include_directories(trase_tst PRIVATE tests)
 target_link_libraries(trase_tst PRIVATE trase backendSVG)
@@ -245,6 +260,9 @@ endif()
 
 # install stuff
 set(install-targets trase backendSVG)
+if (WIN32)
+    list(APPEND dirent)
+endif()
 if (trase_BUILD_OPENGL)
     list(APPEND install-targets backendGL glext nanovg imgui)
 endif()
