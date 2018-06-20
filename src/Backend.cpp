@@ -53,6 +53,8 @@ void FontManager::list_fonts(const std::string &path) {
             0 ==
                 name.compare(name.length() - ext.length(), ext.length(), ext)) {
           m_list_of_available_fonts.push_back(path + f->d_name);
+          std::cout << "found font " << m_list_of_available_fonts.back()
+                    << std::endl;
         }
       }
     }
