@@ -95,7 +95,7 @@ void FontManager::list_fonts(const std::string &path) {
         if (name.length() >= ext.length() &&
             0 ==
                 name.compare(name.length() - ext.length(), ext.length(), ext)) {
-          m_list_of_available_fonts.push_back(path +
+          m_list_of_available_fonts.push_back(path + sep +
                                               static_cast<char *>(f->d_name));
         }
       }

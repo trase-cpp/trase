@@ -133,9 +133,9 @@ NVGcontext *BackendGL::init_nanovg(int x_pixels, int y_pixels) {
   if (!vg)
     throw Exception("trase: Cannot init NanoVG");
   auto filename = m_fm.find_font("Roboto-Regular", "");
-  int fontNormal = nvgCreateFont(vg, "Roboto-Regular", filename.c_str());
+  int fontNormal = nvgCreateFont(vg, "Roboto", filename.c_str());
   if (fontNormal == -1) {
-    throw Exception("Could not add font Roboto-Regular");
+    throw Exception("Could not add font Roboto");
   }
   filename = m_fm.find_font("Roboto-Bold", "");
   int fontBold = nvgCreateFont(vg, "Roboto-Bold", filename.c_str());
