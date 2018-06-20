@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
 #include <sstream>
+#include <vector>
 
 #include "Vector.hpp"
 
@@ -138,6 +139,26 @@ enum Align {
 enum ArcDirection {
   CLOCKWISE = 1 << 0,
   COUNTER_CLOCKWISE = 1 << 1,
+};
+
+class FontManager {
+public:
+  std::vector<std::string> m_list_of_available_fonts;
+  std::vector<std::string> m_font_dirs;
+  FontManager();
+
+  /// finds a font with name containing substring name1 (case sensitive), and
+  /// optionally substring name2 (case insensitive) e.g.
+  ///  find_font("Roboto","");
+  ///  find_font("Roboto","bold");
+  std::string find_font(const std::string &name1, const std::string &name2);
+
+  void add_system_fonts();
+  void add_font_dir(const std::string &path);
+  void clear_font_dirs();
+
+private:
+  void list_fonts(const std::string &path);
 };
 
 } // namespace trase
