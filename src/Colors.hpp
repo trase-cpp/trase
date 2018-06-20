@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 struct RGBA {
-  RGBA() {}
-  RGBA(int r, int g, int b, int a) : m_r(r), m_g(g), m_b(b), m_a(a) {}
+  RGBA() = default;
+  RGBA(int r, int g, int b, int a) noexcept : m_r(r), m_g(g), m_b(b), m_a(a) {}
   std::string to_rgb_string() const {
     std::stringstream stream;
     stream.precision(2);

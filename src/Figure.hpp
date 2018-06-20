@@ -57,7 +57,7 @@ class Figure : public Drawable {
   static int m_num_windows;
 
 public:
-  Figure(const std::array<float, 2> &pixels);
+  explicit Figure(const std::array<float, 2> &pixels);
 
   std::shared_ptr<Axis> axis() { return m_axis; }
 

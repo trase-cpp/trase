@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Axis.hpp"
+#include "Backend.hpp"
 #include <cmath>
 #include <limits>
 
@@ -62,6 +63,7 @@ template <typename Backend> void Axis::serialise(Backend &backend) {
 
 template <typename Backend> void Axis::draw_common(Backend &backend) {
   const float lw = 3.0f;
+  const float font_size = 18.f;
   backend.stroke_width(lw);
 
   // axis box
@@ -92,7 +94,7 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
   const float tick_len = 10.0f;
 
   backend.begin_path();
-  backend.font_size(18.0f);
+  backend.font_size(font_size);
   backend.font_blur(0.0f);
   backend.font_face(m_font_face.c_str());
   backend.text_align(ALIGN_CENTER | ALIGN_TOP);
@@ -166,6 +168,29 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
     backend.rotate(-pi / 2.0f);
     backend.text(vfloat2_t(0.f, 0.f), m_ylabel.c_str(), NULL);
     backend.reset_transform();
+  }
+
+  // legend
+  if (m_legend) {
+    const float sample_length = 20.f;
+
+    // draw legend in upper right corner
+    const vfloat2_t upper_right_corner = {m_pixels.bmax[0], m_pixels.bmin[1]};
+    vfloat2_t text_loc = upper_right_corner;
+    backend.text_align(ALIGN_RIGHT | ALIGN_TOP);
+    backend.stroke_width(lw);
+    for (const auto &i : m_plot1d) {
+      backend.begin_path();
+      backend.move_to(text_loc +
+                      vfloat2_t(-sample_length / 3.f, font_size / 2.f));
+      backend.line_to(text_loc +
+                      vfloat2_t(-(4.f / 3.f) * sample_length, font_size / 2.f));
+      backend.stroke_color(i->get_color());
+      backend.stroke();
+      backend.text(text_loc + vfloat2_t(-(5.f / 3.f) * sample_length, 0.f),
+                   i->get_label().c_str(), nullptr);
+      text_loc[1] += font_size;
+    }
   }
 }
 

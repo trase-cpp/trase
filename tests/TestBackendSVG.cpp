@@ -50,8 +50,8 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
     x[i] = static_cast<float>(i) * 6.28f / n;
     y[i] = std::sin(x[i]);
   }
-  auto static_plot = ax->plot(x, y);
-  auto moving_plot = ax->plot(x, y);
+  auto static_plot = ax->plot(x, y, "static");
+  auto moving_plot = ax->plot(x, y, "moving");
   float time = 0.0f;
 
   auto do_plot = [&](const float theta) {
@@ -69,16 +69,17 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
     do_plot(static_cast<float>(i));
   }
 
-  // ax->font_face("Indie Flower");
+  ax->font_face("Indie Flower");
   ax->xlabel("x");
   ax->ylabel("y");
   ax->title("the svg test");
+  ax->legend();
 
   std::ofstream out;
   out.open("test_figure.svg");
   BackendSVG backend(out);
-  // backend.import_web_font(
-  //    "https://fonts.googleapis.com/css?family=Indie+Flower");
+  backend.import_web_font(
+      "https://fonts.googleapis.com/css?family=Indie+Flower");
   fig->serialise(backend);
   out.close();
 }
