@@ -31,27 +31,28 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Figure.hpp"
-#include "Vector.hpp"
-#include <limits>
+#include "catch.hpp"
 
-namespace trase {
+#include <iterator>
+#include <type_traits>
 
-Axis::Axis(Figure &figure, const bfloat2_t &area)
-    : Drawable(&figure, area),
-      m_limits(vfloat2_t(std::numeric_limits<float>::max(),
-                         std::numeric_limits<float>::max()),
-               vfloat2_t(std::numeric_limits<float>::min(),
-                         std::numeric_limits<float>::min())),
-      m_font_face("Roboto") {}
+#include "Backend.hpp"
 
-std::shared_ptr<Plot1D> Axis::plot_impl(std::vector<vfloat2_t> &&values) {
-  m_plot1d.emplace_back(new Plot1D(*this));
-  m_children.push_back(&*m_plot1d.back());
-  m_plot1d.back()->add_values(std::move(values), 0);
-  m_plot1d.back()->set_color(default_colors[m_plot1d.size() - 1]);
-  m_plot1d.back()->resize(m_pixels);
-  return m_plot1d.back();
+TEST_CASE("find fonts", "[font manager]") {
+
+  // Default construction
+  trase::FontManager fm;
+
+  auto font = fm.find_font("Roboto-Regular", "");
+  CHECK(!font.empty());
+  CHECK(font.find("Roboto-Regular") != std::string::npos);
+  CHECK(font.find(".ttf") != std::string::npos);
+
+  font = fm.find_font("SomeCrazyFontThatCantExist", "");
+  CHECK(font.empty());
+
+  fm.clear_font_dirs();
+  fm.add_font_dir("nonexistant_dir");
+  font = fm.find_font("Roboto-Regular", "");
+  CHECK(font.empty());
 }
-
-} // namespace trase
