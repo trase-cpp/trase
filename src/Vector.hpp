@@ -56,13 +56,15 @@ namespace trase {
 ///
 template <typename T, int N> class Vector {
 public:
+
   using value_type = T;
-  const static int size = N;
 
   using iter = typename std::array<T, N>::iterator;
   using const_iter = typename std::array<T, N>::const_iterator;
   using reverse_iter = typename std::array<T, N>::reverse_iterator;
   using const_reverse_iter = typename std::array<T, N>::const_reverse_iterator;
+
+  const static int size = N;
 
   /// Constructs an vector and allocates memory
   Vector() = default;
@@ -71,7 +73,7 @@ public:
   ///
   /// \param arg1 All the elements of the vector are set to
   /// this value
-  explicit Vector(T arg1) { std::fill_n(begin(), N, arg1); }
+  explicit Vector(T arg1) { std::fill(begin(), end(), arg1); }
 
   /// Constructs a vector with initial values.
   ///
@@ -181,7 +183,7 @@ public:
   ///
   /// \return A new vector with each element `static_cast` to
   /// `T2`
-  template <typename T2> Vector<T2, N> cast() {
+  template <typename T2> Vector<T2, N> cast() const noexcept {
     Vector<T2, N> ret;
     std::transform(begin(), end(), ret.begin(),
                    [](const T &a) { return static_cast<T2>(a); });
@@ -190,49 +192,41 @@ public:
 
   /// squared norm
   /// \return the squared 2-norm of the vector $\sum_i v_i^2$
-  double squaredNorm() const {
-    double ret = 0;
-    for (size_t i = 0; i < N; ++i) {
-      ret += mem[i] * mem[i];
-    }
-    return ret;
+  T squaredNorm() const noexcept {
+    return (*this).inner_product(*this);
   }
 
   /// 2-norm
   /// \return the 2-norm of the vector $\sqrt{\sum_i v_i^2}$
-  double norm() const { return std::sqrt(squaredNorm()); }
+  double norm() const noexcept { return std::sqrt(squaredNorm()); }
 
   /// inf-norm
   /// \return the infinity norm of the vector $\max_i |v_i|$
-  double inf_norm() const {
-    double ret = std::abs(mem[0]);
-    for (int i = 1; i < N; ++i) {
-      const double absi = std::abs(mem[i]);
-      if (absi > ret) {
-        ret = absi;
-      }
-    }
-    return ret;
+  T inf_norm() const noexcept {
+    T max = *std::max_element(begin(), end(), [](const T &a, const T &b) {
+      return std::fabs(a) < std::fabs(b);
+    });
+    return max >= static_cast<T>(0) ? max : -max;
   }
 
-  // element-wise `pow` function
-  // \return a new vector with each element taken to the power of `exponent`
-  // \param exponent the exponent
-  template <typename EXP_T> Vector<T, N> pow(const EXP_T exponent) {
-    Vector<T, N> n = *this;
-    for (size_t i = 0; i < N; ++i) {
-      n[i] = std::pow(n[i], exponent);
-    }
-    return n;
+  /// element-wise `pow` function
+  /// \return a new vector with each element taken to the power of `exponent`
+  /// \param exponent the exponent
+  template <typename EXP_T>
+  Vector<T, N> pow(const EXP_T exponent) const noexcept {
+    Vector<T, N> ret;
+    std::transform(begin(), end(), ret.begin(), [&exponent](const T &a) {
+      return static_cast<T>(std::pow(a, exponent));
+    });
+    return ret;
   }
 
   /// normalise vector so that its length (2-norm) equals one.
   /// \see norm
-  void normalize() {
-    double n = norm();
-    for (size_t i = 0; i < N; ++i) {
-      mem[i] /= n;
-    }
+  void normalize() noexcept {
+    const double n = norm();
+    std::transform(begin(), end(), begin(),
+                   [&n](const T &a) { return static_cast<T>(a / n); });
   }
 
   /// collapse vector to bool using std::all_of
@@ -345,12 +339,12 @@ private:
 
 /// returns arg.pow(exponent)
 template <typename T, int N, typename EXP_T>
-Vector<T, N> pow(Vector<T, N> arg, EXP_T exponent) {
+Vector<T, N> pow(const Vector<T, N> &arg, EXP_T exponent) noexcept{
   return arg.pow(exponent);
 }
 
 /// unary `-` (minus) operator for Vector class
-template <typename T, int N> Vector<T, N> operator-(const Vector<T, N> &a) {
+template <typename T, int N> Vector<T, N> operator-(const Vector<T, N> &a) noexcept{
   Vector<T, N> ret;
   std::transform(a.begin(), a.end(), ret.begin(), std::negate<T>());
   return ret;
@@ -366,7 +360,7 @@ template <typename T, int N> Vector<T, N> operator-(const Vector<T, N> &a) {
 
 /// binary `+` (plus) operator for two Vectors
 template <typename T, int N>
-Vector<T, N> operator+(const Vector<T, N> &a, const Vector<T, N> &b) {
+Vector<T, N> operator+(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
   Vector<T, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::plus<T>());
   return ret;
@@ -374,7 +368,7 @@ Vector<T, N> operator+(const Vector<T, N> &a, const Vector<T, N> &b) {
 
 /// binary `-` (minus) operator for two Vectors
 template <typename T, int N>
-Vector<T, N> operator-(const Vector<T, N> &a, const Vector<T, N> &b) {
+Vector<T, N> operator-(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
   Vector<T, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::minus<T>());
   return ret;
@@ -382,7 +376,7 @@ Vector<T, N> operator-(const Vector<T, N> &a, const Vector<T, N> &b) {
 
 /// binary `*` (multiples) operator for two Vectors
 template <typename T, int N>
-Vector<T, N> operator*(const Vector<T, N> &a, const Vector<T, N> &b) {
+Vector<T, N> operator*(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
   Vector<T, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::multiplies<T>());
@@ -391,7 +385,7 @@ Vector<T, N> operator*(const Vector<T, N> &a, const Vector<T, N> &b) {
 
 /// binary `/` (divides) operator for two Vectors
 template <typename T, int N>
-Vector<T, N> operator/(const Vector<T, N> &a, const Vector<T, N> &b) {
+Vector<T, N> operator/(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
   Vector<T, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::divides<T>());
   return ret;
@@ -399,7 +393,7 @@ Vector<T, N> operator/(const Vector<T, N> &a, const Vector<T, N> &b) {
 
 /// binary `+` (plus) operator for scalar and Vector
 template <typename T, int N>
-Vector<T, N> operator+(const T &a, const Vector<T, N> &b) {
+Vector<T, N> operator+(const T &a, const Vector<T, N> &b) noexcept{
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::plus<T>(), a, std::placeholders::_1));
@@ -408,7 +402,7 @@ Vector<T, N> operator+(const T &a, const Vector<T, N> &b) {
 
 /// binary `-` (minus) operator for scalar and Vector
 template <typename T, int N>
-Vector<T, N> operator-(const T &a, const Vector<T, N> &b) {
+Vector<T, N> operator-(const T &a, const Vector<T, N> &b) noexcept{
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::minus<T>(), a, std::placeholders::_1));
@@ -417,7 +411,7 @@ Vector<T, N> operator-(const T &a, const Vector<T, N> &b) {
 
 /// binary `*` (multiples) operator for scalar and Vector
 template <typename T, int N>
-Vector<T, N> operator*(const T &a, const Vector<T, N> &b) {
+Vector<T, N> operator*(const T &a, const Vector<T, N> &b) noexcept{
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::multiplies<T>(), a, std::placeholders::_1));
@@ -426,7 +420,7 @@ Vector<T, N> operator*(const T &a, const Vector<T, N> &b) {
 
 /// binary `/` (divides) operator for scalar and Vector
 template <typename T, int N>
-Vector<T, N> operator/(const T &a, const Vector<T, N> &b) {
+Vector<T, N> operator/(const T &a, const Vector<T, N> &b) noexcept{
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::divides<T>(), a, std::placeholders::_1));
@@ -435,7 +429,7 @@ Vector<T, N> operator/(const T &a, const Vector<T, N> &b) {
 
 /// binary `+` (plus) operator for Vector and scalar
 template <typename T, int N>
-Vector<T, N> operator+(const Vector<T, N> &b, const T &a) {
+Vector<T, N> operator+(const Vector<T, N> &b, const T &a) noexcept{
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::plus<T>(), std::placeholders::_1, a));
@@ -444,7 +438,7 @@ Vector<T, N> operator+(const Vector<T, N> &b, const T &a) {
 
 /// binary `-` (minus) operator for Vector and scalar
 template <typename T, int N>
-Vector<T, N> operator-(const Vector<T, N> &b, const T &a) {
+Vector<T, N> operator-(const Vector<T, N> &b, const T &a) noexcept{
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::minus<T>(), std::placeholders::_1, a));
@@ -453,7 +447,7 @@ Vector<T, N> operator-(const Vector<T, N> &b, const T &a) {
 
 /// binary `*` (multiples) operator for Vector and scalar
 template <typename T, int N>
-Vector<T, N> operator*(const Vector<T, N> &b, const T &a) {
+Vector<T, N> operator*(const Vector<T, N> &b, const T &a) noexcept{
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::multiplies<T>(), std::placeholders::_1, a));
@@ -462,7 +456,7 @@ Vector<T, N> operator*(const Vector<T, N> &b, const T &a) {
 
 /// binary `/` (divides) operator for Vector and scalar
 template <typename T, int N>
-Vector<T, N> operator/(const Vector<T, N> &b, const T &a) {
+Vector<T, N> operator/(const Vector<T, N> &b, const T &a) noexcept{
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::divides<T>(), std::placeholders::_1, a));
@@ -472,7 +466,7 @@ Vector<T, N> operator/(const Vector<T, N> &b, const T &a) {
 // Comparison operators: == != < > <= >=
 
 template <typename T, int N>
-Vector<bool, N> operator==(const Vector<T, N> &a, const Vector<T, N> &b) {
+Vector<bool, N> operator==(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
   Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::equal_to<T>());
@@ -480,7 +474,7 @@ Vector<bool, N> operator==(const Vector<T, N> &a, const Vector<T, N> &b) {
 }
 
 template <typename T, int N>
-Vector<bool, N> operator!=(const Vector<T, N> &a, const Vector<T, N> &b) {
+Vector<bool, N> operator!=(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
   Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::not_equal_to<T>());
@@ -488,21 +482,21 @@ Vector<bool, N> operator!=(const Vector<T, N> &a, const Vector<T, N> &b) {
 }
 
 template <typename T, int N>
-Vector<bool, N> operator<(const Vector<T, N> &a, const Vector<T, N> &b) {
+Vector<bool, N> operator<(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
   Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::less<T>());
   return ret;
 }
 
 template <typename T, int N>
-Vector<bool, N> operator>(const Vector<T, N> &a, const Vector<T, N> &b) {
+Vector<bool, N> operator>(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
   Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::greater<T>());
   return ret;
 }
 
 template <typename T, int N>
-Vector<bool, N> operator<=(const Vector<T, N> &a, const Vector<T, N> &b) {
+Vector<bool, N> operator<=(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
   Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::less_equal<T>());
@@ -510,44 +504,52 @@ Vector<bool, N> operator<=(const Vector<T, N> &a, const Vector<T, N> &b) {
 }
 
 template <typename T, int N>
-Vector<bool, N> operator>=(const Vector<T, N> &a, const Vector<T, N> &b) {
+Vector<bool, N> operator>=(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
   Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::greater_equal<T>());
   return ret;
 }
 
-#define UFUNC(the_op)                                                          \
-  template <typename T, int N> Vector<T, N> the_op(const Vector<T, N> &arg1) { \
-    Vector<T, N> ret;                                                          \
-    for (size_t i = 0; i < N; ++i) {                                           \
-      ret[i] = std::the_op(arg1[i]);                                           \
-    }                                                                          \
-    return ret;                                                                \
-  }
-
 /// element-wise `floor` rounding function for Vector class
-UFUNC(floor)
+template <typename T, int N> Vector<T, N> floor(const Vector<T, N> &a) noexcept{
+  Vector<T, N> ret;
+  std::transform(a.begin(), a.end(), ret.begin(),
+                 [](const T &a) { return static_cast<T>(std::floor(a)); });
+  return ret;
+}
+
 /// element-wise `ceil` rounding function for Vector class
-UFUNC(ceil)
+template <typename T, int N> Vector<T, N> ceil(const Vector<T, N> &a) noexcept {
+  Vector<T, N> ret;
+  std::transform(a.begin(), a.end(), ret.begin(),
+                 [](const T &a) { return static_cast<T>(std::ceil(a)); });
+  return ret;
+}
+
 /// element-wise `round` rounding function for Vector class
-UFUNC(round)
-
-/// return arg1.norm()
-template <typename T, int I> double norm(const Vector<T, I> &arg1) {
-  return arg1.norm();
+template <typename T, int N>
+Vector<T, N> round(const Vector<T, N> &a) noexcept {
+  Vector<T, N> ret;
+  std::transform(a.begin(), a.end(), ret.begin(),
+                 [](const T &a) { return static_cast<T>(std::round(a)); });
+  return ret;
 }
 
-/// return arg1.squaredNorm()
-template <typename T, int I> double squaredNorm(const Vector<T, I> &arg1) {
-  return arg1.squaredNorm();
+/// element-wise absolute value function for Vector class
+template <typename T, int N> Vector<T, N> abs(const Vector<T, N> &a) noexcept {
+  Vector<T, N> ret;
+  std::transform(a.begin(), a.end(), ret.begin(),
+                 [](const T &a) { return static_cast<T>(std::fabs(a)); });
+  return ret;
 }
 
-/// external dot product for vector class (probably conflicts with symbolic
-/// dot?)
-template <typename T1, typename T2, int I>
-double dot(const Vector<T1, I> &arg1, const Vector<T2, I> &arg2) {
-  return arg1.inner_product(arg2);
+/// element-wise `e_i*e_i` function for Vector class
+template <typename T, int N> Vector<T, N> abs2(const Vector<T, N> &a) noexcept {
+  Vector<T, N> ret;
+  std::transform(a.begin(), a.end(), ret.begin(),
+                 [](const T &a) { return a * a; });
+  return ret;
 }
 
 /// cross-product function for 3D vectors
@@ -557,26 +559,6 @@ Vector<T, 3> cross(const Vector<T, 3> &arg1, const Vector<T, 3> &arg2) {
   ret[0] = arg1[1] * arg2[2] - arg1[2] * arg2[1];
   ret[1] = -arg1[0] * arg2[2] + arg1[2] * arg2[0];
   ret[2] = arg1[0] * arg2[1] - arg1[1] * arg2[0];
-  return ret;
-}
-
-/// returns new Vector made from element-wise absolute value of input arg
-template <typename T, int N>
-inline const Vector<T, N> abs(const Vector<T, N> &x) {
-  Vector<T, N> ret;
-  for (int i = 0; i < N; ++i) {
-    ret[i] = std::fabs(x[i]);
-  }
-  return ret;
-}
-
-/// element-wise `e_i*e_i` function for Vector class
-template <typename T, int N>
-inline const Vector<T, N> abs2(const Vector<T, N> &x) {
-  Vector<T, N> ret;
-  for (int i = 0; i < N; ++i) {
-    ret[i] = x[i] * x[i];
-  }
   return ret;
 }
 
@@ -599,6 +581,7 @@ Vector<T, N> round_off(const Vector<T, N> &x, int n) {
   }
   return num;
 }
+
 
 /// stream output operator for Vector class
 template <typename T, int N>
