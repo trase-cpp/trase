@@ -98,7 +98,7 @@ public:
   }
 
   template <typename Backend> void serialise(Backend &backend);
-  template <typename Backend> void draw(Backend &backend, const float time);
+  template <typename Backend> void draw(Backend &backend, float time);
 
   vfloat2_t from_pixel(const vfloat2_t &i) {
     auto inv_delta = 1.0f / m_pixels.delta();

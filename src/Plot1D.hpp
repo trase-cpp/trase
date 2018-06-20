@@ -63,7 +63,7 @@ class Plot1D : public Drawable {
   Axis &m_axis;
 
 public:
-  Plot1D(Axis &axis);
+  explicit Plot1D(Axis &axis);
 
   template <typename T1, typename T2>
   void add_frame(const std::vector<T1> &x, const std::vector<T2> &y,
