@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of the Oxford RSE C++ Template project.
+This file is part of trase.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -78,7 +78,7 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
   const auto limits_delta = m_limits.delta();
   const int ny_ticks = 5;
   vfloat2_t n_ticks(ny_ticks * pixel_delta[0] / pixel_delta[1], ny_ticks);
-  const int sig_digits = 1;
+  const int sig_digits = 2;
 
   // calculate y tick locations
   const auto tick_dx = round_off(limits_delta / n_ticks, sig_digits);
