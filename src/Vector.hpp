@@ -571,7 +571,7 @@ Vector<T, N> round_off(const Vector<T, N> &arg, int n) {
     const int num_digits = 1 + static_cast<int>(std::log10(a));
     //\todo: this does not work for all but small integers!
     const auto d = static_cast<T>(std::pow(10.0, n - num_digits));
-    return std::floor(a * d + static_cast<T>(0.5)) / d;
+    return static_cast<T>(std::floor(a * d + static_cast<T>(0.5)) / d);
   });
   return ret;
 }
@@ -579,22 +579,19 @@ Vector<T, N> round_off(const Vector<T, N> &arg, int n) {
 /// stream output operator for Vector class
 template <typename T, int N>
 std::ostream &operator<<(std::ostream &out, const Vector<T, N> &v) {
-  out << "(";
-  for (size_t i = 0; i < N; ++i) {
-    out << v[i];
-    if (i != N - 1) {
-      out << ",";
-    }
+  out << '(' << v[0];
+  for (auto it = std::next(v.cbegin()); it != v.cend(); ++it) {
+    out << ',' << *it;
   }
-  return out << ")";
+  return out << ')';
 }
 
 /// stream input operator for Vector class
 template <typename T, int N>
 std::istream &operator>>(std::istream &out, Vector<T, N> &v) {
   out.get();
-  for (size_t i = 0; i < N; ++i) {
-    out >> v[i];
+  for (T &x : v) {
+    out >> x;
     out.get();
   }
   return out;
