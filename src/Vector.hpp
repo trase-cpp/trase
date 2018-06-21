@@ -56,7 +56,6 @@ namespace trase {
 ///
 template <typename T, int N> class Vector {
 public:
-
   using value_type = T;
 
   using iter = typename std::array<T, N>::iterator;
@@ -192,9 +191,7 @@ public:
 
   /// squared norm
   /// \return the squared 2-norm of the vector $\sum_i v_i^2$
-  T squaredNorm() const noexcept {
-    return (*this).inner_product(*this);
-  }
+  T squaredNorm() const noexcept { return (*this).inner_product(*this); }
 
   /// 2-norm
   /// \return the 2-norm of the vector $\sqrt{\sum_i v_i^2}$
@@ -339,12 +336,13 @@ private:
 
 /// returns arg.pow(exponent)
 template <typename T, int N, typename EXP_T>
-Vector<T, N> pow(const Vector<T, N> &arg, EXP_T exponent) noexcept{
+Vector<T, N> pow(const Vector<T, N> &arg, EXP_T exponent) noexcept {
   return arg.pow(exponent);
 }
 
 /// unary `-` (minus) operator for Vector class
-template <typename T, int N> Vector<T, N> operator-(const Vector<T, N> &a) noexcept{
+template <typename T, int N>
+Vector<T, N> operator-(const Vector<T, N> &a) noexcept {
   Vector<T, N> ret;
   std::transform(a.begin(), a.end(), ret.begin(), std::negate<T>());
   return ret;
@@ -360,7 +358,7 @@ template <typename T, int N> Vector<T, N> operator-(const Vector<T, N> &a) noexc
 
 /// binary `+` (plus) operator for two Vectors
 template <typename T, int N>
-Vector<T, N> operator+(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
+Vector<T, N> operator+(const Vector<T, N> &a, const Vector<T, N> &b) noexcept {
   Vector<T, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::plus<T>());
   return ret;
@@ -368,7 +366,7 @@ Vector<T, N> operator+(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
 
 /// binary `-` (minus) operator for two Vectors
 template <typename T, int N>
-Vector<T, N> operator-(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
+Vector<T, N> operator-(const Vector<T, N> &a, const Vector<T, N> &b) noexcept {
   Vector<T, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::minus<T>());
   return ret;
@@ -376,7 +374,7 @@ Vector<T, N> operator-(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
 
 /// binary `*` (multiples) operator for two Vectors
 template <typename T, int N>
-Vector<T, N> operator*(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
+Vector<T, N> operator*(const Vector<T, N> &a, const Vector<T, N> &b) noexcept {
   Vector<T, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::multiplies<T>());
@@ -385,7 +383,7 @@ Vector<T, N> operator*(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
 
 /// binary `/` (divides) operator for two Vectors
 template <typename T, int N>
-Vector<T, N> operator/(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
+Vector<T, N> operator/(const Vector<T, N> &a, const Vector<T, N> &b) noexcept {
   Vector<T, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::divides<T>());
   return ret;
@@ -393,7 +391,7 @@ Vector<T, N> operator/(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
 
 /// binary `+` (plus) operator for scalar and Vector
 template <typename T, int N>
-Vector<T, N> operator+(const T &a, const Vector<T, N> &b) noexcept{
+Vector<T, N> operator+(const T &a, const Vector<T, N> &b) noexcept {
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::plus<T>(), a, std::placeholders::_1));
@@ -402,7 +400,7 @@ Vector<T, N> operator+(const T &a, const Vector<T, N> &b) noexcept{
 
 /// binary `-` (minus) operator for scalar and Vector
 template <typename T, int N>
-Vector<T, N> operator-(const T &a, const Vector<T, N> &b) noexcept{
+Vector<T, N> operator-(const T &a, const Vector<T, N> &b) noexcept {
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::minus<T>(), a, std::placeholders::_1));
@@ -411,7 +409,7 @@ Vector<T, N> operator-(const T &a, const Vector<T, N> &b) noexcept{
 
 /// binary `*` (multiples) operator for scalar and Vector
 template <typename T, int N>
-Vector<T, N> operator*(const T &a, const Vector<T, N> &b) noexcept{
+Vector<T, N> operator*(const T &a, const Vector<T, N> &b) noexcept {
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::multiplies<T>(), a, std::placeholders::_1));
@@ -420,7 +418,7 @@ Vector<T, N> operator*(const T &a, const Vector<T, N> &b) noexcept{
 
 /// binary `/` (divides) operator for scalar and Vector
 template <typename T, int N>
-Vector<T, N> operator/(const T &a, const Vector<T, N> &b) noexcept{
+Vector<T, N> operator/(const T &a, const Vector<T, N> &b) noexcept {
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::divides<T>(), a, std::placeholders::_1));
@@ -429,7 +427,7 @@ Vector<T, N> operator/(const T &a, const Vector<T, N> &b) noexcept{
 
 /// binary `+` (plus) operator for Vector and scalar
 template <typename T, int N>
-Vector<T, N> operator+(const Vector<T, N> &b, const T &a) noexcept{
+Vector<T, N> operator+(const Vector<T, N> &b, const T &a) noexcept {
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::plus<T>(), std::placeholders::_1, a));
@@ -438,7 +436,7 @@ Vector<T, N> operator+(const Vector<T, N> &b, const T &a) noexcept{
 
 /// binary `-` (minus) operator for Vector and scalar
 template <typename T, int N>
-Vector<T, N> operator-(const Vector<T, N> &b, const T &a) noexcept{
+Vector<T, N> operator-(const Vector<T, N> &b, const T &a) noexcept {
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::minus<T>(), std::placeholders::_1, a));
@@ -447,7 +445,7 @@ Vector<T, N> operator-(const Vector<T, N> &b, const T &a) noexcept{
 
 /// binary `*` (multiples) operator for Vector and scalar
 template <typename T, int N>
-Vector<T, N> operator*(const Vector<T, N> &b, const T &a) noexcept{
+Vector<T, N> operator*(const Vector<T, N> &b, const T &a) noexcept {
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::multiplies<T>(), std::placeholders::_1, a));
@@ -456,7 +454,7 @@ Vector<T, N> operator*(const Vector<T, N> &b, const T &a) noexcept{
 
 /// binary `/` (divides) operator for Vector and scalar
 template <typename T, int N>
-Vector<T, N> operator/(const Vector<T, N> &b, const T &a) noexcept{
+Vector<T, N> operator/(const Vector<T, N> &b, const T &a) noexcept {
   Vector<T, N> ret;
   std::transform(b.begin(), b.end(), ret.begin(),
                  std::bind(std::divides<T>(), std::placeholders::_1, a));
@@ -466,7 +464,8 @@ Vector<T, N> operator/(const Vector<T, N> &b, const T &a) noexcept{
 // Comparison operators: == != < > <= >=
 
 template <typename T, int N>
-Vector<bool, N> operator==(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
+Vector<bool, N> operator==(const Vector<T, N> &a,
+                           const Vector<T, N> &b) noexcept {
   Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::equal_to<T>());
@@ -474,7 +473,8 @@ Vector<bool, N> operator==(const Vector<T, N> &a, const Vector<T, N> &b) noexcep
 }
 
 template <typename T, int N>
-Vector<bool, N> operator!=(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
+Vector<bool, N> operator!=(const Vector<T, N> &a,
+                           const Vector<T, N> &b) noexcept {
   Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::not_equal_to<T>());
@@ -482,21 +482,24 @@ Vector<bool, N> operator!=(const Vector<T, N> &a, const Vector<T, N> &b) noexcep
 }
 
 template <typename T, int N>
-Vector<bool, N> operator<(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
+Vector<bool, N> operator<(const Vector<T, N> &a,
+                          const Vector<T, N> &b) noexcept {
   Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::less<T>());
   return ret;
 }
 
 template <typename T, int N>
-Vector<bool, N> operator>(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
+Vector<bool, N> operator>(const Vector<T, N> &a,
+                          const Vector<T, N> &b) noexcept {
   Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(), std::greater<T>());
   return ret;
 }
 
 template <typename T, int N>
-Vector<bool, N> operator<=(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
+Vector<bool, N> operator<=(const Vector<T, N> &a,
+                           const Vector<T, N> &b) noexcept {
   Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::less_equal<T>());
@@ -504,7 +507,8 @@ Vector<bool, N> operator<=(const Vector<T, N> &a, const Vector<T, N> &b) noexcep
 }
 
 template <typename T, int N>
-Vector<bool, N> operator>=(const Vector<T, N> &a, const Vector<T, N> &b) noexcept{
+Vector<bool, N> operator>=(const Vector<T, N> &a,
+                           const Vector<T, N> &b) noexcept {
   Vector<bool, N> ret;
   std::transform(a.begin(), a.end(), b.begin(), ret.begin(),
                  std::greater_equal<T>());
@@ -512,7 +516,8 @@ Vector<bool, N> operator>=(const Vector<T, N> &a, const Vector<T, N> &b) noexcep
 }
 
 /// element-wise `floor` rounding function for Vector class
-template <typename T, int N> Vector<T, N> floor(const Vector<T, N> &a) noexcept{
+template <typename T, int N>
+Vector<T, N> floor(const Vector<T, N> &a) noexcept {
   Vector<T, N> ret;
   std::transform(a.begin(), a.end(), ret.begin(),
                  [](const T &a) { return static_cast<T>(std::floor(a)); });

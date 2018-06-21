@@ -42,80 +42,80 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 TEST_CASE("vector constructors", "[vector]") {
 
-    // Default construction
-    trase::Vector<int, 3> a{};
+  // Default construction
+  trase::Vector<int, 3> a{};
 
-    // One arg constructor fills the vector with that value
-    trase::Vector<int, 5> b(123);
-    for (const auto i : b){
-        CHECK(i == 123);
-    }
+  // One arg constructor fills the vector with that value
+  trase::Vector<int, 5> b(123);
+  for (const auto i : b) {
+    CHECK(i == 123);
+  }
 
-    trase::Vector<int, 2> c(1, 2);
-    CHECK(c[0] == 1);
-    CHECK(c[1] == 2);
+  trase::Vector<int, 2> c(1, 2);
+  CHECK(c[0] == 1);
+  CHECK(c[1] == 2);
 
-    trase::Vector<int, 3> d(1, 2, 3);
-    CHECK(d[0] == 1);
-    CHECK(d[1] == 2);
-    CHECK(d[2] == 3);
+  trase::Vector<int, 3> d(1, 2, 3);
+  CHECK(d[0] == 1);
+  CHECK(d[1] == 2);
+  CHECK(d[2] == 3);
 
-    trase::Vector<int, 4> e(1, 2, 3, 4);
-    CHECK(e[0] == 1);
-    CHECK(e[1] == 2);
-    CHECK(e[2] == 3);
-    CHECK(e[3] == 4);
+  trase::Vector<int, 4> e(1, 2, 3, 4);
+  CHECK(e[0] == 1);
+  CHECK(e[1] == 2);
+  CHECK(e[2] == 3);
+  CHECK(e[3] == 4);
 }
 
 TEST_CASE("vector iterators", "[vector]") {
 
-    trase::Vector<int, 3> a = {123, 0, 234};
+  trase::Vector<int, 3> a = {123, 0, 234};
 
-    CHECK(*a.begin() == 123);
-    CHECK(*(a.end()-1) == 234);
+  CHECK(*a.begin() == 123);
+  CHECK(*(a.end() - 1) == 234);
 
-    CHECK(*a.cbegin() == 123);
-    CHECK(*(a.cend()-1) == 234);
+  CHECK(*a.cbegin() == 123);
+  CHECK(*(a.cend() - 1) == 234);
 
-    CHECK(*a.rbegin() == 234);
-    CHECK(*(a.rend()-1) == 123);
+  CHECK(*a.rbegin() == 234);
+  CHECK(*(a.rend() - 1) == 123);
 
-    CHECK(*a.crbegin() == 234);
-    CHECK(*(a.crend()-1) == 123);
+  CHECK(*a.crbegin() == 234);
+  CHECK(*(a.crend() - 1) == 123);
 
-    CHECK(std::distance(a.begin(), a.end()) == 3);
-    CHECK(std::distance(a.cbegin(), a.cend()) == 3);
-    CHECK(std::distance(a.rbegin(), a.rend()) == 3);
-    CHECK(std::distance(a.crbegin(), a.crend()) == 3);
+  CHECK(std::distance(a.begin(), a.end()) == 3);
+  CHECK(std::distance(a.cbegin(), a.cend()) == 3);
+  CHECK(std::distance(a.rbegin(), a.rend()) == 3);
+  CHECK(std::distance(a.crbegin(), a.crend()) == 3);
 }
 
 TEST_CASE("rule of five", "[vector]") {
 
-    trase::Vector<int, 4> ref = {123, 234, 345, 456};
+  trase::Vector<int, 4> ref = {123, 234, 345, 456};
 
-    // Copy constructor
-    {
-        trase::Vector<int, 4> a = {123, 234, 345, 456};
-        trase::Vector<int, 4> b(a);
-        CHECK((a == ref).all());
-        CHECK((b == ref).all());
-    }
+  // Copy constructor
+  {
+    trase::Vector<int, 4> a = {123, 234, 345, 456};
+    trase::Vector<int, 4> b(a);
+    CHECK((a == ref).all());
+    CHECK((b == ref).all());
+  }
 
-    // Copy assignment
-    {
-        trase::Vector<int, 4> a = {123, 234, 345, 456};
-        trase::Vector<int, 4> b = a;
-        CHECK((a == ref).all());
-        CHECK((b == ref).all());
-    }
+  // Copy assignment
+  {
+    trase::Vector<int, 4> a = {123, 234, 345, 456};
+    trase::Vector<int, 4> b = a;
+    CHECK((a == ref).all());
+    CHECK((b == ref).all());
+  }
 
-    // Vector is trivially copyable so no need to check move constructor or move assignment
-//    CHECK(std::is_trivially_copyable<trase::Vector<int, 2>>::value);
-//    CHECK(std::is_trivially_copyable<trase::Vector<int, 3>>::value);
-//    CHECK(std::is_trivially_copyable<trase::Vector<float, 2>>::value);
-//    CHECK(std::is_trivially_copyable<trase::Vector<float, 3>>::value);
+  // Vector is trivially copyable so no need to check move constructor or move
+  // assignment
+  //    CHECK(std::is_trivially_copyable<trase::Vector<int, 2>>::value);
+  //    CHECK(std::is_trivially_copyable<trase::Vector<int, 3>>::value);
+  //    CHECK(std::is_trivially_copyable<trase::Vector<float, 2>>::value);
+  //    CHECK(std::is_trivially_copyable<trase::Vector<float, 3>>::value);
 }
-
 
 TEST_CASE("comparison operators", "[vector]") {
 
@@ -143,54 +143,54 @@ TEST_CASE("comparison operators", "[vector]") {
 }
 
 TEST_CASE("all any none", "[vector]") {
-    trase::Vector<bool, 2> zero = {false, false};
-    trase::Vector<bool, 2> one = {false, true};
-    trase::Vector<bool, 2> two = {true, true};
+  trase::Vector<bool, 2> zero = {false, false};
+  trase::Vector<bool, 2> one = {false, true};
+  trase::Vector<bool, 2> two = {true, true};
 
-    CHECK(!zero.all());
-    CHECK(!zero.any());
-    CHECK(zero.none());
+  CHECK(!zero.all());
+  CHECK(!zero.any());
+  CHECK(zero.none());
 
-    CHECK(!one.all());
-    CHECK(one.any());
-    CHECK(!one.none());
+  CHECK(!one.all());
+  CHECK(one.any());
+  CHECK(!one.none());
 
-    CHECK(two.all());
-    CHECK(two.any());
-    CHECK(!two.none());
+  CHECK(two.all());
+  CHECK(two.any());
+  CHECK(!two.none());
 }
 
 TEST_CASE("inner product and norms", "[vector]") {
 
-    trase::Vector<int, 4> a = {1, 2, 3, 4};
-    trase::Vector<int, 4> b = {2, 3, 4, 5};
+  trase::Vector<int, 4> a = {1, 2, 3, 4};
+  trase::Vector<int, 4> b = {2, 3, 4, 5};
 
-    trase::Vector<double, 4> c = {-1.2, 2.3, -5.2, 1.2};
+  trase::Vector<double, 4> c = {-1.2, 2.3, -5.2, 1.2};
 
-    CHECK(a.inner_product(b) == 40);
-    CHECK(a.inner_product(b) == b.inner_product(a));
+  CHECK(a.inner_product(b) == 40);
+  CHECK(a.inner_product(b) == b.inner_product(a));
 
-    CHECK(a.dot(b) == 40);
-    CHECK(a.dot(b) == b.dot(a));
+  CHECK(a.dot(b) == 40);
+  CHECK(a.dot(b) == b.dot(a));
 
-    CHECK(a.squaredNorm() == 30);
-    CHECK(b.squaredNorm() == 54);
-    CHECK(c.squaredNorm() == 1.2 * 1.2 + 2.3 * 2.3 + 5.2 * 5.2 + 1.2 * 1.2);
+  CHECK(a.squaredNorm() == 30);
+  CHECK(b.squaredNorm() == 54);
+  CHECK(c.squaredNorm() == 1.2 * 1.2 + 2.3 * 2.3 + 5.2 * 5.2 + 1.2 * 1.2);
 
-    CHECK(a.norm() == std::sqrt(30));
-    CHECK(b.norm() == std::sqrt(54));
-    CHECK(c.norm() == std::sqrt(1.2 * 1.2 + 2.3 * 2.3 + 5.2 * 5.2 + 1.2 * 1.2));
+  CHECK(a.norm() == std::sqrt(30));
+  CHECK(b.norm() == std::sqrt(54));
+  CHECK(c.norm() == std::sqrt(1.2 * 1.2 + 2.3 * 2.3 + 5.2 * 5.2 + 1.2 * 1.2));
 
-    CHECK(a.inf_norm() == 4);
-    CHECK(b.inf_norm() == 5);
-    CHECK(c.inf_norm() == 5.2);
+  CHECK(a.inf_norm() == 4);
+  CHECK(b.inf_norm() == 5);
+  CHECK(c.inf_norm() == 5.2);
 
-    CHECK(a.inf_norm() == (-a).inf_norm());
-    CHECK(b.inf_norm() == (-b).inf_norm());
-    CHECK(c.inf_norm() == (-c).inf_norm());
+  CHECK(a.inf_norm() == (-a).inf_norm());
+  CHECK(b.inf_norm() == (-b).inf_norm());
+  CHECK(c.inf_norm() == (-c).inf_norm());
 
-    c.normalize();
-    CHECK(c.norm() == Approx(1.0));
+  c.normalize();
+  CHECK(c.norm() == Approx(1.0));
 }
 
 TEST_CASE("cast", "[vector]") {
@@ -239,8 +239,7 @@ TEST_CASE("operators", "[vector]") {
     trase::Vector<int, 4> sca_vec = k + a;
     trase::Vector<int, 4> vec_sca = a + k;
 
-    for (unsigned i = 0; i < 4; ++i)
-    {
+    for (unsigned i = 0; i < 4; ++i) {
       CHECK(vec_vec[i] == b[i] + a[i]);
       CHECK(sca_vec[i] == k + a[i]);
       CHECK(vec_sca[i] == a[i] + k);
@@ -257,8 +256,7 @@ TEST_CASE("operators", "[vector]") {
     trase::Vector<int, 4> sca_vec = k - a;
     trase::Vector<int, 4> vec_sca = a - k;
 
-    for (unsigned i = 0; i < 4; ++i)
-    {
+    for (unsigned i = 0; i < 4; ++i) {
       CHECK(vec_vec[i] == b[i] - a[i]);
       CHECK(sca_vec[i] == k - a[i]);
       CHECK(vec_sca[i] == a[i] - k);
@@ -275,8 +273,7 @@ TEST_CASE("operators", "[vector]") {
     trase::Vector<int, 4> sca_vec = k * a;
     trase::Vector<int, 4> vec_sca = a * k;
 
-    for (unsigned i = 0; i < 4; ++i)
-    {
+    for (unsigned i = 0; i < 4; ++i) {
       CHECK(vec_vec[i] == b[i] * a[i]);
       CHECK(sca_vec[i] == k * a[i]);
       CHECK(vec_sca[i] == a[i] * k);
@@ -293,8 +290,7 @@ TEST_CASE("operators", "[vector]") {
     trase::Vector<int, 4> sca_vec = k / a;
     trase::Vector<int, 4> vec_sca = a / k;
 
-    for (unsigned i = 0; i < 4; ++i)
-    {
+    for (unsigned i = 0; i < 4; ++i) {
       CHECK(vec_vec[i] == b[i] / a[i]);
       CHECK(sca_vec[i] == k / a[i]);
       CHECK(vec_sca[i] == a[i] / k);
@@ -312,8 +308,7 @@ TEST_CASE("operators", "[vector]") {
     a += b;
     a += k;
 
-    for (unsigned i = 0; i < 4; ++i)
-    {
+    for (unsigned i = 0; i < 4; ++i) {
       CHECK(a[i] == (copy_of_a[i] + b[i]) + k);
     }
   }
@@ -329,8 +324,7 @@ TEST_CASE("operators", "[vector]") {
     a -= b;
     a -= k;
 
-    for (unsigned i = 0; i < 4; ++i)
-    {
+    for (unsigned i = 0; i < 4; ++i) {
       CHECK(a[i] == (copy_of_a[i] - b[i]) - k);
     }
   }
@@ -346,8 +340,7 @@ TEST_CASE("operators", "[vector]") {
     a *= b;
     a *= k;
 
-    for (unsigned i = 0; i < 4; ++i)
-    {
+    for (unsigned i = 0; i < 4; ++i) {
       CHECK(a[i] == (copy_of_a[i] * b[i]) * k);
     }
   }
@@ -363,8 +356,7 @@ TEST_CASE("operators", "[vector]") {
     a /= b;
     a /= k;
 
-    for (unsigned i = 0; i < 4; ++i)
-    {
+    for (unsigned i = 0; i < 4; ++i) {
       CHECK(a[i] == (copy_of_a[i] / b[i]) / k);
     }
   }
