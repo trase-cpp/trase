@@ -33,7 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
+#include <iomanip>
 #include <iterator>
+#include <sstream>
 #include <type_traits>
 
 #include "Vector.hpp"
@@ -431,4 +433,47 @@ TEST_CASE("round off", "[vector]") {
 
   trase::Vector<int, 4> b = {1, 2, 3, 5};
   CHECK((trase::round_off(b, 1) == b).all());
+}
+
+TEST_CASE("stream operators", "[vector]") {
+
+  // Floating point ostream
+  trase::Vector<double, 3> a = {1.23456789123456, 2.34567891234567, 3.7};
+
+  std::stringstream x_default;
+  x_default << a;
+  std::stringstream x_8;
+  x_8 << std::setprecision(8) << a;
+  std::stringstream x_3;
+  x_3 << std::setprecision(3) << a;
+  std::stringstream x_1;
+  x_1 << std::setprecision(1) << a;
+
+  CHECK(x_default.str() == "(1.23457,2.34568,3.7)");
+  CHECK(x_8.str() == "(1.2345679,2.3456789,3.7)");
+  CHECK(x_3.str() == "(1.23,2.35,3.7)");
+  CHECK(x_1.str() == "(1,2,4)");
+
+  // Integer ostream
+  trase::Vector<int, 3> b = {1234, -78, 5};
+  std::stringstream y;
+  y << b;
+
+  CHECK(y.str() == "(1234,-78,5)");
+
+  // Floating point istream
+  std::stringstream float_input;
+  float_input << "(1.23457,2.34568,3.7)";
+  trase::Vector<double, 3> float_vec;
+  float_input >> float_vec;
+
+  CHECK((float_vec == trase::Vector<double, 3>{1.23457, 2.34568, 3.7}).all());
+
+  // Integer istream
+  std::stringstream int_input;
+  int_input << "(1234,-78,5)";
+  trase::Vector<int, 3> int_vec;
+  int_input >> int_vec;
+
+  CHECK((int_vec == trase::Vector<int, 3>{1234, -78, 5}).all());
 }
