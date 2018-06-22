@@ -63,7 +63,7 @@ template <typename Backend> void Plot1D::serialise(Backend &backend) {
   // hidden lines in time
   auto color = m_color;
   color.m_a = 0;
-  backend.stroke_color(color);
+  backend.stroke_color_on_mouseover(color, m_color);
   for (size_t i = 0; i < m_values[0].size(); ++i) {
     backend.begin_path();
     backend.move_to(m_axis.to_pixel(m_values[0][i]));
@@ -75,16 +75,15 @@ template <typename Backend> void Plot1D::serialise(Backend &backend) {
 
   // hidden points in time
   char buffer[100];
+  backend.stroke_color(color);
   for (size_t i = 0; i < m_values[0].size(); ++i) {
     for (size_t f = 0; f < m_times.size(); ++f) {
       auto point = m_values[f][i];
       auto point_pixel = m_axis.to_pixel(point);
-      backend.fill_color(color);
-      backend.circle(point_pixel, 2 * lw);
+      backend.fill_color_on_mouseover(color, m_color);
       std::snprintf(buffer, sizeof(buffer), "(%f,%f)", point[0], point[1]);
-      backend.fill_color(RGBA(0, 0, 0, 0));
-      backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
-      backend.text(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer, NULL);
+      // backend.circle_with_text(point_pixel, 2 * lw, buffer);
+      backend.circle(point_pixel, 2 * lw);
     }
   }
 }

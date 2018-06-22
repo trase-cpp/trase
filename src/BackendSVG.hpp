@@ -155,6 +155,25 @@ public:
       */
   }
 
+  inline void circle_with_text(const vfloat2_t &centre, float radius,
+                               const char *string) {
+    m_out << "<g " << m_fill_color << ' ' << m_line_color << ' ' << m_linewidth
+          << ">\n";
+    auto text_pos = centre + 2.f * vfloat2_t(radius, -radius);
+    m_out << "<text x=\"" << text_pos[0] << "\" y=\"" << text_pos[1] << "\" "
+          << m_font_face << ' ' << m_font_size << ' ' << m_font_align << ' '
+          << "fill=\"black\">" << string << "</text>\n";
+    m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1]
+          << "\" r=\"" << radius << "\"/>\n";
+
+    m_out << "</g>\n";
+
+    /*
+      arc(centre, radius, 0, pi);
+      arc(centre, radius, pi, 2 * pi);
+      */
+  }
+
   inline void arc(const vfloat2_t &centre, const float radius,
                   const float angle0, const float angle1) {
     const vfloat2_t p0 =
@@ -179,9 +198,39 @@ public:
                    "\" stroke-opacity=\"" + std::to_string(color.m_a / 255.0) +
                    '\"';
   };
+  inline void stroke_color_on_mouseover(const RGBA &color,
+                                        const RGBA &color_mouseover) {
+    m_line_color = std::string("stroke=\"") + color.to_rgb_string() +
+                   "\" stroke-opacity=\"" + std::to_string(color.m_a / 255.0) +
+                   "\" onmouseover=\"evt.target.setAttribute('stroke', '" +
+                   color_mouseover.to_rgb_string() +
+                   "'); evt.target.setAttribute('stroke-opacity','" +
+                   std::to_string(color_mouseover.m_a / 255.0) +
+                   "');\" onmouseout=\"evt.target.setAttribute('stroke', '" +
+                   color.to_rgb_string() +
+                   "'); evt.target.setAttribute('stroke-opacity','" +
+                   std::to_string(color.m_a / 255.0) + "');\"";
+  }
   inline void stroke_width(const float lw) {
     m_linewidth =
         std::string("stroke-width=\"") + std::to_string(lw) + std::string("\"");
+  }
+  inline void fill_color(const RGBA &color) {
+    m_fill_color = "fill=\"" + color.to_rgb_string() + "\" fill-opacity=\"" +
+                   std::to_string(color.m_a / 255.0) + '\"';
+  }
+  inline void fill_color_on_mouseover(const RGBA &color,
+                                      const RGBA &color_mouseover) {
+    m_fill_color = "fill=\"" + color.to_rgb_string() + "\" fill-opacity=\"" +
+                   std::to_string(color.m_a / 255.0) +
+                   +"\" onmouseover=\"evt.target.setAttribute('fill', '" +
+                   color_mouseover.to_rgb_string() +
+                   "'); evt.target.setAttribute('fill-opacity','" +
+                   std::to_string(color_mouseover.m_a / 255.0) +
+                   "');\" onmouseout=\"evt.target.setAttribute('fill', '" +
+                   color.to_rgb_string() +
+                   "'); evt.target.setAttribute('fill-opacity','" +
+                   std::to_string(color.m_a / 255.0) + "');\"";
   }
   inline void stroke() {
     m_out << "<path d=\"" << m_path << "\" " << m_line_color << ' '
@@ -229,10 +278,6 @@ public:
     }
     m_font_align = "text-anchor=\"" + align_text + "\" alignment-baseline=\"" +
                    vert_align_text + '\"';
-  }
-  inline void fill_color(const RGBA &color) {
-    m_fill_color = "fill=\"" + color.to_rgb_string() + "\" fill-opacity=\"" +
-                   std::to_string(color.m_a / 255.0) + '\"';
   }
 
   inline void text(const vfloat2_t &x, const char *string, const char *end) {
