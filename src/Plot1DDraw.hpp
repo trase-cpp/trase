@@ -114,27 +114,24 @@ void Plot1D::draw(Backend &backend, const float time) {
   // get mouse position
   auto pos = vfloat2_t(std::numeric_limits<float>::max(),
                        std::numeric_limits<float>::max());
+  auto mouse_pos = pos;
   if (backend.is_interactive()) {
-    auto mouse_pos = backend.get_mouse_pos();
+    mouse_pos = backend.get_mouse_pos();
     if ((mouse_pos > m_pixels.bmin).all() &&
         (mouse_pos < m_pixels.bmax).all()) {
       pos = m_axis.from_pixel(mouse_pos);
     }
   }
 
-  // define search radius
-  const float r2 =
-      std::pow(3 * lw * m_limits.delta()[0] / m_pixels.delta()[0], 2);
-
   // find closest point
   float min_r2 = std::numeric_limits<float>::max();
-  vfloat2_t min_point;
+  vfloat2_t min_point{};
   if (w2 == 0.0f) {
     // exactly on a frame
     for (size_t i = 0; i < m_values[0].size(); ++i) {
       const auto point = m_values[frame_i][i];
       auto point_r2 = (point - pos).squaredNorm();
-      if (point_r2 < r2 && point_r2 < min_r2) {
+      if (point_r2 < min_r2) {
         min_point = point;
         min_r2 = point_r2;
       }
@@ -145,26 +142,26 @@ void Plot1D::draw(Backend &backend, const float time) {
       const auto point =
           w1 * m_values[frame_i][i] + w2 * m_values[frame_i - 1][i];
       auto point_r2 = (point - pos).squaredNorm();
-      if (point_r2 < r2 && point_r2 < min_r2) {
+      if (point_r2 < min_r2) {
         min_point = point;
         min_r2 = point_r2;
       }
     }
   }
 
+  // define search radius
+  auto point_pixel = m_axis.to_pixel(min_point);
+
   // if a point is within r2, then draw it
-  if (min_r2 < std::numeric_limits<float>::max()) {
-    char buffer[100];
-    backend.begin_path();
-    auto point_pixel = m_axis.to_pixel(min_point);
-    backend.circle(point_pixel, lw * 2);
+  if ((mouse_pos - point_pixel).squaredNorm() < std::pow(2.f * lw, 2)) {
     backend.fill_color(m_color);
-    backend.fill();
+    backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
+    char buffer[100];
     std::snprintf(buffer, sizeof(buffer), "(%f,%f)", min_point[0],
                   min_point[1]);
+    backend.circle(point_pixel, lw * 2);
     backend.fill_color(RGBA(0, 0, 0, 255));
-    backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
-    backend.text(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer, NULL);
+    backend.text(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer, nullptr);
   }
 }
 

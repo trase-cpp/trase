@@ -58,6 +58,10 @@ class BackendGL {
   GLFWwindow *m_window;
   NVGcontext *m_vg;
   FontManager m_fm;
+  std::string m_tooltip_txt;
+  vfloat2_t m_tooltip_x;
+  RGBA m_stroke_color_mouseover;
+  RGBA m_fill_color_mouseover;
 
 public:
   void init(int x_pixels, int y_pixels, const char *name);
@@ -99,22 +103,46 @@ public:
   inline void rounded_rect(const bfloat2_t &x, const float r) {
     const auto &delta = x.delta();
     const auto &min = x.min();
+    begin_path();
     nvgRoundedRect(m_vg, min[0], min[1], delta[0], delta[1], r);
+    fill();
   }
   inline void rect(const bfloat2_t &x) {
     const auto &delta = x.delta();
     const auto &min = x.min();
+    begin_path();
     nvgRect(m_vg, min[0], min[1], delta[0], delta[1]);
+    fill();
   }
 
   inline void circle(const vfloat2_t &centre, float radius) {
+    begin_path();
     nvgArc(m_vg, centre[0], centre[1], radius, 0, 2 * M_PI, NVG_CW);
+    fill();
+    if (!m_tooltip_txt.empty()) {
+      auto pos = get_mouse_pos();
+      if ((pos - centre).squaredNorm() < std::pow(radius, 2)) {
+        text(centre + 2.f * vfloat2_t(radius, -radius), m_tooltip_txt.c_str(),
+             nullptr);
+      }
+    }
   }
 
   inline void move_to(const vfloat2_t &x) { nvgMoveTo(m_vg, x[0], x[1]); }
   inline void line_to(const vfloat2_t &x) { nvgLineTo(m_vg, x[0], x[1]); }
   inline void stroke_color(const RGBA &color) {
     nvgStrokeColor(m_vg, nvgRGBA(color.m_r, color.m_g, color.m_b, color.m_a));
+  }
+
+  inline void tooltip(const vfloat2_t &x, const char *string) {
+    m_tooltip_txt = std::string(string);
+    m_tooltip_x = x;
+  }
+  inline void clear_tooltip() { m_tooltip_txt.clear(); }
+
+  inline void stroke_color(const RGBA &color, const RGBA &color_mouseover) {
+    stroke_color(color);
+    m_stroke_color_mouseover = color_mouseover;
   }
   inline void stroke_width(const float lw) { nvgStrokeWidth(m_vg, lw); }
   inline void stroke() { nvgStroke(m_vg); }
@@ -137,6 +165,11 @@ public:
   inline void text_align(const int align) { nvgTextAlign(m_vg, align); }
   inline void fill_color(const RGBA &color) {
     nvgFillColor(m_vg, nvgRGBA(color.m_r, color.m_g, color.m_b, color.m_a));
+  }
+
+  inline void fill_color(const RGBA &color, const RGBA &color_mouseover) {
+    fill_color(color);
+    m_fill_color_mouseover = color_mouseover;
   }
 
   inline void text(const vfloat2_t &x, const char *string, const char *end) {
