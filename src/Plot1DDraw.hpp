@@ -59,6 +59,21 @@ template <typename Backend> void Plot1D::serialise(Backend &backend) {
   }
 
   backend.end_frames(m_times.back());
+
+  // highlighted points just for frame 0
+  char buffer[100];
+  auto color = m_color;
+  color.m_a = 0;
+  backend.stroke_color(RGBA(0, 0, 0, 0));
+  backend.fill_color(color, m_color);
+  for (size_t i = 0; i < m_values[0].size(); ++i) {
+    auto point = m_values[0][i];
+    auto point_pixel = m_axis.to_pixel(point);
+    std::snprintf(buffer, sizeof(buffer), "(%f,%f)", point[0], point[1]);
+    backend.tooltip(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer);
+    backend.circle(point_pixel, 2 * lw);
+  }
+  backend.clear_tooltip();
 }
 
 template <typename Backend>
