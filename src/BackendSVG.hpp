@@ -155,25 +155,6 @@ public:
       */
   }
 
-  inline void circle_with_text(const vfloat2_t &centre, float radius,
-                               const char *string) {
-    m_out << "<g " << m_fill_color << ' ' << m_line_color << ' ' << m_linewidth
-          << ">\n";
-    auto text_pos = centre + 2.f * vfloat2_t(radius, -radius);
-    m_out << "<text x=\"" << text_pos[0] << "\" y=\"" << text_pos[1] << "\" "
-          << m_font_face << ' ' << m_font_size << ' ' << m_font_align << ' '
-          << "fill=\"black\">" << string << "</text>\n";
-    m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1]
-          << "\" r=\"" << radius << "\"/>\n";
-
-    m_out << "</g>\n";
-
-    /*
-      arc(centre, radius, 0, pi);
-      arc(centre, radius, pi, 2 * pi);
-      */
-  }
-
   inline void arc(const vfloat2_t &centre, const float radius,
                   const float angle0, const float angle1) {
     const vfloat2_t p0 =
