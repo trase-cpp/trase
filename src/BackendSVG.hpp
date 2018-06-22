@@ -148,6 +148,22 @@ public:
     m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1]
           << "\" r=\"" << radius << "\" " << m_fill_color << ' ' << m_line_color
           << ' ' << m_linewidth << "/>\n";
+
+    /*
+      arc(centre, radius, 0, pi);
+      arc(centre, radius, pi, 2 * pi);
+      */
+  }
+
+  inline void arc(const vfloat2_t &centre, const float radius,
+                  const float angle0, const float angle1) {
+    const vfloat2_t p0 =
+        centre + radius * vfloat2_t(std::cos(angle0), std::sin(angle0));
+    const vfloat2_t p1 =
+        centre + radius * vfloat2_t(std::cos(angle1), std::sin(angle1));
+    move_to(p0);
+    m_path += " A " + std::to_string(radius) + ' ' + std::to_string(radius) +
+              " 0 0 1 " + std::to_string(p1[0]) + ' ' + std::to_string(p1[1]);
   }
 
   inline void move_to(const vfloat2_t &x) {
