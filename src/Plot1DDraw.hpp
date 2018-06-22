@@ -68,17 +68,20 @@ void Plot1D::draw(Backend &backend, const float time) {
   // draw plot
   backend.begin_path();
 
+  // are we exactly on a frame, or in-between?
   float frame_i_float = get_frame_index(time);
   int frame_i = std::ceil(frame_i_float);
   const float w2 = frame_i - frame_i_float;
   const float w1 = 1.0f - w2;
 
   if (w2 == 0.0f) {
+    // exactly on a single frame
     backend.move_to(m_axis.to_pixel(m_values[frame_i][0]));
     for (size_t i = 1; i < m_values[0].size(); ++i) {
       backend.line_to(m_axis.to_pixel(m_values[frame_i][i]));
     }
   } else {
+    // between two frames
     backend.move_to(m_axis.to_pixel(w1 * m_values[frame_i][0] +
                                     w2 * m_values[frame_i - 1][0]));
     for (size_t i = 1; i < m_values[0].size(); ++i) {
@@ -92,6 +95,8 @@ void Plot1D::draw(Backend &backend, const float time) {
   backend.stroke();
 
   // draw highlighted point
+
+  // get mouse position
   auto pos = vfloat2_t(std::numeric_limits<float>::max(),
                        std::numeric_limits<float>::max());
   if (backend.is_interactive()) {
@@ -102,35 +107,49 @@ void Plot1D::draw(Backend &backend, const float time) {
     }
   }
 
+  // define search radius
   const float r2 =
       std::pow(3 * lw * m_limits.delta()[0] / m_pixels.delta()[0], 2);
-  char buffer[20];
-  auto draw_close_point = [&](const vfloat2_t &point) {
-    if ((point - pos).squaredNorm() < r2) {
-      backend.begin_path();
-      auto point_pixel = m_axis.to_pixel(point);
-      backend.circle(point_pixel, lw * 2);
-      backend.fill_color(m_color);
-      backend.fill();
 
-      std::sprintf(buffer, "(%f,%f)", point[0], point[1]);
-      backend.fill_color(RGBA(0, 0, 0, 255));
-      backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
-      backend.text(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer, NULL);
-    }
-  };
-
+  // find closest point
+  float min_r2 = std::numeric_limits<float>::max();
+  vfloat2_t min_point;
   if (w2 == 0.0f) {
-    draw_close_point(m_values[frame_i][0]);
-    for (size_t i = 1; i < m_values[0].size(); ++i) {
-      draw_close_point(m_values[frame_i][i]);
+    // exactly on a frame
+    for (size_t i = 0; i < m_values[0].size(); ++i) {
+      const auto point = m_values[frame_i][i];
+      auto point_r2 = (point - pos).squaredNorm();
+      if (point_r2 < r2 && point_r2 < min_r2) {
+        min_point = point;
+        min_r2 = point_r2;
+      }
     }
   } else {
-    draw_close_point(w1 * m_values[frame_i][0] + w2 * m_values[frame_i - 1][0]);
-    for (size_t i = 1; i < m_values[0].size(); ++i) {
-      draw_close_point(w1 * m_values[frame_i][i] +
-                       w2 * m_values[frame_i - 1][i]);
+    // between two frames
+    for (size_t i = 0; i < m_values[0].size(); ++i) {
+      const auto point =
+          w1 * m_values[frame_i][i] + w2 * m_values[frame_i - 1][i];
+      auto point_r2 = (point - pos).squaredNorm();
+      if (point_r2 < r2 && point_r2 < min_r2) {
+        min_point = point;
+        min_r2 = point_r2;
+      }
     }
+  }
+
+  // if a point is within r2, then draw it
+  if (min_r2 < std::numeric_limits<float>::max()) {
+    char buffer[100];
+    backend.begin_path();
+    auto point_pixel = m_axis.to_pixel(min_point);
+    backend.circle(point_pixel, lw * 2);
+    backend.fill_color(m_color);
+    backend.fill();
+    std::snprintf(buffer, sizeof(buffer), "(%f,%f)", min_point[0],
+                  min_point[1]);
+    backend.fill_color(RGBA(0, 0, 0, 255));
+    backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
+    backend.text(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer, NULL);
   }
 }
 
