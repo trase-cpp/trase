@@ -60,20 +60,22 @@ template <typename Backend> void Plot1D::serialise(Backend &backend) {
 
   backend.end_frames(m_times.back());
 
-  // highlighted points just for frame 0
-  char buffer[100];
-  auto color = m_color;
-  color.m_a = 0;
-  backend.stroke_color(RGBA(0, 0, 0, 0));
-  backend.fill_color(color, m_color);
-  for (size_t i = 0; i < m_values[0].size(); ++i) {
-    auto point = m_values[0][i];
-    auto point_pixel = m_axis.to_pixel(point);
-    std::snprintf(buffer, sizeof(buffer), "(%f,%f)", point[0], point[1]);
-    backend.tooltip(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer);
-    backend.circle(point_pixel, 2 * lw);
+  // highlighted points just for frame 0 and for stationary lines
+  if (m_times.size() == 1) {
+    char buffer[100];
+    auto color = m_color;
+    color.m_a = 0;
+    backend.stroke_color(RGBA(0, 0, 0, 0));
+    backend.fill_color(color, m_color);
+    for (size_t i = 0; i < m_values[0].size(); ++i) {
+      auto point = m_values[0][i];
+      auto point_pixel = m_axis.to_pixel(point);
+      std::snprintf(buffer, sizeof(buffer), "(%f,%f)", point[0], point[1]);
+      backend.tooltip(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer);
+      backend.circle(point_pixel, 2 * lw);
+    }
+    backend.clear_tooltip();
   }
-  backend.clear_tooltip();
 }
 
 template <typename Backend>
@@ -123,10 +125,11 @@ void Plot1D::draw(Backend &backend, const float time) {
     }
   }
 
-  // find closest point
-  float min_r2 = std::numeric_limits<float>::max();
-  vfloat2_t min_point{};
-  if (w2 == 0.0f) {
+  // highlight mouseover point if we are exactly on a frame (i.e. a stationary
+  // line)
+  if (w2 == 0.f) {
+    float min_r2 = std::numeric_limits<float>::max();
+    vfloat2_t min_point{};
     // exactly on a frame
     for (size_t i = 0; i < m_values[0].size(); ++i) {
       const auto point = m_values[frame_i][i];
@@ -136,32 +139,21 @@ void Plot1D::draw(Backend &backend, const float time) {
         min_r2 = point_r2;
       }
     }
-  } else {
-    // between two frames
-    for (size_t i = 0; i < m_values[0].size(); ++i) {
-      const auto point =
-          w1 * m_values[frame_i][i] + w2 * m_values[frame_i - 1][i];
-      auto point_r2 = (point - pos).squaredNorm();
-      if (point_r2 < min_r2) {
-        min_point = point;
-        min_r2 = point_r2;
-      }
+
+    // define search radius
+    auto point_pixel = m_axis.to_pixel(min_point);
+
+    // if a point is within r2, then draw it
+    if ((mouse_pos - point_pixel).squaredNorm() < std::pow(2.f * lw, 2)) {
+      backend.fill_color(m_color);
+      backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
+      char buffer[100];
+      std::snprintf(buffer, sizeof(buffer), "(%f,%f)", min_point[0],
+                    min_point[1]);
+      backend.circle(point_pixel, lw * 2);
+      backend.fill_color(RGBA(0, 0, 0, 255));
+      backend.text(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer, nullptr);
     }
-  }
-
-  // define search radius
-  auto point_pixel = m_axis.to_pixel(min_point);
-
-  // if a point is within r2, then draw it
-  if ((mouse_pos - point_pixel).squaredNorm() < std::pow(2.f * lw, 2)) {
-    backend.fill_color(m_color);
-    backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
-    char buffer[100];
-    std::snprintf(buffer, sizeof(buffer), "(%f,%f)", min_point[0],
-                  min_point[1]);
-    backend.circle(point_pixel, lw * 2);
-    backend.fill_color(RGBA(0, 0, 0, 255));
-    backend.text(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer, nullptr);
   }
 }
 
