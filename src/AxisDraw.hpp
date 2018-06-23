@@ -67,11 +67,9 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
   backend.stroke_width(lw);
 
   // axis box
-  backend.begin_path();
-  backend.rect(m_pixels);
   backend.stroke_color(RGBA(200, 200, 200, 255));
   backend.fill_color(RGBA(200, 200, 200, 255));
-  backend.fill();
+  backend.rect(m_pixels);
 
   // ticks
   const auto pixel_delta = m_pixels.delta();
