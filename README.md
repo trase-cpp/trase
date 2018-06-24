@@ -121,7 +121,7 @@ $ cmake -DCMAKE_PREFIX_PATH=$HOME/trase ..
 $ make
 ```
 
-##Acknowledgments
+## Acknowledgments
 
 Trase uses [Dear ImGui](https://github.com/ocornut/imgui) and 
 [NanoVG](https://github.com/memononen/nanovg) for the OpenGL backend. The 
