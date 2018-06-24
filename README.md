@@ -55,8 +55,7 @@ For example, the above svg image was generated with the following code.
     moving_plot->add_frame(x, y, 3.f * i / nf);
   }
 
-  // choose font and label axes
-  ax->font_face("Indie Flower");
+  // set label axes
   ax->xlabel("x");
   ax->ylabel("y");
   ax->title("the svg test");
@@ -66,8 +65,6 @@ For example, the above svg image was generated with the following code.
   std::ofstream out;
   out.open("test_figure.svg");
   BackendSVG backend(out);
-  backend.import_web_font(
-      "https://fonts.googleapis.com/css?family=Indie+Flower");
   fig->serialise(backend);
   out.close();
 ```
