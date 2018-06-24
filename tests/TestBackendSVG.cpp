@@ -44,7 +44,7 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   auto fig = figure();
   auto ax = fig->axis();
   const int n = 100;
-  const int nframes = 100;
+  const int nframes = 10;
   std::vector<float> x(n);
   std::vector<float> y(n);
 
@@ -53,29 +53,26 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
     x[i] = static_cast<float>(i) / n;
   }
 
-  // define y function (the gaussian distribution)
-  auto write_y = [&](const float amplitude, const float mean,
-                     const float sigma2) {
+  // define y = sin(x) with given amplitude and frequency
+  auto write_y = [&](const float amplitude, const float freq) {
     for (int i = 0; i < n; ++i) {
-      y[i] = amplitude * std::exp(-std::pow(x[i] - mean, 2) / sigma2);
+      y[i] = amplitude * std::sin(6.28f * freq * x[i]);
     }
   };
 
-  // create a static gaussian in the middle
-  write_y(1.f, 0.5f, 0.01);
+  // create a static sin(x) function
+  write_y(1.f, 2.f);
   auto static_plot = ax->plot(x, y, "static");
 
-  // create a moving gaussian with varying amplitude, mean and variance
-  write_y(1.f, -0.5, 0.01);
+  // create a moving sin(x) function with varying amplitude
+  write_y(1.f, 5.f);
   auto moving_plot = ax->plot(x, y, "moving");
 
-  for (int i = 0; i < nframes; ++i) {
+  for (int i = 1; i <= nframes; ++i) {
     const float nf = static_cast<float>(nframes);
-    const float amplitude = 1.f - 0.5f * std::cos(6.28 * i / nf);
-    const float sigma2 = 0.2f * std::pow(1.f / amplitude, 2) / 6.28f;
-    const float mean = -0.5f + 2.f * i / nf;
-    write_y(amplitude, mean, sigma2);
-    moving_plot->add_frame(x, y, 3.f * (i + 1) / nf);
+    const float amplitude = 1.f - 0.5f * std::sin(6.28 * i / nf);
+    write_y(amplitude, 5.f);
+    moving_plot->add_frame(x, y, 3.f * i / nf);
   }
 
   // choose font and label axes

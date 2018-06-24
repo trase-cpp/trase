@@ -23,34 +23,50 @@ For example, the above svg image was generated with the following code.
   auto fig = figure();
   auto ax = fig->axis();
   const int n = 100;
+  const int nframes = 10;
   std::vector<float> x(n);
   std::vector<float> y(n);
-  for (int i = 0; i < n; ++i) {
-    x[i] = static_cast<float>(i) * 6.28 / n;
-    y[i] = std::sin(x[i]);
-  }
-  auto static_plot = ax->plot(x, y);
-  auto moving_plot = ax->plot(x, y);
-  float time = 0.0;
 
-  auto do_plot = [&](const float theta) {
+  // define x points
+  for (int i = 0; i < n; ++i) {
+    x[i] = static_cast<float>(i) / n;
+  }
+
+  // define y = sin(x) with given amplitude and frequency
+  auto write_y = [&](const float amplitude, const float freq) {
     for (int i = 0; i < n; ++i) {
-      y[i] = std::sin(theta * x[i]);
+      y[i] = amplitude * std::sin(6.28f * freq * x[i]);
     }
-    time += 0.3;
-    moving_plot->add_frame(x, y, time);
   };
 
-  for (int i = 1; i < 6; ++i) {
-    do_plot(i);
-  }
-  for (int i = 5; i >= 1; --i) {
-    do_plot(i);
+  // create a static sin(x) function
+  write_y(1.f, 2.f);
+  auto static_plot = ax->plot(x, y, "static");
+
+  // create a moving sin(x) function with varying amplitude
+  write_y(1.f, 5.f);
+  auto moving_plot = ax->plot(x, y, "moving");
+
+  for (int i = 1; i <= nframes; ++i) {
+    const float nf = static_cast<float>(nframes);
+    const float amplitude = 1.f - 0.5f * std::sin(6.28 * i / nf);
+    write_y(amplitude, 5.f);
+    moving_plot->add_frame(x, y, 3.f * i / nf);
   }
 
+  // choose font and label axes
+  ax->font_face("Indie Flower");
+  ax->xlabel("x");
+  ax->ylabel("y");
+  ax->title("the svg test");
+  ax->legend();
+
+  // output to svg
   std::ofstream out;
   out.open("test_figure.svg");
   BackendSVG backend(out);
+  backend.import_web_font(
+      "https://fonts.googleapis.com/css?family=Indie+Flower");
   fig->serialise(backend);
   out.close();
 ```
