@@ -39,7 +39,7 @@ namespace trase {
 
 template <typename Backend> void Figure::serialise(Backend &backend) {
   auto name = "Figure " + std::to_string(m_id);
-  backend.init(m_pixels.bmax[0], m_pixels.bmax[1], name.c_str());
+  backend.init(m_pixels.bmax[0], m_pixels.bmax[1], m_time_span, name.c_str());
   m_axis->serialise(backend);
   backend.finalise();
 }

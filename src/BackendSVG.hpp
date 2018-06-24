@@ -50,7 +50,6 @@ class BackendSVG {
   std::string m_line_color;
   std::string m_fill_color;
   std::string m_path;
-  std::string m_path_from;
   std::string m_font_face;
   std::string m_font_size;
   std::string m_font_align;
@@ -61,22 +60,21 @@ class BackendSVG {
   std::string m_onmouseout_fill;
   std::string m_onmouseover_tooltip;
   std::string m_onmouseout_tooltip;
-  float m_from_time;
+  std::string m_animate_values;
+  std::string m_animate_times;
+  float m_time_span;
   std::string m_font_size_base;
   std::string m_font_face_base;
-  int m_nanimate;
-  int m_nframe;
-  bool m_end_of_frames;
   Transform m_transform;
 
 public:
-  BackendSVG(std::ostream &out)
-      : m_out(out), m_nanimate(0), m_nframe(0), m_end_of_frames(false) {
+  BackendSVG(std::ostream &out) : m_out(out) {
     stroke_color(RGBA(0, 0, 0, 255));
     fill_color(RGBA(0, 0, 0, 255));
     stroke_width(1);
   }
-  void init(const float width, const float height, const char *name);
+  void init(const float width, const float height, const float time_span,
+            const char *name);
   void finalise();
 
   inline bool is_interactive() { return false; }
@@ -91,65 +89,56 @@ public:
 
   inline void begin_path() { m_path.clear(); }
   inline void begin_frames() {
-    m_path.clear();
-    m_path_from.clear();
-    m_from_time = 0;
-    m_nframe = 0;
-    m_nanimate++;
+    m_animate_times = "keyTimes=\"";
+    m_animate_values = "values=\"";
+    begin_path();
   }
   inline void add_frame(const float time) {
-    std::string frame_id =
-        "id" + std::to_string(m_nanimate) + '_' + std::to_string(m_nframe);
-    std::string prev_frame_id =
-        "id" + std::to_string(m_nanimate) + '_' + std::to_string(m_nframe - 1);
-    std::string last_frame_id = "id" + std::to_string(m_nanimate) + "_end";
-    if (m_end_of_frames) {
-      frame_id = last_frame_id;
+
+    // if its the first frame need to write the path element
+    // TODO: not sure why need to add d attribute here, but neccessary for
+    // single frame animations. Figure out how to remove this as it doubles the
+    // required space
+    if (m_animate_times.back() == '\"') {
+      m_out << "<path " << m_line_color << ' ' << m_linewidth
+            << " fill-opacity=\"0\" d=\"" << m_path << "\">\n ";
     }
 
-    if (m_nframe == 0 || m_path_from.empty()) {
-      // write out start of path
-      m_out << "<path d=\"" << m_path << "\" " << m_line_color << ' '
-            << m_linewidth << " fill-opacity=\"0\">\n ";
-    } else if (m_nframe == 1) {
-      // write out first animate element
-      m_out << "<animate id=\"" << frame_id
-            << "\" attributeName=\"d\" attributeType=\"XML\" begin=\"1s;"
-            << last_frame_id << ".end\" dur=\"" << time - m_from_time
-            << "s\" fill=\"freeze\" from=\"" << m_path_from << "\" to=\""
-            << m_path << "\" />\n";
-    } else {
-      // write out other animate element
-      m_out << "<animate id=\"" << frame_id
-            << "\" attributeName=\"d\" attributeType=\"XML\" begin=\""
-            << prev_frame_id << ".end\" dur=\"" << time - m_from_time
-            << "s\" fill=\"freeze\" from=\"" << m_path_from << "\" to=\""
-            << m_path << "\" />\n";
-    }
-    m_path_from = m_path;
+    // all times are scaled by total time span (all times start at 0)
+    m_animate_times += std::to_string(time / m_time_span) + ';';
+    m_animate_values += m_path + ';';
     m_path.clear();
-    m_from_time = time;
-    m_nframe++;
   }
+
   inline void end_frames(const float time) {
-    m_end_of_frames = true;
     add_frame(time);
-    m_end_of_frames = false;
+    m_animate_times.back() = '\"';
+    m_animate_values.back() = '\"';
+    m_out << "<animate attributeName=\"d\" "
+             //"calcMode=\"discrete\" "
+             "repeatCount=\"indefinite\" "
+             "begin =\"0s\" "
+             "dur=\""
+          << m_time_span << "s\" " << m_animate_values << ' ' << m_animate_times
+          << "/>\n";
     m_out << "</path>\n";
   }
   inline void rounded_rect(const bfloat2_t &x, const float r) { rect(x); }
   inline void rect(const bfloat2_t &x) {
     const auto &delta = x.delta();
-    vfloat2_t point = x.min();
-    begin_path();
-    move_to(point);
-    point[0] += delta[0];
-    line_to(point);
-    point[1] += delta[1];
-    line_to(point);
-    point[0] -= delta[0];
-    line_to(point);
-    close_path();
+    vfloat2_t min = x.min();
+    m_out << "<rect x=\"" << min[0] << "\" y=\"" << min[1] << "\" width=\""
+          << delta[0] << "\" height=\"" << delta[1] << "\" " << m_fill_color
+          << ' ' << m_line_color << ' ' << m_linewidth;
+    if (!m_onmouseover_fill.empty() || !m_onmouseover_stroke.empty() ||
+        !m_onmouseout_tooltip.empty()) {
+      m_out << " onmouseover=\"" << m_onmouseover_fill << m_onmouseover_stroke
+            << m_onmouseover_tooltip << '\"';
+      m_out << " onmouseout=\"" << m_onmouseout_fill << m_onmouseout_stroke
+            << m_onmouseout_tooltip << '\"';
+    }
+
+    m_out << "/>\n";
   }
 
   inline void circle(const vfloat2_t &centre, float radius) {
@@ -319,7 +308,7 @@ public:
     }
     m_out << '>' << string << "</text>\n";
   }
-};
+}; // namespace trase
 
 } // namespace trase
 

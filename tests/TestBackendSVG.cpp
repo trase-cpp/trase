@@ -44,37 +44,48 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   auto fig = figure();
   auto ax = fig->axis();
   const int n = 100;
+  const int nframes = 100;
   std::vector<float> x(n);
   std::vector<float> y(n);
-  for (int i = 0; i < n; ++i) {
-    x[i] = static_cast<float>(i) * 6.28f / n;
-    y[i] = std::sin(x[i]);
-  }
-  auto static_plot = ax->plot(x, y, "static");
-  auto moving_plot = ax->plot(x, y, "moving");
-  float time = 0.0f;
 
-  auto do_plot = [&](const float theta) {
+  // define x points
+  for (int i = 0; i < n; ++i) {
+    x[i] = static_cast<float>(i) / n;
+  }
+
+  // define y function (the gaussian distribution)
+  auto write_y = [&](const float amplitude, const float mean,
+                     const float sigma2) {
     for (int i = 0; i < n; ++i) {
-      y[i] = std::sin(theta * x[i]);
+      y[i] = amplitude * std::exp(-std::pow(x[i] - mean, 2) / sigma2);
     }
-    time += 0.3f;
-    moving_plot->add_frame(x, y, time);
   };
 
-  for (int i = 1; i < 6; ++i) {
-    do_plot(static_cast<float>(i));
-  }
-  for (int i = 5; i >= 1; --i) {
-    do_plot(static_cast<float>(i));
+  // create a static gaussian in the middle
+  write_y(1.f, 0.5f, 0.01);
+  auto static_plot = ax->plot(x, y, "static");
+
+  // create a moving gaussian with varying amplitude, mean and variance
+  write_y(1.f, -0.5, 0.01);
+  auto moving_plot = ax->plot(x, y, "moving");
+
+  for (int i = 0; i < nframes; ++i) {
+    const float nf = static_cast<float>(nframes);
+    const float amplitude = 1.f - 0.5f * std::cos(6.28 * i / nf);
+    const float sigma2 = 0.2f * std::pow(1.f / amplitude, 2) / 6.28f;
+    const float mean = -0.5f + 2.f * i / nf;
+    write_y(amplitude, mean, sigma2);
+    moving_plot->add_frame(x, y, 3.f * (i + 1) / nf);
   }
 
+  // choose font and label axes
   ax->font_face("Indie Flower");
   ax->xlabel("x");
   ax->ylabel("y");
   ax->title("the svg test");
   ax->legend();
 
+  // output to svg
   std::ofstream out;
   out.open("test_figure.svg");
   BackendSVG backend(out);
