@@ -70,7 +70,7 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
 
   for (int i = 1; i <= nframes; ++i) {
     const float nf = static_cast<float>(nframes);
-    const float amplitude = 1.f - 0.5f * std::sin(6.28 * i / nf);
+    const float amplitude = 1.f - 0.5f * std::sin(6.28f * i / nf);
     write_y(amplitude, 5.f);
     moving_plot->add_frame(x, y, 3.f * i / nf);
   }
