@@ -14,7 +14,7 @@ requires [GLFW](http://www.glfw.org/).
 
 <p align="center">
   <img width="600" 
-  src="https://cdn.rawgit.com/martinjrobins/trase/svg/test_figure.svg">
+  src="https://rawgit.com/martinjrobins/trase/master/test_figure.svg">
 </p>
 
 
