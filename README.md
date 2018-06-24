@@ -7,9 +7,10 @@ Status](https://travis-ci.org/martinjrobins/trase.svg?branch=master)](https://tr
 status](https://ci.appveyor.com/api/projects/status/kfm43tg6qltyjsyl/branch/master?svg=true)](https://ci.appveyor.com/project/martinjrobins/trase/branch/master)
 
 Trase is a lightweight scientific plotting library for C++ with animation 
-support. It enables you to construct plots, and display them via the OpenGL 
-interface, or write them out to animated svg files. The svg backend has no dependencies other than the standard library. The OpenGL backend requires [GLFW](http://www.glfw.org/), and uses [Dear ImGui](https://github.com/ocornut/imgui) and [NanoVG](https://github.com/memononen/nanovg).
-
+support. It enables you to construct plots and write them out to animated svg 
+files, or display them in an OpenGL window. The main library and svg backend 
+have no dependencies other than the standard library. The OpenGL backend 
+requires [GLFW](http://www.glfw.org/).
 
 <p align="center">
   <img width="600" 
@@ -122,3 +123,10 @@ target_link_libraries(myexe trase backendGL backendSVG)
 $ cmake -DCMAKE_PREFIX_PATH=$HOME/trase ..
 $ make
 ```
+
+##Acknowledgments
+
+Trase uses [Dear ImGui](https://github.com/ocornut/imgui) and 
+[NanoVG](https://github.com/memononen/nanovg) for the OpenGL backend. The 
+[Dirent port](https://github.com/tronkko/dirent) for Windows is used for finding 
+local font files.
