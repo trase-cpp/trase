@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of the Oxford RSE C++ Template project.
+This file is part of trase.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:

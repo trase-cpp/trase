@@ -7,13 +7,14 @@ Status](https://travis-ci.org/martinjrobins/trase.svg?branch=master)](https://tr
 status](https://ci.appveyor.com/api/projects/status/kfm43tg6qltyjsyl/branch/master?svg=true)](https://ci.appveyor.com/project/martinjrobins/trase/branch/master)
 
 Trase is a lightweight scientific plotting library for C++ with animation 
-support. It enables you to construct plots, and display them via the OpenGL 
-interface, or write them out to animated svg files. The svg backend has no dependencies other than the standard library. The OpenGL backend requires [GLFW](http://www.glfw.org/), and uses [Dear ImGui](https://github.com/ocornut/imgui) and [NanoVG](https://github.com/memononen/nanovg).
-
+support. It enables you to construct plots and write them out to animated svg 
+files, or display them in an OpenGL window. The main library and svg backend 
+have no dependencies other than the standard library. The OpenGL backend 
+requires [GLFW](http://www.glfw.org/).
 
 <p align="center">
   <img width="600" 
-  src="https://cdn.rawgit.com/martinjrobins/trase/svg/test_figure.svg">
+  src="https://rawgit.com/martinjrobins/trase/master/test_figure.svg">
 </p>
 
 
@@ -23,31 +24,44 @@ For example, the above svg image was generated with the following code.
   auto fig = figure();
   auto ax = fig->axis();
   const int n = 100;
+  const int nframes = 10;
   std::vector<float> x(n);
   std::vector<float> y(n);
-  for (int i = 0; i < n; ++i) {
-    x[i] = static_cast<float>(i) * 6.28 / n;
-    y[i] = std::sin(x[i]);
-  }
-  auto static_plot = ax->plot(x, y);
-  auto moving_plot = ax->plot(x, y);
-  float time = 0.0;
 
-  auto do_plot = [&](const float theta) {
+  // define x points
+  for (int i = 0; i < n; ++i) {
+    x[i] = static_cast<float>(i) / n;
+  }
+
+  // define y = sin(x) with given amplitude and frequency
+  auto write_y = [&](const float amplitude, const float freq) {
     for (int i = 0; i < n; ++i) {
-      y[i] = std::sin(theta * x[i]);
+      y[i] = amplitude * std::sin(6.28f * freq * x[i]);
     }
-    time += 0.3;
-    moving_plot->add_frame(x, y, time);
   };
 
-  for (int i = 1; i < 6; ++i) {
-    do_plot(i);
-  }
-  for (int i = 5; i >= 1; --i) {
-    do_plot(i);
+  // create a static sin(x) function
+  write_y(1.f, 2.f);
+  auto static_plot = ax->plot(x, y, "static");
+
+  // create a moving sin(x) function with varying amplitude
+  write_y(1.f, 5.f);
+  auto moving_plot = ax->plot(x, y, "moving");
+
+  for (int i = 1; i <= nframes; ++i) {
+    const float nf = static_cast<float>(nframes);
+    const float amplitude = 1.f - 0.5f * std::sin(6.28 * i / nf);
+    write_y(amplitude, 5.f);
+    moving_plot->add_frame(x, y, 3.f * i / nf);
   }
 
+  // set label axes
+  ax->xlabel("x");
+  ax->ylabel("y");
+  ax->title("the svg test");
+  ax->legend();
+
+  // output to svg
   std::ofstream out;
   out.open("test_figure.svg");
   BackendSVG backend(out);
@@ -106,3 +120,10 @@ target_link_libraries(myexe trase backendGL backendSVG)
 $ cmake -DCMAKE_PREFIX_PATH=$HOME/trase ..
 $ make
 ```
+
+## Acknowledgments
+
+Trase uses [Dear ImGui](https://github.com/ocornut/imgui) and 
+[NanoVG](https://github.com/memononen/nanovg) for the OpenGL backend. The 
+[Dirent port](https://github.com/tronkko/dirent) for Windows is used for finding 
+local font files.

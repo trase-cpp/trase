@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of the Oxford RSE C++ Template project.
+This file is part of trase.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -50,25 +50,31 @@ class BackendSVG {
   std::string m_line_color;
   std::string m_fill_color;
   std::string m_path;
-  std::string m_path_from;
   std::string m_font_face;
   std::string m_font_size;
   std::string m_font_align;
   std::string m_web_font;
-  float m_from_time;
-  int m_nanimate;
-  int m_nframe;
-  bool m_end_of_frames;
+  std::string m_onmouseover_stroke;
+  std::string m_onmouseout_stroke;
+  std::string m_onmouseover_fill;
+  std::string m_onmouseout_fill;
+  std::string m_onmouseover_tooltip;
+  std::string m_onmouseout_tooltip;
+  std::string m_animate_values;
+  std::string m_animate_times;
+  float m_time_span;
+  std::string m_font_size_base;
+  std::string m_font_face_base;
   Transform m_transform;
 
 public:
-  BackendSVG(std::ostream &out)
-      : m_out(out), m_nanimate(0), m_nframe(0), m_end_of_frames(false) {
+  BackendSVG(std::ostream &out) : m_out(out) {
     stroke_color(RGBA(0, 0, 0, 255));
     fill_color(RGBA(0, 0, 0, 255));
     stroke_width(1);
   }
-  void init(const float width, const float height, const char *name);
+  void init(const float width, const float height, const float time_span,
+            const char *name);
   void finalise();
 
   inline bool is_interactive() { return false; }
@@ -83,71 +89,101 @@ public:
 
   inline void begin_path() { m_path.clear(); }
   inline void begin_frames() {
-    m_path.clear();
-    m_path_from.clear();
-    m_from_time = 0;
-    m_nframe = 0;
-    m_nanimate++;
+    m_animate_times = "keyTimes=\"";
+    m_animate_values = "values=\"";
+    begin_path();
   }
   inline void add_frame(const float time) {
-    std::string frame_id =
-        "id" + std::to_string(m_nanimate) + '_' + std::to_string(m_nframe);
-    std::string prev_frame_id =
-        "id" + std::to_string(m_nanimate) + '_' + std::to_string(m_nframe - 1);
-    std::string last_frame_id = "id" + std::to_string(m_nanimate) + "_end";
-    if (m_end_of_frames) {
-      frame_id = last_frame_id;
+
+    // if its the first frame need to write the path element
+    // TODO: not sure why need to add d attribute here, but neccessary for
+    // single frame animations. Figure out how to remove this as it doubles the
+    // required space
+    if (m_animate_times.back() == '\"') {
+      m_out << "<path " << m_line_color << ' ' << m_linewidth
+            << " fill-opacity=\"0\" d=\"" << m_path << "\">\n ";
     }
 
-    if (m_nframe == 0 || m_path_from.empty()) {
-      // write out start of path
-      m_out << "<path d=\"" << m_path << "\" " << m_line_color << ' '
-            << m_linewidth << " fill-opacity=\"0\">\n ";
-    } else if (m_nframe == 1) {
-      // write out first animate element
-      m_out << "<animate id=\"" << frame_id
-            << "\" attributeName=\"d\" attributeType=\"XML\" begin=\"1s;"
-            << last_frame_id << ".end\" dur=\"" << time - m_from_time
-            << "s\" fill=\"freeze\" from=\"" << m_path_from << "\" to=\""
-            << m_path << "\" />\n";
-    } else {
-      // write out other animate element
-      m_out << "<animate id=\"" << frame_id
-            << "\" attributeName=\"d\" attributeType=\"XML\" begin=\""
-            << prev_frame_id << ".end\" dur=\"" << time - m_from_time
-            << "s\" fill=\"freeze\" from=\"" << m_path_from << "\" to=\""
-            << m_path << "\" />\n";
-    }
-    m_path_from = m_path;
+    // all times are scaled by total time span (all times start at 0)
+    m_animate_times += std::to_string(time / m_time_span) + ';';
+    m_animate_values += m_path + ';';
     m_path.clear();
-    m_from_time = time;
-    m_nframe++;
   }
+
   inline void end_frames(const float time) {
-    m_end_of_frames = true;
     add_frame(time);
-    m_end_of_frames = false;
+    m_animate_times.back() = '\"';
+    m_animate_values.back() = '\"';
+    m_out << "<animate attributeName=\"d\" "
+             //"calcMode=\"discrete\" "
+             "repeatCount=\"indefinite\" "
+             "begin =\"0s\" "
+             "dur=\""
+          << m_time_span << "s\" " << m_animate_values << ' ' << m_animate_times
+          << "/>\n";
     m_out << "</path>\n";
   }
   inline void rounded_rect(const bfloat2_t &x, const float r) { rect(x); }
   inline void rect(const bfloat2_t &x) {
     const auto &delta = x.delta();
-    vfloat2_t point = x.min();
-    begin_path();
-    move_to(point);
-    point[0] += delta[0];
-    line_to(point);
-    point[1] += delta[1];
-    line_to(point);
-    point[0] -= delta[0];
-    line_to(point);
-    close_path();
+    vfloat2_t min = x.min();
+    m_out << "<rect x=\"" << min[0] << "\" y=\"" << min[1] << "\" width=\""
+          << delta[0] << "\" height=\"" << delta[1] << "\" " << m_fill_color
+          << ' ' << m_line_color << ' ' << m_linewidth;
+    if (!m_onmouseover_fill.empty() || !m_onmouseover_stroke.empty() ||
+        !m_onmouseout_tooltip.empty()) {
+      m_out << " onmouseover=\"" << m_onmouseover_fill << m_onmouseover_stroke
+            << m_onmouseover_tooltip << '\"';
+      m_out << " onmouseout=\"" << m_onmouseout_fill << m_onmouseout_stroke
+            << m_onmouseout_tooltip << '\"';
+    }
+
+    m_out << "/>\n";
   }
 
   inline void circle(const vfloat2_t &centre, float radius) {
     m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1]
           << "\" r=\"" << radius << "\" " << m_fill_color << ' ' << m_line_color
-          << ' ' << m_linewidth << "/>\n";
+          << ' ' << m_linewidth;
+    if (!m_onmouseover_fill.empty() || !m_onmouseover_stroke.empty() ||
+        !m_onmouseout_tooltip.empty()) {
+      m_out << " onmouseover=\"" << m_onmouseover_fill << m_onmouseover_stroke
+            << m_onmouseover_tooltip << '\"';
+      m_out << " onmouseout=\"" << m_onmouseout_fill << m_onmouseout_stroke
+            << m_onmouseout_tooltip << '\"';
+    }
+
+    m_out << "/>\n";
+
+    /*
+      arc(centre, radius, 0, pi);
+      arc(centre, radius, pi, 2 * pi);
+      */
+  }
+
+  inline void circle_with_text(const vfloat2_t &centre, float radius,
+                               const char *string) {
+    m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1]
+          << "\" r=\"" << radius << "\" " << m_fill_color << ' ' << m_line_color
+          << ' ' << m_linewidth
+          << " onmouseover=\"evt.target.setAttribute('stroke-opacity','1.0');"
+             "\" onmouseout=\"bob.setAttribute('stroke-opacity', '0.0');"
+             "\"/>\n";
+    auto text_pos = centre + 2.f * vfloat2_t(radius, -radius);
+    m_out << "<text id=\"bob\" x=\"" << text_pos[0] << "\" y=\"" << text_pos[1]
+          << "\" " << m_font_face << ' ' << m_font_size << ' ' << m_font_align
+          << ' ' << m_fill_color << '>' << string << "</text>\n";
+  }
+
+  inline void arc(const vfloat2_t &centre, const float radius,
+                  const float angle0, const float angle1) {
+    const vfloat2_t p0 =
+        centre + radius * vfloat2_t(std::cos(angle0), std::sin(angle0));
+    const vfloat2_t p1 =
+        centre + radius * vfloat2_t(std::cos(angle1), std::sin(angle1));
+    move_to(p0);
+    m_path += " A " + std::to_string(radius) + ' ' + std::to_string(radius) +
+              " 0 0 1 " + std::to_string(p1[0]) + ' ' + std::to_string(p1[1]);
   }
 
   inline void move_to(const vfloat2_t &x) {
@@ -162,11 +198,43 @@ public:
     m_line_color = std::string("stroke=\"") + color.to_rgb_string() +
                    "\" stroke-opacity=\"" + std::to_string(color.m_a / 255.0) +
                    '\"';
+    m_onmouseover_stroke.clear();
+    m_onmouseout_stroke.clear();
   };
+
+  inline void stroke_color(const RGBA &color, const RGBA &color_mouseover) {
+    stroke_color(color);
+    m_onmouseover_stroke = "evt.target.setAttribute('stroke', '" +
+                           color_mouseover.to_rgb_string() +
+                           "'); evt.target.setAttribute('stroke-opacity','" +
+                           std::to_string(color_mouseover.m_a / 255.0) + "');";
+    m_onmouseout_stroke = "evt.target.setAttribute('stroke', '" +
+                          color.to_rgb_string() +
+                          "'); evt.target.setAttribute('stroke-opacity','" +
+                          std::to_string(color.m_a / 255.0) + "');";
+  }
+
+  inline void tooltip(const vfloat2_t &x, const char *string) {
+    m_onmouseover_tooltip = "tooltip(" + std::to_string(x[0]) + ',' +
+                            std::to_string(x[1]) + ",'" + string + "'," +
+                            m_font_size_base + ",'" + m_font_face_base + "');";
+    m_onmouseout_tooltip = "remove_tooltip();";
+  }
+
+  inline void clear_tooltip() {
+    m_onmouseover_tooltip.clear();
+    m_onmouseout_tooltip.clear();
+  }
+
   inline void stroke_width(const float lw) {
     m_linewidth =
         std::string("stroke-width=\"") + std::to_string(lw) + std::string("\"");
   }
+  inline void fill_color(const RGBA &color) {
+    m_fill_color = "fill=\"" + color.to_rgb_string() + "\" fill-opacity=\"" +
+                   std::to_string(color.m_a / 255.0) + '\"';
+  }
+
   inline void stroke() {
     m_out << "<path d=\"" << m_path << "\" " << m_line_color << ' '
           << m_linewidth << " fill-opacity=\"0\"";
@@ -182,12 +250,29 @@ public:
       m_out << ' ' << m_transform.to_string();
     }
     m_out << "/>\n";
+    m_onmouseover_fill.clear();
+    m_onmouseout_fill.clear();
   }
+
+  inline void fill_color(const RGBA &color, const RGBA &color_mouseover) {
+    fill_color(color);
+    m_onmouseover_fill = "evt.target.setAttribute('fill', '" +
+                         color_mouseover.to_rgb_string() +
+                         "'); evt.target.setAttribute('fill-opacity','" +
+                         std::to_string(color_mouseover.m_a / 255.0) + "');";
+    m_onmouseout_fill = "evt.target.setAttribute('fill', '" +
+                        color.to_rgb_string() +
+                        "'); evt.target.setAttribute('fill-opacity','" +
+                        std::to_string(color.m_a / 255.0) + "');";
+  }
+
   inline void font_size(float size) {
+    m_font_size_base = std::to_string(size);
     m_font_size = "font-size=\"" + std::to_string(size) + '\"';
   }
 
   inline void font_face(const char *face) {
+    m_font_face_base = std::string(face);
     m_font_face = "font-family=\"" + std::string(face) + '\"';
   }
 
@@ -214,10 +299,6 @@ public:
     m_font_align = "text-anchor=\"" + align_text + "\" alignment-baseline=\"" +
                    vert_align_text + '\"';
   }
-  inline void fill_color(const RGBA &color) {
-    m_fill_color = "fill=\"" + color.to_rgb_string() + "\" fill-opacity=\"" +
-                   std::to_string(color.m_a / 255.0) + '\"';
-  }
 
   inline void text(const vfloat2_t &x, const char *string, const char *end) {
     m_out << "<text x=\"" << x[0] << "\" y=\"" << x[1] << "\" " << m_font_face
@@ -227,7 +308,7 @@ public:
     }
     m_out << '>' << string << "</text>\n";
   }
-};
+}; // namespace trase
 
 } // namespace trase
 

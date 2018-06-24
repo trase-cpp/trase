@@ -58,6 +58,8 @@ class BackendGL {
   GLFWwindow *m_window;
   NVGcontext *m_vg;
   FontManager m_fm;
+  RGBA m_stroke_color_mouseover;
+  RGBA m_fill_color_mouseover;
 
 public:
   void init(int x_pixels, int y_pixels, const char *name);
@@ -99,16 +101,22 @@ public:
   inline void rounded_rect(const bfloat2_t &x, const float r) {
     const auto &delta = x.delta();
     const auto &min = x.min();
+    begin_path();
     nvgRoundedRect(m_vg, min[0], min[1], delta[0], delta[1], r);
+    fill();
   }
   inline void rect(const bfloat2_t &x) {
     const auto &delta = x.delta();
     const auto &min = x.min();
+    begin_path();
     nvgRect(m_vg, min[0], min[1], delta[0], delta[1]);
+    fill();
   }
 
   inline void circle(const vfloat2_t &centre, float radius) {
+    begin_path();
     nvgArc(m_vg, centre[0], centre[1], radius, 0, 2 * M_PI, NVG_CW);
+    fill();
   }
 
   inline void move_to(const vfloat2_t &x) { nvgMoveTo(m_vg, x[0], x[1]); }
@@ -116,6 +124,7 @@ public:
   inline void stroke_color(const RGBA &color) {
     nvgStrokeColor(m_vg, nvgRGBA(color.m_r, color.m_g, color.m_b, color.m_a));
   }
+
   inline void stroke_width(const float lw) { nvgStrokeWidth(m_vg, lw); }
   inline void stroke() { nvgStroke(m_vg); }
   inline void fill() { nvgFill(m_vg); }
