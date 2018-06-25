@@ -40,7 +40,7 @@ namespace trase {
 template <typename Backend> void Figure::serialise(Backend &backend) {
   auto name = "Figure " + std::to_string(m_id);
   backend.init(m_pixels.bmax[0], m_pixels.bmax[1], m_time_span, name.c_str());
-  m_axis->serialise(backend);
+  m_axes.back()->serialise(backend);
   backend.finalise();
 }
 
@@ -53,19 +53,19 @@ template <typename Backend> void Figure::show(Backend &backend) {
     const vfloat2_t win_limits = backend.begin_frame();
     if ((win_limits != m_pixels.bmax).any()) {
       m_pixels.bmax = win_limits;
-      m_axis->resize(m_pixels);
+      m_axes.back()->resize(m_pixels);
     }
 
     if (backend.mouse_dragging()) {
       vfloat2_t delta = backend.mouse_drag_delta();
 
       // scale by axis pixel area
-      delta /= m_axis->pixels().bmax * vfloat2_t(-1, 1);
+      delta /= m_axes.back()->pixels().bmax * vfloat2_t(-1, 1);
 
       // scale by axis limits
-      delta *= m_axis->limits().delta();
+      delta *= m_axes.back()->limits().delta();
 
-      m_axis->limits() += delta;
+      m_axes.back()->limits() += delta;
       backend.mouse_drag_reset_delta();
     }
 
@@ -80,7 +80,7 @@ template <typename Backend> void Figure::show(Backend &backend) {
 
 template <typename Backend>
 void Figure::draw(Backend &backend, const float time) {
-  m_axis->draw(backend, time);
+  m_axes.back()->draw(backend, time);
 }
 
 } // namespace trase

@@ -51,7 +51,7 @@ class Figure : public Drawable {
   int m_id;
 
   /// the axis object for this figure
-  std::shared_ptr<Axis> m_axis;
+  std::vector<std::shared_ptr<Axis>> m_axes;
 
   /// total number of figures currentl created
   static int m_num_windows;
@@ -59,7 +59,7 @@ class Figure : public Drawable {
 public:
   explicit Figure(const std::array<float, 2> &pixels);
 
-  std::shared_ptr<Axis> axis() { return m_axis; }
+  std::shared_ptr<Axis> axis() { return m_axes.back(); }
 
   template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void show(Backend &backend);
