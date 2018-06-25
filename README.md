@@ -5,6 +5,8 @@
 Status](https://travis-ci.org/martinjrobins/trase.svg?branch=master)](https://travis-ci.org/martinjrobins/trase)
 [![Build 
 status](https://ci.appveyor.com/api/projects/status/kfm43tg6qltyjsyl/branch/master?svg=true)](https://ci.appveyor.com/project/martinjrobins/trase/branch/master)
+[![BCH 
+compliance](https://bettercodehub.com/edge/badge/trase-cpp/trase?branch=master)](https://bettercodehub.com/)
 
 Trase is a lightweight scientific plotting library for C++ with animation 
 support. It enables you to construct plots and write them out to animated svg 

@@ -1,0 +1,22 @@
+component_depth: 1
+languages:
+- name: cpp
+  production:
+    exclude:
+      - /tests/.*\.cpp
+      - /dirent/.*
+      - /font/.*
+      - /nanovg/.*
+      - /imgui/.*
+      - /glad/.*
+      - /tests/catch.hpp
+  test:
+    include:
+      - /tests/.*\.cpp
+    exclude:
+      - /dirent/.*
+      - /font/.*
+      - /nanovg/.*
+      - /imgui/.*
+      - /glad/.*
+      - /tests/catch.hpp
