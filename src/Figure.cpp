@@ -44,12 +44,18 @@ int Figure::m_num_windows = 0;
 Figure::Figure(const std::array<float, 2> &pixels)
     : Drawable(nullptr,
                bfloat2_t(vfloat2_t(0, 0), vfloat2_t(pixels[0], pixels[1]))),
-      m_id(++m_num_windows), m_axes{std::make_shared<Axis>(
-                                 *this,
-                                 bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f}))} {
-  m_children.push_back(m_axes.back().get());
+      m_id(++m_num_windows) {
   m_pixels = m_area;
-  m_axes.back()->resize(m_pixels);
 }
+
+std::shared_ptr<Axis> Figure::axis() noexcept {
+  m_axes.emplace_back(
+      std::make_shared<Axis>(*this, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f})));
+  m_axes.back()->resize(m_pixels);
+  m_children.push_back(m_axes.back().get());
+  return m_axes.back();
+}
+
+std::shared_ptr<Axis> Figure::axis(int n) { return m_axes.at(n); }
 
 } // namespace trase

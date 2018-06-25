@@ -59,7 +59,13 @@ class Figure : public Drawable {
 public:
   explicit Figure(const std::array<float, 2> &pixels);
 
-  std::shared_ptr<Axis> axis() { return m_axes.back(); }
+  /// Create a new axis and return a shared pointer to it
+  std::shared_ptr<Axis> axis() noexcept;
+
+  /// Return a shared pointer to an existing axis.
+  /// Throws std::out_of_range exception if out of range.
+  /// \param n the axis to return
+  std::shared_ptr<Axis> axis(int n);
 
   template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void show(Backend &backend);
