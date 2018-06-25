@@ -60,11 +60,13 @@ public:
   explicit Figure(const std::array<float, 2> &pixels);
 
   /// Create a new axis and return a shared pointer to it
+  /// \return a shared pointer to the new axis
   std::shared_ptr<Axis> axis() noexcept;
 
   /// Return a shared pointer to an existing axis.
   /// Throws std::out_of_range exception if out of range.
   /// \param n the axis to return
+  /// \return a shared pointer to the nth axis
   std::shared_ptr<Axis> axis(int n);
 
   template <typename Backend> void serialise(Backend &backend);

@@ -45,10 +45,12 @@ Axis::Axis(Figure &figure, const bfloat2_t &area)
                          std::numeric_limits<float>::min())),
       m_font_face("Roboto"), m_legend(false) {}
 
+std::shared_ptr<Plot1D> Axis::plot(int n) { return m_plot1d.at(n); }
+
 std::shared_ptr<Plot1D> Axis::plot_impl(std::vector<vfloat2_t> &&values,
                                         const std::string &label) {
   m_plot1d.emplace_back(std::make_shared<Plot1D>(*this));
-  m_children.push_back(&*m_plot1d.back());
+  m_children.push_back(m_plot1d.back().get());
   m_plot1d.back()->add_values(std::move(values), 0);
   m_plot1d.back()->set_color(default_colors[m_plot1d.size() - 1]);
   m_plot1d.back()->set_label(label);
