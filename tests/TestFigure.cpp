@@ -42,14 +42,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace trase;
 
-TEST_CASE("figure can be created", "[figure]") {
+TEST_CASE("check figure can be created", "[figure]") {
   Figure fig0({600, 300});
   auto fig1 = figure();
   auto fig2 = figure({800, 600});
 }
 
 
-TEST_CASE("axis methods can be invoked", "[figure]") {
+TEST_CASE("check axis methods can be invoked", "[figure]") {
   auto fig = figure();
 
   CHECK_NOTHROW(fig->axis());

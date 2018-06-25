@@ -37,6 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <type_traits>
 
 #include "trase.hpp"
+#include "Axis.hpp"
+#include "Figure.hpp"
+#include "Plot1D.hpp"
 
 using namespace trase;
 
@@ -44,6 +47,26 @@ TEST_CASE("axis can be created", "[axis]") {
   auto fig = figure({800, 600});
 
   Axis ax(*fig, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f}));
+}
+
+TEST_CASE("check plot methods can be invoked", "[axis]") {
+
+  std::vector<int> three_ints_a = {1, 2, 3};
+  std::vector<int> three_ints_b = {1, 2, 3};
+  std::vector<int> four_ints = {1, 2, 3, 4};
+
+  auto fig = figure();
+  auto ax = fig->axis();
+
+  CHECK_NOTHROW(ax->plot(three_ints_a, three_ints_b));
+  CHECK_NOTHROW(ax->plot(three_ints_a, three_ints_b));
+  CHECK_NOTHROW(ax->plot(0));
+  CHECK_NOTHROW(ax->plot(1));
+
+  CHECK_THROWS_AS(ax->plot(2), std::out_of_range);
+  CHECK_THROWS_AS(ax->plot(-1), std::out_of_range);
+
+  CHECK_THROWS_AS(ax->plot(three_ints_a, four_ints), std::exception);
 }
 
 TEST_CASE("check limit setting", "[axis]") {

@@ -82,6 +82,11 @@ public:
   void title(const char *string) { m_title.assign(string); }
   void legend() { m_legend = true; }
 
+  /// Create a new plot and return a shared pointer to it.
+  /// \param x the x-values to plot
+  /// \param y the y-values to plot
+  /// \param label the plot label. Defaults to empty string.
+  /// \return shared pointer to the new plot
   template <typename T1, typename T2>
   std::shared_ptr<Plot1D> plot(const std::vector<T1> &x,
                                const std::vector<T2> &y,
@@ -96,6 +101,12 @@ public:
     }
     return plot_impl(std::move(values), label);
   }
+
+  /// Return a shared pointer to an existing plot.
+  /// Throws std::out_of_range exception if out of range.
+  /// \param n the plot to return
+  /// \return a shared pointer to the nth plot
+  std::shared_ptr<Plot1D> plot(int n);
 
   template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
@@ -125,7 +136,7 @@ private:
   template <typename Backend> void draw_common(Backend &backend);
 
   void set_auto_ticks();
-}; // namespace trase
+};
 
 } // namespace trase
 
