@@ -47,3 +47,16 @@ TEST_CASE("figure can be created", "[figure]") {
   auto fig1 = figure();
   auto fig2 = figure({800, 600});
 }
+
+
+TEST_CASE("axis methods can be invoked", "[figure]") {
+  auto fig = figure();
+
+  CHECK_NOTHROW(fig->axis());
+  CHECK_NOTHROW(fig->axis());
+  CHECK_NOTHROW(fig->axis(0));
+  CHECK_NOTHROW(fig->axis(1));
+
+  CHECK_THROWS_AS(fig->axis(2), std::out_of_range);
+  CHECK_THROWS_AS(fig->axis(-1), std::out_of_range);
+}
