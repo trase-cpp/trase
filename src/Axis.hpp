@@ -55,6 +55,9 @@ class Axis : public Drawable {
   /// plot extents [x_min,y_min,x_max,y_max]
   bfloat2_t m_limits;
 
+  float m_line_width;
+  float m_font_size;
+
   std::string m_font_face;
   std::string m_xlabel;
   std::string m_ylabel;
