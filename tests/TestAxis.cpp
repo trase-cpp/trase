@@ -63,7 +63,7 @@ TEST_CASE("check plot methods can be invoked", "[axis]") {
   CHECK_THROWS_AS(ax->plot(2), std::out_of_range);
   CHECK_THROWS_AS(ax->plot(-1), std::out_of_range);
 
-  CHECK_THROWS_AS(ax->plot(three_ints_a, four_ints), std::exception);
+  CHECK_THROWS_AS(ax->plot(three_ints_a, four_ints), Exception);
 }
 
 TEST_CASE("check limit setting", "[axis]") {
