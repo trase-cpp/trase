@@ -138,6 +138,8 @@ private:
 
   template <typename Backend> void draw_common(Backend &backend);
 
+  template <typename Backend> void draw_common_legend(Backend &backend);
+
   void set_auto_ticks();
 };
 
