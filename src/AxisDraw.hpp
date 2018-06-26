@@ -138,41 +138,59 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
   backend.stroke_width(m_line_width / 2.f);
   backend.stroke();
 
-  // axis title
-  if (!m_title.empty()) {
-    backend.text_align(ALIGN_CENTER | ALIGN_BOTTOM);
-    backend.text(vfloat2_t(0.5f * (m_pixels.bmax[0] + m_pixels.bmin[0]),
-                           m_pixels.bmin[1] -
-                               0.05f * (m_pixels.bmax[1] - m_pixels.bmin[1])),
-                 m_title.c_str(), NULL);
+  draw_common_title(backend);
+  draw_common_xlabel(backend);
+  draw_common_ylabel(backend);
+  draw_common_legend(backend);
+}
+
+template <typename Backend> void Axis::draw_common_title(Backend &backend) {
+
+  if (m_title.empty()) {
+    return;
   }
 
-  // axis labels
-  if (!m_xlabel.empty()) {
-    backend.text_align(ALIGN_CENTER | ALIGN_TOP);
-    backend.text(vfloat2_t(0.5f * (m_pixels.bmax[0] + m_pixels.bmin[0]),
-                           m_pixels.bmax[1] +
-                               0.05f * (m_pixels.bmax[1] - m_pixels.bmin[1])),
-                 m_xlabel.c_str(), NULL);
+  backend.text_align(ALIGN_CENTER | ALIGN_BOTTOM);
+  backend.text(vfloat2_t(0.5f * (m_pixels.bmax[0] + m_pixels.bmin[0]),
+                         m_pixels.bmin[1] -
+                         0.05f * (m_pixels.bmax[1] - m_pixels.bmin[1])),
+               m_title.c_str(), NULL);
+}
+
+template <typename Backend> void Axis::draw_common_xlabel(Backend &backend) {
+
+  if (m_xlabel.empty()) {
+    return;
   }
 
-  if (!m_ylabel.empty()) {
-    backend.text_align(ALIGN_CENTER | ALIGN_BOTTOM);
-    const vfloat2_t point = vfloat2_t(
-        m_pixels.bmin[0] - 0.05f * (m_pixels.bmax[0] - m_pixels.bmin[0]),
-        0.5f * (m_pixels.bmax[1] + m_pixels.bmin[1]));
-    backend.translate(point);
-    backend.rotate(-pi / 2.0f);
-    backend.text(vfloat2_t(0.f, 0.f), m_ylabel.c_str(), NULL);
-    backend.reset_transform();
+  backend.text_align(ALIGN_CENTER | ALIGN_TOP);
+  backend.text(vfloat2_t(0.5f * (m_pixels.bmax[0] + m_pixels.bmin[0]),
+                         m_pixels.bmax[1] +
+                             0.05f * (m_pixels.bmax[1] - m_pixels.bmin[1])),
+               m_xlabel.c_str(), NULL);
+}
+
+template <typename Backend> void Axis::draw_common_ylabel(Backend &backend) {
+
+  if (m_ylabel.empty()) {
+    return;
   }
 
-  if (m_legend) {
-    draw_common_legend(backend);
-  }
+  backend.text_align(ALIGN_CENTER | ALIGN_BOTTOM);
+  const vfloat2_t point = vfloat2_t(
+      m_pixels.bmin[0] - 0.05f * (m_pixels.bmax[0] - m_pixels.bmin[0]),
+      0.5f * (m_pixels.bmax[1] + m_pixels.bmin[1]));
+  backend.translate(point);
+  backend.rotate(-pi / 2.0f);
+  backend.text(vfloat2_t(0.f, 0.f), m_ylabel.c_str(), NULL);
+  backend.reset_transform();
 }
 
 template <typename Backend> void Axis::draw_common_legend(Backend &backend) {
+
+  if (!m_legend) {
+    return;
+  }
 
   const float sample_length = 20.f;
 
