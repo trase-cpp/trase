@@ -37,9 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <type_traits>
 
 #include "trase.hpp"
-#include "Axis.hpp"
-#include "Figure.hpp"
-#include "Plot1D.hpp"
 
 using namespace trase;
 
