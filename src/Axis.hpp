@@ -49,12 +49,32 @@ class Axis;
 
 namespace trase {
 
+/// A helper struct for Axis that holds tick-related information
+struct TickInfo {
+  std::vector<float> x_val;
+  std::vector<float> y_val;
+  std::vector<float> x_pos;
+  std::vector<float> y_pos;
+
+  void clear() {
+    x_val.clear();
+    y_val.clear();
+    x_pos.clear();
+    y_pos.clear();
+  }
+};
+
 class Axis : public Drawable {
   std::vector<std::shared_ptr<Plot1D>> m_plot1d;
 
   /// plot extents [x_min,y_min,x_max,y_max]
   bfloat2_t m_limits;
 
+  int m_sig_digits;
+  int m_nx_ticks;
+  int m_ny_ticks;
+
+  float m_tick_len;
   float m_line_width;
   float m_font_size;
 
@@ -65,6 +85,9 @@ class Axis : public Drawable {
 
   /// true if legend is visible
   bool m_legend;
+
+  /// tick helper
+  TickInfo m_tick_info;
 
 public:
   Axis(Figure &figure, const bfloat2_t &area);
@@ -132,8 +155,13 @@ private:
   std::shared_ptr<Plot1D> plot_impl(std::vector<vfloat2_t> &&values,
                                     const std::string &label);
 
-  template <typename Backend> void draw_common(Backend &backend);
+  void update_tick_information();
+  vfloat2_t calculate_num_ticks();
 
+  template <typename Backend> void draw_common(Backend &backend);
+  template <typename Backend> void draw_common_axis_box(Backend &backend);
+  template <typename Backend> void draw_common_ticks(Backend &backend);
+  template <typename Backend> void draw_common_gridlines(Backend &backend);
   template <typename Backend> void draw_common_title(Backend &backend);
   template <typename Backend> void draw_common_xlabel(Backend &backend);
   template <typename Backend> void draw_common_ylabel(Backend &backend);

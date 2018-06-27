@@ -43,8 +43,8 @@ Axis::Axis(Figure &figure, const bfloat2_t &area)
                          std::numeric_limits<float>::max()),
                vfloat2_t(std::numeric_limits<float>::min(),
                          std::numeric_limits<float>::min())),
-      m_line_width(3.f), m_font_size(18.f), m_font_face("Roboto"),
-      m_legend(false) {}
+      m_sig_digits(2), m_ny_ticks(0), m_tick_len(10.f), m_line_width(3.f),
+      m_font_size(18.f), m_font_face("Roboto"), m_legend(false) {}
 
 std::shared_ptr<Plot1D> Axis::plot(int n) { return m_plot1d.at(n); }
 
