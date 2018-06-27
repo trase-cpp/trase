@@ -62,33 +62,27 @@ template <typename Backend> void Axis::serialise(Backend &backend) {
 }
 
 template <typename Backend> void Axis::draw_common(Backend &backend) {
+  update_tick_information();
 
+  draw_common_axis_box(backend);
+  draw_common_ticks(backend);
+  draw_common_gridlines(backend);
+  draw_common_title(backend);
+  draw_common_xlabel(backend);
+  draw_common_ylabel(backend);
+  draw_common_legend(backend);
+}
+
+template <typename Backend> void Axis::draw_common_axis_box(Backend &backend) {
   backend.stroke_width(m_line_width);
-
-  // axis box
   backend.stroke_color(RGBA(200, 200, 200, 255));
   backend.fill_color(RGBA(200, 200, 200, 255));
   backend.rect(m_pixels);
+}
 
-  // ticks
-  const auto pixel_delta = m_pixels.delta();
-  const auto limits_delta = m_limits.delta();
-  const int ny_ticks = 5;
-  vfloat2_t n_ticks(ny_ticks * pixel_delta[0] / pixel_delta[1], ny_ticks);
-  const int sig_digits = 2;
+template <typename Backend> void Axis::draw_common_ticks(Backend &backend) {
 
-  // calculate y tick locations
-  const auto tick_dx = round_off(limits_delta / n_ticks, sig_digits);
-  const auto tick_min = ceil(m_limits.bmin / tick_dx) * tick_dx;
-  const auto tick_max = floor(m_limits.bmax / tick_dx) * tick_dx;
-  n_ticks = (tick_max - tick_min) / tick_dx + 1.0f;
-
-  // scale to pixels
-  const auto tick_dx_pixels = tick_dx * pixel_delta / limits_delta;
-
-  const auto tick_min_pixels = to_pixel(tick_min);
-
-  const float tick_len = 10.0f;
+  char buffer[100];
 
   backend.begin_path();
   backend.font_size(m_font_size);
@@ -97,51 +91,109 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
   backend.text_align(ALIGN_CENTER | ALIGN_TOP);
   backend.fill_color(RGBA(0, 0, 0, 255));
 
-  // axis ticks
-  char buffer[100];
-  for (int i = 0; i < n_ticks[0]; ++i) {
-    const float tick_pos = tick_min_pixels[0] + i * tick_dx_pixels[0];
-    const float tick_val = tick_min[0] + i * tick_dx[0];
-    backend.move_to(vfloat2_t(tick_pos, m_pixels.bmax[1] + tick_len / 2));
-    backend.line_to(vfloat2_t(tick_pos, m_pixels.bmax[1]));
-    std::snprintf(buffer, sizeof(buffer), "%.*g", sig_digits + 1, tick_val);
-    backend.text(vfloat2_t(tick_pos, m_pixels.bmax[1] + tick_len / 2), buffer,
+  // x ticks
+  for (std::size_t i = 0; i < m_tick_info.x_pos.size(); ++i) {
+    const float pos = m_tick_info.x_pos[i];
+    const float val = m_tick_info.x_val[i];
+
+    backend.move_to(vfloat2_t(pos, m_pixels.bmax[1] + m_tick_len / 2));
+    backend.line_to(vfloat2_t(pos, m_pixels.bmax[1]));
+    std::snprintf(buffer, sizeof(buffer), "%.*g", m_sig_digits + 1, val);
+    backend.text(vfloat2_t(pos, m_pixels.bmax[1] + m_tick_len / 2), buffer,
                  NULL);
   }
+
   backend.text_align(ALIGN_RIGHT | ALIGN_MIDDLE);
-  for (int i = 0; i < n_ticks[1]; ++i) {
-    const float tick_pos = tick_min_pixels[1] - i * tick_dx_pixels[1];
-    const float tick_val = tick_min[1] + i * tick_dx[1];
-    backend.move_to(vfloat2_t(m_pixels.bmin[0] - tick_len / 2, tick_pos));
-    backend.line_to(vfloat2_t(m_pixels.bmin[0], tick_pos));
-    std::snprintf(buffer, sizeof(buffer), "%.*g", sig_digits + 1, tick_val);
-    backend.text(vfloat2_t(m_pixels.bmin[0] - tick_len / 2, tick_pos), buffer,
+
+  // y ticks
+  for (std::size_t i = 0; i < m_tick_info.y_pos.size(); ++i) {
+    const float pos = m_tick_info.y_pos[i];
+    const float val = m_tick_info.y_val[i];
+
+    backend.move_to(vfloat2_t(m_pixels.bmin[0] - m_tick_len / 2, pos));
+    backend.line_to(vfloat2_t(m_pixels.bmin[0], pos));
+    std::snprintf(buffer, sizeof(buffer), "%.*g", m_sig_digits + 1, val);
+    backend.text(vfloat2_t(m_pixels.bmin[0] - m_tick_len / 2, pos), buffer,
                  NULL);
   }
+
   backend.stroke_color(RGBA(0, 0, 0, 255));
   backend.stroke_width(m_line_width / 2);
   backend.stroke();
+}
 
-  // axis grid lines
+template <typename Backend> void Axis::draw_common_gridlines(Backend &backend) {
+
   backend.begin_path();
-  for (int i = 0; i < n_ticks[0]; ++i) {
-    const float tick_pos = tick_min_pixels[0] + i * tick_dx_pixels[0];
+
+  // x gridlines
+  for (const float &tick_pos : m_tick_info.x_pos) {
     backend.move_to(vfloat2_t(tick_pos, m_pixels.bmin[1]));
     backend.line_to(vfloat2_t(tick_pos, m_pixels.bmax[1]));
   }
-  for (int i = 0; i < n_ticks[1]; ++i) {
-    const float tick_pos = tick_min_pixels[1] - i * tick_dx_pixels[1];
+
+  // y gridlines
+  for (const float &tick_pos : m_tick_info.y_pos) {
     backend.move_to(vfloat2_t(m_pixels.bmin[0], tick_pos));
     backend.line_to(vfloat2_t(m_pixels.bmax[0], tick_pos));
   }
+
   backend.stroke_color(RGBA(255, 255, 255, 255));
   backend.stroke_width(m_line_width / 2.f);
   backend.stroke();
+}
 
-  draw_common_title(backend);
-  draw_common_xlabel(backend);
-  draw_common_ylabel(backend);
-  draw_common_legend(backend);
+void Axis::update_tick_information() {
+
+  // Use num ticks if user defined, or calculate with defaults
+  vfloat2_t n_ticks = calculate_num_ticks();
+
+  // Calculate ideal distance between ticks in limits coords
+  const vfloat2_t tick_dx = round_off(m_limits.delta() / n_ticks, m_sig_digits);
+
+  // Idealise the lowest pick position
+  const vfloat2_t tick_min = ceil(m_limits.bmin / tick_dx) * tick_dx;
+
+  // scale to pixels
+  const vfloat2_t tick_dx_pixels =
+      tick_dx * m_pixels.delta() / m_limits.delta();
+  const vfloat2_t tick_min_pixels = to_pixel(tick_min);
+
+  // Update values in the struct
+  m_tick_info.clear();
+
+  // x tick values and positions
+  for (int i = 0; i < static_cast<int>(n_ticks[0]); ++i) {
+    m_tick_info.x_val.emplace_back(tick_min[0] + i * tick_dx[0]);
+    m_tick_info.x_pos.emplace_back(tick_min_pixels[0] + i * tick_dx_pixels[0]);
+  }
+
+  // y tick values and positions
+  for (int i = 0; i < static_cast<int>(n_ticks[1]); ++i) {
+    m_tick_info.y_val.emplace_back(tick_min[1] + i * tick_dx[1]);
+    m_tick_info.y_pos.emplace_back(tick_min_pixels[1] - i * tick_dx_pixels[1]);
+  }
+}
+
+vfloat2_t Axis::calculate_num_ticks() {
+
+  if (m_nx_ticks > 0 && m_ny_ticks > 0) {
+    return {static_cast<float>(m_nx_ticks), static_cast<float>(m_ny_ticks)};
+  }
+
+  const float pix_ratio = m_pixels.delta()[0] / m_pixels.delta()[1];
+
+  if (m_nx_ticks > 0) {
+    const float n = static_cast<float>(m_nx_ticks);
+    return {n, std::floor(n / pix_ratio)};
+  }
+
+  if (m_ny_ticks > 0) {
+    const float n = static_cast<float>(m_ny_ticks);
+    return {std::floor(n * pix_ratio), n};
+  }
+
+  return {std::floor(5.f * pix_ratio), 5.f};
 }
 
 template <typename Backend> void Axis::draw_common_title(Backend &backend) {
@@ -153,7 +205,7 @@ template <typename Backend> void Axis::draw_common_title(Backend &backend) {
   backend.text_align(ALIGN_CENTER | ALIGN_BOTTOM);
   backend.text(vfloat2_t(0.5f * (m_pixels.bmax[0] + m_pixels.bmin[0]),
                          m_pixels.bmin[1] -
-                         0.05f * (m_pixels.bmax[1] - m_pixels.bmin[1])),
+                             0.05f * (m_pixels.bmax[1] - m_pixels.bmin[1])),
                m_title.c_str(), NULL);
 }
 
