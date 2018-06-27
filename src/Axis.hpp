@@ -123,11 +123,7 @@ public:
   }
 
   vfloat2_t to_pixel(const vfloat2_t &i) {
-    auto inv_delta = 1.0f / m_limits.delta();
-    return m_pixels.bmin +
-           m_pixels.delta() *
-               vfloat2_t((i[0] - m_limits.bmin[0]) * inv_delta[0],
-                         (m_limits.bmax[1] - i[1]) * inv_delta[1]);
+    return m_limits.to_coords(m_pixels, i);
   }
 
   void font_face(const std::string &fontFace) { m_font_face = fontFace; }
