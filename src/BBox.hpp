@@ -172,6 +172,27 @@ template <typename T, int N> struct bbox {
     }
     return false;
   }
+
+  ///
+  /// @brief given two bboxes representing the same cube in space, convert from
+  /// one coordinate system to another
+  ///
+  /// @param other the other bbox representing a different coordinate system
+  /// @param point the point in this bbox to convert to other's coords
+  /// @param y_inv whether to invert y (e.g. pixel to limits). Default true.
+  /// @return the new location of point in other's coords
+  ///
+  vector_t to_coords(bbox<T, N> &other, vector_t point, bool y_inv = true) {
+    vector_t len_ratio = other.delta() / delta();
+
+    // Get the relative position and invert y by default (e.g. limits->pixels)
+    vector_t rel_pos = point - bmin;
+    if (y_inv && N > 1) {
+      rel_pos[1] = bmax[1] - point[1];
+    }
+
+    return other.bmin + rel_pos * len_ratio;
+  }
 };
 
 ///
