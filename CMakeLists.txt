@@ -215,6 +215,7 @@ add_executable (
     tests/TestAxis.cpp
     tests/TestPlot1D.cpp
     tests/TestBackendSVG.cpp
+    tests/TestBBox.cpp
     tests/TestVector.cpp
     tests/TestTransform.cpp
     tests/TestFontManager.cpp
