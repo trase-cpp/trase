@@ -581,6 +581,12 @@ Vector<T, N> round_off(const Vector<T, N> &arg, int n) {
   return ret;
 }
 
+template <typename T, int N>
+Vector<bool, N> approx_equal(const Vector<T, N> &a, const Vector<T, N> &b,
+                             const T epsilon) {
+  return abs(b - a) <= Vector<T, N>::Constant(epsilon);
+}
+
 /// stream output operator for Vector class
 template <typename T, int N>
 std::ostream &operator<<(std::ostream &out, const Vector<T, N> &v) {
