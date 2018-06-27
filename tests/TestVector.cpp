@@ -427,6 +427,34 @@ TEST_CASE("round off", "[vector]") {
   CHECK((trase::round_off(b, 1) == b).all());
 }
 
+TEST_CASE("approx_equal", "[vector]") {
+
+  // Floating point tests
+  trase::Vector<double, 3> a = {1.234567, 2.345678, 3.7};
+  trase::Vector<double, 3> b = {1.2345670001, 2.3456780001, 3.7000000001};
+
+  const double epsilon = std::numeric_limits<double>::epsilon();
+  const double tooo_small = 0.00000000009;
+  const double just_right = 0.00000000011;
+
+  CHECK(trase::approx_equal(a, a, epsilon).all());
+  CHECK(trase::approx_equal(b, b, epsilon).all());
+
+  CHECK(!trase::approx_equal(a, b, epsilon).all());
+  CHECK(!trase::approx_equal(a, b, tooo_small).all());
+  CHECK(trase::approx_equal(a, b, just_right).all());
+
+  // Integer tests
+  trase::Vector<int, 3> c = {1, 2, 3};
+  trase::Vector<int, 3> d = {0, 1, 2};
+
+  CHECK(trase::approx_equal(c, c, 0).all());
+  CHECK(trase::approx_equal(d, d, 0).all());
+
+  CHECK(!trase::approx_equal(c, d, 0).all());
+  CHECK(trase::approx_equal(c, d, 1).all());
+}
+
 TEST_CASE("stream operators", "[vector]") {
 
   // Floating point ostream
