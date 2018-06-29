@@ -139,11 +139,7 @@ public:
   template <typename Backend> void draw(Backend &backend, float time);
 
   vfloat2_t from_pixel(const vfloat2_t &i) {
-    auto inv_delta = 1.0f / m_pixels.delta();
-    return m_limits.bmin +
-           m_limits.delta() *
-               vfloat2_t((i[0] - m_pixels.bmin[0]) * inv_delta[0],
-                         (m_pixels.bmax[1] - i[1]) * inv_delta[1]);
+    return m_pixels.to_coords(m_limits, i);
   }
 
   vfloat2_t to_pixel(const vfloat2_t &i) {
