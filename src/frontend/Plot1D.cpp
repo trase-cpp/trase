@@ -41,7 +41,7 @@ namespace trase {
 
 Plot1D::Plot1D(Axis &axis)
     : Drawable(&axis, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
-      m_axis(axis) {}
+      m_line_width(3.f), m_axis(axis) {}
 
 void Plot1D::add_values(std::vector<vfloat2_t> &&values, const float time) {
   m_values.emplace_back(std::move(values));

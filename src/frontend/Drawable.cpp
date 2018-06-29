@@ -48,28 +48,17 @@ void Drawable::resize(const bfloat2_t &parent_pixels) {
   }
 }
 
-float Drawable::get_frame_index(const float time) {
+void Drawable::update_frame_info(const float time) {
+
   // if time is outside time range clip it
-  float clipped_time;
-  if (time < 0) {
-    clipped_time = 0;
+  float clipped_time = time;
+  if (time < 0.f) {
+    clipped_time = 0.f;
   } else if (time > m_time_span) {
     clipped_time = m_time_span;
-  } else {
-    clipped_time = time;
   }
 
-  auto time_index = std::distance(
-      m_times.begin(),
-      std::lower_bound(m_times.begin(), m_times.end(), clipped_time));
-
-  if (time_index == 0) {
-    return 0.0f;
-  }
-
-  const float delta_t = m_times[time_index] - m_times[time_index - 1];
-  const float w1 = (clipped_time - m_times[time_index - 1]) / delta_t;
-  return static_cast<float>(time_index - 1) + w1;
+  m_frame_info.update(m_times, clipped_time);
 }
 
 void Drawable::add_frame_time(const float time) {

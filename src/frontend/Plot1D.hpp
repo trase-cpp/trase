@@ -58,6 +58,8 @@ class Plot1D : public Drawable {
   /// [xmin, ymin, xmax, ymax]
   bfloat2_t m_limits;
 
+  float m_line_width;
+
   RGBA m_color;
 
   /// parent axis
@@ -93,7 +95,13 @@ public:
   const RGBA &get_color() const { return m_color; }
 
   template <typename Backend> void serialise(Backend &backend);
+  template <typename Backend> void serialise_frames(Backend &backend);
+  template <typename Backend> void serialise_highlights(Backend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
+
+private:
+  template <typename Backend> void draw_plot(Backend &backend);
+  template <typename Backend> void draw_highlights(Backend &backend);
 
 }; // namespace trase
 

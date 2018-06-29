@@ -38,13 +38,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 template <typename Backend> void Plot1D::serialise(Backend &backend) {
-  const float lw = 3.0f;
+  serialise_frames(backend);
+  serialise_highlights(backend);
+}
 
-  // draw first frame
+template <typename Backend> void Plot1D::serialise_frames(Backend &backend) {
+
   backend.begin_frames();
   backend.stroke_color(m_color);
-  backend.stroke_width(lw);
+  backend.stroke_width(m_line_width);
 
+  // draw first frame
   backend.move_to(m_axis.to_pixel(m_values[0][0]));
   for (size_t i = 1; i < m_values[0].size(); ++i) {
     backend.line_to(m_axis.to_pixel(m_values[0][i]));
@@ -60,6 +64,10 @@ template <typename Backend> void Plot1D::serialise(Backend &backend) {
   }
 
   backend.end_frames(m_times.back());
+}
+
+template <typename Backend>
+void Plot1D::serialise_highlights(Backend &backend) {
 
   // highlighted points just for frame 0 and for stationary lines
   if (m_times.size() == 1) {
@@ -68,12 +76,12 @@ template <typename Backend> void Plot1D::serialise(Backend &backend) {
     color.m_a = 0;
     backend.stroke_color(RGBA(0, 0, 0, 0));
     backend.fill_color(color, m_color);
-    for (size_t i = 0; i < m_values[0].size(); ++i) {
-      auto point = m_values[0][i];
-      auto point_pixel = m_axis.to_pixel(point);
-      std::snprintf(buffer, sizeof(buffer), "(%f,%f)", point[0], point[1]);
-      backend.tooltip(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer);
-      backend.circle(point_pixel, 2 * lw);
+    for (const auto& value : m_values[0]) {
+      auto point_pixel = m_axis.to_pixel(value);
+      std::snprintf(buffer, sizeof(buffer), "(%f,%f)", value[0], value[1]);
+      backend.tooltip(
+          point_pixel + 2.f * vfloat2_t(m_line_width, -m_line_width), buffer);
+      backend.circle(point_pixel, 2 * m_line_width);
     }
     backend.clear_tooltip();
   }
@@ -81,43 +89,47 @@ template <typename Backend> void Plot1D::serialise(Backend &backend) {
 
 template <typename Backend>
 void Plot1D::draw(Backend &backend, const float time) {
-  const float lw = 3.0f;
+  update_frame_info(time);
+  draw_plot(backend);
+  draw_highlights(backend);
+}
 
-  // draw plot
+template <typename Backend> void Plot1D::draw_plot(Backend &backend) {
+
   backend.begin_path();
 
-  // are we exactly on a frame, or in-between?
-  float frame_i_float = get_frame_index(time);
-  int frame_i = std::ceil(frame_i_float);
-  const float w2 = frame_i - frame_i_float;
-  const float w1 = 1.0f - w2;
+  const int f = m_frame_info.frame_above;
+  const float w1 = m_frame_info.w1;
+  const float w2 = m_frame_info.w2;
 
   if (w2 == 0.0f) {
     // exactly on a single frame
-    backend.move_to(m_axis.to_pixel(m_values[frame_i][0]));
+    backend.move_to(m_axis.to_pixel(m_values[f][0]));
     for (size_t i = 1; i < m_values[0].size(); ++i) {
-      backend.line_to(m_axis.to_pixel(m_values[frame_i][i]));
+      backend.line_to(m_axis.to_pixel(m_values[f][i]));
     }
   } else {
     // between two frames
-    backend.move_to(m_axis.to_pixel(w1 * m_values[frame_i][0] +
-                                    w2 * m_values[frame_i - 1][0]));
+    backend.move_to(
+        m_axis.to_pixel(w1 * m_values[f][0] + w2 * m_values[f - 1][0]));
     for (size_t i = 1; i < m_values[0].size(); ++i) {
-      backend.line_to(m_axis.to_pixel(w1 * m_values[frame_i][i] +
-                                      w2 * m_values[frame_i - 1][i]));
+      backend.line_to(
+          m_axis.to_pixel(w1 * m_values[f][i] + w2 * m_values[f - 1][i]));
     }
   }
 
   backend.stroke_color(m_color);
-  backend.stroke_width(lw);
+  backend.stroke_width(m_line_width);
   backend.stroke();
+}
 
-  // draw highlighted point
+template <typename Backend> void Plot1D::draw_highlights(Backend &backend) {
 
   // get mouse position
   auto pos = vfloat2_t(std::numeric_limits<float>::max(),
                        std::numeric_limits<float>::max());
   auto mouse_pos = pos;
+
   if (backend.is_interactive()) {
     mouse_pos = backend.get_mouse_pos();
     if ((mouse_pos > m_pixels.bmin).all() &&
@@ -126,14 +138,13 @@ void Plot1D::draw(Backend &backend, const float time) {
     }
   }
 
-  // highlight mouseover point if we are exactly on a frame (i.e. a stationary
-  // line)
-  if (w2 == 0.f) {
+  // highlight mouse-over point if exactly on a frame (i.e. stationary line)
+  if (m_frame_info.w2 == 0.f) {
     float min_r2 = std::numeric_limits<float>::max();
     vfloat2_t min_point{};
     // exactly on a frame
     for (size_t i = 0; i < m_values[0].size(); ++i) {
-      const auto point = m_values[frame_i][i];
+      const auto point = m_values[m_frame_info.frame_above][i];
       auto point_r2 = (point - pos).squaredNorm();
       if (point_r2 < min_r2) {
         min_point = point;
@@ -145,15 +156,17 @@ void Plot1D::draw(Backend &backend, const float time) {
     auto point_pixel = m_axis.to_pixel(min_point);
 
     // if a point is within r2, then draw it
-    if ((mouse_pos - point_pixel).squaredNorm() < std::pow(2.f * lw, 2)) {
+    if ((mouse_pos - point_pixel).squaredNorm() <
+        std::pow(2.f * m_line_width, 2)) {
       backend.fill_color(m_color);
       backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
       char buffer[100];
       std::snprintf(buffer, sizeof(buffer), "(%f,%f)", min_point[0],
                     min_point[1]);
-      backend.circle(point_pixel, lw * 2);
+      backend.circle(point_pixel, m_line_width * 2);
       backend.fill_color(RGBA(0, 0, 0, 255));
-      backend.text(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer, nullptr);
+      backend.text(point_pixel + 2.f * vfloat2_t(m_line_width, -m_line_width),
+                   buffer, nullptr);
     }
   }
 }
