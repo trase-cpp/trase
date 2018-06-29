@@ -40,6 +40,8 @@ class Plot1D;
 }
 
 #include <array>
+#include <functional>
+#include <memory>
 #include <vector>
 
 #include "frontend/Axis.hpp"
@@ -49,47 +51,109 @@ class Plot1D;
 
 namespace trase {
 
-class Data {
+using Column = std::vector<float>;
+
+class RawData {
   // raw data set, can have any number of columns
-  std::vector<std::vector<float>> m_matrix;
-};
+  std::vector<Column> m_matrix;
 
-class Aesthetic {
-  int m_x;       // column index for the x-axis
-  int m_y;       // column index for the y-axis
-  int m_colour;  // column index to colour by
-  int m_opacity; // column index to colour by
-};
+public:
+  int cols() { return m_matrix.size(); };
 
-class Stat {
-  std::shared_ptr<Data> m_original;
-  std::shared_ptr<Aesthetic> m_aes;
-  Data m_transformed;
+  // assume that all columns are the same size
+  int rows() { return m_matrix[0].size(); };
 
-  enum Transform { Identity, Histogram };
-  Transform m_transform;
+  template <typename T> void add_column(const std::vector<T> &data) {
+    m_matrix.emplace_back();
 
-  Stat(std::shared_ptr<Data> original, Transform transform)
-      : m_original(original), m_transform(transform) {
-    if (m_transform == Histogram) {
-      // histogram the data
-    }
-    // note: do nothing for Identity
-  }
-  const Data &data() {
-    if (m_transform == Identity) {
-      return *m_original;
-    } else {
-      return m_transformed;
+    // if columns already exist then match the sizes
+    if (cols() > 1) {
+      m_matrix.back().resize(rows());
     }
   }
+
+  Column &operator[](const int i) { return m_matrix[i]; }
+  const Column &operator[](const int i) const { return m_matrix[i]; }
+  Column &at(const int i) { return m_matrix.at(i); }
+  const Column &at(const int i) const { return m_matrix.at(i); }
 };
 
-enum Geom { Point, Line, Box, ... };
+struct Aesthetic {
+  // aesthetic indexes must be able to index a vector with size=SIZE
+  static const int size = 3;
+  struct x {
+    const int index = 0;
+    const char *name = "x";
+  };
+  struct y {
+    const int index = 1;
+    const char *name = "y";
+  };
+  struct color {
+    const int index = 2;
+    const char *name = "color";
+  };
+};
+
+enum Geometry { Point, Line };
+
+class DataWithAesthetic {
+  /// matrix of raw data
+  std::shared_ptr<RawData> m_data;
+
+  /// the aethetics define the mapping from x,y,color,.. to column indices
+  std::array<int, Aesthetic::size> m_aesthetics;
+
+public:
+  DataWithAesthetic() : m_data(std::make_shared<RawData>()) {
+    std::fill(m_aesthetics.begin(), m_aesthetics.end(), -1);
+  }
+  DataWithAesthetic(std::shared_ptr<RawData> data) : m_data(data) {
+    std::fill(m_aesthetics.begin(), m_aesthetics.end(), -1);
+  }
+
+  template <typename Aesthetic> Column &operator[](const Aesthetic) {
+    const int index = m_aesthetics[Aesthetic::index];
+    if (index < 0) {
+      throw Exception(Aesthetic::name + std::string(" aestheic not provided"));
+    }
+    return (*m_data)[index];
+  };
+
+  template <typename Aesthetic>
+  Column &set_aesthetic(const Aesthetic, const Column &data) {
+    int index = m_aesthetics[Aesthetic::index];
+
+    // if aesthetic is not in data then add a new column
+    if (index < 0) {
+      m_aesthetics[Aesthetic::index] = m_data->cols();
+      index = m_aesthetics[Aesthetic::index];
+      m_data->add_column();
+    }
+
+    // copy new column to data matrix
+    std::copy(data.begin(), data.end(), m_data->at(index).begin());
+    return (*m_data)[index];
+  };
+};
+
+class Transform {
+  std::function<DataWithAesthetic(const DataWithAesthetic &)> m_transform;
+
+public:
+  template <typename T>
+  Transform(const T &transform) : m_transform(transform) {}
+  DataWithAesthetic operator()(const DataWithAesthetic &data) {
+    return m_transform(data);
+  }
+};
+
+/// Identity transform, just pass through...
+DataWithAesthetic identity(const DataWithAesthetic &data) { return data; }
 
 class Plot1D : public Drawable {
-  /// values
-  std::vector<std::vector<vfloat2_t>> m_values;
+  /// dataset
+  std::vector<std::shared_ptr<DataWithAesthetic>> m_data;
 
   /// label
   std::string m_label;
@@ -111,15 +175,13 @@ public:
     if (x.size() != y.size()) {
       throw Exception("x and y vector sizes do not match");
     }
-    std::vector<vfloat2_t> values(x.size());
-    for (size_t i = 0; i < x.size(); ++i) {
-      values[i][0] = x[i];
-      values[i][1] = y[i];
-    }
-    return add_values(std::move(values), time);
+    auto data = std::make_shared<DataWithAesthetic>();
+    data->set_aesthetic(Aesthetic::x(), x);
+    data->set_aesthetic(Aesthetic::y(), x);
+    return add_values(data, time);
   }
 
-  void add_values(std::vector<vfloat2_t> &&values, float time);
+  void add_values(std::shared_ptr<DataWithAesthetic> values, float time);
 
   const std::vector<vfloat2_t> &get_values(const int i) const {
     return m_values[i];
