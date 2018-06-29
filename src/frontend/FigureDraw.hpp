@@ -31,31 +31,63 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Figure.hpp"
-#include "BBox.hpp"
-#include "Vector.hpp"
 #include <array>
 #include <string>
 
+#include "frontend/Figure.hpp"
+
 namespace trase {
 
-int Figure::m_num_windows = 0;
-
-Figure::Figure(const std::array<float, 2> &pixels)
-    : Drawable(nullptr,
-               bfloat2_t(vfloat2_t(0, 0), vfloat2_t(pixels[0], pixels[1]))),
-      m_id(++m_num_windows) {
-  m_pixels = m_area;
+template <typename Backend> void Figure::serialise(Backend &backend) {
+  auto name = "Figure " + std::to_string(m_id);
+  backend.init(m_pixels.bmax[0], m_pixels.bmax[1], m_time_span, name.c_str());
+  for (const auto &axis : m_axes) {
+    axis->serialise(backend);
+  }
+  backend.finalise();
 }
 
-std::shared_ptr<Axis> Figure::axis() noexcept {
-  m_axes.emplace_back(
-      std::make_shared<Axis>(*this, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f})));
-  m_axes.back()->resize(m_pixels);
-  m_children.push_back(m_axes.back().get());
-  return m_axes.back();
+template <typename Backend> void Figure::show(Backend &backend) {
+  auto name = "Figure " + std::to_string(m_id);
+  backend.init(this->m_pixels.bmax[0], this->m_pixels.bmax[1], name.c_str());
+
+  // Main loop
+  while (!backend.should_close()) {
+    const vfloat2_t win_limits = backend.begin_frame();
+    if ((win_limits != m_pixels.bmax).any()) {
+      m_pixels.bmax = win_limits;
+      for (const auto &axis : m_axes) {
+        axis->resize(m_pixels);
+      }
+    }
+
+    if (backend.mouse_dragging()) {
+      vfloat2_t delta = backend.mouse_drag_delta();
+      for (const auto &axis : m_axes) {
+        // scale by axis pixel area
+        vfloat2_t ax_delta = delta / (axis->pixels().bmax * vfloat2_t(-1, 1));
+        // scale by axis limits
+        ax_delta *= axis->limits().delta();
+
+        axis->limits() += delta;
+      }
+      backend.mouse_drag_reset_delta();
+    }
+
+    const float time = backend.get_time();
+    const float looped_time = std::fmod(time, m_time_span);
+    draw(backend, looped_time);
+
+    backend.end_frame();
+  }
+  backend.finalise();
 }
 
-std::shared_ptr<Axis> Figure::axis(int n) { return m_axes.at(n); }
+template <typename Backend>
+void Figure::draw(Backend &backend, const float time) {
+  for (const auto &axis : m_axes) {
+    axis->draw(backend, time);
+  }
+}
 
 } // namespace trase

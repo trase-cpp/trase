@@ -31,62 +31,55 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Figure.hpp"
+#ifndef FIGURE_H_
+#define FIGURE_H_
+
+// forward declare Figure so can be stored in Axis
+namespace trase {
+class Figure;
+}
+
 #include <array>
-#include <string>
+#include <memory>
+
+#include "frontend/Axis.hpp"
+#include "frontend/Drawable.hpp"
 
 namespace trase {
 
-template <typename Backend> void Figure::serialise(Backend &backend) {
-  auto name = "Figure " + std::to_string(m_id);
-  backend.init(m_pixels.bmax[0], m_pixels.bmax[1], m_time_span, name.c_str());
-  for (const auto &axis : m_axes) {
-    axis->serialise(backend);
-  }
-  backend.finalise();
-}
+class Figure : public Drawable {
+  /// a unique id for this figure
+  int m_id;
 
-template <typename Backend> void Figure::show(Backend &backend) {
-  auto name = "Figure " + std::to_string(m_id);
-  backend.init(this->m_pixels.bmax[0], this->m_pixels.bmax[1], name.c_str());
+  /// the axis object for this figure
+  std::vector<std::shared_ptr<Axis>> m_axes;
 
-  // Main loop
-  while (!backend.should_close()) {
-    const vfloat2_t win_limits = backend.begin_frame();
-    if ((win_limits != m_pixels.bmax).any()) {
-      m_pixels.bmax = win_limits;
-      for (const auto &axis : m_axes) {
-        axis->resize(m_pixels);
-      }
-    }
+  /// total number of figures currentl created
+  static int m_num_windows;
 
-    if (backend.mouse_dragging()) {
-      vfloat2_t delta = backend.mouse_drag_delta();
-      for (const auto &axis : m_axes) {
-        // scale by axis pixel area
-        vfloat2_t ax_delta = delta / (axis->pixels().bmax * vfloat2_t(-1, 1));
-        // scale by axis limits
-        ax_delta *= axis->limits().delta();
+public:
+  explicit Figure(const std::array<float, 2> &pixels);
 
-        axis->limits() += delta;
-      }
-      backend.mouse_drag_reset_delta();
-    }
+  /// Create a new axis and return a shared pointer to it
+  /// \return a shared pointer to the new axis
+  std::shared_ptr<Axis> axis() noexcept;
 
-    const float time = backend.get_time();
-    const float looped_time = std::fmod(time, m_time_span);
-    draw(backend, looped_time);
+  /// Return a shared pointer to an existing axis.
+  /// Throws std::out_of_range exception if out of range.
+  /// \param n the axis to return
+  /// \return a shared pointer to the nth axis
+  std::shared_ptr<Axis> axis(int n);
 
-    backend.end_frame();
-  }
-  backend.finalise();
-}
+  template <typename Backend> void serialise(Backend &backend);
+  template <typename Backend> void show(Backend &backend);
+  template <typename Backend> void draw(Backend &backend, float time);
+};
 
-template <typename Backend>
-void Figure::draw(Backend &backend, const float time) {
-  for (const auto &axis : m_axes) {
-    axis->draw(backend, time);
-  }
+inline std::shared_ptr<Figure> figure(std::array<float, 2> pixels = {
+                                          {800.0, 600.0}}) {
+  return std::make_shared<Figure>(pixels);
 }
 
 } // namespace trase
+
+#endif // FIGURE_H_

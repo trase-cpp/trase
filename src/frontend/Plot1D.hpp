@@ -31,32 +31,72 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Figure.hpp"
-#include "Vector.hpp"
-#include <limits>
+#ifndef PLOT1D_H_
+#define PLOT1D_H_
+
+// forward declare Plot1D so can be used in Axis
+namespace trase {
+class Plot1D;
+}
+
+#include <array>
+
+#include "frontend/Axis.hpp"
+#include "frontend/Drawable.hpp"
+#include "util/Colors.hpp"
+#include "util/Exception.hpp"
 
 namespace trase {
 
-Axis::Axis(Figure &figure, const bfloat2_t &area)
-    : Drawable(&figure, area),
-      m_limits(vfloat2_t(std::numeric_limits<float>::max(),
-                         std::numeric_limits<float>::max()),
-               vfloat2_t(std::numeric_limits<float>::min(),
-                         std::numeric_limits<float>::min())),
-      m_sig_digits(2), m_ny_ticks(0), m_tick_len(10.f), m_line_width(3.f),
-      m_font_size(18.f), m_font_face("Roboto"), m_legend(false) {}
+class Plot1D : public Drawable {
+  /// values
+  std::vector<std::vector<vfloat2_t>> m_values;
 
-std::shared_ptr<Plot1D> Axis::plot(int n) { return m_plot1d.at(n); }
+  /// label
+  std::string m_label;
 
-std::shared_ptr<Plot1D> Axis::plot_impl(std::vector<vfloat2_t> &&values,
-                                        const std::string &label) {
-  m_plot1d.emplace_back(std::make_shared<Plot1D>(*this));
-  m_children.push_back(m_plot1d.back().get());
-  m_plot1d.back()->add_values(std::move(values), 0);
-  m_plot1d.back()->set_color(default_colors[m_plot1d.size() - 1]);
-  m_plot1d.back()->set_label(label);
-  m_plot1d.back()->resize(m_pixels);
-  return m_plot1d.back();
-}
+  /// [xmin, ymin, xmax, ymax]
+  bfloat2_t m_limits;
+
+  RGBA m_color;
+
+  /// parent axis
+  Axis &m_axis;
+
+public:
+  explicit Plot1D(Axis &axis);
+
+  template <typename T1, typename T2>
+  void add_frame(const std::vector<T1> &x, const std::vector<T2> &y,
+                 const float time) {
+    if (x.size() != y.size()) {
+      throw Exception("x and y vector sizes do not match");
+    }
+    std::vector<vfloat2_t> values(x.size());
+    for (size_t i = 0; i < x.size(); ++i) {
+      values[i][0] = x[i];
+      values[i][1] = y[i];
+    }
+    return add_values(std::move(values), time);
+  }
+
+  void add_values(std::vector<vfloat2_t> &&values, float time);
+
+  const std::vector<vfloat2_t> &get_values(const int i) const {
+    return m_values[i];
+  }
+  std::vector<vfloat2_t> &get_values(const int i) { return m_values[i]; }
+
+  void set_color(const RGBA &color) { m_color = color; }
+  void set_label(const std::string &label) { m_label = label; }
+  const std::string &get_label() const { return m_label; }
+  const RGBA &get_color() const { return m_color; }
+
+  template <typename Backend> void serialise(Backend &backend);
+  template <typename Backend> void draw(Backend &backend, float time);
+
+}; // namespace trase
 
 } // namespace trase
+
+#endif // PLOT1D_H_

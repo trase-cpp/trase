@@ -31,27 +31,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Plot1D.hpp"
-#include "Vector.hpp"
-#include <numeric>
+#include "frontend/Figure.hpp"
+
+#include <array>
+#include <string>
+
+#include "util/BBox.hpp"
+#include "util/Vector.hpp"
 
 namespace trase {
 
-Plot1D::Plot1D(Axis &axis)
-    : Drawable(&axis, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
-      m_axis(axis) {}
+int Figure::m_num_windows = 0;
 
-void Plot1D::add_values(std::vector<vfloat2_t> &&values, const float time) {
-  m_values.emplace_back(std::move(values));
-  if (time > 0) {
-    add_frame_time(time);
-  }
-  m_limits =
-      std::accumulate(m_values.back().begin(), m_values.back().end(), m_limits,
-                      [](auto a, auto b) { return a + bfloat2_t(b); });
-
-  const float buffer = 1.05f;
-  m_axis.limits() += m_limits * vfloat2_t(buffer, buffer);
+Figure::Figure(const std::array<float, 2> &pixels)
+    : Drawable(nullptr,
+               bfloat2_t(vfloat2_t(0, 0), vfloat2_t(pixels[0], pixels[1]))),
+      m_id(++m_num_windows) {
+  m_pixels = m_area;
 }
+
+std::shared_ptr<Axis> Figure::axis() noexcept {
+  m_axes.emplace_back(
+      std::make_shared<Axis>(*this, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f})));
+  m_axes.back()->resize(m_pixels);
+  m_children.push_back(m_axes.back().get());
+  return m_axes.back();
+}
+
+std::shared_ptr<Axis> Figure::axis(int n) { return m_axes.at(n); }
 
 } // namespace trase

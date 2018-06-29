@@ -31,7 +31,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "BackendSVG.hpp"
+#include "backend/BackendSVG.hpp"
 
 namespace trase {
 
@@ -79,26 +79,26 @@ void BackendSVG::finalise() {
 
 } // namespace trase
 
-#include "DrawableDraw.hpp"
+#include "frontend/DrawableDraw.hpp"
 
 namespace trase {
 template void Drawable::serialise<BackendSVG>(BackendSVG &backend);
 } // namespace trase
 
-#include "FigureDraw.hpp"
+#include "frontend/FigureDraw.hpp"
 
 namespace trase {
 template void Figure::serialise<BackendSVG>(BackendSVG &backend);
 } // namespace trase
 
-#include "AxisDraw.hpp"
+#include "frontend/AxisDraw.hpp"
 
 namespace trase {
 template void Axis::serialise<BackendSVG>(BackendSVG &backend);
 template void Axis::draw_common<BackendSVG>(BackendSVG &backend);
 } // namespace trase
 
-#include "Plot1DDraw.hpp"
+#include "frontend/Plot1DDraw.hpp"
 
 namespace trase {
 template void Plot1D::serialise<BackendSVG>(BackendSVG &backend);

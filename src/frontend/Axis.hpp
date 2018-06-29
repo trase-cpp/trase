@@ -39,13 +39,14 @@ namespace trase {
 class Axis;
 }
 
-#include "Colors.hpp"
-#include "Drawable.hpp"
-#include "Exception.hpp"
-#include "Figure.hpp"
-#include "Plot1D.hpp"
 #include <array>
 #include <memory>
+
+#include "frontend/Drawable.hpp"
+#include "frontend/Figure.hpp"
+#include "frontend/Plot1D.hpp"
+#include "util/Colors.hpp"
+#include "util/Exception.hpp"
 
 namespace trase {
 

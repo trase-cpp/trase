@@ -31,54 +31,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FIGURE_H_
-#define FIGURE_H_
-
-// forward declare Figure so can be stored in Axis
-namespace trase {
-class Figure;
-}
-
-#include "Axis.hpp"
-#include "Drawable.hpp"
-#include <array>
-#include <memory>
+#include "frontend/Drawable.hpp"
 
 namespace trase {
 
-class Figure : public Drawable {
-  /// a unique id for this figure
-  int m_id;
+template <typename Backend>
+void Drawable::draw(Backend &backend, const float time) {}
 
-  /// the axis object for this figure
-  std::vector<std::shared_ptr<Axis>> m_axes;
-
-  /// total number of figures currentl created
-  static int m_num_windows;
-
-public:
-  explicit Figure(const std::array<float, 2> &pixels);
-
-  /// Create a new axis and return a shared pointer to it
-  /// \return a shared pointer to the new axis
-  std::shared_ptr<Axis> axis() noexcept;
-
-  /// Return a shared pointer to an existing axis.
-  /// Throws std::out_of_range exception if out of range.
-  /// \param n the axis to return
-  /// \return a shared pointer to the nth axis
-  std::shared_ptr<Axis> axis(int n);
-
-  template <typename Backend> void serialise(Backend &backend);
-  template <typename Backend> void show(Backend &backend);
-  template <typename Backend> void draw(Backend &backend, float time);
-};
-
-inline std::shared_ptr<Figure> figure(std::array<float, 2> pixels = {
-                                          {800.0, 600.0}}) {
-  return std::make_shared<Figure>(pixels);
-}
+template <typename Backend> void Drawable::serialise(Backend &out) {}
 
 } // namespace trase
-
-#endif // FIGURE_H_

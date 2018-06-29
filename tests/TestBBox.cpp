@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sstream>
 
-#include "BBox.hpp"
+#include "util/BBox.hpp"
 
 TEST_CASE("bbox constructors", "[bbox]") {
 
