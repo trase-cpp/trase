@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <vector>
 
-#include "Vector.hpp"
+#include "util/Vector.hpp"
 
 namespace trase {
 

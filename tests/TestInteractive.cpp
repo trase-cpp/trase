@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <limits>
 #include <type_traits>
 
-#include "BackendGL.hpp"
+#include "backend/BackendGL.hpp"
 #include "trase.hpp"
 
 using namespace trase;

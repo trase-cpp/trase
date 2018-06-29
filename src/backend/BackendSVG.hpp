@@ -34,11 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BACKENDSVG_H_
 #define BACKENDSVG_H_
 
-#include "BBox.hpp"
-#include "Backend.hpp"
-#include "Colors.hpp"
-#include "Exception.hpp"
-#include "Vector.hpp"
+#include "backend/Backend.hpp"
+#include "util/BBox.hpp"
+#include "util/Colors.hpp"
+#include "util/Exception.hpp"
+#include "util/Vector.hpp"
 
 #include <ostream>
 
@@ -308,7 +308,7 @@ public:
     }
     m_out << '>' << string << "</text>\n";
   }
-}; // namespace trase
+};
 
 } // namespace trase
 

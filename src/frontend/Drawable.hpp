@@ -31,63 +31,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Drawable.hpp"
-#include "Exception.hpp"
+#ifndef DRAWABLE_H_
+#define DRAWABLE_H_
+
+#include <array>
+#include <ostream>
+#include <vector>
+
+#include "util/BBox.hpp"
 
 namespace trase {
 
-Drawable::Drawable(Drawable *parent, const bfloat2_t &area_of_parent)
-    : m_parent(parent), m_area(area_of_parent), m_time_span(0), m_times({0}) {}
+class Drawable {
+protected:
+  /// a list of Drawables that are children of this object
+  std::vector<Drawable *> m_children;
 
-void Drawable::resize(const bfloat2_t &parent_pixels) {
-  m_pixels.bmin = m_area.bmin * parent_pixels.delta() + parent_pixels.min();
-  m_pixels.bmax = m_area.bmax * parent_pixels.delta() + parent_pixels.min();
-  for (auto &i : m_children) {
-    i->resize(m_pixels);
-  }
-}
+  /// parent of this object
+  Drawable *m_parent;
 
-float Drawable::get_frame_index(const float time) {
-  // if time is outside time range clip it
-  float clipped_time;
-  if (time < 0) {
-    clipped_time = 0;
-  } else if (time > m_time_span) {
-    clipped_time = m_time_span;
-  } else {
-    clipped_time = time;
-  }
+  /// the area of this object as a ratio of its parent object
+  bfloat2_t m_area;
 
-  auto time_index = std::distance(
-      m_times.begin(),
-      std::lower_bound(m_times.begin(), m_times.end(), clipped_time));
+  /// the area of this object in raw pixels
+  bfloat2_t m_pixels;
 
-  if (time_index == 0) {
-    return 0.0f;
-  }
+  /// the animation time span
+  float m_time_span;
 
-  const float delta_t = m_times[time_index] - m_times[time_index - 1];
-  const float w1 = (clipped_time - m_times[time_index - 1]) / delta_t;
-  return static_cast<float>(time_index - 1) + w1;
-}
+  /// the animation frame times
+  std::vector<float> m_times;
 
-void Drawable::add_frame_time(const float time) {
-  if (time < m_times.back()) {
-    throw Exception("cannot add frame with time less than max frame time");
-  }
-  m_times.push_back(time);
-  update_time_span(time);
-}
-
-void Drawable::update_time_span(const float time) {
-  if (time > m_time_span) {
-    m_time_span = time;
-  }
-
-  // need to inform parents
-  if (m_parent != nullptr) {
-    m_parent->update_time_span(time);
-  }
-}
+public:
+  Drawable(Drawable *parent, const bfloat2_t &area_of_parent);
+  void resize(const bfloat2_t &parent_pixels);
+  void update_time_span(float time);
+  void add_frame_time(float time);
+  float get_frame_index(float time);
+  const bfloat2_t &pixels() { return m_pixels; }
+  const bfloat2_t &area() { return m_pixels; }
+  template <typename Backend> void serialise(Backend &backend);
+  template <typename Backend> void draw(Backend &backend, float time);
+};
 
 } // namespace trase
+
+#endif // DRAWABLE_H_

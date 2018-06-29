@@ -31,13 +31,64 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Drawable.hpp"
+#include "frontend/Drawable.hpp"
+
+#include "util/Exception.hpp"
 
 namespace trase {
 
-template <typename Backend>
-void Drawable::draw(Backend &backend, const float time) {}
+Drawable::Drawable(Drawable *parent, const bfloat2_t &area_of_parent)
+    : m_parent(parent), m_area(area_of_parent), m_time_span(0), m_times({0}) {}
 
-template <typename Backend> void Drawable::serialise(Backend &out) {}
+void Drawable::resize(const bfloat2_t &parent_pixels) {
+  m_pixels.bmin = m_area.bmin * parent_pixels.delta() + parent_pixels.min();
+  m_pixels.bmax = m_area.bmax * parent_pixels.delta() + parent_pixels.min();
+  for (auto &i : m_children) {
+    i->resize(m_pixels);
+  }
+}
+
+float Drawable::get_frame_index(const float time) {
+  // if time is outside time range clip it
+  float clipped_time;
+  if (time < 0) {
+    clipped_time = 0;
+  } else if (time > m_time_span) {
+    clipped_time = m_time_span;
+  } else {
+    clipped_time = time;
+  }
+
+  auto time_index = std::distance(
+      m_times.begin(),
+      std::lower_bound(m_times.begin(), m_times.end(), clipped_time));
+
+  if (time_index == 0) {
+    return 0.0f;
+  }
+
+  const float delta_t = m_times[time_index] - m_times[time_index - 1];
+  const float w1 = (clipped_time - m_times[time_index - 1]) / delta_t;
+  return static_cast<float>(time_index - 1) + w1;
+}
+
+void Drawable::add_frame_time(const float time) {
+  if (time < m_times.back()) {
+    throw Exception("cannot add frame with time less than max frame time");
+  }
+  m_times.push_back(time);
+  update_time_span(time);
+}
+
+void Drawable::update_time_span(const float time) {
+  if (time > m_time_span) {
+    m_time_span = time;
+  }
+
+  // need to inform parents
+  if (m_parent != nullptr) {
+    m_parent->update_time_span(time);
+  }
+}
 
 } // namespace trase

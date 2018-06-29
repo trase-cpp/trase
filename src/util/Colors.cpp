@@ -31,48 +31,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef DRAWABLE_H_
-#define DRAWABLE_H_
+#include "util/Colors.hpp"
 
-#include "BBox.hpp"
-#include <array>
-#include <ostream>
-#include <vector>
-
-namespace trase {
-
-class Drawable {
-protected:
-  /// a list of Drawables that are children of this object
-  std::vector<Drawable *> m_children;
-
-  /// parent of this object
-  Drawable *m_parent;
-
-  /// the area of this object as a ratio of its parent object
-  bfloat2_t m_area;
-
-  /// the area of this object in raw pixels
-  bfloat2_t m_pixels;
-
-  /// the animation time span
-  float m_time_span;
-
-  /// the animation frame times
-  std::vector<float> m_times;
-
-public:
-  Drawable(Drawable *parent, const bfloat2_t &area_of_parent);
-  void resize(const bfloat2_t &parent_pixels);
-  void update_time_span(float time);
-  void add_frame_time(float time);
-  float get_frame_index(float time);
-  const bfloat2_t &pixels() { return m_pixels; }
-  const bfloat2_t &area() { return m_pixels; }
-  template <typename Backend> void serialise(Backend &backend);
-  template <typename Backend> void draw(Backend &backend, float time);
-};
-
-} // namespace trase
-
-#endif // DRAWABLE_H_
+namespace trase {} // namespace trase

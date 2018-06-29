@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fstream>
 
-#include "BackendSVG.hpp"
+#include "backend/BackendSVG.hpp"
 #include "trase.hpp"
 
 using namespace trase;

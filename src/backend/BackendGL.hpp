@@ -39,18 +39,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GLFW_INCLUDE_GLEXT
 #include <GLFW/glfw3.h>
 
-#include "imgui.h"
 #include <array>
 #include <iostream>
 #include <stdio.h>
 
+#include "imgui.h"
 #include "nanovg.h"
 
-#include "BBox.hpp"
-#include "Backend.hpp"
-#include "Colors.hpp"
-#include "Exception.hpp"
-#include "Vector.hpp"
+#include "backend/Backend.hpp"
+#include "util/BBox.hpp"
+#include "util/Colors.hpp"
+#include "util/Exception.hpp"
+#include "util/Vector.hpp"
 
 namespace trase {
 

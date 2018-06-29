@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <type_traits>
 
-#include "Vector.hpp"
+#include "util/Vector.hpp"
 
 TEST_CASE("vector constructors", "[vector]") {
 
