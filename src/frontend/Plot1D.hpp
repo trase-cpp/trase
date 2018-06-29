@@ -40,6 +40,7 @@ class Plot1D;
 }
 
 #include <array>
+#include <vector>
 
 #include "frontend/Axis.hpp"
 #include "frontend/Drawable.hpp"
@@ -47,6 +48,44 @@ class Plot1D;
 #include "util/Exception.hpp"
 
 namespace trase {
+
+class Data {
+  // raw data set, can have any number of columns
+  std::vector<std::vector<float>> m_matrix;
+};
+
+class Aesthetic {
+  int m_x;       // column index for the x-axis
+  int m_y;       // column index for the y-axis
+  int m_colour;  // column index to colour by
+  int m_opacity; // column index to colour by
+};
+
+class Stat {
+  std::shared_ptr<Data> m_original;
+  std::shared_ptr<Aesthetic> m_aes;
+  Data m_transformed;
+
+  enum Transform { Identity, Histogram };
+  Transform m_transform;
+
+  Stat(std::shared_ptr<Data> original, Transform transform)
+      : m_original(original), m_transform(transform) {
+    if (m_transform == Histogram) {
+      // histogram the data
+    }
+    // note: do nothing for Identity
+  }
+  const Data &data() {
+    if (m_transform == Identity) {
+      return *m_original;
+    } else {
+      return m_transformed;
+    }
+  }
+};
+
+enum Geom { Point, Line, Box, ... };
 
 class Plot1D : public Drawable {
   /// values
