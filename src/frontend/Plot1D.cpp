@@ -43,17 +43,22 @@ Plot1D::Plot1D(Axis &axis)
     : Drawable(&axis, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
       m_axis(axis) {}
 
-void Plot1D::add_values(std::shared_ptr<DataWithAesthetic> values, float time) {
-  m_data.push_back(values);
+void Plot1D::add_frame(const std::shared_ptr<DataWithAesthetic> &data,
+                       float time) {
+  // add new data frame
+  m_data.push_back(data);
+
+  // add new frame time
   if (time > 0) {
     add_frame_time(time);
   }
-  m_limits =
-      std::accumulate(m_values.back().begin(), m_values.back().end(), m_limits,
-                      [](auto a, auto b) { return a + bfloat2_t(b); });
 
+  // update limits with new frame
+  m_limits += data->limits();
+
+  // communicate limits to parent axis
   const float buffer = 1.05f;
-  m_axis.limits() += m_limits * vfloat2_t(buffer, buffer);
+  m_axis.limits() += m_limits * Limits::vector_t::Constant(buffer);
 }
 
 } // namespace trase

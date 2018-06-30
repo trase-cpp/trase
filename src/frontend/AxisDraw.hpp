@@ -150,14 +150,18 @@ void Axis::update_tick_information() {
   vfloat2_t n_ticks = calculate_num_ticks();
 
   // Calculate ideal distance between ticks in limits coords
-  const vfloat2_t tick_dx = round_off(m_limits.delta() / n_ticks, m_sig_digits);
+  bfloat2_t xy_limits(
+      {m_limits.bmin[Aesthetic::x::index], m_limits.bmin[Aesthetic::y::index]},
+      {m_limits.bmax[Aesthetic::x::index], m_limits.bmax[Aesthetic::y::index]});
+  const vfloat2_t tick_dx =
+      round_off(xy_limits.delta() / n_ticks, m_sig_digits);
 
   // Idealise the lowest pick position
-  const vfloat2_t tick_min = ceil(m_limits.bmin / tick_dx) * tick_dx;
+  const vfloat2_t tick_min = ceil(xy_limits.bmin / tick_dx) * tick_dx;
 
   // scale to pixels
   const vfloat2_t tick_dx_pixels =
-      tick_dx * m_pixels.delta() / m_limits.delta();
+      tick_dx * m_pixels.delta() / xy_limits.delta();
   const vfloat2_t tick_min_pixels = to_pixel(tick_min);
 
   // Update values in the struct

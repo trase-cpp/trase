@@ -132,6 +132,8 @@ set (trase_headers
      src/frontend/Drawable.hpp
      src/frontend/Figure.hpp
      src/frontend/Plot1D.hpp
+     src/frontend/Transform.hpp
+     src/frontend/Data.hpp
      src/util/BBox.hpp
      src/util/Colors.hpp
      src/util/Exception.hpp

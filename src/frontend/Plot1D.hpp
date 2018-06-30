@@ -39,129 +39,34 @@ namespace trase {
 class Plot1D;
 }
 
-#include <array>
-#include <functional>
 #include <memory>
 #include <vector>
 
 #include "frontend/Axis.hpp"
+#include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
+#include "frontend/Transform.hpp"
+#include "util/BBox.hpp"
 #include "util/Colors.hpp"
 #include "util/Exception.hpp"
 
 namespace trase {
 
-using Column = std::vector<float>;
-
-class RawData {
-  // raw data set, can have any number of columns
-  std::vector<Column> m_matrix;
-
-public:
-  int cols() { return m_matrix.size(); };
-
-  // assume that all columns are the same size
-  int rows() { return m_matrix[0].size(); };
-
-  template <typename T> void add_column(const std::vector<T> &data) {
-    m_matrix.emplace_back();
-
-    // if columns already exist then match the sizes
-    if (cols() > 1) {
-      m_matrix.back().resize(rows());
-    }
-  }
-
-  Column &operator[](const int i) { return m_matrix[i]; }
-  const Column &operator[](const int i) const { return m_matrix[i]; }
-  Column &at(const int i) { return m_matrix.at(i); }
-  const Column &at(const int i) const { return m_matrix.at(i); }
-};
-
-struct Aesthetic {
-  // aesthetic indexes must be able to index a vector with size=SIZE
-  static const int size = 3;
-  struct x {
-    const int index = 0;
-    const char *name = "x";
-  };
-  struct y {
-    const int index = 1;
-    const char *name = "y";
-  };
-  struct color {
-    const int index = 2;
-    const char *name = "color";
-  };
-};
-
-enum Geometry { Point, Line };
-
-class DataWithAesthetic {
-  /// matrix of raw data
-  std::shared_ptr<RawData> m_data;
-
-  /// the aethetics define the mapping from x,y,color,.. to column indices
-  std::array<int, Aesthetic::size> m_aesthetics;
-
-public:
-  DataWithAesthetic() : m_data(std::make_shared<RawData>()) {
-    std::fill(m_aesthetics.begin(), m_aesthetics.end(), -1);
-  }
-  DataWithAesthetic(std::shared_ptr<RawData> data) : m_data(data) {
-    std::fill(m_aesthetics.begin(), m_aesthetics.end(), -1);
-  }
-
-  template <typename Aesthetic> Column &operator[](const Aesthetic) {
-    const int index = m_aesthetics[Aesthetic::index];
-    if (index < 0) {
-      throw Exception(Aesthetic::name + std::string(" aestheic not provided"));
-    }
-    return (*m_data)[index];
-  };
-
-  template <typename Aesthetic>
-  Column &set_aesthetic(const Aesthetic, const Column &data) {
-    int index = m_aesthetics[Aesthetic::index];
-
-    // if aesthetic is not in data then add a new column
-    if (index < 0) {
-      m_aesthetics[Aesthetic::index] = m_data->cols();
-      index = m_aesthetics[Aesthetic::index];
-      m_data->add_column();
-    }
-
-    // copy new column to data matrix
-    std::copy(data.begin(), data.end(), m_data->at(index).begin());
-    return (*m_data)[index];
-  };
-};
-
-class Transform {
-  std::function<DataWithAesthetic(const DataWithAesthetic &)> m_transform;
-
-public:
-  template <typename T>
-  Transform(const T &transform) : m_transform(transform) {}
-  DataWithAesthetic operator()(const DataWithAesthetic &data) {
-    return m_transform(data);
-  }
-};
-
-/// Identity transform, just pass through...
-DataWithAesthetic identity(const DataWithAesthetic &data) { return data; }
-
 class Plot1D : public Drawable {
+
+  // available geometry types
+  enum Geometry { Point, Line };
+
   /// dataset
   std::vector<std::shared_ptr<DataWithAesthetic>> m_data;
 
   /// label
   std::string m_label;
 
-  /// [xmin, ymin, xmax, ymax]
-  bfloat2_t m_limits;
-
   RGBA m_color;
+
+  /// min/max limits of m_data across all frames
+  Limits m_limits;
 
   /// parent axis
   Axis &m_axis;
@@ -176,17 +81,19 @@ public:
       throw Exception("x and y vector sizes do not match");
     }
     auto data = std::make_shared<DataWithAesthetic>();
-    data->set_aesthetic(Aesthetic::x(), x);
-    data->set_aesthetic(Aesthetic::y(), x);
-    return add_values(data, time);
+    data->set(Aesthetic::x(), x);
+    data->set(Aesthetic::y(), x);
+    return add_frame(data, time);
   }
 
-  void add_values(std::shared_ptr<DataWithAesthetic> values, float time);
+  void add_frame(const std::shared_ptr<DataWithAesthetic> &data, float time);
 
-  const std::vector<vfloat2_t> &get_values(const int i) const {
-    return m_values[i];
+  const std::shared_ptr<DataWithAesthetic> &get_data(const int i) const {
+    return m_data[i];
   }
-  std::vector<vfloat2_t> &get_values(const int i) { return m_values[i]; }
+  std::shared_ptr<DataWithAesthetic> &get_data(const int i) {
+    return m_data[i];
+  }
 
   void set_color(const RGBA &color) { m_color = color; }
   void set_label(const std::string &label) { m_label = label; }
@@ -195,8 +102,7 @@ public:
 
   template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
-
-}; // namespace trase
+};
 
 } // namespace trase
 

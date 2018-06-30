@@ -31,29 +31,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "frontend/Axis.hpp"
-#include "frontend/Figure.hpp"
-#include "util/Vector.hpp"
+#ifndef TRANSFORM_H_
+#define TRANSFORM_H_
+
+#include <functional>
+
+#include "frontend/Data.hpp"
 
 namespace trase {
 
-Axis::Axis(Figure &figure, const bfloat2_t &area)
-    : Drawable(&figure, area), m_sig_digits(2), m_ny_ticks(0), m_tick_len(10.f),
-      m_line_width(3.f), m_font_size(18.f), m_font_face("Roboto"),
-      m_legend(false) {}
+class Transform {
+  std::function<DataWithAesthetic(const DataWithAesthetic &)> m_transform;
 
-std::shared_ptr<Plot1D> Axis::plot(int n) { return m_plot1d.at(n); }
+public:
+  template <typename T>
+  explicit Transform(const T &transform) : m_transform(transform) {}
+  DataWithAesthetic operator()(const DataWithAesthetic &data) {
+    return m_transform(data);
+  }
+};
 
-std::shared_ptr<Plot1D>
-Axis::plot_impl(const std::shared_ptr<DataWithAesthetic> &values,
-                const std::string &label) {
-  m_plot1d.emplace_back(std::make_shared<Plot1D>(*this));
-  m_children.push_back(m_plot1d.back().get());
-  m_plot1d.back()->add_frame(values, 0);
-  m_plot1d.back()->set_color(default_colors[m_plot1d.size() - 1]);
-  m_plot1d.back()->set_label(label);
-  m_plot1d.back()->resize(m_pixels);
-  return m_plot1d.back();
-}
+/// Identity transform, just pass through...
+struct Identity {
+  DataWithAesthetic operator()(const DataWithAesthetic &data) { return data; }
+};
 
 } // namespace trase
+
+#endif // TRANSFORM_H_

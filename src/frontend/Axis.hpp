@@ -42,6 +42,7 @@ class Axis;
 #include <array>
 #include <memory>
 
+#include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
 #include "frontend/Figure.hpp"
 #include "frontend/Plot1D.hpp"
@@ -68,8 +69,8 @@ struct TickInfo {
 class Axis : public Drawable {
   std::vector<std::shared_ptr<Plot1D>> m_plot1d;
 
-  /// plot extents [x_min,y_min,x_max,y_max]
-  bfloat2_t m_limits;
+  /// limits of all children plots
+  bbox<float, Aesthetic::size> m_limits;
 
   int m_sig_digits;
   int m_nx_ticks;
@@ -93,16 +94,16 @@ class Axis : public Drawable {
 public:
   Axis(Figure &figure, const bfloat2_t &area);
 
-  const bfloat2_t &limits() const { return m_limits; }
-  bfloat2_t &limits() { return m_limits; }
+  const Limits &limits() const { return m_limits; }
+  Limits &limits() { return m_limits; }
 
   void xlim(std::array<float, 2> xlimits) {
-    m_limits.bmin[0] = xlimits[0];
-    m_limits.bmax[0] = xlimits[1];
+    m_limits.bmin[Aesthetic::x::index] = xlimits[0];
+    m_limits.bmax[Aesthetic::x::index] = xlimits[1];
   }
   void ylim(std::array<float, 2> xlimits) {
-    m_limits.bmin[1] = xlimits[0];
-    m_limits.bmax[1] = xlimits[1];
+    m_limits.bmin[Aesthetic::y::index] = xlimits[0];
+    m_limits.bmax[Aesthetic::y::index] = xlimits[1];
   }
   void xlabel(const char *string) { m_xlabel.assign(string); }
   void ylabel(const char *string) { m_ylabel.assign(string); }
@@ -121,12 +122,10 @@ public:
     if (x.size() != y.size()) {
       throw Exception("x and y vector sizes do not match");
     }
-    std::vector<vfloat2_t> values(x.size());
-    for (size_t i = 0; i < x.size(); ++i) {
-      values[i][0] = static_cast<float>(x[i]);
-      values[i][1] = static_cast<float>(y[i]);
-    }
-    return plot_impl(std::move(values), label);
+    auto data = std::make_shared<DataWithAesthetic>();
+    data->set(Aesthetic::x(), x);
+    data->set(Aesthetic::y(), x);
+    return plot_impl(data, label);
   }
 
   /// Return a shared pointer to an existing plot.
@@ -138,23 +137,34 @@ public:
   template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 
-  vfloat2_t from_pixel(const vfloat2_t &i) {
+  vfloat2_t from_pixel(const vfloat2_t &i) const {
+    const bfloat2_t xy_limits({m_limits.bmin[Aesthetic::x::index],
+                               m_limits.bmin[Aesthetic::y::index]},
+                              {m_limits.bmax[Aesthetic::x::index],
+                               m_limits.bmax[Aesthetic::y::index]});
+
     auto inv_delta = 1.0f / m_pixels.delta();
-    return m_limits.bmin +
-           m_limits.delta() *
+    return xy_limits.bmin +
+           xy_limits.delta() *
                vfloat2_t((i[0] - m_pixels.bmin[0]) * inv_delta[0],
                          (m_pixels.bmax[1] - i[1]) * inv_delta[1]);
   }
 
-  vfloat2_t to_pixel(const vfloat2_t &i) {
-    return m_limits.to_coords(m_pixels, i);
+  vfloat2_t to_pixel(const vfloat2_t &i) const {
+    const bfloat2_t xy_limits({m_limits.bmin[Aesthetic::x::index],
+                               m_limits.bmin[Aesthetic::y::index]},
+                              {m_limits.bmax[Aesthetic::x::index],
+                               m_limits.bmax[Aesthetic::y::index]});
+
+    return xy_limits.to_coords(m_pixels, i);
   }
 
   void font_face(const std::string &fontFace) { m_font_face = fontFace; }
 
 private:
-  std::shared_ptr<Plot1D> plot_impl(std::vector<vfloat2_t> &&values,
-                                    const std::string &label);
+  std::shared_ptr<Plot1D>
+  plot_impl(const std::shared_ptr<DataWithAesthetic> &values,
+            const std::string &label);
 
   void update_tick_information();
   vfloat2_t calculate_num_ticks();
