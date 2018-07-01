@@ -110,7 +110,7 @@ class RawData {
   int m_cols{0};
 
 public:
-  int cols() { return m_rows; };
+  int cols() { return m_cols; };
   int rows() { return m_rows; };
 
   template <typename T> void add_column(const std::vector<T> &new_col) {
@@ -146,8 +146,8 @@ public:
     }
   }
 
-  ColumnIterator begin(const int i) { return {m_matrix.begin() + i, i}; }
-  ColumnIterator end(const int i) { return {m_matrix.end() + i, i}; }
+  ColumnIterator begin(const int i) { return {m_matrix.begin() + i, m_cols}; }
+  ColumnIterator end(const int i) { return {m_matrix.end() + i, m_cols}; }
 };
 
 struct Aesthetic {
@@ -155,15 +155,15 @@ struct Aesthetic {
   static const int size = 3;
   struct x {
     static const int index = 0;
-    const char *name = "x";
+    static const char *name;
   };
   struct y {
     static const int index = 1;
-    const char *name = "y";
+    static const char *name;
   };
   struct color {
     static const int index = 2;
-    const char *name = "color";
+    static const char *name;
   };
 };
 

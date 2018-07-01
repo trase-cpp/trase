@@ -101,9 +101,9 @@ public:
     m_limits.bmin[Aesthetic::x::index] = xlimits[0];
     m_limits.bmax[Aesthetic::x::index] = xlimits[1];
   }
-  void ylim(std::array<float, 2> xlimits) {
-    m_limits.bmin[Aesthetic::y::index] = xlimits[0];
-    m_limits.bmax[Aesthetic::y::index] = xlimits[1];
+  void ylim(std::array<float, 2> ylimits) {
+    m_limits.bmin[Aesthetic::y::index] = ylimits[0];
+    m_limits.bmax[Aesthetic::y::index] = ylimits[1];
   }
   void xlabel(const char *string) { m_xlabel.assign(string); }
   void ylabel(const char *string) { m_ylabel.assign(string); }
@@ -124,7 +124,7 @@ public:
     }
     auto data = std::make_shared<DataWithAesthetic>();
     data->set(Aesthetic::x(), x);
-    data->set(Aesthetic::y(), x);
+    data->set(Aesthetic::y(), y);
     return plot_impl(data, label);
   }
 

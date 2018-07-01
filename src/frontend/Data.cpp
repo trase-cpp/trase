@@ -31,29 +31,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "frontend/Axis.hpp"
-#include "frontend/Figure.hpp"
-#include "util/Vector.hpp"
+#include "frontend/Data.hpp"
 
 namespace trase {
 
-Axis::Axis(Figure &figure, const bfloat2_t &area)
-    : Drawable(&figure, area), m_sig_digits(2), m_nx_ticks(0), m_ny_ticks(0),
-      m_tick_len(10.f), m_line_width(3.f), m_font_size(18.f),
-      m_font_face("Roboto"), m_legend(false) {}
-
-std::shared_ptr<Plot1D> Axis::plot(int n) { return m_plot1d.at(n); }
-
-std::shared_ptr<Plot1D>
-Axis::plot_impl(const std::shared_ptr<DataWithAesthetic> &values,
-                const std::string &label) {
-  m_plot1d.emplace_back(std::make_shared<Plot1D>(*this));
-  m_children.push_back(m_plot1d.back().get());
-  m_plot1d.back()->add_frame(values, 0);
-  m_plot1d.back()->set_color(default_colors[m_plot1d.size() - 1]);
-  m_plot1d.back()->set_label(label);
-  m_plot1d.back()->resize(m_pixels);
-  return m_plot1d.back();
-}
+const int Aesthetic::size;
+const int Aesthetic::x::index;
+const char *Aesthetic::x::name = "x";
+const int Aesthetic::y::index;
+const char *Aesthetic::y::name = "y";
+const int Aesthetic::color::index;
+const char *Aesthetic::color::name = "y";
 
 } // namespace trase

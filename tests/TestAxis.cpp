@@ -71,11 +71,9 @@ TEST_CASE("check limit setting", "[axis]") {
   auto ax = fig->axis();
   CHECK(ax->limits().is_empty() == true);
   ax->xlim({0.0f, 1.0f});
-  CHECK(ax->limits().is_empty() == true);
   CHECK(ax->limits().bmin[0] == 0.0f);
   CHECK(ax->limits().bmax[0] == 1.0f);
   ax->ylim({-1.0f, 1.0f});
-  CHECK(ax->limits().is_empty() == false);
   CHECK(ax->limits().bmin[1] == -1.0f);
   CHECK(ax->limits().bmax[1] == 1.0f);
 }

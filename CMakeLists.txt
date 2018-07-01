@@ -146,6 +146,7 @@ set (trase_source
      src/frontend/Drawable.cpp
      src/frontend/Figure.cpp
      src/frontend/Plot1D.cpp
+     src/frontend/Data.cpp
      )
 
 set (trase_draw_headers

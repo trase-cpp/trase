@@ -82,7 +82,7 @@ public:
     }
     auto data = std::make_shared<DataWithAesthetic>();
     data->set(Aesthetic::x(), x);
-    data->set(Aesthetic::y(), x);
+    data->set(Aesthetic::y(), y);
     return add_frame(data, time);
   }
 
