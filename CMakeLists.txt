@@ -223,7 +223,7 @@ add_executable (
         tests/TestBackendSVG.cpp
         tests/TestBBox.cpp
         tests/TestVector.cpp
-        tests/TestTransform.cpp
+        tests/TestTransformMatrix.cpp
         tests/TestFontManager.cpp
 )
 target_include_directories (trase_tst PRIVATE tests)
