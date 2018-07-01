@@ -45,17 +45,21 @@ template <typename Backend> void Plot1D::serialise(Backend &backend) {
   backend.stroke_color(m_color);
   backend.stroke_width(lw);
 
-  backend.move_to(m_axis.to_pixel(m_values[0][0]));
-  for (size_t i = 1; i < m_values[0].size(); ++i) {
-    backend.line_to(m_axis.to_pixel(m_values[0][i]));
+  auto x = m_data[0]->begin(Aesthetic::x());
+  auto y = m_data[0]->begin(Aesthetic::y());
+  backend.move_to(m_axis.to_pixel({x[0], y[0]}));
+  for (int i = 1; i < m_data[0]->rows(); ++i) {
+    backend.line_to(m_axis.to_pixel({x[i], y[i]}));
   }
 
   // other frames
   for (size_t f = 1; f < m_times.size(); ++f) {
+    auto x = m_data[f]->begin(Aesthetic::x());
+    auto y = m_data[f]->begin(Aesthetic::y());
     backend.add_frame(m_times[f - 1]);
-    backend.move_to(m_axis.to_pixel(m_values[f][0]));
-    for (size_t i = 1; i < m_values[0].size(); ++i) {
-      backend.line_to(m_axis.to_pixel(m_values[f][i]));
+    backend.move_to(m_axis.to_pixel({x[0], y[0]}));
+    for (int i = 1; i < m_data[0]->rows(); ++i) {
+      backend.line_to(m_axis.to_pixel({x[i], y[i]}));
     }
   }
 
@@ -68,8 +72,9 @@ template <typename Backend> void Plot1D::serialise(Backend &backend) {
     color.m_a = 0;
     backend.stroke_color(RGBA(0, 0, 0, 0));
     backend.fill_color(color, m_color);
-    for (size_t i = 0; i < m_values[0].size(); ++i) {
-      auto point = m_values[0][i];
+
+    for (int i = 0; i < m_data[0]->rows(); ++i) {
+      vfloat2_t point = {x[i], y[i]};
       auto point_pixel = m_axis.to_pixel(point);
       std::snprintf(buffer, sizeof(buffer), "(%f,%f)", point[0], point[1]);
       backend.tooltip(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer);
@@ -94,17 +99,23 @@ void Plot1D::draw(Backend &backend, const float time) {
 
   if (w2 == 0.0f) {
     // exactly on a single frame
-    backend.move_to(m_axis.to_pixel(m_values[frame_i][0]));
-    for (size_t i = 1; i < m_values[0].size(); ++i) {
-      backend.line_to(m_axis.to_pixel(m_values[frame_i][i]));
+    auto x = m_data[frame_i]->begin(Aesthetic::x());
+    auto y = m_data[frame_i]->begin(Aesthetic::y());
+    backend.move_to(m_axis.to_pixel({x[0], y[0]}));
+    for (int i = 1; i < m_data[0]->rows(); ++i) {
+      backend.line_to(m_axis.to_pixel({x[i], y[i]}));
     }
   } else {
     // between two frames
-    backend.move_to(m_axis.to_pixel(w1 * m_values[frame_i][0] +
-                                    w2 * m_values[frame_i - 1][0]));
-    for (size_t i = 1; i < m_values[0].size(); ++i) {
-      backend.line_to(m_axis.to_pixel(w1 * m_values[frame_i][i] +
-                                      w2 * m_values[frame_i - 1][i]));
+    auto x0 = m_data[frame_i - 1]->begin(Aesthetic::x());
+    auto y0 = m_data[frame_i - 1]->begin(Aesthetic::y());
+    auto x1 = m_data[frame_i]->begin(Aesthetic::x());
+    auto y1 = m_data[frame_i]->begin(Aesthetic::y());
+    backend.move_to(m_axis.to_pixel(w1 * vfloat2_t{x1[0], y1[0]} +
+                                    w2 * vfloat2_t{x0[0], y0[0]}));
+    for (int i = 1; i < m_data[0]->rows(); ++i) {
+      backend.line_to(m_axis.to_pixel(w1 * vfloat2_t{x1[i], y1[i]} +
+                                      w2 * vfloat2_t{x0[i], y0[i]}));
     }
   }
 
@@ -132,8 +143,10 @@ void Plot1D::draw(Backend &backend, const float time) {
     float min_r2 = std::numeric_limits<float>::max();
     vfloat2_t min_point{};
     // exactly on a frame
-    for (size_t i = 0; i < m_values[0].size(); ++i) {
-      const auto point = m_values[frame_i][i];
+    auto x = m_data[frame_i]->begin(Aesthetic::x());
+    auto y = m_data[frame_i]->begin(Aesthetic::y());
+    for (int i = 0; i < m_data[0]->rows(); ++i) {
+      const vfloat2_t point = {x[i], y[i]};
       auto point_r2 = (point - pos).squaredNorm();
       if (point_r2 < min_r2) {
         min_point = point;

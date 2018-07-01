@@ -66,10 +66,17 @@ template <typename Backend> void Figure::show(Backend &backend) {
       for (const auto &axis : m_axes) {
         // scale by axis pixel area
         vfloat2_t ax_delta = delta / (axis->pixels().bmax * vfloat2_t(-1, 1));
-        // scale by axis limits
-        ax_delta *= axis->limits().delta();
 
-        axis->limits() += delta;
+        // scale by axis limits
+        ax_delta[0] *= axis->limits().bmax[Aesthetic::x::index] -
+                       axis->limits().bmin[Aesthetic::x::index];
+        ax_delta[1] *= axis->limits().bmax[Aesthetic::y::index] -
+                       axis->limits().bmin[Aesthetic::y::index];
+
+        axis->limits().bmin[Aesthetic::x::index] += ax_delta[0];
+        axis->limits().bmax[Aesthetic::x::index] += ax_delta[0];
+        axis->limits().bmin[Aesthetic::y::index] += ax_delta[1];
+        axis->limits().bmax[Aesthetic::y::index] += ax_delta[1];
       }
       backend.mouse_drag_reset_delta();
     }

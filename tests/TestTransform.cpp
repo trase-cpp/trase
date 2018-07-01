@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 TEST_CASE("constructors", "[transform]") {
 
   // Default construction
-  trase::Transform t;
+  trase::TransformMatrix t;
 
   // check identity
   CHECK(t.is_identity() == true);
@@ -61,14 +61,14 @@ TEST_CASE("constructors", "[transform]") {
 TEST_CASE("to_string", "[transform]") {
 
   // Default construction
-  trase::Transform t;
+  trase::TransformMatrix t;
 
   CHECK(t.to_string() == "transform=\"matrix(1 0 0 1 0 0)\"");
 }
 
 TEST_CASE("translations", "[transform]") {
 
-  trase::Transform t;
+  trase::TransformMatrix t;
 
   /// [a c e]   [1 0 0]
   /// [b d f] = [0 1 1]
@@ -97,7 +97,7 @@ TEST_CASE("translations", "[transform]") {
 
 TEST_CASE("rotations", "[transform]") {
 
-  trase::Transform t;
+  trase::TransformMatrix t;
 
   /// [a c e]   [-1 0 0]
   /// [b d f] = [0 -1 0]

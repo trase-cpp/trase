@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef DATA_H_
 #define DATA_H_
 
+#include <cassert>
 #include <functional>
 #include <memory>
 #include <unordered_map>
@@ -44,31 +45,109 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-using Column = std::vector<float>;
+class ColumnIterator {
+public:
+  using pointer = float *;
+  using iterator_category = std::random_access_iterator_tag;
+  using reference = float &;
+  using value_type = float;
+  using difference_type = std::ptrdiff_t;
+
+  ColumnIterator(const std::vector<float>::iterator &p, const int stride)
+      : m_p(&(*p)), m_stride(stride) {}
+
+  reference operator*() const { return dereference(); }
+
+  reference operator->() const { return dereference(); }
+
+  ColumnIterator &operator++() {
+    increment();
+    return *this;
+  }
+
+  const ColumnIterator operator++(int) {
+    ColumnIterator tmp(*this);
+    operator++();
+    return tmp;
+  }
+
+  ColumnIterator operator+(int n) const {
+    ColumnIterator tmp(*this);
+    tmp.increment(n);
+    return tmp;
+  }
+
+  reference operator[](const int i) const { return operator+(i).dereference(); }
+
+  size_t operator-(const ColumnIterator &start) const {
+    return (m_p - start.m_p) / m_stride;
+  }
+
+  inline bool operator==(const ColumnIterator &rhs) const { return equal(rhs); }
+
+  inline bool operator!=(const ColumnIterator &rhs) const {
+    return !operator==(rhs);
+  }
+
+private:
+  bool equal(ColumnIterator const &other) const { return m_p == other.m_p; }
+
+  reference dereference() const { return *m_p; }
+
+  void increment() { m_p += m_stride; }
+
+  void increment(const int n) { m_p += n * m_stride; }
+
+  float *m_p;
+  int m_stride;
+};
 
 class RawData {
-  // raw data set, can have any number of columns
-  std::vector<Column> m_matrix;
+  // raw data set, in row major order
+  std::vector<float> m_matrix;
+  std::vector<float> m_tmp;
+  int m_rows{0};
+  int m_cols{0};
 
 public:
-  int cols() { return m_matrix.size(); };
+  int cols() { return m_rows; };
+  int rows() { return m_rows; };
 
-  // assume that all columns are the same size
-  int rows() { return m_matrix[0].size(); };
+  template <typename T> void add_column(const std::vector<T> &new_col) {
+    ++m_cols;
 
-  void add_column() {
-    m_matrix.emplace_back();
+    // if columns already exist then add the extra memory
+    if (m_cols > 1) {
 
-    // if columns already exist then match the sizes
-    if (cols() > 1) {
-      m_matrix.back().resize(rows());
+      // check number of rows in new column match
+      assert(static_cast<int>(new_col.size()) == m_rows);
+
+      // resize tmp vector
+      m_tmp.resize(m_rows * m_cols);
+
+      // copy orig data and new column to m_tmp
+      for (int i = 0; i < m_rows; ++i) {
+        for (int j = 0; j < m_cols - 1; ++j) {
+          m_tmp[i * m_cols + j] = m_matrix[i * (m_cols - 1) + j];
+        }
+        m_tmp[i * m_cols + m_cols - 1] = new_col[i];
+      }
+
+      // swap data back to m_matrix
+      m_matrix.swap(m_tmp);
+    } else {
+      // first column for matrix, set num rows and cols to match it
+      m_rows = new_col.size();
+      m_cols = 1;
+      m_matrix.resize(m_rows * m_cols);
+
+      // copy data in
+      std::copy(new_col.begin(), new_col.end(), m_matrix.begin());
     }
   }
 
-  Column &operator[](const int i) { return m_matrix[i]; }
-  const Column &operator[](const int i) const { return m_matrix[i]; }
-  Column &at(const int i) { return m_matrix.at(i); }
-  const Column &at(const int i) const { return m_matrix.at(i); }
+  ColumnIterator begin(const int i) { return {m_matrix.begin() + i, i}; }
+  ColumnIterator end(const int i) { return {m_matrix.end() + i, i}; }
 };
 
 struct Aesthetic {
@@ -105,39 +184,47 @@ public:
   explicit DataWithAesthetic(std::shared_ptr<RawData> data)
       : m_data(std::move(data)) {}
 
-  template <typename Aesthetic> Column &get(const Aesthetic &unused) {
-    (void)unused; // supress compiler warning
+  template <typename Aesthetic> ColumnIterator begin(const Aesthetic &a) {
 
-    auto search = m_map.find(Aesthetic::index);
+    auto search = m_map.find(a.index);
 
     if (search == m_map.end()) {
-      throw Exception(Aesthetic::name + std::string(" aestheic not provided"));
+      throw Exception(a.name + std::string(" aestheic not provided"));
     }
-    return (*m_data)[search->second];
+    return m_data->begin(search->second);
   }
 
-  template <typename Aesthetic>
-  Column &set(const Aesthetic &unused, const Column &data) {
-    (void)unused; // supress compiler warning
+  template <typename Aesthetic> ColumnIterator end(const Aesthetic &a) {
 
-    auto search = m_map.find(Aesthetic::index);
+    auto search = m_map.find(a.index);
+
+    if (search == m_map.end()) {
+      throw Exception(a.name + std::string(" aestheic not provided"));
+    }
+    return m_data->end(search->second);
+  }
+
+  template <typename Aesthetic, typename T>
+  void set(const Aesthetic &a, const std::vector<T> &data) {
+
+    auto search = m_map.find(a.index);
 
     if (search == m_map.end()) {
       // if aesthetic is not in data then add a new column
-      search = m_map.insert({Aesthetic::index, m_data->cols()}).first;
-      m_data->add_column();
+      search = m_map.insert({a.index, m_data->cols()}).first;
+      m_data->add_column(data);
+    } else {
+      // copy data to column
+      std::copy(data.begin(), data.end(), m_data->begin(search->second));
     }
-
-    // copy data to column
-    std::copy(data.begin(), data.end(), (*m_data)[search->second].begin());
 
     // set m_limits with new data
     auto min_max = std::minmax_element(data.begin(), data.end());
-    m_limits.bmin[Aesthetic::index] = *min_max.first;
-    m_limits.bmax[Aesthetic::index] = *min_max.second;
-
-    return (*m_data)[search->second];
+    m_limits.bmin[a.index] = *min_max.first;
+    m_limits.bmax[a.index] = *min_max.second;
   }
+
+  int rows() const { return m_data->rows(); }
 
   const Limits &limits() { return m_limits; }
 };
