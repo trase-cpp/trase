@@ -68,9 +68,9 @@ class BackendSVG {
   TransformMatrix m_transform;
 
 public:
-  BackendSVG(std::ostream &out) : m_out(out) {
-    stroke_color(RGBA(0, 0, 0, 255));
-    fill_color(RGBA(0, 0, 0, 255));
+  explicit BackendSVG(std::ostream &out) : m_out(out) {
+    stroke_color({0, 0, 0, 255});
+    fill_color({0, 0, 0, 255});
     stroke_width(1);
   }
   void init(const float width, const float height, const float time_span,
@@ -196,7 +196,7 @@ public:
 
   inline void stroke_color(const RGBA &color) {
     m_line_color = std::string("stroke=\"") + color.to_rgb_string() +
-                   "\" stroke-opacity=\"" + std::to_string(color.m_a / 255.0) +
+                   "\" stroke-opacity=\"" + std::to_string(color.a() / 255.0) +
                    '\"';
     m_onmouseover_stroke.clear();
     m_onmouseout_stroke.clear();
@@ -207,11 +207,11 @@ public:
     m_onmouseover_stroke = "evt.target.setAttribute('stroke', '" +
                            color_mouseover.to_rgb_string() +
                            "'); evt.target.setAttribute('stroke-opacity','" +
-                           std::to_string(color_mouseover.m_a / 255.0) + "');";
+                           std::to_string(color_mouseover.a() / 255.0) + "');";
     m_onmouseout_stroke = "evt.target.setAttribute('stroke', '" +
                           color.to_rgb_string() +
                           "'); evt.target.setAttribute('stroke-opacity','" +
-                          std::to_string(color.m_a / 255.0) + "');";
+                          std::to_string(color.a() / 255.0) + "');";
   }
 
   inline void tooltip(const vfloat2_t &x, const char *string) {
@@ -232,7 +232,7 @@ public:
   }
   inline void fill_color(const RGBA &color) {
     m_fill_color = "fill=\"" + color.to_rgb_string() + "\" fill-opacity=\"" +
-                   std::to_string(color.m_a / 255.0) + '\"';
+                   std::to_string(color.a() / 255.0) + '\"';
   }
 
   inline void stroke() {
@@ -259,11 +259,11 @@ public:
     m_onmouseover_fill = "evt.target.setAttribute('fill', '" +
                          color_mouseover.to_rgb_string() +
                          "'); evt.target.setAttribute('fill-opacity','" +
-                         std::to_string(color_mouseover.m_a / 255.0) + "');";
+                         std::to_string(color_mouseover.a() / 255.0) + "');";
     m_onmouseout_fill = "evt.target.setAttribute('fill', '" +
                         color.to_rgb_string() +
                         "'); evt.target.setAttribute('fill-opacity','" +
-                        std::to_string(color.m_a / 255.0) + "');";
+                        std::to_string(color.a() / 255.0) + "');";
   }
 
   inline void font_size(float size) {

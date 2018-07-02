@@ -50,7 +50,7 @@ Axis::plot_impl(const std::shared_ptr<DataWithAesthetic> &values,
   m_plot1d.emplace_back(std::make_shared<Plot1D>(*this));
   m_children.push_back(m_plot1d.back().get());
   m_plot1d.back()->add_frame(values, 0);
-  m_plot1d.back()->set_color(default_colors[m_plot1d.size() - 1]);
+  m_plot1d.back()->set_color(RGBA::defaults[m_plot1d.size() - 1]);
   m_plot1d.back()->set_label(label);
   m_plot1d.back()->resize(m_pixels);
   return m_plot1d.back();

@@ -76,7 +76,7 @@ void Plot1D::serialise_highlights(Backend &backend) {
   if (m_times.size() == 1) {
     char buffer[100];
     auto color = m_color;
-    color.m_a = 0;
+    color.a(0);
     backend.stroke_color(RGBA(0, 0, 0, 0));
     backend.fill_color(color, m_color);
 
