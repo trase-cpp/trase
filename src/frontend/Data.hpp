@@ -141,7 +141,7 @@ public:
         for (int j = 0; j < m_cols - 1; ++j) {
           m_tmp[i * m_cols + j] = m_matrix[i * (m_cols - 1) + j];
         }
-        m_tmp[i * m_cols + m_cols - 1] = new_col[i];
+        m_tmp[i * m_cols + m_cols - 1] = static_cast<float>(new_col[i]);
       }
 
       // swap data back to m_matrix
@@ -152,8 +152,10 @@ public:
       m_cols = 1;
       m_matrix.resize(m_rows * m_cols);
 
-      // copy data in
-      std::copy(new_col.begin(), new_col.end(), m_matrix.begin());
+      // copy data in (not using std::copy because visual studio complains if T
+      // is not float)
+      std::transform(new_col.begin(), new_col.end(), m_matrix.begin(),
+                     [](auto i) { return static_cast<float>(i); });
     }
   }
 
@@ -256,8 +258,8 @@ public:
 
     // set m_limits with new data
     auto min_max = std::minmax_element(data.begin(), data.end());
-    m_limits.bmin[a.index] = *min_max.first;
-    m_limits.bmax[a.index] = *min_max.second;
+    m_limits.bmin[a.index] = static_cast<float>(*min_max.first);
+    m_limits.bmax[a.index] = static_cast<float>(*min_max.second);
   }
 
   /// returns number of rows in the data let
