@@ -252,8 +252,9 @@ public:
       search = m_map.insert({a.index, m_data->cols()}).first;
       m_data->add_column(data);
     } else {
-      // copy data to column
-      std::copy(data.begin(), data.end(), m_data->begin(search->second));
+      // copy data to column (TODO: move this into RawData class)
+      std::transform(data.begin(), data.end(), m_data->begin(search->second),
+                     [](auto i) { return static_cast<float>(i); });
     }
 
     // set m_limits with new data
