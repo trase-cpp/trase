@@ -37,8 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 TEST_CASE("color construction", "[colors]") {
 
-  trase::RGBA a;
-
   trase::RGBA b{1,2,3};
   trase::RGBA c{1,2,3, trase::RGBA::default_alpha};
 
