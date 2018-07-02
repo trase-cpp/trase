@@ -45,29 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-/// Raw data class, impliments a matrix with row major order
-class RawData {
-  // raw data set, in row major order
-  std::vector<float> m_matrix;
-
-  /// temporary data
-  std::vector<float> m_tmp;
-
-  int m_rows{0};
-  int m_cols{0};
-
-public:
-  /// return the number of columns
-  int cols() { return m_cols; };
-
-  /// return the number of rows
-  int rows() { return m_rows; };
-
-  /// add a new column to the matrix. the data in `new_col` is copied into the
-  /// new column
-  template <typename T> void add_column(const std::vector<T> &new_col);
-};
-
 /// An iterator that iterates through a single column of the raw data class
 /// Impliments an random access iterator with a given stride
 class ColumnIterator {
@@ -125,6 +102,66 @@ private:
 
   float *m_p;
   int m_stride;
+};
+
+/// Raw data class, impliments a matrix with row major order
+class RawData {
+  // raw data set, in row major order
+  std::vector<float> m_matrix;
+
+  /// temporary data
+  std::vector<float> m_tmp;
+
+  int m_rows{0};
+  int m_cols{0};
+
+public:
+  /// return the number of columns
+  int cols() { return m_cols; };
+
+  /// return the number of rows
+  int rows() { return m_rows; };
+
+  /// add a new column to the matrix. the data in `new_col` is copied into the
+  /// new column
+  template <typename T> void add_column(const std::vector<T> &new_col) {
+    ++m_cols;
+
+    // if columns already exist then add the extra memory
+    if (m_cols > 1) {
+
+      // check number of rows in new column match
+      assert(static_cast<int>(new_col.size()) == m_rows);
+
+      // resize tmp vector
+      m_tmp.resize(m_rows * m_cols);
+
+      // copy orig data and new column to m_tmp
+      for (int i = 0; i < m_rows; ++i) {
+        for (int j = 0; j < m_cols - 1; ++j) {
+          m_tmp[i * m_cols + j] = m_matrix[i * (m_cols - 1) + j];
+        }
+        m_tmp[i * m_cols + m_cols - 1] = new_col[i];
+      }
+
+      // swap data back to m_matrix
+      m_matrix.swap(m_tmp);
+    } else {
+      // first column for matrix, set num rows and cols to match it
+      m_rows = new_col.size();
+      m_cols = 1;
+      m_matrix.resize(m_rows * m_cols);
+
+      // copy data in
+      std::copy(new_col.begin(), new_col.end(), m_matrix.begin());
+    }
+  }
+
+  /// return a ColumnIterator to the beginning of column i
+  ColumnIterator begin(const int i) { return {m_matrix.begin() + i, m_cols}; }
+
+  /// return a ColumnIterator to the end of column i
+  ColumnIterator end(const int i) { return {m_matrix.end() + i, m_cols}; }
 };
 
 /// Aesthetics are a collection of tag classes that represent each aesthetic

@@ -43,37 +43,4 @@ const char *Aesthetic::y::name = "y";
 const int Aesthetic::color::index;
 const char *Aesthetic::color::name = "y";
 
-template <typename T> void RawDat::add_column(const std::vector<T> &new_col) {
-  ++m_cols;
-
-  // if columns already exist then add the extra memory
-  if (m_cols > 1) {
-
-    // check number of rows in new column match
-    assert(static_cast<int>(new_col.size()) == m_rows);
-
-    // resize tmp vector
-    m_tmp.resize(m_rows * m_cols);
-
-    // copy orig data and new column to m_tmp
-    for (int i = 0; i < m_rows; ++i) {
-      for (int j = 0; j < m_cols - 1; ++j) {
-        m_tmp[i * m_cols + j] = m_matrix[i * (m_cols - 1) + j];
-      }
-      m_tmp[i * m_cols + m_cols - 1] = new_col[i];
-    }
-
-    // swap data back to m_matrix
-    m_matrix.swap(m_tmp);
-  } else {
-    // first column for matrix, set num rows and cols to match it
-    m_rows = new_col.size();
-    m_cols = 1;
-    m_matrix.resize(m_rows * m_cols);
-
-    // copy data in
-    std::copy(new_col.begin(), new_col.end(), m_matrix.begin());
-  }
-}
-
 } // namespace trase
