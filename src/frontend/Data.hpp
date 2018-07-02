@@ -45,6 +45,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+/// Raw data class, impliments a matrix with row major order
+class RawData {
+  // raw data set, in row major order
+  std::vector<float> m_matrix;
+
+  /// temporary data
+  std::vector<float> m_tmp;
+
+  int m_rows{0};
+  int m_cols{0};
+
+public:
+  /// return the number of columns
+  int cols() { return m_cols; };
+
+  /// return the number of rows
+  int rows() { return m_rows; };
+
+  /// add a new column to the matrix. the data in `new_col` is copied into the
+  /// new column
+  template <typename T> void add_column(const std::vector<T> &new_col);
+};
+
+/// An iterator that iterates through a single column of the raw data class
+/// Impliments an random access iterator with a given stride
 class ColumnIterator {
 public:
   using pointer = float *;
@@ -102,73 +127,39 @@ private:
   int m_stride;
 };
 
-class RawData {
-  // raw data set, in row major order
-  std::vector<float> m_matrix;
-  std::vector<float> m_tmp;
-  int m_rows{0};
-  int m_cols{0};
-
-public:
-  int cols() { return m_cols; };
-  int rows() { return m_rows; };
-
-  template <typename T> void add_column(const std::vector<T> &new_col) {
-    ++m_cols;
-
-    // if columns already exist then add the extra memory
-    if (m_cols > 1) {
-
-      // check number of rows in new column match
-      assert(static_cast<int>(new_col.size()) == m_rows);
-
-      // resize tmp vector
-      m_tmp.resize(m_rows * m_cols);
-
-      // copy orig data and new column to m_tmp
-      for (int i = 0; i < m_rows; ++i) {
-        for (int j = 0; j < m_cols - 1; ++j) {
-          m_tmp[i * m_cols + j] = m_matrix[i * (m_cols - 1) + j];
-        }
-        m_tmp[i * m_cols + m_cols - 1] = new_col[i];
-      }
-
-      // swap data back to m_matrix
-      m_matrix.swap(m_tmp);
-    } else {
-      // first column for matrix, set num rows and cols to match it
-      m_rows = new_col.size();
-      m_cols = 1;
-      m_matrix.resize(m_rows * m_cols);
-
-      // copy data in
-      std::copy(new_col.begin(), new_col.end(), m_matrix.begin());
-    }
-  }
-
-  ColumnIterator begin(const int i) { return {m_matrix.begin() + i, m_cols}; }
-  ColumnIterator end(const int i) { return {m_matrix.end() + i, m_cols}; }
-};
-
+/// Aesthetics are a collection of tag classes that represent each aesthetic
+/// Each aesthetic has a name, and an index from 0 -> size, where size is the
+/// total number of aesthetics
 struct Aesthetic {
   // aesthetic indexes must be able to index a vector with size=SIZE
   static const int size = 3;
+
+  /// the data to display on the x-axis of the plot
   struct x {
     static const int index = 0;
     static const char *name;
   };
+
+  /// the data to display on the y-axis of the plot
   struct y {
     static const int index = 1;
     static const char *name;
   };
+
+  /// the color of each plotting element
   struct color {
     static const int index = 2;
     static const char *name;
   };
 };
 
+/// Each aesthetic has a set of min/max limits, or scales, that are used for
+/// plotting
 using Limits = bbox<float, Aesthetic::size>;
 
+/// Combination of the RawData class and Aesthetics, this class points to a
+/// RawData object, and contains a mapping from aesthetics to RawData column
+/// numbers
 class DataWithAesthetic {
   /// matrix of raw data
   std::shared_ptr<RawData> m_data;
@@ -184,6 +175,8 @@ public:
   explicit DataWithAesthetic(std::shared_ptr<RawData> data)
       : m_data(std::move(data)) {}
 
+  /// return a ColumnIterator to the beginning of the data column for aesthetic
+  /// a, throws if a has not yet been set
   template <typename Aesthetic> ColumnIterator begin(const Aesthetic &a) {
 
     auto search = m_map.find(a.index);
@@ -194,6 +187,8 @@ public:
     return m_data->begin(search->second);
   }
 
+  /// return a ColumnIterator to the end of the data column for aesthetic a,
+  /// throws if a has not yet been set
   template <typename Aesthetic> ColumnIterator end(const Aesthetic &a) {
 
     auto search = m_map.find(a.index);
@@ -204,6 +199,10 @@ public:
     return m_data->end(search->second);
   }
 
+  /// if aesthetic a is not yet been set, this creates a new data column and
+  /// copies in `data` (throws if data does not have the correct number of
+  /// rows). If aesthetic a has been previously set, its data column is
+  /// overwritten with `data`
   template <typename Aesthetic, typename T>
   void set(const Aesthetic &a, const std::vector<T> &data) {
 
@@ -224,8 +223,10 @@ public:
     m_limits.bmax[a.index] = *min_max.second;
   }
 
+  /// returns number of rows in the data let
   int rows() const { return m_data->rows(); }
 
+  /// returns the min/max limits of the data
   const Limits &limits() { return m_limits; }
 };
 

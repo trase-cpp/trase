@@ -40,12 +40,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+/// holds a `std::function` that maps between two DataWithAesthetic classes
 class Transform {
   std::function<DataWithAesthetic(const DataWithAesthetic &)> m_transform;
 
 public:
+  /// construct a Transform wrapping the given transform function T. The
+  /// function T can be any function or function object that is compatible with
+  /// `std::function`
   template <typename T>
   explicit Transform(const T &transform) : m_transform(transform) {}
+
+  /// perform mapping on `data`, return result
   DataWithAesthetic operator()(const DataWithAesthetic &data) {
     return m_transform(data);
   }
