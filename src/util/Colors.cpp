@@ -33,15 +33,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "util/Colors.hpp"
 
+#include "util/Exception.hpp"
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include "util/Exception.hpp"
 
 namespace trase {
 
 RGBA::RGBA(int r, int g, int b, int a) noexcept
     : m_r(r), m_g(g), m_b(b), m_a(a) {}
+
+/// constructor taking float vector
+RGBA::RGBA(const Vector<float, 4> &v) noexcept
+    : m_r(v[0]), m_g(v[1]), m_b(v[2]), m_a(v[3]) {}
 
 int RGBA::r() const noexcept { return m_r; }
 int RGBA::g() const noexcept { return m_g; }
@@ -81,10 +85,7 @@ bool RGBA::operator==(const RGBA &b) const noexcept {
   return m_r == b.r() && m_g == b.g() && m_b == b.b() && m_a == b.a();
 }
 
-
-bool RGBA::operator!=(const RGBA &b) const noexcept {
-  return !(*this == b);
-}
+bool RGBA::operator!=(const RGBA &b) const noexcept { return !(*this == b); }
 
 const int RGBA::default_alpha = 200;
 
@@ -96,7 +97,7 @@ const std::array<const RGBA, 10> RGBA::defaults = {
     RGBA{227, 119, 194}, RGBA{127, 127, 127}, RGBA{188, 189, 34},
     RGBA{23, 190, 207}};
 
-const RGBA RGBA::black {0, 0, 0};
-const RGBA RGBA::white {255, 255, 255};
+const RGBA RGBA::black{0, 0, 0};
+const RGBA RGBA::white{255, 255, 255};
 
 } // namespace trase

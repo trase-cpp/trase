@@ -181,8 +181,10 @@ template <typename Backend> void Plot1D::draw_plot_point(Backend &backend) {
     // exactly on a single frame
     auto x = m_data[f]->begin(Aesthetic::x());
     auto y = m_data[f]->begin(Aesthetic::y());
+    auto color = m_data[f]->begin(Aesthetic::color());
+    auto size = m_data[f]->begin(Aesthetic::size());
     for (int i = 0; i < m_data[0]->rows(); ++i) {
-      backend.circle(m_axis.to_pixel({x[i], y[i]}), m_line_width);
+      backend.circle({x[i], y[i]}), m_line_width);
     }
   } else {
     // between two frames

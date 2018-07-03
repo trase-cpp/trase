@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 #include "util/BBox.hpp"
+#include "util/Colors.hpp"
 #include "util/Exception.hpp"
 
 namespace trase {
@@ -169,38 +170,187 @@ public:
 /// Aesthetics are a collection of tag classes that represent each aesthetic
 /// Each aesthetic has a name, and an index from 0 -> size, where size is the
 /// total number of aesthetics
+///
+/// Each Aesthetic defines a mapping to and from a display type
 struct Aesthetic {
   // aesthetic indexes must be able to index a vector with size=SIZE
   static const int size = 4;
+  using Limits = bbox<float, size>;
+
+  struct DisplayLimits;
 
   /// the data to display on the x-axis of the plot
   struct x {
     static const int index = 0;
     static const char *name;
+    static float to_display(const float data, const Limits &limits,
+                            const DisplayLimits &display_limits) {
+      float len_ratio = (display_limits.bmax[index] - pixels.bmin[0]) /
+                        (limits.bmax[index] - limits.bmin[index]);
+
+      float rel_pos = data - limits.bmin[index];
+      return pixels.bmin[0] + rel_pos * len_ratio;
+    }
+    static float from_display(const float display, const Limits &limits,
+                              const bfloat2_t &pixels) {
+      float len_ratio = (limits.bmax[index] - limits.bmin[index]) /
+                        (pixels.bmax[0] - pixels.bmin[0]);
+
+      float rel_pos = display - pixels.bmin[0];
+      return limits.bmin[index] + rel_pos * len_ratio;
+    }
   };
 
   /// the data to display on the y-axis of the plot
   struct y {
     static const int index = 1;
     static const char *name;
+    static float to_display(const float data, const Limits &limits,
+                            const bfloat2_t &pixels) {
+      float len_ratio = (pixels.bmax[1] - pixels.bmin[1]) /
+                        (limits.bmax[index] - limits.bmin[index]);
+
+      // Get the relative position and invert y by default (e.g. limits->pixels)
+      float rel_pos = limits.bmax[index] - data;
+      return pixels.bmin[1] + rel_pos * len_ratio;
+    }
+    static float from_display(const float display, const Limits &limits,
+                              const bfloat2_t &pixels) {
+      float len_ratio = (limits.bmax[index] - limits.bmin[index]) /
+                        (pixels.bmax[1] - pixels.bmin[1]);
+
+      // Get the relative position and invert y by default (e.g. limits->pixels)
+      float rel_pos = pixels.bmax[1] - display;
+      return limits.bmin[index] + rel_pos * len_ratio;
+    }
   };
 
   /// the color of each plotting element
   struct color {
     static const int index = 2;
     static const char *name;
+    static RGBA to_display(const float data, const Limits &limits,
+                           const RGBA &min_color, const RGBA &max_color) {
+      using vfloat4 = Vector<float, 4>;
+      const vfloat4 max(min_color);
+      const vfloat4 min(max_color);
+
+      const vfloat4 ratio =
+          (max - min) / (limits.bmax[index] - limits.bmin[index]);
+
+      // Get the relative position and invert y by default (e.g. limits->pixels)
+      return min + (data - limits.bmin[index]) * ratio;
+    }
+
+    static float from_display(const RGBA &display, const Limits &limits,
+                              const RGBA &min_color, const RGBA &max_color) {
+      const float ratio =
+          (display.r() - min_color.r()) / (max_color.r() - min_color.r());
+
+      return limits.bmin[index] +
+             (limits.bmax[index] - limits.bmin[index]) * ratio;
+    }
   };
 
   /// the size of each plotting element
   struct size {
     static const int index = 3;
     static const char *name;
+    static float to_display(const float data, const Limits &limits,
+                            const bbox<float, 1> &span) {
+      float len_ratio = (span.bmax[0] - span.bmin[0]) /
+                        (limits.bmax[index] - limits.bmin[index]);
+
+      float rel_pos = data - limits.bmin[index];
+      return span.bmin[0] + rel_pos * len_ratio;
+    }
+    static float from_display(const float display, const Limits &limits,
+                              const bbox<float, 1> &span) {
+      float len_ratio = (limits.bmax[index] - limits.bmin[index]) /
+                        (span.bmax[0] - span.bmin[0]);
+
+      float rel_pos = display - span.bmin[0];
+      return limits.bmin[index] + rel_pos * len_ratio;
+    }
+
+    struct DisplayLimits {
+      using T = std::tuple<x::display_t, y::display_t, color::display_t,
+                           size::display_t>;
+      T m_min;
+      T m_max;
+    };
   };
-};
+}; // namespace trase
 
 /// Each aesthetic has a set of min/max limits, or scales, that are used for
 /// plotting
-using Limits = bbox<float, Aesthetic::size>;
+using Limits = Aesthetic::Limits;
+
+/// An iterator that iterates through a single column of the raw data class
+/// Impliments an random access iterator with a given stride
+template <typename... T> class AestheticIterator {
+public:
+  using value_type = Vector<float, sizeof...(T)>;
+  using pointer = value_type *;
+  using iterator_category = std::random_access_iterator_tag;
+  using reference = value_type &;
+  using difference_type = std::ptrdiff_t;
+
+  AestheticIterator(const std::vector<float>::iterator &p, const int stride)
+      : m_p(&(*p)), m_stride(stride) {}
+
+  reference operator*() const { return dereference(); }
+
+  reference operator->() const { return dereference(); }
+
+  ColumnIterator &operator++() {
+    increment();
+    return *this;
+  }
+
+  const ColumnIterator operator++(int) {
+    ColumnIterator tmp(*this);
+    operator++();
+    return tmp;
+  }
+
+  ColumnIterator operator+(int n) const {
+    ColumnIterator tmp(*this);
+    tmp.increment(n);
+    return tmp;
+  }
+
+  reference operator[](const int i) const { return operator+(i).dereference(); }
+
+  size_t operator-(const ColumnIterator &start) const {
+    return (m_p - start.m_p) / m_stride;
+  }
+
+  inline bool operator==(const ColumnIterator &rhs) const { return equal(rhs); }
+
+  inline bool operator!=(const ColumnIterator &rhs) const {
+    return !operator==(rhs);
+  }
+
+private:
+  bool equal(ColumnIterator const &other) const { return m_p == other.m_p; }
+
+  reference dereference() const { return m_value; }
+
+  void increment() {
+    m_p += m_stride;
+    m_value = {*(m_p + T::index)...};
+  }
+
+  void increment(const int n) {
+    m_p += n * m_stride;
+    m_value = {*(m_p + T::index)...};
+  }
+
+  float *m_p;
+  int m_stride;
+  value_type m_value;
+};
 
 /// Combination of the RawData class and Aesthetics, this class points to a
 /// RawData object, and contains a mapping from aesthetics to RawData column
