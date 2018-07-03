@@ -40,14 +40,14 @@ namespace trase {
 
 class Style {
 
-  float m_line_width;
+  float m_line_width{0.f};
 
-  RGBA m_color;
+  RGBA m_color{RGBA::black};
 
 public:
 
   /// constructor
-  Style();
+  Style() = default;
 
   /// get the current line width
   float line_width() const noexcept;

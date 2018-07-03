@@ -35,8 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-Style::Style() : m_line_width(0.f), m_color(0, 0, 0, 255) {}
-
 float Style::line_width() const noexcept { return m_line_width; }
 
 RGBA Style::color() const noexcept { return m_color; }
