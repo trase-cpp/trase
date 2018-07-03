@@ -38,12 +38,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 template <typename Backend> void Plot1D::serialise(Backend &backend) {
-  const float lw = 3.0f;
+  serialise_frames(backend);
+  serialise_highlights(backend);
+}
 
-  // draw first frame
+template <typename Backend> void Plot1D::serialise_frames(Backend &backend) {
+
   backend.begin_frames();
   backend.stroke_color(m_color);
-  backend.stroke_width(lw);
+  backend.stroke_width(m_line_width);
 
   auto x = m_data[0]->begin(Aesthetic::x());
   auto y = m_data[0]->begin(Aesthetic::y());
@@ -64,6 +67,10 @@ template <typename Backend> void Plot1D::serialise(Backend &backend) {
   }
 
   backend.end_frames(m_times.back());
+}
+
+template <typename Backend>
+void Plot1D::serialise_highlights(Backend &backend) {
 
   // highlighted points just for frame 0 and for stationary lines
   if (m_times.size() == 1) {
@@ -73,12 +80,15 @@ template <typename Backend> void Plot1D::serialise(Backend &backend) {
     backend.stroke_color(RGBA(0, 0, 0, 0));
     backend.fill_color(color, m_color);
 
+    auto x = m_data[0]->begin(Aesthetic::x());
+    auto y = m_data[0]->begin(Aesthetic::y());
     for (int i = 0; i < m_data[0]->rows(); ++i) {
       vfloat2_t point = {x[i], y[i]};
       auto point_pixel = m_axis.to_pixel(point);
       std::snprintf(buffer, sizeof(buffer), "(%f,%f)", point[0], point[1]);
-      backend.tooltip(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer);
-      backend.circle(point_pixel, 2 * lw);
+      backend.tooltip(
+          point_pixel + 2.f * vfloat2_t(m_line_width, -m_line_width), buffer);
+      backend.circle(point_pixel, 2 * m_line_width);
     }
     backend.clear_tooltip();
   }
@@ -86,31 +96,33 @@ template <typename Backend> void Plot1D::serialise(Backend &backend) {
 
 template <typename Backend>
 void Plot1D::draw(Backend &backend, const float time) {
-  const float lw = 3.0f;
+  update_frame_info(time);
+  draw_plot(backend);
+  draw_highlights(backend);
+}
 
-  // draw plot
+template <typename Backend> void Plot1D::draw_plot(Backend &backend) {
+
   backend.begin_path();
 
-  // are we exactly on a frame, or in-between?
-  float frame_i_float = get_frame_index(time);
-  int frame_i = std::ceil(frame_i_float);
-  const float w2 = frame_i - frame_i_float;
-  const float w1 = 1.0f - w2;
+  const int f = m_frame_info.frame_above;
+  const float w1 = m_frame_info.w1;
+  const float w2 = m_frame_info.w2;
 
   if (w2 == 0.0f) {
     // exactly on a single frame
-    auto x = m_data[frame_i]->begin(Aesthetic::x());
-    auto y = m_data[frame_i]->begin(Aesthetic::y());
+    auto x = m_data[f]->begin(Aesthetic::x());
+    auto y = m_data[f]->begin(Aesthetic::y());
     backend.move_to(m_axis.to_pixel({x[0], y[0]}));
     for (int i = 1; i < m_data[0]->rows(); ++i) {
       backend.line_to(m_axis.to_pixel({x[i], y[i]}));
     }
   } else {
     // between two frames
-    auto x0 = m_data[frame_i - 1]->begin(Aesthetic::x());
-    auto y0 = m_data[frame_i - 1]->begin(Aesthetic::y());
-    auto x1 = m_data[frame_i]->begin(Aesthetic::x());
-    auto y1 = m_data[frame_i]->begin(Aesthetic::y());
+    auto x0 = m_data[f - 1]->begin(Aesthetic::x());
+    auto y0 = m_data[f - 1]->begin(Aesthetic::y());
+    auto x1 = m_data[f]->begin(Aesthetic::x());
+    auto y1 = m_data[f]->begin(Aesthetic::y());
     backend.move_to(m_axis.to_pixel(w1 * vfloat2_t{x1[0], y1[0]} +
                                     w2 * vfloat2_t{x0[0], y0[0]}));
     for (int i = 1; i < m_data[0]->rows(); ++i) {
@@ -120,15 +132,17 @@ void Plot1D::draw(Backend &backend, const float time) {
   }
 
   backend.stroke_color(m_color);
-  backend.stroke_width(lw);
+  backend.stroke_width(m_line_width);
   backend.stroke();
+}
 
-  // draw highlighted point
+template <typename Backend> void Plot1D::draw_highlights(Backend &backend) {
 
   // get mouse position
   auto pos = vfloat2_t(std::numeric_limits<float>::max(),
                        std::numeric_limits<float>::max());
   auto mouse_pos = pos;
+
   if (backend.is_interactive()) {
     mouse_pos = backend.get_mouse_pos();
     if ((mouse_pos > m_pixels.bmin).all() &&
@@ -137,14 +151,13 @@ void Plot1D::draw(Backend &backend, const float time) {
     }
   }
 
-  // highlight mouseover point if we are exactly on a frame (i.e. a stationary
-  // line)
-  if (w2 == 0.f) {
+  // highlight mouse-over point if exactly on a frame (i.e. stationary line)
+  if (m_frame_info.w2 == 0.f) {
     float min_r2 = std::numeric_limits<float>::max();
     vfloat2_t min_point{};
     // exactly on a frame
-    auto x = m_data[frame_i]->begin(Aesthetic::x());
-    auto y = m_data[frame_i]->begin(Aesthetic::y());
+    auto x = m_data[m_frame_info.frame_above]->begin(Aesthetic::x());
+    auto y = m_data[m_frame_info.frame_above]->begin(Aesthetic::y());
     for (int i = 0; i < m_data[0]->rows(); ++i) {
       const vfloat2_t point = {x[i], y[i]};
       auto point_r2 = (point - pos).squaredNorm();
@@ -158,15 +171,17 @@ void Plot1D::draw(Backend &backend, const float time) {
     auto point_pixel = m_axis.to_pixel(min_point);
 
     // if a point is within r2, then draw it
-    if ((mouse_pos - point_pixel).squaredNorm() < std::pow(2.f * lw, 2)) {
+    if ((mouse_pos - point_pixel).squaredNorm() <
+        std::pow(2.f * m_line_width, 2)) {
       backend.fill_color(m_color);
       backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
       char buffer[100];
       std::snprintf(buffer, sizeof(buffer), "(%f,%f)", min_point[0],
                     min_point[1]);
-      backend.circle(point_pixel, lw * 2);
+      backend.circle(point_pixel, m_line_width * 2);
       backend.fill_color(RGBA(0, 0, 0, 255));
-      backend.text(point_pixel + 2.f * vfloat2_t(lw, -lw), buffer, nullptr);
+      backend.text(point_pixel + 2.f * vfloat2_t(m_line_width, -m_line_width),
+                   buffer, nullptr);
     }
   }
 }

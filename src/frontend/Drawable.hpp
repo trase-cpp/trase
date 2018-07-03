@@ -42,6 +42,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+/// A helper struct for Drawable that holds frame-related information
+struct FrameInfo {
+
+  int frame_above;
+  float frame;
+  float w1;
+  float w2;
+
+  void update(std::vector<float> &times, const float time_now) {
+    frame_above = static_cast<int>(std::distance(
+        times.begin(), std::lower_bound(times.begin(), times.end(), time_now)));
+
+    if (frame_above == 0) {
+      w1 = 1.f;
+      w2 = 0.f;
+      frame = 0.f;
+    } else {
+      const float delta_t = times[frame_above] - times[frame_above - 1];
+      w1 = (time_now - times[frame_above - 1]) / delta_t;
+      w2 = 1.f - w1;
+      frame = static_cast<float>(frame_above - 1) + w1;
+    }
+  }
+};
+
 class Drawable {
 protected:
   /// a list of Drawables that are children of this object
@@ -62,12 +87,14 @@ protected:
   /// the animation frame times
   std::vector<float> m_times;
 
+  FrameInfo m_frame_info;
+
 public:
   Drawable(Drawable *parent, const bfloat2_t &area_of_parent);
   void resize(const bfloat2_t &parent_pixels);
   void update_time_span(float time);
   void add_frame_time(float time);
-  float get_frame_index(float time);
+  void update_frame_info(float time);
   const bfloat2_t &pixels() { return m_pixels; }
   const bfloat2_t &area() { return m_pixels; }
   template <typename Backend> void serialise(Backend &backend);
