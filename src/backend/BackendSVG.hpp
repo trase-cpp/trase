@@ -65,7 +65,7 @@ class BackendSVG {
   float m_time_span;
   std::string m_font_size_base;
   std::string m_font_face_base;
-  Transform m_transform;
+  TransformMatrix m_transform;
 
 public:
   BackendSVG(std::ostream &out) : m_out(out) {

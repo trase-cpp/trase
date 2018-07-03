@@ -1,22 +1,27 @@
 image:
-  - Visual Studio 2017
+    - Visual Studio 2015
+    - Visual Studio 2017
 
-clone_folder: c:\projects\source
+configuration:
+    - Release
+    - Debug
 
-# Boost is already installed on AppVeyor.
+      # Boost is already installed on AppVeyor.
 environment:
-  BOOST_ROOT: C:\Libraries\boost_1_64_0
+    BOOST_ROOT: C:\Libraries\boost_1_64_0
 
-build_script:
-- cmd: >-
-    mkdir build
+init:
+- echo %APPVEYOR_BUILD_WORKER_IMAGE%
+- if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2017" ( set generator="Visual Studio 15 2017%arch%" )
+- if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2015" ( set generator="Visual Studio 14 2015%arch%" )
+- echo %generator%
 
-    cd build
-    
-    cmake c:\projects\source -G "Visual Studio 15" -Dtrase_BUILD_OPENGL:BOOL=FALSE
-    
-    cmake --build . --config "Debug"
+before_build:
+- cmake -G %generator% -Dtrase_BUILD_OPENGL:BOOL=FALSE .
+
+build:
+  project: $(APPVEYOR_BUILD_FOLDER)\$(APPVEYOR_PROJECT_NAME).sln
 
 test_script:
-- cmd: ctest -C Debug --output-on-failure
+- '%APPVEYOR_BUILD_FOLDER%\%CONFIGURATION%\trase_tst.exe'
 

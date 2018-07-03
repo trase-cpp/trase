@@ -183,7 +183,8 @@ template <typename T, int N> struct bbox {
   /// @param y_inv whether to invert y (e.g. pixel to limits). Default true.
   /// @return the new location of point in other's coords
   ///
-  vector_t to_coords(bbox<T, N> &other, vector_t point, bool y_inv = true) {
+  vector_t to_coords(const bbox<T, N> &other, vector_t point,
+                     bool y_inv = true) const {
     vector_t len_ratio = other.delta() / delta();
 
     // Get the relative position and invert y by default (e.g. limits->pixels)

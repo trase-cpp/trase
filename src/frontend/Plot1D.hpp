@@ -39,28 +39,36 @@ namespace trase {
 class Plot1D;
 }
 
-#include <array>
+#include <memory>
+#include <vector>
 
 #include "frontend/Axis.hpp"
+#include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
+#include "frontend/Transform.hpp"
+#include "util/BBox.hpp"
 #include "util/Colors.hpp"
 #include "util/Exception.hpp"
 
 namespace trase {
 
 class Plot1D : public Drawable {
-  /// values
-  std::vector<std::vector<vfloat2_t>> m_values;
+
+  // available geometry types
+  enum Geometry { Point, Line };
+
+  /// dataset
+  std::vector<std::shared_ptr<DataWithAesthetic>> m_data;
 
   /// label
   std::string m_label;
 
-  /// [xmin, ymin, xmax, ymax]
-  bfloat2_t m_limits;
-
   float m_line_width;
 
   RGBA m_color;
+
+  /// min/max limits of m_data across all frames
+  Limits m_limits;
 
   /// parent axis
   Axis &m_axis;
@@ -74,20 +82,20 @@ public:
     if (x.size() != y.size()) {
       throw Exception("x and y vector sizes do not match");
     }
-    std::vector<vfloat2_t> values(x.size());
-    for (size_t i = 0; i < x.size(); ++i) {
-      values[i][0] = x[i];
-      values[i][1] = y[i];
-    }
-    return add_values(std::move(values), time);
+    auto data = std::make_shared<DataWithAesthetic>();
+    data->set(Aesthetic::x(), x);
+    data->set(Aesthetic::y(), y);
+    return add_frame(data, time);
   }
 
-  void add_values(std::vector<vfloat2_t> &&values, float time);
+  void add_frame(const std::shared_ptr<DataWithAesthetic> &data, float time);
 
-  const std::vector<vfloat2_t> &get_values(const int i) const {
-    return m_values[i];
+  const std::shared_ptr<DataWithAesthetic> &get_data(const int i) const {
+    return m_data[i];
   }
-  std::vector<vfloat2_t> &get_values(const int i) { return m_values[i]; }
+  std::shared_ptr<DataWithAesthetic> &get_data(const int i) {
+    return m_data[i];
+  }
 
   void set_color(const RGBA &color) { m_color = color; }
   void set_label(const std::string &label) { m_label = label; }
@@ -102,8 +110,7 @@ public:
 private:
   template <typename Backend> void draw_plot(Backend &backend);
   template <typename Backend> void draw_highlights(Backend &backend);
-
-}; // namespace trase
+};
 
 } // namespace trase
 

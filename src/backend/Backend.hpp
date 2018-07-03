@@ -52,10 +52,8 @@ const float pi =
 /// [b d f]
 /// [0 0 1]
 ///
-struct Transform {
-  float a, b, c, d, e, f;
-
-  Transform() : a(1), b(0), c(0), d(1), e(0), f(0) {}
+struct TransformMatrix {
+  float a{1}, b{0}, c{0}, d{1}, e{0}, f{0};
 
   bool is_identity() {
     return a == 1.0f && b == 0.0f && c == 0.0f && d == 1.0f && e == 0.0f &&
@@ -126,19 +124,19 @@ struct Transform {
 
 enum Align {
   // Horizontal align
-  ALIGN_LEFT = 1 << 0,   // Default, align text horizontally to left.
-  ALIGN_CENTER = 1 << 1, // Align text horizontally to center.
-  ALIGN_RIGHT = 1 << 2,  // Align text horizontally to right.
+  ALIGN_LEFT = 1u << 0u,   // Default, align text horizontally to left.
+  ALIGN_CENTER = 1u << 1u, // Align text horizontally to center.
+  ALIGN_RIGHT = 1u << 2u,  // Align text horizontally to right.
   // Vertical align
-  ALIGN_TOP = 1 << 3,      // Align text vertically to top.
-  ALIGN_MIDDLE = 1 << 4,   // Align text vertically to middle.
-  ALIGN_BOTTOM = 1 << 5,   // Align text vertically to bottom.
-  ALIGN_BASELINE = 1 << 6, // Default, align text vertically to baseline.
+  ALIGN_TOP = 1u << 3u,      // Align text vertically to top.
+  ALIGN_MIDDLE = 1u << 4u,   // Align text vertically to middle.
+  ALIGN_BOTTOM = 1u << 5u,   // Align text vertically to bottom.
+  ALIGN_BASELINE = 1u << 6u, // Default, align text vertically to baseline.
 };
 
 enum ArcDirection {
-  CLOCKWISE = 1 << 0,
-  COUNTER_CLOCKWISE = 1 << 1,
+  CLOCKWISE = 1u << 0u,
+  COUNTER_CLOCKWISE = 1u << 1u,
 };
 
 class FontManager {

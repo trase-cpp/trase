@@ -31,34 +31,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "frontend/Plot1D.hpp"
+#ifndef TRANSFORM_H_
+#define TRANSFORM_H_
 
-#include <numeric>
+#include <functional>
 
-#include "util/Vector.hpp"
+#include "frontend/Data.hpp"
 
 namespace trase {
 
-Plot1D::Plot1D(Axis &axis)
-    : Drawable(&axis, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
-      m_line_width(3.f), m_axis(axis) {}
+/// holds a `std::function` that maps between two DataWithAesthetic classes
+class Transform {
+  std::function<DataWithAesthetic(const DataWithAesthetic &)> m_transform;
 
-void Plot1D::add_frame(const std::shared_ptr<DataWithAesthetic> &data,
-                       float time) {
-  // add new data frame
-  m_data.push_back(data);
+public:
+  /// construct a Transform wrapping the given transform function T. The
+  /// function T can be any function or function object that is compatible with
+  /// `std::function`
+  template <typename T>
+  explicit Transform(const T &transform) : m_transform(transform) {}
 
-  // add new frame time
-  if (time > 0) {
-    add_frame_time(time);
+  /// perform mapping on `data`, return result
+  DataWithAesthetic operator()(const DataWithAesthetic &data) {
+    return m_transform(data);
   }
+};
 
-  // update limits with new frame
-  m_limits += data->limits();
-
-  // communicate limits to parent axis
-  const float buffer = 1.05f;
-  m_axis.limits() += m_limits * Limits::vector_t::Constant(buffer);
-}
+/// Identity transform, just pass through...
+struct Identity {
+  DataWithAesthetic operator()(const DataWithAesthetic &data) { return data; }
+};
 
 } // namespace trase
+
+#endif // TRANSFORM_H_

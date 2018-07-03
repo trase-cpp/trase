@@ -38,10 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "backend/Backend.hpp"
 
-TEST_CASE("constructors", "[transform]") {
+TEST_CASE("constructors", "[transform matrix]") {
 
   // Default construction
-  trase::Transform t;
+  trase::TransformMatrix t;
 
   // check identity
   CHECK(t.is_identity() == true);
@@ -58,17 +58,17 @@ TEST_CASE("constructors", "[transform]") {
   CHECK(t.f == 0.f);
 }
 
-TEST_CASE("to_string", "[transform]") {
+TEST_CASE("to_string", "[transform matrix]") {
 
   // Default construction
-  trase::Transform t;
+  trase::TransformMatrix t;
 
   CHECK(t.to_string() == "transform=\"matrix(1 0 0 1 0 0)\"");
 }
 
-TEST_CASE("translations", "[transform]") {
+TEST_CASE("translations", "[transform matrix]") {
 
-  trase::Transform t;
+  trase::TransformMatrix t;
 
   /// [a c e]   [1 0 0]
   /// [b d f] = [0 1 1]
@@ -95,9 +95,9 @@ TEST_CASE("translations", "[transform]") {
   CHECK(t.f == 1.f);
 }
 
-TEST_CASE("rotations", "[transform]") {
+TEST_CASE("rotations", "[transform matrix]") {
 
-  trase::Transform t;
+  trase::TransformMatrix t;
 
   /// [a c e]   [-1 0 0]
   /// [b d f] = [0 -1 0]

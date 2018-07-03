@@ -32,31 +32,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "frontend/Axis.hpp"
-
-#include <limits>
-
 #include "frontend/Figure.hpp"
 #include "util/Vector.hpp"
 
 namespace trase {
 
 Axis::Axis(Figure &figure, const bfloat2_t &area)
-    : Drawable(&figure, area),
-      m_limits(vfloat2_t(std::numeric_limits<float>::max(),
-                         std::numeric_limits<float>::max()),
-               vfloat2_t(std::numeric_limits<float>::min(),
-                         std::numeric_limits<float>::min())),
-      m_sig_digits(2), m_nx_ticks(0), m_ny_ticks(0), m_tick_len(10.f),
-      m_line_width(3.f), m_font_size(18.f), m_font_face("Roboto"),
-      m_legend(false) {}
+    : Drawable(&figure, area), m_sig_digits(2), m_nx_ticks(0), m_ny_ticks(0),
+      m_tick_len(10.f), m_line_width(3.f), m_font_size(18.f),
+      m_font_face("Roboto"), m_legend(false) {}
 
 std::shared_ptr<Plot1D> Axis::plot(int n) { return m_plot1d.at(n); }
 
-std::shared_ptr<Plot1D> Axis::plot_impl(std::vector<vfloat2_t> &&values,
-                                        const std::string &label) {
+std::shared_ptr<Plot1D>
+Axis::plot_impl(const std::shared_ptr<DataWithAesthetic> &values,
+                const std::string &label) {
   m_plot1d.emplace_back(std::make_shared<Plot1D>(*this));
   m_children.push_back(m_plot1d.back().get());
-  m_plot1d.back()->add_values(std::move(values), 0);
+  m_plot1d.back()->add_frame(values, 0);
   m_plot1d.back()->set_color(default_colors[m_plot1d.size() - 1]);
   m_plot1d.back()->set_label(label);
   m_plot1d.back()->resize(m_pixels);

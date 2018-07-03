@@ -31,34 +31,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "frontend/Plot1D.hpp"
-
-#include <numeric>
-
-#include "util/Vector.hpp"
+#include "frontend/Data.hpp"
 
 namespace trase {
 
-Plot1D::Plot1D(Axis &axis)
-    : Drawable(&axis, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
-      m_line_width(3.f), m_axis(axis) {}
-
-void Plot1D::add_frame(const std::shared_ptr<DataWithAesthetic> &data,
-                       float time) {
-  // add new data frame
-  m_data.push_back(data);
-
-  // add new frame time
-  if (time > 0) {
-    add_frame_time(time);
-  }
-
-  // update limits with new frame
-  m_limits += data->limits();
-
-  // communicate limits to parent axis
-  const float buffer = 1.05f;
-  m_axis.limits() += m_limits * Limits::vector_t::Constant(buffer);
-}
+const int Aesthetic::size;
+const int Aesthetic::x::index;
+const char *Aesthetic::x::name = "x";
+const int Aesthetic::y::index;
+const char *Aesthetic::y::name = "y";
+const int Aesthetic::color::index;
+const char *Aesthetic::color::name = "y";
 
 } // namespace trase
