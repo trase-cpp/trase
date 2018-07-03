@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of trase.
+This file is part of the Oxford RSE C++ Template project.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,29 +31,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "frontend/Axis.hpp"
-#include "frontend/Figure.hpp"
-#include "util/Vector.hpp"
+#include "catch.hpp"
 
-namespace trase {
+#include "util/Colors.hpp"
+#include "util/Style.hpp"
 
-Axis::Axis(Figure &figure, const bfloat2_t &area)
-    : Drawable(&figure, area), m_sig_digits(2), m_nx_ticks(0), m_ny_ticks(0),
-      m_tick_len(10.f), m_line_width(3.f), m_font_size(18.f),
-      m_font_face("Roboto"), m_legend(false) {}
+TEST_CASE("style construction", "[style]") {
 
-std::shared_ptr<Plot1D> Axis::plot(int n) { return m_plot1d.at(n); }
+  trase::Style s{};
 
-std::shared_ptr<Plot1D>
-Axis::plot_impl(const std::shared_ptr<DataWithAesthetic> &values,
-                const std::string &label) {
-  m_plot1d.emplace_back(std::make_shared<Plot1D>(*this));
-  m_children.push_back(m_plot1d.back().get());
-  m_plot1d.back()->add_frame(values, 0);
-  m_plot1d.back()->set_color(RGBA::defaults[m_plot1d.size() - 1]);
-  m_plot1d.back()->set_label(label);
-  m_plot1d.back()->resize(m_pixels);
-  return m_plot1d.back();
+  CHECK(s.line_width() == 0.f);
 }
 
-} // namespace trase
+TEST_CASE("style setting and getting", "[style]") {
+
+  trase::Style my_style;
+
+  trase::RGBA my_col{1,2,3,4};
+
+  my_style.line_width(2.3f).color(my_col);
+
+  CHECK(my_style.line_width() == 2.3f);
+  CHECK(my_style.color() == my_col);
+}

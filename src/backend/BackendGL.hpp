@@ -122,7 +122,7 @@ public:
   inline void move_to(const vfloat2_t &x) { nvgMoveTo(m_vg, x[0], x[1]); }
   inline void line_to(const vfloat2_t &x) { nvgLineTo(m_vg, x[0], x[1]); }
   inline void stroke_color(const RGBA &color) {
-    nvgStrokeColor(m_vg, nvgRGBA(color.m_r, color.m_g, color.m_b, color.m_a));
+    nvgStrokeColor(m_vg, nvgRGBA(color.r(), color.g(), color.b(), color.a()));
   }
 
   inline void stroke_width(const float lw) { nvgStrokeWidth(m_vg, lw); }
@@ -145,7 +145,7 @@ public:
   inline void font_blur(const float blur) { nvgFontBlur(m_vg, blur); }
   inline void text_align(const int align) { nvgTextAlign(m_vg, align); }
   inline void fill_color(const RGBA &color) {
-    nvgFillColor(m_vg, nvgRGBA(color.m_r, color.m_g, color.m_b, color.m_a));
+    nvgFillColor(m_vg, nvgRGBA(color.r(), color.g(), color.b(), color.a()));
   }
 
   inline void text(const vfloat2_t &x, const char *string, const char *end) {
@@ -169,7 +169,7 @@ private:
   NVGcontext *init_nanovg(int x_pixels, int y_pixels);
   void init_imgui(GLFWwindow *window);
   GLFWwindow *create_window(int x_pixels, int y_pixels, const char *name);
-}; // namespace trase
+};
 
 } // namespace trase
 

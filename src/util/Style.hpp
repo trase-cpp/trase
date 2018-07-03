@@ -31,72 +31,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "util/Colors.hpp"
+#ifndef STYLE_H_
+#define STYLE_H_
 
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-#include "util/Exception.hpp"
+#include "util/Colors.hpp"
 
 namespace trase {
 
-RGBA::RGBA(int r, int g, int b, int a) noexcept
-    : m_r(r), m_g(g), m_b(b), m_a(a) {}
+class Style {
 
-int RGBA::r() const noexcept { return m_r; }
-int RGBA::g() const noexcept { return m_g; }
-int RGBA::b() const noexcept { return m_b; }
-int RGBA::a() const noexcept { return m_a; }
+  float m_line_width{0.f};
 
-RGBA &RGBA::r(const int r) noexcept {
-  m_r = r;
-  return *this;
-}
+  RGBA m_color{RGBA::black};
 
-RGBA &RGBA::g(const int g) noexcept {
-  m_g = g;
-  return *this;
-}
+public:
 
-RGBA &RGBA::b(const int b) noexcept {
-  m_b = b;
-  return *this;
-}
+  /// constructor
+  Style() = default;
 
-RGBA &RGBA::a(const int a) noexcept {
-  m_a = a;
-  return *this;
-}
+  /// get the current line width
+  float line_width() const noexcept;
 
-std::string RGBA::to_rgb_string() const noexcept {
-  std::stringstream stream;
-  stream.precision(2);
+  /// get the current colour
+  RGBA color() const noexcept;
 
-  stream << '#' << std::hex << std::setfill('0') << std::setw(2) << m_r
-         << std::setw(2) << m_g << std::setw(2) << m_b;
-  return stream.str();
-}
+  /// set the new line width
+  Style &line_width(float lineWidth) noexcept;
 
-bool RGBA::operator==(const RGBA &b) const noexcept {
-  return m_r == b.r() && m_g == b.g() && m_b == b.b() && m_a == b.a();
-}
-
-
-bool RGBA::operator!=(const RGBA &b) const noexcept {
-  return !(*this == b);
-}
-
-const int RGBA::default_alpha = 200;
-
-// default colors taken from d3 category10 color scheme
-// https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
-const std::array<const RGBA, 10> RGBA::defaults = {
-    RGBA{31, 119, 180},  RGBA{255, 127, 14},  RGBA{44, 160, 44},
-    RGBA{214, 39, 40},   RGBA{148, 103, 189}, RGBA{140, 86, 75},
-    RGBA{227, 119, 194}, RGBA{127, 127, 127}, RGBA{188, 189, 34},
-    RGBA{23, 190, 207}};
-
-const RGBA RGBA::black {0, 0, 0};
-const RGBA RGBA::white {255, 255, 255};
+  /// set the new color
+  Style &color(RGBA color) noexcept;
+};
 
 } // namespace trase
+
+#endif // STYLE_H_

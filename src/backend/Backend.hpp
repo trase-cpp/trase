@@ -122,7 +122,7 @@ struct TransformMatrix {
   }
 };
 
-enum Align {
+enum Align : unsigned int {
   // Horizontal align
   ALIGN_LEFT = 1u << 0u,   // Default, align text horizontally to left.
   ALIGN_CENTER = 1u << 1u, // Align text horizontally to center.

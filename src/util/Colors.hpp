@@ -35,37 +35,69 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define COLORS_H_
 
 #include <array>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
 #include <string>
 
 namespace trase {
 
-struct RGBA {
+/// Colour class with red, green, blue and alpha in range 0 to 255
+class RGBA {
+
+  /// red value
+  int m_r;
+
+  /// green value
+  int m_g;
+
+  /// blue value
+  int m_b;
+
+  /// alpha value
+  int m_a;
+
+public:
+
+  const static int default_alpha;
+  const static std::array<const RGBA, 10> defaults;
+  const static RGBA black;
+  const static RGBA white;
+
+  /// default constructor
   RGBA() = default;
-  RGBA(int r, int g, int b, int a) noexcept : m_r(r), m_g(g), m_b(b), m_a(a) {}
-  std::string to_rgb_string() const {
-    std::stringstream stream;
-    stream.precision(2);
 
-    stream << '#' << std::hex << std::setfill('0') << std::setw(2) << m_r
-           << std::setw(2) << m_g << std::setw(2) << m_b;
-    return stream.str();
-  }
-  int m_r, m_g, m_b, m_a;
+  /// constructor taking red, green, blue and alpha
+  RGBA(int r, int g, int b, int a=default_alpha) noexcept;
+
+  /// convert to an rgb string of form #rrggbb
+  std::string to_rgb_string() const noexcept;
+
+  /// Get the current red value
+  int r() const noexcept;
+
+  /// Get the current green value
+  int g() const noexcept;
+
+  /// Get the current blue value
+  int b() const noexcept;
+
+  /// Get the current alpha value
+  int a() const noexcept;
+
+  /// Set a new red value
+  RGBA &r(int r) noexcept;
+
+  /// Set a new green value
+  RGBA &g(int g) noexcept;
+
+  /// Set a new blue value
+  RGBA &b(int b) noexcept;
+
+  /// Set a new alpha value
+  RGBA &a(int a) noexcept;
+
+  /// Equality comparison
+  bool operator==(const RGBA &b) const noexcept;
+  bool operator!=(const RGBA &b) const noexcept;
 };
-
-const static int default_alpha = 200;
-
-// default colors taken from d3 category10 color scheme
-// https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
-const static std::array<RGBA, 10> default_colors = {
-    RGBA(31, 119, 180, default_alpha),  RGBA(255, 127, 14, default_alpha),
-    RGBA(44, 160, 44, default_alpha),   RGBA(214, 39, 40, default_alpha),
-    RGBA(148, 103, 189, default_alpha), RGBA(140, 86, 75, default_alpha),
-    RGBA(227, 119, 194, default_alpha), RGBA(127, 127, 127, default_alpha),
-    RGBA(188, 189, 34, default_alpha),  RGBA(23, 190, 207, default_alpha)};
 
 } // namespace trase
 
