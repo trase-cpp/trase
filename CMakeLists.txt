@@ -51,7 +51,7 @@ if (MSVC)
     set(release_options ${common_options} -D_ITERATOR_DEBUG_LEVEL=0 -D_SCL_SECURE_NO_WARNINGS)
 
     add_compile_options(
-        "$<$<CONFIG:Debug>:${debug_options}:${release_options}>"
+        "$<$<CONFIG:Debug>:${debug_options},${release_options}>"
         )
 else ()
     add_compile_options (-Wall -pedantic)
