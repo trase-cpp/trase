@@ -17,7 +17,7 @@ init:
 - echo %generator%
 
 before_build:
-- cmake -G %generator% .
+- cmake -G %generator% -Dtrase_BUILD_OPENGL:BOOL=FALSE .
 
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\$(APPVEYOR_PROJECT_NAME).sln
