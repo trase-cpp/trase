@@ -135,24 +135,27 @@ set (trase_headers
     src/trase.hpp
     src/backend/Backend.hpp
     src/frontend/Axis.hpp
+    src/frontend/Data.hpp
     src/frontend/Drawable.hpp
     src/frontend/Figure.hpp
     src/frontend/Plot1D.hpp
     src/frontend/Transform.hpp
-    src/frontend/Data.hpp
     src/util/BBox.hpp
     src/util/Colors.hpp
     src/util/Exception.hpp
+    src/util/Style.hpp
     src/util/Vector.hpp
     )
 
 set (trase_source
     src/backend/Backend.cpp
     src/frontend/Axis.cpp
+    src/frontend/Data.cpp
     src/frontend/Drawable.cpp
     src/frontend/Figure.cpp
     src/frontend/Plot1D.cpp
-    src/frontend/Data.cpp
+    src/util/Colors.cpp
+    src/util/Style.cpp
     )
 
 set (trase_draw_headers
@@ -224,15 +227,17 @@ endif ()
 
 add_executable (
     trase_tst
-    tests/TestFigure.cpp
     tests/TestAxis.cpp
-    tests/TestPlot1D.cpp
     tests/TestBackendSVG.cpp
     tests/TestBBox.cpp
-    tests/TestVector.cpp
-    tests/TestTransformMatrix.cpp
+    tests/TestColors.cpp
+    tests/TestFigure.cpp
     tests/TestFontManager.cpp
-    )
+    tests/TestPlot1D.cpp
+    tests/TestStyle.cpp
+    tests/TestTransformMatrix.cpp
+    tests/TestVector.cpp
+)
 target_include_directories (trase_tst PRIVATE tests)
 target_link_libraries (trase_tst PRIVATE trase backendSVG)
 add_test (the_trase_tst trase_tst)
