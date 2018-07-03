@@ -52,10 +52,12 @@ class Plot1D;
 
 namespace trase {
 
-class Plot1D : public Drawable {
+// available geometry types
+enum class Geometry { point, line };
 
-  // available geometry types
-  enum Geometry { Point, Line };
+class Plot1D : public Drawable {
+  /// geometry
+  Geometry m_geom;
 
   /// dataset
   std::vector<std::shared_ptr<DataWithAesthetic>> m_data;
@@ -98,17 +100,21 @@ public:
   }
 
   void set_color(const RGBA &color) { m_color = color; }
+  void set_geometry(const Geometry &geom) { m_geom = geom; }
   void set_label(const std::string &label) { m_label = label; }
   const std::string &get_label() const { return m_label; }
   const RGBA &get_color() const { return m_color; }
 
   template <typename Backend> void serialise(Backend &backend);
-  template <typename Backend> void serialise_frames(Backend &backend);
+  template <typename Backend> void serialise_frames_line(Backend &backend);
+  template <typename Backend> void serialise_frames_point(Backend &backend);
   template <typename Backend> void serialise_highlights(Backend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 
 private:
   template <typename Backend> void draw_plot(Backend &backend);
+  template <typename Backend> void draw_plot_line(Backend &backend);
+  template <typename Backend> void draw_plot_point(Backend &backend);
   template <typename Backend> void draw_highlights(Backend &backend);
 };
 

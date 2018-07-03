@@ -268,6 +268,21 @@ public:
 
   /// returns the min/max limits of the data
   const Limits &limits() { return m_limits; }
+
+  template <typename T> DataWithAesthetic &x(const std::vector<T> &data) {
+    set(Aesthetic::x(), data);
+    return *this;
+  }
+
+  template <typename T> DataWithAesthetic &y(const std::vector<T> &data) {
+    set(Aesthetic::y(), data);
+    return *this;
+  }
+
+  template <typename T> DataWithAesthetic &color(const std::vector<T> &data) {
+    set(Aesthetic::color(), data);
+    return *this;
+  }
 };
 
 } // namespace trase

@@ -38,13 +38,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 template <typename Backend> void Plot1D::serialise(Backend &backend) {
-  serialise_frames(backend);
+  switch (m_geom) {
+  case Geometry::line:
+    serialise_frames_line(backend);
+    break;
+  case Geometry::point:
+    serialise_frames_point(backend);
+    break;
+  }
   serialise_highlights(backend);
 }
 
-template <typename Backend> void Plot1D::serialise_frames(Backend &backend) {
+template <typename Backend>
+void Plot1D::serialise_frames_line(Backend &backend) {
 
-  backend.begin_frames();
+  backend.begin_animated_path();
   backend.stroke_color(m_color);
   backend.stroke_width(m_line_width);
 
@@ -59,14 +67,30 @@ template <typename Backend> void Plot1D::serialise_frames(Backend &backend) {
   for (size_t f = 1; f < m_times.size(); ++f) {
     auto x = m_data[f]->begin(Aesthetic::x());
     auto y = m_data[f]->begin(Aesthetic::y());
-    backend.add_frame(m_times[f - 1]);
+    backend.add_animated_path(m_times[f - 1]);
     backend.move_to(m_axis.to_pixel({x[0], y[0]}));
     for (int i = 1; i < m_data[0]->rows(); ++i) {
       backend.line_to(m_axis.to_pixel({x[i], y[i]}));
     }
   }
 
-  backend.end_frames(m_times.back());
+  backend.end_animated_path(m_times.back());
+}
+
+template <typename Backend>
+void Plot1D::serialise_frames_point(Backend &backend) {
+
+  backend.stroke_color(m_color);
+  backend.stroke_width(m_line_width);
+  for (int i = 0; i < m_data[0]->rows(); ++i) {
+    for (size_t f = 0; f < m_times.size(); ++f) {
+      auto x = m_data[f]->begin(Aesthetic::x());
+      auto y = m_data[f]->begin(Aesthetic::y());
+      backend.add_animated_circle(m_axis.to_pixel({x[i], y[i]}), m_line_width,
+                                  m_times[f]);
+    }
+    backend.end_animated_circle();
+  }
 }
 
 template <typename Backend>
@@ -97,11 +121,18 @@ void Plot1D::serialise_highlights(Backend &backend) {
 template <typename Backend>
 void Plot1D::draw(Backend &backend, const float time) {
   update_frame_info(time);
-  draw_plot(backend);
+  switch (m_geom) {
+  case Geometry::line:
+    draw_plot_line(backend);
+    break;
+  case Geometry::point:
+    draw_plot_point(backend);
+    break;
+  }
   draw_highlights(backend);
 }
 
-template <typename Backend> void Plot1D::draw_plot(Backend &backend) {
+template <typename Backend> void Plot1D::draw_plot_line(Backend &backend) {
 
   backend.begin_path();
 
@@ -134,6 +165,37 @@ template <typename Backend> void Plot1D::draw_plot(Backend &backend) {
   backend.stroke_color(m_color);
   backend.stroke_width(m_line_width);
   backend.stroke();
+}
+
+template <typename Backend> void Plot1D::draw_plot_point(Backend &backend) {
+
+  const int f = m_frame_info.frame_above;
+  const float w1 = m_frame_info.w1;
+  const float w2 = m_frame_info.w2;
+
+  backend.fill_color(m_color);
+  backend.stroke_color(m_color);
+  backend.stroke_width(m_line_width);
+
+  if (w2 == 0.0f) {
+    // exactly on a single frame
+    auto x = m_data[f]->begin(Aesthetic::x());
+    auto y = m_data[f]->begin(Aesthetic::y());
+    for (int i = 0; i < m_data[0]->rows(); ++i) {
+      backend.circle(m_axis.to_pixel({x[i], y[i]}), m_line_width);
+    }
+  } else {
+    // between two frames
+    auto x0 = m_data[f - 1]->begin(Aesthetic::x());
+    auto y0 = m_data[f - 1]->begin(Aesthetic::y());
+    auto x1 = m_data[f]->begin(Aesthetic::x());
+    auto y1 = m_data[f]->begin(Aesthetic::y());
+    for (int i = 0; i < m_data[0]->rows(); ++i) {
+      backend.circle(m_axis.to_pixel(w1 * vfloat2_t{x1[i], y1[i]} +
+                                     w2 * vfloat2_t{x0[i], y0[i]}),
+                     m_line_width);
+    }
+  }
 }
 
 template <typename Backend> void Plot1D::draw_highlights(Backend &backend) {

@@ -128,6 +128,15 @@ public:
     return plot_impl(data, label);
   }
 
+  /// Create a new plot and return a shared pointer to it.
+  /// \param data the `DataWithAesthetic` dataset to use
+  /// \return shared pointer to the new plot
+  template <typename T1, typename T2>
+  std::shared_ptr<Plot1D> plot(const std::shared_ptr<DataWithAesthetic> &data,
+                               const std::string &label = std::string()) {
+    return plot_impl(data, label);
+  }
+
   /// Return a shared pointer to an existing plot.
   /// Throws std::out_of_range exception if out of range.
   /// \param n the plot to return

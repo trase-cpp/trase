@@ -60,9 +60,10 @@ class BackendSVG {
   std::string m_onmouseout_fill;
   std::string m_onmouseover_tooltip;
   std::string m_onmouseout_tooltip;
-  std::string m_animate_values;
+  std::vector<std::string> m_animate_values;
   std::string m_animate_times;
   float m_time_span;
+  float m_old_time;
   std::string m_font_size_base;
   std::string m_font_face_base;
   TransformMatrix m_transform;
@@ -88,12 +89,16 @@ public:
   inline void translate(const vfloat2_t &v) { m_transform.translate(v); }
 
   inline void begin_path() { m_path.clear(); }
-  inline void begin_frames() {
+
+  inline void begin_animated_path() {
+    if (m_animate_values.size() < 1) {
+      m_animate_values.resize(1);
+    }
     m_animate_times = "keyTimes=\"";
-    m_animate_values = "values=\"";
+    m_animate_values[0] = "values=\"";
     begin_path();
   }
-  inline void add_frame(const float time) {
+  inline void add_animated_path(const float time) {
 
     // if its the first frame need to write the path element
     // TODO: not sure why need to add d attribute here, but neccessary for
@@ -106,23 +111,26 @@ public:
 
     // all times are scaled by total time span (all times start at 0)
     m_animate_times += std::to_string(time / m_time_span) + ';';
-    m_animate_values += m_path + ';';
+    m_animate_values[0] += m_path + ';';
     m_path.clear();
   }
 
-  inline void end_frames(const float time) {
-    add_frame(time);
+  inline void end_animated_path(const float time) {
+    add_animated_path(time);
     m_animate_times.back() = '\"';
-    m_animate_values.back() = '\"';
+    m_animate_values[0].back() = '\"';
     m_out << "<animate attributeName=\"d\" "
              //"calcMode=\"discrete\" "
              "repeatCount=\"indefinite\" "
              "begin =\"0s\" "
              "dur=\""
-          << m_time_span << "s\" " << m_animate_values << ' ' << m_animate_times
-          << "/>\n";
+          << m_time_span << "s\" " << m_animate_values[0] << ' '
+          << m_animate_times << "/>\n";
     m_out << "</path>\n";
+    m_animate_times.clear();
+    m_animate_values[0].clear();
   }
+
   inline void rounded_rect(const bfloat2_t &x, const float r) { rect(x); }
   inline void rect(const bfloat2_t &x) {
     const auto &delta = x.delta();
@@ -141,7 +149,7 @@ public:
     m_out << "/>\n";
   }
 
-  inline void circle(const vfloat2_t &centre, float radius) {
+  inline void circle_begin(const vfloat2_t &centre, float radius) {
     m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1]
           << "\" r=\"" << radius << "\" " << m_fill_color << ' ' << m_line_color
           << ' ' << m_linewidth;
@@ -153,12 +161,61 @@ public:
             << m_onmouseout_tooltip << '\"';
     }
 
-    m_out << "/>\n";
+    m_out << ">\n";
 
     /*
       arc(centre, radius, 0, pi);
       arc(centre, radius, pi, 2 * pi);
       */
+  }
+
+  inline void circle_end() { m_out << "</circle>\n"; }
+
+  inline void circle(const vfloat2_t &centre, float radius) {
+    circle_begin(centre, radius);
+    circle_end();
+  }
+
+  inline void add_animated_circle(const vfloat2_t &centre, float radius,
+                                  float time) {
+    // check if first circle
+    if (m_animate_times.empty()) {
+      circle_begin(centre, radius);
+
+      if (m_animate_values.size() < 3) {
+        m_animate_values.resize(3);
+      }
+      m_animate_times = "keyTimes=\"" + std::to_string(time / m_time_span);
+      m_animate_values[0] = "values=\"" + std::to_string(centre[0]);
+      m_animate_values[1] = "values=\"" + std::to_string(centre[1]);
+      m_animate_values[2] = "values=\"" + std::to_string(radius);
+    } else {
+      m_animate_times += std::to_string(time / m_time_span) + ';';
+      m_animate_values[0] = std::to_string(centre[0]) + ';';
+      m_animate_values[1] = std::to_string(centre[1]) + ';';
+      m_animate_values[2] = std::to_string(radius) + ';';
+    }
+  }
+
+  inline void end_animated_circle() {
+
+    m_animate_times.back() = '\"';
+    for (int i = 0; i < 3; ++i) {
+      m_animate_values[3].back() = '\"';
+    }
+    const std::string names[3] = {"cx", "cy", "r"};
+    for (int i = 0; i < 3; ++i) {
+      m_out << "<animate attributeName=\"" + names[i] +
+                   "\" repeatCount=\"indefinite\" begin =\"0s\" dur=\""
+            << m_time_span << "s\" " << m_animate_values[0] << ' '
+            << m_animate_times << "/>\n";
+    }
+    circle_end();
+    m_animate_times.clear();
+
+    for (int i = 0; i < 3; ++i) {
+      m_animate_values[i].clear();
+    }
   }
 
   inline void circle_with_text(const vfloat2_t &centre, float radius,
