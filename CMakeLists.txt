@@ -48,10 +48,10 @@ set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 if (MSVC)
     set(common_options /W3 /WX)
     set(debug_options ${common_options} -D_ITERATOR_DEBUG_LEVEL=2)
-    set(release_options ${common_options} -D_ITERATOR_DEBUG_LEVEL=0 -D_SCL_SECURE_NO_WARNINGS)
+    set(not_debug_options ${common_options} -D_ITERATOR_DEBUG_LEVEL=0 -D_SCL_SECURE_NO_WARNINGS)
 
     add_compile_options(
-        "$<$<CONFIG:Debug>:${debug_options}>$<$<NOT:$<CONFIG:Debug>>:${release_options}>"
+        "$<$<CONFIG:Debug>:${debug_options}>$<$<NOT:$<CONFIG:Debug>>:${not_debug_options}>"
         )
 else ()
     add_compile_options (-Wall -pedantic)
