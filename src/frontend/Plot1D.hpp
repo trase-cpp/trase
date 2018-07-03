@@ -53,7 +53,7 @@ class Plot1D;
 namespace trase {
 
 // available geometry types
-enum class Geometry { point, line };
+enum class Geometry { line, point };
 
 class Plot1D : public Drawable {
   /// geometry

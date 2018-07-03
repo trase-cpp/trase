@@ -171,7 +171,7 @@ public:
 /// total number of aesthetics
 struct Aesthetic {
   // aesthetic indexes must be able to index a vector with size=SIZE
-  static const int size = 3;
+  static const int size = 4;
 
   /// the data to display on the x-axis of the plot
   struct x {
@@ -188,6 +188,12 @@ struct Aesthetic {
   /// the color of each plotting element
   struct color {
     static const int index = 2;
+    static const char *name;
+  };
+
+  /// the size of each plotting element
+  struct size {
+    static const int index = 3;
     static const char *name;
   };
 };
@@ -281,6 +287,11 @@ public:
 
   template <typename T> DataWithAesthetic &color(const std::vector<T> &data) {
     set(Aesthetic::color(), data);
+    return *this;
+  }
+
+  template <typename T> DataWithAesthetic &size(const std::vector<T> &data) {
+    set(Aesthetic::size(), data);
     return *this;
   }
 };

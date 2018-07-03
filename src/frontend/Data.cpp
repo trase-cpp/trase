@@ -41,6 +41,8 @@ const char *Aesthetic::x::name = "x";
 const int Aesthetic::y::index;
 const char *Aesthetic::y::name = "y";
 const int Aesthetic::color::index;
-const char *Aesthetic::color::name = "y";
+const char *Aesthetic::color::name = "color";
+const int Aesthetic::size::index;
+const char *Aesthetic::size::name = "size";
 
 } // namespace trase
