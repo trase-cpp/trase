@@ -33,8 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
-#include "frontend/Style.hpp"
 #include "util/Colors.hpp"
+#include "util/Style.hpp"
 
 TEST_CASE("style construction", "[style]") {
 
