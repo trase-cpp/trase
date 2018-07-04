@@ -45,15 +45,13 @@ class Plot1D;
 #include "frontend/Axis.hpp"
 #include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
+#include "frontend/Geometry.hpp"
 #include "frontend/Transform.hpp"
 #include "util/BBox.hpp"
 #include "util/Colors.hpp"
 #include "util/Exception.hpp"
 
 namespace trase {
-
-// available geometry types
-enum class Geometry { line, point };
 
 class Plot1D : public Drawable {
   /// geometry

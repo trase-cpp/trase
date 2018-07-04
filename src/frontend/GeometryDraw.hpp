@@ -31,19 +31,69 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <algorithm>
-
-#include "frontend/Plot1D.hpp"
+#include "frontend/Geometry.hpp"
 
 namespace trase {
 
-template <typename Backend> void Plot1D::serialise(Backend &backend) {
-  serialise_geometry(m_geom, backend, m_axis, *this);
-  serialise_highlights(backend);
+template <typename Backend>
+void Line::serialise(Backend &backend, const Axis &axis, const Plot1D &plot) {
+  serialise_frames(backend, axis, plot);
+  serialise_highlights(backend, axis, plot);
 }
 
 template <typename Backend>
-void Plot1D::serialise_frames_point(Backend &backend) {
+void Line::draw(Backend &backend, const Axis &axis, const Plot1D &plot) {
+  draw_plot(backend, axis, plot);
+  draw_highlights(backend, axis, plot);
+}
+
+template <typename Backend>
+void Points::serialise(Backend &backend, const Axis &axis, const Plot1D &plot) {
+  serialise_frames(backend, axis, plot);
+}
+
+template <typename Backend>
+void Points::draw(Backend &backend, const Axis &axis, const Plot1D &plot) {
+  draw_plot(backend, axis, plot);
+}
+
+template <typename Backend>
+void Line::serialise_frames(Backend &backend, const Axis &axis,
+                            const Plot1D &plot) {
+
+  backend.begin_animated_path();
+  backend.stroke_color(m_color);
+  backend.stroke_width(m_line_width);
+
+  auto to_pixel = [&](auto x, auto y) {
+    return vfloat2_t{m_axis.to_display<Aesthetic::x>(x),
+                     m_axis.to_display<Aesthetic::y>(y)};
+  };
+
+  auto x = m_data[0]->begin(Aesthetic::x());
+  auto y = m_data[0]->begin(Aesthetic::y());
+  backend.move_to(to_pixel(x[0], y[0]));
+  for (int i = 1; i < m_data[0]->rows(); ++i) {
+    backend.line_to(to_pixel(x[i], y[i]));
+  }
+
+  // other frames
+  for (size_t f = 1; f < m_times.size(); ++f) {
+    auto x = m_data[f]->begin(Aesthetic::x());
+    auto y = m_data[f]->begin(Aesthetic::y());
+    backend.add_animated_path(m_times[f - 1]);
+    backend.move_to(to_pixel(x[0], y[0]));
+    for (int i = 1; i < m_data[0]->rows(); ++i) {
+      backend.line_to(to_pixel(x[i], y[i]));
+    }
+  }
+
+  backend.end_animated_path(m_times.back());
+}
+
+template <typename Backend>
+void Points::serialise_frames(Backend &backend, const Axis &axis,
+                              const Plot1D &plot) {
 
   auto to_pixel = [&](auto x, auto y, auto c, auto s) {
     return Vector<float, 4>{m_axis.to_display<Aesthetic::x>(x),
@@ -69,7 +119,8 @@ void Plot1D::serialise_frames_point(Backend &backend) {
 }
 
 template <typename Backend>
-void Plot1D::serialise_highlights(Backend &backend) {
+void Line::serialise_highlights(Backend &backend, const Axis &axis,
+                                const Plot1D &plot) {
 
   // highlighted points just for frame 0 and for stationary lines
   if (m_times.size() == 1) {
@@ -95,21 +146,7 @@ void Plot1D::serialise_highlights(Backend &backend) {
 }
 
 template <typename Backend>
-void Plot1D::draw(Backend &backend, const float time) {
-  update_frame_info(time);
-  switch (m_geom) {
-  case Geometry::line:
-    draw_plot_line(backend);
-    break;
-  case Geometry::point:
-    draw_plot_point(backend);
-    break;
-  }
-  draw_highlights(backend);
-}
-
-template <typename Backend> void Plot1D::draw_plot_line(Backend &backend) {
-
+void Line::draw_plot(Backend &backend, const Axis &axis, const Plot1D &plot) {
   backend.begin_path();
 
   const int f = m_frame_info.frame_above;
@@ -147,7 +184,8 @@ template <typename Backend> void Plot1D::draw_plot_line(Backend &backend) {
   backend.stroke();
 }
 
-template <typename Backend> void Plot1D::draw_plot_point(Backend &backend) {
+template <typename Backend>
+void Points::draw_plot(Backend &backend, const Axis &axis, const Plot1D &plot) {
 
   const int f = m_frame_info.frame_above;
   const float w1 = m_frame_info.w1;
@@ -194,7 +232,9 @@ template <typename Backend> void Plot1D::draw_plot_point(Backend &backend) {
   }
 }
 
-template <typename Backend> void Plot1D::draw_highlights(Backend &backend) {
+template <typename Backend>
+void Line::draw_highlights(Backend &backend, const Axis &axis,
+                           const Plot1D &plot) {
 
   // get mouse position
   auto pos = vfloat2_t(std::numeric_limits<float>::max(),
