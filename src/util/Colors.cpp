@@ -107,16 +107,16 @@ Colormap::Colormap(const std::vector<Vector<float, 3>> &list)
 
 RGBA Colormap::to_color(float i) const {
   if (i <= 0.f) {
-    return m_colors[0];
+    return 255.f * m_colors[0];
   }
   if (i >= 1.f) {
-    return m_colors.back();
+    return 255.f * m_colors.back();
   }
   const float pos = i * m_colors.size();
   const auto c0 = m_colors[static_cast<int>(std::floor(pos))];
   const auto c1 = m_colors[static_cast<int>(std::ceil(pos))];
 
-  return (pos - std::floor(pos)) * c1 + (std::ceil(pos) - pos) * c0;
+  return 255.f * ((pos - std::floor(pos)) * c1 + (std::ceil(pos) - pos) * c0);
 }
 
 /// https://github.com/BIDS/colormap/blob/master/option_d.py

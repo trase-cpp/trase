@@ -66,6 +66,8 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
   auto points = ax->plot(data, "points");
   points->set_geometry(Geometry::point);
 
+  std::cout << "limits of axis after points are: " << ax->limits() << std::endl;
+
   float time = 0.0;
 
   auto do_plot = [&](const float theta) {
@@ -88,6 +90,9 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
     const float theta = 5 - i;
     do_plot(theta);
   }
+
+  std::cout << "limits of axis after all  points are: " << ax->limits()
+            << std::endl;
 
   ax->xlabel("x");
   ax->ylabel("y");

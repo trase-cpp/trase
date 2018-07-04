@@ -244,14 +244,15 @@ struct Aesthetic {
     }
   };
 
-  /// the size of each plotting element, scaled from 1 pixel to size of y-axis
+  /// the size of each plotting element, scaled from 1 pixel to 1/20 size of
+  /// y-axis
   struct size {
     static const int index = 3;
     static const char *name;
 
     static float to_display(const float data, const Limits &data_lim,
                             const bfloat2_t &display_lim) {
-      float len_ratio = (display_lim.bmax[1] - display_lim.bmin[1]) /
+      float len_ratio = 0.05 * (display_lim.bmax[1] - display_lim.bmin[1]) /
                         (data_lim.bmax[index] - data_lim.bmin[index]);
 
       float rel_pos = data - data_lim.bmin[index];
@@ -259,7 +260,7 @@ struct Aesthetic {
     }
     static float from_display(const float display, const Limits &data_lim,
                               const bfloat2_t &display_lim) {
-      float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
+      float len_ratio = 20.f * (data_lim.bmax[index] - data_lim.bmin[index]) /
                         (display_lim.bmax[1] - display_lim.bmin[1]);
 
       float rel_pos = display - 1.f;

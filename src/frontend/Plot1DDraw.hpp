@@ -101,8 +101,8 @@ void Plot1D::serialise_frames_point(Backend &backend) {
                         m_data[f]->begin(Aesthetic::color())[i],
                         m_data[f]->begin(Aesthetic::size())[i]);
 
-      backend.fill_color(m_colormap->to_color(p[4]));
-      backend.add_animated_circle({p[0], p[1]}, p[2], m_times[f]);
+      backend.fill_color(m_colormap->to_color(p[2]));
+      backend.add_animated_circle({p[0], p[1]}, p[3], m_times[f]);
     }
     backend.end_animated_circle();
   }
@@ -185,7 +185,7 @@ template <typename Backend> void Plot1D::draw_plot_line(Backend &backend) {
   backend.stroke_color(m_color);
   backend.stroke_width(m_line_width);
   backend.stroke();
-} // namespace trase
+}
 
 template <typename Backend> void Plot1D::draw_plot_point(Backend &backend) {
 
@@ -212,8 +212,8 @@ template <typename Backend> void Plot1D::draw_plot_point(Backend &backend) {
     auto size = m_data[f]->begin(Aesthetic::size());
     for (int i = 0; i < m_data[0]->rows(); ++i) {
       const auto p = to_pixel(x[i], y[i], color[i], size[i]);
-      backend.fill_color(m_colormap->to_color(p[4]));
-      backend.circle({p[0], p[1]}, p[2]);
+      backend.fill_color(m_colormap->to_color(p[2]));
+      backend.circle({p[0], p[1]}, p[3]);
     }
   } else {
     // between two frames
@@ -228,8 +228,8 @@ template <typename Backend> void Plot1D::draw_plot_point(Backend &backend) {
     for (int i = 0; i < m_data[0]->rows(); ++i) {
       const auto p = w1 * to_pixel(x1[i], y1[i], color1[i], size1[i]) +
                      w2 * to_pixel(x0[i], y0[i], color0[i], size0[i]);
-      backend.fill_color(m_colormap->to_color(p[4]));
-      backend.circle({p[0], p[1]}, p[2]);
+      backend.fill_color(m_colormap->to_color(p[2]));
+      backend.circle({p[0], p[1]}, p[3]);
     }
   }
 }
