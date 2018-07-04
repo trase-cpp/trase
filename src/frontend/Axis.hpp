@@ -145,22 +145,11 @@ public:
   template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 
-  vfloat2_t from_pixel(const vfloat2_t &i) const {
-    const bfloat2_t xy_limits({m_limits.bmin[Aesthetic::x::index],
-                               m_limits.bmin[Aesthetic::y::index]},
-                              {m_limits.bmax[Aesthetic::x::index],
-                               m_limits.bmax[Aesthetic::y::index]});
-
-    return m_pixels.to_coords(xy_limits, i);
+  template <typename Aesthetic> float from_display(const float i) const {
+    Aesthetic::from_display(i, m_limits, m_pixels);
   }
-
-  vfloat2_t to_pixel(const vfloat2_t &i) const {
-    const bfloat2_t xy_limits({m_limits.bmin[Aesthetic::x::index],
-                               m_limits.bmin[Aesthetic::y::index]},
-                              {m_limits.bmax[Aesthetic::x::index],
-                               m_limits.bmax[Aesthetic::y::index]});
-
-    return xy_limits.to_coords(m_pixels, i);
+  template <typename Aesthetic> float to_display(const float i) const {
+    Aesthetic::to_display(i, m_limits, m_pixels);
   }
 
   void font_face(const std::string &fontFace) { m_font_face = fontFace; }

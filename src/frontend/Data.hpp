@@ -175,29 +175,28 @@ public:
 struct Aesthetic {
   // aesthetic indexes must be able to index a vector with size=SIZE
   static const int size = 4;
-  using Limits = bbox<float, size>;
 
-  struct DisplayLimits;
+  using Limits = bbox<float, size>;
 
   /// the data to display on the x-axis of the plot
   struct x {
     static const int index = 0;
     static const char *name;
-    static float to_display(const float data, const Limits &limits,
-                            const DisplayLimits &display_limits) {
-      float len_ratio = (display_limits.bmax[index] - pixels.bmin[0]) /
-                        (limits.bmax[index] - limits.bmin[index]);
+    static float to_display(const float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim) {
+      float len_ratio = (display_lim.bmax[0] - display_lim.bmin[0]) /
+                        (data_lim.bmax[index] - data_lim.bmin[index]);
 
-      float rel_pos = data - limits.bmin[index];
-      return pixels.bmin[0] + rel_pos * len_ratio;
+      float rel_pos = data - data_lim.bmin[index];
+      return display_lim.bmin[0] + rel_pos * len_ratio;
     }
-    static float from_display(const float display, const Limits &limits,
-                              const bfloat2_t &pixels) {
-      float len_ratio = (limits.bmax[index] - limits.bmin[index]) /
-                        (pixels.bmax[0] - pixels.bmin[0]);
+    static float from_display(const float display, const Limits &data_lim,
+                              const Limits &display_lim) {
+      float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
+                        (display_lim.bmax[1] - display_lim.bmin[1]);
 
-      float rel_pos = display - pixels.bmin[0];
-      return limits.bmin[index] + rel_pos * len_ratio;
+      float rel_pos = display - display_lim.bmin[1];
+      return data_lim.bmin[index] + rel_pos * len_ratio;
     }
   };
 
@@ -205,23 +204,22 @@ struct Aesthetic {
   struct y {
     static const int index = 1;
     static const char *name;
-    static float to_display(const float data, const Limits &limits,
-                            const bfloat2_t &pixels) {
-      float len_ratio = (pixels.bmax[1] - pixels.bmin[1]) /
-                        (limits.bmax[index] - limits.bmin[index]);
+    static float to_display(const float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim) {
+      float len_ratio = (display_lim.bmax[1] - display_lim.bmin[1]) /
+                        (data_lim.bmax[index] - data_lim.bmin[index]);
 
       // Get the relative position and invert y by default (e.g. limits->pixels)
-      float rel_pos = limits.bmax[index] - data;
-      return pixels.bmin[1] + rel_pos * len_ratio;
+      float rel_pos = data_lim.bmax[index] - data;
+      return display_lim.bmin[1] + rel_pos * len_ratio;
     }
-    static float from_display(const float display, const Limits &limits,
-                              const bfloat2_t &pixels) {
-      float len_ratio = (limits.bmax[index] - limits.bmin[index]) /
-                        (pixels.bmax[1] - pixels.bmin[1]);
+    static float from_display(const float display, const Limits &data_lim,
+                              const bfloat2_t &display_lim) {
+      float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
+                        (display_lim.bmax[1] - display_lim.bmin[1]);
 
-      // Get the relative position and invert y by default (e.g. limits->pixels)
-      float rel_pos = pixels.bmax[1] - display;
-      return limits.bmin[index] + rel_pos * len_ratio;
+      float rel_pos = display_lim.bmax[1] - display;
+      return data_lim.bmin[index] + rel_pos * len_ratio;
     }
   };
 
@@ -229,26 +227,20 @@ struct Aesthetic {
   struct color {
     static const int index = 2;
     static const char *name;
-    static RGBA to_display(const float data, const Limits &limits,
-                           const RGBA &min_color, const RGBA &max_color) {
-      using vfloat4 = Vector<float, 4>;
-      const vfloat4 max(min_color);
-      const vfloat4 min(max_color);
 
-      const vfloat4 ratio =
-          (max - min) / (limits.bmax[index] - limits.bmin[index]);
+    static float to_display(const float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim) {
+      float len_ratio = 1.f / (data_lim.bmax[index] - data_lim.bmin[index]);
 
-      // Get the relative position and invert y by default (e.g. limits->pixels)
-      return min + (data - limits.bmin[index]) * ratio;
+      float rel_pos = data - data_lim.bmin[index];
+      return rel_pos * len_ratio;
     }
+    static float from_display(const float display, const Limits &data_lim,
+                              const Limits &display_lim) {
+      float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]);
 
-    static float from_display(const RGBA &display, const Limits &limits,
-                              const RGBA &min_color, const RGBA &max_color) {
-      const float ratio =
-          (display.r() - min_color.r()) / (max_color.r() - min_color.r());
-
-      return limits.bmin[index] +
-             (limits.bmax[index] - limits.bmin[index]) * ratio;
+      float rel_pos = display;
+      return data_lim.bmin[index] + rel_pos * len_ratio;
     }
   };
 
@@ -256,31 +248,24 @@ struct Aesthetic {
   struct size {
     static const int index = 3;
     static const char *name;
-    static float to_display(const float data, const Limits &limits,
-                            const bbox<float, 1> &span) {
-      float len_ratio = (span.bmax[0] - span.bmin[0]) /
-                        (limits.bmax[index] - limits.bmin[index]);
+    static float to_display(const float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim) {
+      float len_ratio = (display_lim.bmax[0] - display_lim.bmin[0]) /
+                        (data_lim.bmax[index] - data_lim.bmin[index]);
 
-      float rel_pos = data - limits.bmin[index];
-      return span.bmin[0] + rel_pos * len_ratio;
+      float rel_pos = data;
+      return rel_pos * len_ratio;
     }
-    static float from_display(const float display, const Limits &limits,
-                              const bbox<float, 1> &span) {
-      float len_ratio = (limits.bmax[index] - limits.bmin[index]) /
-                        (span.bmax[0] - span.bmin[0]);
+    static float from_display(const float display, const Limits &data_lim,
+                              const Limits &display_lim) {
+      float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
+                        (display_lim.bmax[1] - display_lim.bmin[1]);
 
-      float rel_pos = display - span.bmin[0];
-      return limits.bmin[index] + rel_pos * len_ratio;
+      float rel_pos = display;
+      return rel_pos * len_ratio;
     }
-
-    struct DisplayLimits {
-      using T = std::tuple<x::display_t, y::display_t, color::display_t,
-                           size::display_t>;
-      T m_min;
-      T m_max;
-    };
   };
-}; // namespace trase
+};
 
 /// Each aesthetic has a set of min/max limits, or scales, that are used for
 /// plotting

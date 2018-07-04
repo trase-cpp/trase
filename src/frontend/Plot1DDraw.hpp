@@ -184,7 +184,12 @@ template <typename Backend> void Plot1D::draw_plot_point(Backend &backend) {
     auto color = m_data[f]->begin(Aesthetic::color());
     auto size = m_data[f]->begin(Aesthetic::size());
     for (int i = 0; i < m_data[0]->rows(); ++i) {
-      backend.circle({x[i], y[i]}), m_line_width);
+      const float x_d = m_axis.to_display(x[i]);
+      const float y_d = m_axis.to_display(y[i]);
+      const float color_d = m_axis.to_display(color[i]);
+      const float size_d = m_axis.to_display(size[i]);
+      backend.fill_color(m_colorbar(color_d));
+      backend.circle({x_d, y_d}, size_d);
     }
   } else {
     // between two frames
