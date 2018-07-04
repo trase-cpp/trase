@@ -162,7 +162,8 @@ void Axis::update_tick_information() {
   // scale to pixels
   const vfloat2_t tick_dx_pixels =
       tick_dx * m_pixels.delta() / xy_limits.delta();
-  const vfloat2_t tick_min_pixels = to_pixel(tick_min);
+  const vfloat2_t tick_min_pixels = {to_display<Aesthetic::x>(tick_min[0]),
+                                     to_display<Aesthetic::x>(tick_min[1])};
 
   // Update values in the struct
   m_tick_info.clear();

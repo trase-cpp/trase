@@ -173,10 +173,10 @@ public:
 ///
 /// Each Aesthetic defines a mapping to and from a display type
 struct Aesthetic {
-  // aesthetic indexes must be able to index a vector with size=SIZE
-  static const int size = 4;
+  // aesthetic indexes must be able to index a vector with size=N
+  static const int N = 4;
 
-  using Limits = bbox<float, size>;
+  using Limits = bbox<float, N>;
 
   /// the data to display on the x-axis of the plot
   struct x {
@@ -191,7 +191,7 @@ struct Aesthetic {
       return display_lim.bmin[0] + rel_pos * len_ratio;
     }
     static float from_display(const float display, const Limits &data_lim,
-                              const Limits &display_lim) {
+                              const bfloat2_t &display_lim) {
       float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
                         (display_lim.bmax[1] - display_lim.bmin[1]);
 
@@ -223,7 +223,7 @@ struct Aesthetic {
     }
   };
 
-  /// the color of each plotting element
+  /// the color of each plotting element, scaled from 0 -> 1
   struct color {
     static const int index = 2;
     static const char *name;
@@ -236,7 +236,7 @@ struct Aesthetic {
       return rel_pos * len_ratio;
     }
     static float from_display(const float display, const Limits &data_lim,
-                              const Limits &display_lim) {
+                              const bfloat2_t &display_lim) {
       float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]);
 
       float rel_pos = display;
@@ -244,25 +244,26 @@ struct Aesthetic {
     }
   };
 
-  /// the size of each plotting element
+  /// the size of each plotting element, scaled from 1 pixel to size of y-axis
   struct size {
     static const int index = 3;
     static const char *name;
+
     static float to_display(const float data, const Limits &data_lim,
                             const bfloat2_t &display_lim) {
-      float len_ratio = (display_lim.bmax[0] - display_lim.bmin[0]) /
+      float len_ratio = (display_lim.bmax[1] - display_lim.bmin[1]) /
                         (data_lim.bmax[index] - data_lim.bmin[index]);
 
-      float rel_pos = data;
-      return rel_pos * len_ratio;
+      float rel_pos = data - data_lim.bmin[index];
+      return 1.f + rel_pos * len_ratio;
     }
     static float from_display(const float display, const Limits &data_lim,
-                              const Limits &display_lim) {
+                              const bfloat2_t &display_lim) {
       float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
                         (display_lim.bmax[1] - display_lim.bmin[1]);
 
-      float rel_pos = display;
-      return rel_pos * len_ratio;
+      float rel_pos = display - 1.f;
+      return data_lim.bmin[index] + rel_pos * len_ratio;
     }
   };
 };

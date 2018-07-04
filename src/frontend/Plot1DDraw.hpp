@@ -56,11 +56,16 @@ void Plot1D::serialise_frames_line(Backend &backend) {
   backend.stroke_color(m_color);
   backend.stroke_width(m_line_width);
 
+  auto to_pixel = [&](auto x, auto y) {
+    return vfloat2_t{m_axis.to_display<Aesthetic::x>(x),
+                     m_axis.to_display<Aesthetic::y>(y)};
+  };
+
   auto x = m_data[0]->begin(Aesthetic::x());
   auto y = m_data[0]->begin(Aesthetic::y());
-  backend.move_to(m_axis.to_pixel({x[0], y[0]}));
+  backend.move_to(to_pixel(x[0], y[0]));
   for (int i = 1; i < m_data[0]->rows(); ++i) {
-    backend.line_to(m_axis.to_pixel({x[i], y[i]}));
+    backend.line_to(to_pixel(x[i], y[i]));
   }
 
   // other frames
@@ -68,9 +73,9 @@ void Plot1D::serialise_frames_line(Backend &backend) {
     auto x = m_data[f]->begin(Aesthetic::x());
     auto y = m_data[f]->begin(Aesthetic::y());
     backend.add_animated_path(m_times[f - 1]);
-    backend.move_to(m_axis.to_pixel({x[0], y[0]}));
+    backend.move_to(to_pixel(x[0], y[0]));
     for (int i = 1; i < m_data[0]->rows(); ++i) {
-      backend.line_to(m_axis.to_pixel({x[i], y[i]}));
+      backend.line_to(to_pixel(x[i], y[i]));
     }
   }
 
@@ -80,14 +85,24 @@ void Plot1D::serialise_frames_line(Backend &backend) {
 template <typename Backend>
 void Plot1D::serialise_frames_point(Backend &backend) {
 
+  auto to_pixel = [&](auto x, auto y, auto c, auto s) {
+    return Vector<float, 4>{m_axis.to_display<Aesthetic::x>(x),
+                            m_axis.to_display<Aesthetic::y>(y),
+                            m_axis.to_display<Aesthetic::color>(c),
+                            m_axis.to_display<Aesthetic::size>(s)};
+  };
+
   backend.stroke_color(m_color);
   backend.stroke_width(m_line_width);
   for (int i = 0; i < m_data[0]->rows(); ++i) {
     for (size_t f = 0; f < m_times.size(); ++f) {
-      auto x = m_data[f]->begin(Aesthetic::x());
-      auto y = m_data[f]->begin(Aesthetic::y());
-      backend.add_animated_circle(m_axis.to_pixel({x[i], y[i]}), m_line_width,
-                                  m_times[f]);
+      auto p = to_pixel(m_data[f]->begin(Aesthetic::x())[i],
+                        m_data[f]->begin(Aesthetic::y())[i],
+                        m_data[f]->begin(Aesthetic::color())[i],
+                        m_data[f]->begin(Aesthetic::size())[i]);
+
+      backend.fill_color(m_colormap->to_color(p[4]));
+      backend.add_animated_circle({p[0], p[1]}, p[2], m_times[f]);
     }
     backend.end_animated_circle();
   }
@@ -108,7 +123,8 @@ void Plot1D::serialise_highlights(Backend &backend) {
     auto y = m_data[0]->begin(Aesthetic::y());
     for (int i = 0; i < m_data[0]->rows(); ++i) {
       vfloat2_t point = {x[i], y[i]};
-      auto point_pixel = m_axis.to_pixel(point);
+      vfloat2_t point_pixel = {m_axis.to_display<Aesthetic::x>(x[i]),
+                               m_axis.to_display<Aesthetic::y>(y[i])};
       std::snprintf(buffer, sizeof(buffer), "(%f,%f)", point[0], point[1]);
       backend.tooltip(
           point_pixel + 2.f * vfloat2_t(m_line_width, -m_line_width), buffer);
@@ -140,13 +156,18 @@ template <typename Backend> void Plot1D::draw_plot_line(Backend &backend) {
   const float w1 = m_frame_info.w1;
   const float w2 = m_frame_info.w2;
 
+  auto to_pixel = [&](auto x, auto y) {
+    return vfloat2_t{m_axis.to_display<Aesthetic::x>(x),
+                     m_axis.to_display<Aesthetic::y>(y)};
+  };
+
   if (w2 == 0.0f) {
     // exactly on a single frame
     auto x = m_data[f]->begin(Aesthetic::x());
     auto y = m_data[f]->begin(Aesthetic::y());
-    backend.move_to(m_axis.to_pixel({x[0], y[0]}));
+    backend.move_to(to_pixel(x[0], y[0]));
     for (int i = 1; i < m_data[0]->rows(); ++i) {
-      backend.line_to(m_axis.to_pixel({x[i], y[i]}));
+      backend.line_to(to_pixel(x[i], y[i]));
     }
   } else {
     // between two frames
@@ -154,18 +175,17 @@ template <typename Backend> void Plot1D::draw_plot_line(Backend &backend) {
     auto y0 = m_data[f - 1]->begin(Aesthetic::y());
     auto x1 = m_data[f]->begin(Aesthetic::x());
     auto y1 = m_data[f]->begin(Aesthetic::y());
-    backend.move_to(m_axis.to_pixel(w1 * vfloat2_t{x1[0], y1[0]} +
-                                    w2 * vfloat2_t{x0[0], y0[0]}));
+    backend.move_to(w1 * to_pixel(x1[0], y1[0]) + w2 * to_pixel(x0[0], y0[0]));
     for (int i = 1; i < m_data[0]->rows(); ++i) {
-      backend.line_to(m_axis.to_pixel(w1 * vfloat2_t{x1[i], y1[i]} +
-                                      w2 * vfloat2_t{x0[i], y0[i]}));
+      backend.line_to(w1 * to_pixel(x1[i], y1[i]) +
+                      w2 * to_pixel(x0[i], y0[i]));
     }
   }
 
   backend.stroke_color(m_color);
   backend.stroke_width(m_line_width);
   backend.stroke();
-}
+} // namespace trase
 
 template <typename Backend> void Plot1D::draw_plot_point(Backend &backend) {
 
@@ -177,6 +197,13 @@ template <typename Backend> void Plot1D::draw_plot_point(Backend &backend) {
   backend.stroke_color(m_color);
   backend.stroke_width(m_line_width);
 
+  auto to_pixel = [&](auto x, auto y, auto c, auto s) {
+    return Vector<float, 4>{m_axis.to_display<Aesthetic::x>(x),
+                            m_axis.to_display<Aesthetic::y>(y),
+                            m_axis.to_display<Aesthetic::color>(c),
+                            m_axis.to_display<Aesthetic::size>(s)};
+  };
+
   if (w2 == 0.0f) {
     // exactly on a single frame
     auto x = m_data[f]->begin(Aesthetic::x());
@@ -184,23 +211,25 @@ template <typename Backend> void Plot1D::draw_plot_point(Backend &backend) {
     auto color = m_data[f]->begin(Aesthetic::color());
     auto size = m_data[f]->begin(Aesthetic::size());
     for (int i = 0; i < m_data[0]->rows(); ++i) {
-      const float x_d = m_axis.to_display(x[i]);
-      const float y_d = m_axis.to_display(y[i]);
-      const float color_d = m_axis.to_display(color[i]);
-      const float size_d = m_axis.to_display(size[i]);
-      backend.fill_color(m_colorbar(color_d));
-      backend.circle({x_d, y_d}, size_d);
+      const auto p = to_pixel(x[i], y[i], color[i], size[i]);
+      backend.fill_color(m_colormap->to_color(p[4]));
+      backend.circle({p[0], p[1]}, p[2]);
     }
   } else {
     // between two frames
     auto x0 = m_data[f - 1]->begin(Aesthetic::x());
     auto y0 = m_data[f - 1]->begin(Aesthetic::y());
+    auto color0 = m_data[f - 1]->begin(Aesthetic::color());
+    auto size0 = m_data[f - 1]->begin(Aesthetic::size());
     auto x1 = m_data[f]->begin(Aesthetic::x());
     auto y1 = m_data[f]->begin(Aesthetic::y());
+    auto color1 = m_data[f]->begin(Aesthetic::color());
+    auto size1 = m_data[f]->begin(Aesthetic::size());
     for (int i = 0; i < m_data[0]->rows(); ++i) {
-      backend.circle(m_axis.to_pixel(w1 * vfloat2_t{x1[i], y1[i]} +
-                                     w2 * vfloat2_t{x0[i], y0[i]}),
-                     m_line_width);
+      const auto p = w1 * to_pixel(x1[i], y1[i], color1[i], size1[i]) +
+                     w2 * to_pixel(x0[i], y0[i], color0[i], size0[i]);
+      backend.fill_color(m_colormap->to_color(p[4]));
+      backend.circle({p[0], p[1]}, p[2]);
     }
   }
 }
@@ -216,7 +245,8 @@ template <typename Backend> void Plot1D::draw_highlights(Backend &backend) {
     mouse_pos = backend.get_mouse_pos();
     if ((mouse_pos > m_pixels.bmin).all() &&
         (mouse_pos < m_pixels.bmax).all()) {
-      pos = m_axis.from_pixel(mouse_pos);
+      pos = {m_axis.from_display<Aesthetic::x>(mouse_pos[0]),
+             m_axis.from_display<Aesthetic::x>(mouse_pos[1])};
     }
   }
 
@@ -237,7 +267,9 @@ template <typename Backend> void Plot1D::draw_highlights(Backend &backend) {
     }
 
     // define search radius
-    auto point_pixel = m_axis.to_pixel(min_point);
+    const vfloat2_t point_pixel = {
+        m_axis.to_display<Aesthetic::x>(min_point[0]),
+        m_axis.to_display<Aesthetic::x>(min_point[1])};
 
     // if a point is within r2, then draw it
     if ((mouse_pos - point_pixel).squaredNorm() <

@@ -70,7 +70,7 @@ class Axis : public Drawable {
   std::vector<std::shared_ptr<Plot1D>> m_plot1d;
 
   /// limits of all children plots
-  bbox<float, Aesthetic::size> m_limits;
+  Limits m_limits;
 
   int m_sig_digits;
   int m_nx_ticks;
@@ -146,10 +146,10 @@ public:
   template <typename Backend> void draw(Backend &backend, float time);
 
   template <typename Aesthetic> float from_display(const float i) const {
-    Aesthetic::from_display(i, m_limits, m_pixels);
+    return Aesthetic::from_display(i, m_limits, m_pixels);
   }
   template <typename Aesthetic> float to_display(const float i) const {
-    Aesthetic::to_display(i, m_limits, m_pixels);
+    return Aesthetic::to_display(i, m_limits, m_pixels);
   }
 
   void font_face(const std::string &fontFace) { m_font_face = fontFace; }

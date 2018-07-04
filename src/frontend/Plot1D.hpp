@@ -65,6 +65,9 @@ class Plot1D : public Drawable {
   /// label
   std::string m_label;
 
+  /// colormap
+  const Colormap *m_colormap;
+
   float m_line_width;
 
   RGBA m_color;

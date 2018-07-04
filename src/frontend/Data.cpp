@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-const int Aesthetic::size;
+const int Aesthetic::N;
 const int Aesthetic::x::index;
 const char *Aesthetic::x::name = "x";
 const int Aesthetic::y::index;
