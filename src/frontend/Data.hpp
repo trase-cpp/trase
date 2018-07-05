@@ -42,68 +42,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "util/BBox.hpp"
 #include "util/Colors.hpp"
+#include "util/ColumnIterator.hpp"
 #include "util/Exception.hpp"
 
 namespace trase {
-
-/// An iterator that iterates through a single column of the raw data class
-/// Impliments an random access iterator with a given stride
-class ColumnIterator {
-public:
-  using pointer = float *;
-  using iterator_category = std::random_access_iterator_tag;
-  using reference = float &;
-  using value_type = float;
-  using difference_type = std::ptrdiff_t;
-
-  ColumnIterator(const std::vector<float>::iterator &p, const int stride)
-      : m_p(&(*p)), m_stride(stride) {}
-
-  reference operator*() const { return dereference(); }
-
-  reference operator->() const { return dereference(); }
-
-  ColumnIterator &operator++() {
-    increment();
-    return *this;
-  }
-
-  const ColumnIterator operator++(int) {
-    ColumnIterator tmp(*this);
-    operator++();
-    return tmp;
-  }
-
-  ColumnIterator operator+(int n) const {
-    ColumnIterator tmp(*this);
-    tmp.increment(n);
-    return tmp;
-  }
-
-  reference operator[](const int i) const { return operator+(i).dereference(); }
-
-  size_t operator-(const ColumnIterator &start) const {
-    return (m_p - start.m_p) / m_stride;
-  }
-
-  inline bool operator==(const ColumnIterator &rhs) const { return equal(rhs); }
-
-  inline bool operator!=(const ColumnIterator &rhs) const {
-    return !operator==(rhs);
-  }
-
-private:
-  bool equal(ColumnIterator const &other) const { return m_p == other.m_p; }
-
-  reference dereference() const { return *m_p; }
-
-  void increment() { m_p += m_stride; }
-
-  void increment(const int n) { m_p += n * m_stride; }
-
-  float *m_p;
-  int m_stride;
-};
 
 /// Raw data class, impliments a matrix with row major order
 class RawData {

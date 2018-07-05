@@ -143,6 +143,7 @@ set (trase_headers
     src/frontend/Geometry.hpp
     src/frontend/Line.hpp
     src/frontend/Points.hpp
+    src/util/ColumnIterator.hpp
     src/util/BBox.hpp
     src/util/Colors.hpp
     src/util/Exception.hpp
