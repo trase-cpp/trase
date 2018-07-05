@@ -31,44 +31,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef GEOMETRY_H_
-#define GEOMETRY_H_
+#ifndef POINTS_H_
+#define POINTS_H_
 
-#include "frontend/Line.hpp"
-#include "frontend/Points.hpp"
+#include "frontend/Plot1D.hpp"
 
 namespace trase {
 
-// available geometry types
-enum class Geometry { line, point };
+class Points : public Plot1D {
+  template <typename Backend> static void serialise(Backend &backend);
+  template <typename Backend> static void draw(Backend &backend);
 
-/// effectivly just implements a virtual function call on a templated function
-template <typename Backend>
-void serialise_geometry(const Geometry &geom, Backend &backend,
-                        const Axis &axis, const Plot1D &plot) {
-  switch (geom) {
-  case Geometry::line:
-    Line::serialise(backend, axis, plot);
-    break;
-  case Geometry::point:
-    Points::serialise(backend, axis, plot);
-    break;
-  }
-}
-
-template <typename Backend>
-void draw_geometry(const Geometry &geom, Backend &backend, const Axis &axis,
-                   const Plot1D &plot) {
-  switch (geom) {
-  case Geometry::line:
-    Line::draw(backend, axis, plot);
-    break;
-  case Geometry::point:
-    Points::draw(backend, axis, plot);
-    break;
-  }
-}
+private:
+  template <typename Backend> static void serialise_frames(Backend &backend);
+  template <typename Backend> static void draw_plot(Backend &backend);
+};
 
 } // namespace trase
 
-#endif // GEOMETRY_H_
+#endif // POINTS_H_

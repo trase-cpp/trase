@@ -61,6 +61,8 @@ void Drawable::update_frame_info(const float time) {
   m_frame_info.update(m_times, clipped_time);
 }
 
+const FrameInfo &Drawable::get_frame_info() const { return m_frame_info; }
+
 void Drawable::add_frame_time(const float time) {
   if (time < m_times.back()) {
     throw Exception("cannot add frame with time less than max frame time");

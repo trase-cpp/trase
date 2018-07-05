@@ -93,30 +93,26 @@ public:
 
   void add_frame(const std::shared_ptr<DataWithAesthetic> &data, float time);
 
+  float get_time(const int i) const { return m_times[i]; }
+
   const std::shared_ptr<DataWithAesthetic> &get_data(const int i) const {
     return m_data[i];
   }
   std::shared_ptr<DataWithAesthetic> &get_data(const int i) {
     return m_data[i];
   }
+  size_t data_size() const { return m_data.size(); }
 
   void set_color(const RGBA &color) { m_color = color; }
   void set_geometry(const Geometry &geom) { m_geom = geom; }
   void set_label(const std::string &label) { m_label = label; }
   const std::string &get_label() const { return m_label; }
   const RGBA &get_color() const { return m_color; }
+  const float get_line_width() const { return m_line_width; }
+  const Colormap &get_colormap() const { return *m_colormap; }
 
   template <typename Backend> void serialise(Backend &backend);
-  template <typename Backend> void serialise_frames_line(Backend &backend);
-  template <typename Backend> void serialise_frames_point(Backend &backend);
-  template <typename Backend> void serialise_highlights(Backend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
-
-private:
-  template <typename Backend> void draw_plot(Backend &backend);
-  template <typename Backend> void draw_plot_line(Backend &backend);
-  template <typename Backend> void draw_plot_point(Backend &backend);
-  template <typename Backend> void draw_highlights(Backend &backend);
 };
 
 } // namespace trase

@@ -31,35 +31,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "frontend/Geometry.hpp"
+#include "frontend/Line.hpp"
 
 namespace trase {
 
-template <typename Backend>
-void Line::serialise(Backend &backend, const Axis &axis, const Plot1D &plot) {
+template <typename Backend> void Line::serialise(Backend &backend) {
   serialise_frames(backend, axis, plot);
   serialise_highlights(backend, axis, plot);
 }
 
-template <typename Backend>
-void Line::draw(Backend &backend, const Axis &axis, const Plot1D &plot) {
+template <typename Backend> void Line::draw(Backend &backend) {
   draw_plot(backend, axis, plot);
   draw_highlights(backend, axis, plot);
 }
 
-template <typename Backend>
-void Points::serialise(Backend &backend, const Axis &axis, const Plot1D &plot) {
-  serialise_frames(backend, axis, plot);
-}
-
-template <typename Backend>
-void Points::draw(Backend &backend, const Axis &axis, const Plot1D &plot) {
-  draw_plot(backend, axis, plot);
-}
-
-template <typename Backend>
-void Line::serialise_frames(Backend &backend, const Axis &axis,
-                            const Plot1D &plot) {
+template <typename Backend> void Line::serialise_frames(Backend &backend) {
 
   backend.begin_animated_path();
   backend.stroke_color(m_color);
@@ -91,36 +77,7 @@ void Line::serialise_frames(Backend &backend, const Axis &axis,
   backend.end_animated_path(m_times.back());
 }
 
-template <typename Backend>
-void Points::serialise_frames(Backend &backend, const Axis &axis,
-                              const Plot1D &plot) {
-
-  auto to_pixel = [&](auto x, auto y, auto c, auto s) {
-    return Vector<float, 4>{m_axis.to_display<Aesthetic::x>(x),
-                            m_axis.to_display<Aesthetic::y>(y),
-                            m_axis.to_display<Aesthetic::color>(c),
-                            m_axis.to_display<Aesthetic::size>(s)};
-  };
-
-  backend.stroke_color(m_color);
-  backend.stroke_width(m_line_width);
-  for (int i = 0; i < m_data[0]->rows(); ++i) {
-    for (size_t f = 0; f < m_times.size(); ++f) {
-      auto p = to_pixel(m_data[f]->begin(Aesthetic::x())[i],
-                        m_data[f]->begin(Aesthetic::y())[i],
-                        m_data[f]->begin(Aesthetic::color())[i],
-                        m_data[f]->begin(Aesthetic::size())[i]);
-
-      backend.fill_color(m_colormap->to_color(p[2]));
-      backend.add_animated_circle({p[0], p[1]}, p[3], m_times[f]);
-    }
-    backend.end_animated_circle();
-  }
-}
-
-template <typename Backend>
-void Line::serialise_highlights(Backend &backend, const Axis &axis,
-                                const Plot1D &plot) {
+template <typename Backend> void Line::serialise_highlights(Backend &backend) {
 
   // highlighted points just for frame 0 and for stationary lines
   if (m_times.size() == 1) {
@@ -145,8 +102,7 @@ void Line::serialise_highlights(Backend &backend, const Axis &axis,
   }
 }
 
-template <typename Backend>
-void Line::draw_plot(Backend &backend, const Axis &axis, const Plot1D &plot) {
+template <typename Backend> void Line::draw_plot(Backend &backend) {
   backend.begin_path();
 
   const int f = m_frame_info.frame_above;
@@ -184,57 +140,7 @@ void Line::draw_plot(Backend &backend, const Axis &axis, const Plot1D &plot) {
   backend.stroke();
 }
 
-template <typename Backend>
-void Points::draw_plot(Backend &backend, const Axis &axis, const Plot1D &plot) {
-
-  const int f = m_frame_info.frame_above;
-  const float w1 = m_frame_info.w1;
-  const float w2 = m_frame_info.w2;
-
-  backend.fill_color(m_color);
-  backend.stroke_color(m_color);
-  backend.stroke_width(m_line_width);
-
-  auto to_pixel = [&](auto x, auto y, auto c, auto s) {
-    return Vector<float, 4>{m_axis.to_display<Aesthetic::x>(x),
-                            m_axis.to_display<Aesthetic::y>(y),
-                            m_axis.to_display<Aesthetic::color>(c),
-                            m_axis.to_display<Aesthetic::size>(s)};
-  };
-
-  if (w2 == 0.0f) {
-    // exactly on a single frame
-    auto x = m_data[f]->begin(Aesthetic::x());
-    auto y = m_data[f]->begin(Aesthetic::y());
-    auto color = m_data[f]->begin(Aesthetic::color());
-    auto size = m_data[f]->begin(Aesthetic::size());
-    for (int i = 0; i < m_data[0]->rows(); ++i) {
-      const auto p = to_pixel(x[i], y[i], color[i], size[i]);
-      backend.fill_color(m_colormap->to_color(p[2]));
-      backend.circle({p[0], p[1]}, p[3]);
-    }
-  } else {
-    // between two frames
-    auto x0 = m_data[f - 1]->begin(Aesthetic::x());
-    auto y0 = m_data[f - 1]->begin(Aesthetic::y());
-    auto color0 = m_data[f - 1]->begin(Aesthetic::color());
-    auto size0 = m_data[f - 1]->begin(Aesthetic::size());
-    auto x1 = m_data[f]->begin(Aesthetic::x());
-    auto y1 = m_data[f]->begin(Aesthetic::y());
-    auto color1 = m_data[f]->begin(Aesthetic::color());
-    auto size1 = m_data[f]->begin(Aesthetic::size());
-    for (int i = 0; i < m_data[0]->rows(); ++i) {
-      const auto p = w1 * to_pixel(x1[i], y1[i], color1[i], size1[i]) +
-                     w2 * to_pixel(x0[i], y0[i], color0[i], size0[i]);
-      backend.fill_color(m_colormap->to_color(p[2]));
-      backend.circle({p[0], p[1]}, p[3]);
-    }
-  }
-}
-
-template <typename Backend>
-void Line::draw_highlights(Backend &backend, const Axis &axis,
-                           const Plot1D &plot) {
+template <typename Backend> void Line::draw_highlights(Backend &backend) {
 
   // get mouse position
   auto pos = vfloat2_t(std::numeric_limits<float>::max(),

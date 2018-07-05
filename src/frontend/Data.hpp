@@ -230,6 +230,7 @@ struct Aesthetic {
 
     static float to_display(const float data, const Limits &data_lim,
                             const bfloat2_t &display_lim) {
+      (void)display_lim;
       float len_ratio = 1.f / (data_lim.bmax[index] - data_lim.bmin[index]);
 
       float rel_pos = data - data_lim.bmin[index];
@@ -237,6 +238,7 @@ struct Aesthetic {
     }
     static float from_display(const float display, const Limits &data_lim,
                               const bfloat2_t &display_lim) {
+      (void)display_lim;
       float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]);
 
       float rel_pos = display;
@@ -272,72 +274,6 @@ struct Aesthetic {
 /// Each aesthetic has a set of min/max limits, or scales, that are used for
 /// plotting
 using Limits = Aesthetic::Limits;
-
-/// An iterator that iterates through a single column of the raw data class
-/// Impliments an random access iterator with a given stride
-template <typename... T> class AestheticIterator {
-public:
-  using value_type = Vector<float, sizeof...(T)>;
-  using pointer = value_type *;
-  using iterator_category = std::random_access_iterator_tag;
-  using reference = value_type &;
-  using difference_type = std::ptrdiff_t;
-
-  AestheticIterator(const std::vector<float>::iterator &p, const int stride)
-      : m_p(&(*p)), m_stride(stride) {}
-
-  reference operator*() const { return dereference(); }
-
-  reference operator->() const { return dereference(); }
-
-  ColumnIterator &operator++() {
-    increment();
-    return *this;
-  }
-
-  const ColumnIterator operator++(int) {
-    ColumnIterator tmp(*this);
-    operator++();
-    return tmp;
-  }
-
-  ColumnIterator operator+(int n) const {
-    ColumnIterator tmp(*this);
-    tmp.increment(n);
-    return tmp;
-  }
-
-  reference operator[](const int i) const { return operator+(i).dereference(); }
-
-  size_t operator-(const ColumnIterator &start) const {
-    return (m_p - start.m_p) / m_stride;
-  }
-
-  inline bool operator==(const ColumnIterator &rhs) const { return equal(rhs); }
-
-  inline bool operator!=(const ColumnIterator &rhs) const {
-    return !operator==(rhs);
-  }
-
-private:
-  bool equal(ColumnIterator const &other) const { return m_p == other.m_p; }
-
-  reference dereference() const { return m_value; }
-
-  void increment() {
-    m_p += m_stride;
-    m_value = {*(m_p + T::index)...};
-  }
-
-  void increment(const int n) {
-    m_p += n * m_stride;
-    m_value = {*(m_p + T::index)...};
-  }
-
-  float *m_p;
-  int m_stride;
-  value_type m_value;
-};
 
 /// Combination of the RawData class and Aesthetics, this class points to a
 /// RawData object, and contains a mapping from aesthetics to RawData column
