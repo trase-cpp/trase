@@ -34,18 +34,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PLOT1D_H_
 #define PLOT1D_H_
 
-// forward declare Plot1D so can be used in Axis
+// forward declare Axis so it can be stored in plot1d
 namespace trase {
-class Plot1D;
-}
+class Axis;
+} // namespace trase
 
 #include <memory>
 #include <vector>
 
-#include "frontend/Axis.hpp"
 #include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
-#include "frontend/Geometry.hpp"
 #include "frontend/Transform.hpp"
 #include "util/BBox.hpp"
 #include "util/Colors.hpp"
@@ -54,9 +52,7 @@ class Plot1D;
 namespace trase {
 
 class Plot1D : public Drawable {
-  /// geometry
-  Geometry m_geom;
-
+protected:
   /// dataset
   std::vector<std::shared_ptr<DataWithAesthetic>> m_data;
 
@@ -78,6 +74,9 @@ class Plot1D : public Drawable {
 
 public:
   explicit Plot1D(Axis &axis);
+
+  // make it polymorphic
+  virtual ~Plot1D() = default;
 
   template <typename T1, typename T2>
   void add_frame(const std::vector<T1> &x, const std::vector<T2> &y,
@@ -104,7 +103,6 @@ public:
   size_t data_size() const { return m_data.size(); }
 
   void set_color(const RGBA &color) { m_color = color; }
-  void set_geometry(const Geometry &geom) { m_geom = geom; }
   void set_label(const std::string &label) { m_label = label; }
   const std::string &get_label() const { return m_label; }
   const RGBA &get_color() const { return m_color; }

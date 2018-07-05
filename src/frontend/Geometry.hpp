@@ -35,37 +35,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GEOMETRY_H_
 
 #include "frontend/Line.hpp"
+#include "frontend/Plot1D.hpp"
 #include "frontend/Points.hpp"
 
 namespace trase {
 
-// available geometry types
-enum class Geometry { line, point };
+// available geometry types are Points, Line. Any new sub-classes need to be
+// added here
 
-/// effectivly just implements a virtual function call on a templated function
 template <typename Backend>
-void serialise_geometry(const Geometry &geom, Backend &backend,
-                        const Axis &axis, const Plot1D &plot) {
-  switch (geom) {
-  case Geometry::line:
-    Line::serialise(backend, axis, plot);
-    break;
-  case Geometry::point:
-    Points::serialise(backend, axis, plot);
-    break;
+void serialise_geometry(std::shared_ptr<Plot1D> &plot, Backend &backend) {
+  if (auto points = dynamic_cast<Points *>(plot.get())) {
+    points->serialise(backend);
+  } else if (auto line = dynamic_cast<Line *>(plot.get())) {
+    line->serialise(backend);
+  } else {
+    throw Exception("unknown geometry class");
   }
 }
 
 template <typename Backend>
-void draw_geometry(const Geometry &geom, Backend &backend, const Axis &axis,
-                   const Plot1D &plot) {
-  switch (geom) {
-  case Geometry::line:
-    Line::draw(backend, axis, plot);
-    break;
-  case Geometry::point:
-    Points::draw(backend, axis, plot);
-    break;
+void draw_geometry(std::shared_ptr<Plot1D> &plot, Backend &backend,
+                   const float time) {
+  if (auto points = dynamic_cast<Points *>(plot.get())) {
+    points->draw(backend, time);
+  } else if (auto line = dynamic_cast<Line *>(plot.get())) {
+    line->draw(backend, time);
+  } else {
+    throw Exception("unknown geometry class");
   }
 }
 

@@ -45,7 +45,8 @@ class Axis;
 #include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
 #include "frontend/Figure.hpp"
-#include "frontend/Plot1D.hpp"
+#include "frontend/Line.hpp"
+#include "frontend/Points.hpp"
 #include "util/Colors.hpp"
 #include "util/Exception.hpp"
 
@@ -125,15 +126,23 @@ public:
     auto data = std::make_shared<DataWithAesthetic>();
     data->set(Aesthetic::x(), x);
     data->set(Aesthetic::y(), y);
-    return plot_impl(data, label);
+    return plot_impl(std::make_shared<Line>(*this), data, label);
   }
 
-  /// Create a new plot and return a shared pointer to it.
+  /// Create a new Points plot and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
   /// \return shared pointer to the new plot
-  std::shared_ptr<Plot1D> plot(const std::shared_ptr<DataWithAesthetic> &data,
+  std::shared_ptr<Plot1D> points(const std::shared_ptr<DataWithAesthetic> &data,
+                                 const std::string &label = std::string()) {
+    return plot_impl(std::make_shared<Points>(*this), data, label);
+  }
+
+  /// Create a new Line and return a shared pointer to it.
+  /// \param data the `DataWithAesthetic` dataset to use
+  /// \return shared pointer to the new plot
+  std::shared_ptr<Plot1D> line(const std::shared_ptr<DataWithAesthetic> &data,
                                const std::string &label = std::string()) {
-    return plot_impl(data, label);
+    return plot_impl(std::make_shared<Line>(*this), data, label);
   }
 
   /// Return a shared pointer to an existing plot.
@@ -156,7 +165,8 @@ public:
 
 private:
   std::shared_ptr<Plot1D>
-  plot_impl(const std::shared_ptr<DataWithAesthetic> &values,
+  plot_impl(const std::shared_ptr<Plot1D> &plot,
+            const std::shared_ptr<DataWithAesthetic> &values,
             const std::string &label);
 
   void update_tick_information();

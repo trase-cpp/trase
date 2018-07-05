@@ -63,8 +63,7 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
   auto data = moving_plot->get_data(0);
   data->color(r).size(r);
 
-  auto points = ax->plot(data, "points");
-  points->set_geometry(Geometry::point);
+  auto points = ax->points(data, "points");
 
   std::cout << "limits of axis after points are: " << ax->limits() << std::endl;
 

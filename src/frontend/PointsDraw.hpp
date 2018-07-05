@@ -36,11 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 template <typename Backend> void Points::serialise(Backend &backend) {
-  serialise_frames(backend, axis, plot);
+  serialise_frames(backend);
 }
 
-template <typename Backend> void Points::draw(Backend &backend) {
-  draw_plot(backend, axis, plot);
+template <typename Backend>
+void Points::draw(Backend &backend, const float time) {
+  update_frame_info(time);
+  draw_plot(backend);
 }
 
 template <typename Backend> void Points::serialise_frames(Backend &backend) {

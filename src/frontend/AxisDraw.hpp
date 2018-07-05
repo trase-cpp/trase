@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "backend/Backend.hpp"
 #include "frontend/Axis.hpp"
+#include "frontend/Geometry.hpp"
 
 namespace trase {
 
@@ -46,7 +47,7 @@ void Axis::draw(Backend &backend, const float time) {
   // draw plots
   backend.scissor(m_pixels);
   for (auto &i : m_plot1d) {
-    i->draw(backend, time);
+    draw_geometry(i, backend, time);
   }
   backend.reset_scissor();
 }
@@ -57,7 +58,7 @@ template <typename Backend> void Axis::serialise(Backend &backend) {
   // serialise plots
   backend.scissor(m_pixels);
   for (auto &i : m_plot1d) {
-    i->serialise(backend);
+    serialise_geometry(i, backend);
   }
   backend.reset_scissor();
 }

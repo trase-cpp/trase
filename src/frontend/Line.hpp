@@ -39,15 +39,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 class Line : public Plot1D {
-  template <typename Backend> static void serialise(Backend &backend);
-  template <typename Backend> static void draw(Backend &backend);
+public:
+  explicit Line(Axis &axis) : Plot1D(axis) {}
+  template <typename Backend> void serialise(Backend &backend);
+  template <typename Backend> void draw(Backend &backend, const float time);
 
 private:
-  template <typename Backend> static void serialise_frames(Backend &backend);
-  template <typename Backend>
-  static void serialise_highlights(Backend &backend);
-  template <typename Backend> static void draw_plot(Backend &backend);
-  template <typename Backend> static void draw_highlights(Backend &backend);
+  template <typename Backend> void serialise_frames(Backend &backend);
+  template <typename Backend> void serialise_highlights(Backend &backend);
+  template <typename Backend> void draw_plot(Backend &backend);
+  template <typename Backend> void draw_highlights(Backend &backend);
 };
 
 } // namespace trase

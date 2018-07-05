@@ -39,13 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend> void Plot1D::serialise(Backend &backend) {
-  serialise_geometry(m_geom, backend, m_axis, *this);
-}
+template <typename Backend> void Plot1D::serialise(Backend &backend) {}
 
 template <typename Backend>
-void Plot1D::draw(Backend &backend, const float time) {
-  draw_geometry(m_geom, backend, m_axis, *this);
-}
+void Plot1D::draw(Backend &backend, const float time) {}
 
 } // namespace trase
