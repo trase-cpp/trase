@@ -185,15 +185,16 @@ public:
       if (m_animate_values.size() < 3) {
         m_animate_values.resize(3);
       }
-      m_animate_times = "keyTimes=\"" + std::to_string(time / m_time_span);
-      m_animate_values[0] = "values=\"" + std::to_string(centre[0]);
-      m_animate_values[1] = "values=\"" + std::to_string(centre[1]);
-      m_animate_values[2] = "values=\"" + std::to_string(radius);
+      m_animate_times =
+          "keyTimes=\"" + std::to_string(time / m_time_span) + ';';
+      m_animate_values[0] = "values=\"" + std::to_string(centre[0]) + ';';
+      m_animate_values[1] = "values=\"" + std::to_string(centre[1]) + ';';
+      m_animate_values[2] = "values=\"" + std::to_string(radius) + ';';
     } else {
       m_animate_times += std::to_string(time / m_time_span) + ';';
-      m_animate_values[0] = std::to_string(centre[0]) + ';';
-      m_animate_values[1] = std::to_string(centre[1]) + ';';
-      m_animate_values[2] = std::to_string(radius) + ';';
+      m_animate_values[0] += std::to_string(centre[0]) + ';';
+      m_animate_values[1] += std::to_string(centre[1]) + ';';
+      m_animate_values[2] += std::to_string(radius) + ';';
     }
   }
 
@@ -201,13 +202,13 @@ public:
 
     m_animate_times.back() = '\"';
     for (int i = 0; i < 3; ++i) {
-      m_animate_values[3].back() = '\"';
+      m_animate_values[i].back() = '\"';
     }
     const std::string names[3] = {"cx", "cy", "r"};
     for (int i = 0; i < 3; ++i) {
       m_out << "<animate attributeName=\"" + names[i] +
                    "\" repeatCount=\"indefinite\" begin =\"0s\" dur=\""
-            << m_time_span << "s\" " << m_animate_values[0] << ' '
+            << m_time_span << "s\" " << m_animate_values[i] << ' '
             << m_animate_times << "/>\n";
     }
     circle_end();

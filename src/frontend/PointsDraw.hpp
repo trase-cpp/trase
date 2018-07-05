@@ -54,8 +54,7 @@ template <typename Backend> void Points::serialise_frames(Backend &backend) {
                             m_axis.to_display<Aesthetic::size>(s)};
   };
 
-  backend.stroke_color(m_color);
-  backend.stroke_width(m_line_width);
+  backend.stroke_width(0);
   for (int i = 0; i < m_data[0]->rows(); ++i) {
     for (size_t f = 0; f < m_times.size(); ++f) {
       auto p = to_pixel(m_data[f]->begin(Aesthetic::x())[i],
@@ -76,9 +75,7 @@ template <typename Backend> void Points::draw_plot(Backend &backend) {
   const float w1 = m_frame_info.w1;
   const float w2 = m_frame_info.w2;
 
-  backend.fill_color(m_color);
-  backend.stroke_color(m_color);
-  backend.stroke_width(m_line_width);
+  backend.stroke_width(0);
 
   auto to_pixel = [&](auto x, auto y, auto c, auto s) {
     return Vector<float, 4>{m_axis.to_display<Aesthetic::x>(x),
