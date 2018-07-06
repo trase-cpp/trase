@@ -88,10 +88,12 @@ TEST_CASE("to/from pixel coordinates", "[axis]") {
   CHECK(ax->pixels().bmax[1] == 90.f);
   ax->xlim({0.0f, 1.0f});
   ax->ylim({0.0f, 1.0f});
-  auto middle1 = ax->to_pixel({0.5f, 0.5f});
+  auto middle1 = vfloat2_t{ax->to_display<Aesthetic::x>(0.5f),
+                           ax->to_display<Aesthetic::y>(0.5f)};
   CHECK(middle1[0] == 50.f);
   CHECK(middle1[1] == 50.f);
-  auto middle2 = ax->from_pixel(middle1);
+  auto middle2 = vfloat2_t{ax->from_display<Aesthetic::x>(middle1[0]),
+                           ax->from_display<Aesthetic::y>(middle1[1])};
   CHECK(middle2[0] == 0.5f);
   CHECK(middle2[1] == 0.5f);
 }

@@ -31,35 +31,41 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef GEOMETRY_H_
+#define GEOMETRY_H_
+
+#include "frontend/Line.hpp"
 #include "frontend/Plot1D.hpp"
-#include "frontend/Axis.hpp"
-
-#include <numeric>
-
-#include "util/Vector.hpp"
+#include "frontend/Points.hpp"
 
 namespace trase {
 
-Plot1D::Plot1D(Axis &axis)
-    : Drawable(&axis, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
-      m_colormap(&Colormaps::viridis), m_line_width(3.f), m_axis(axis) {}
+// available geometry types are Points, Line. Any new sub-classes need to be
+// added here
 
-void Plot1D::add_frame(const std::shared_ptr<DataWithAesthetic> &data,
-                       float time) {
-  // add new data frame
-  m_data.push_back(data);
-
-  // add new frame time
-  if (time > 0) {
-    add_frame_time(time);
+template <typename Backend>
+void serialise_geometry(std::shared_ptr<Plot1D> &plot, Backend &backend) {
+  if (auto points = dynamic_cast<Points *>(plot.get())) {
+    points->serialise(backend);
+  } else if (auto line = dynamic_cast<Line *>(plot.get())) {
+    line->serialise(backend);
+  } else {
+    throw Exception("unknown geometry class");
   }
+}
 
-  // update limits with new frame
-  m_limits += data->limits();
-
-  // communicate limits to parent axis
-  const float buffer = 1.05f;
-  m_axis.limits() += m_limits * Limits::vector_t::Constant(buffer);
+template <typename Backend>
+void draw_geometry(std::shared_ptr<Plot1D> &plot, Backend &backend,
+                   const float time) {
+  if (auto points = dynamic_cast<Points *>(plot.get())) {
+    points->draw(backend, time);
+  } else if (auto line = dynamic_cast<Line *>(plot.get())) {
+    line->draw(backend, time);
+  } else {
+    throw Exception("unknown geometry class");
+  }
 }
 
 } // namespace trase
+
+#endif // GEOMETRY_H_

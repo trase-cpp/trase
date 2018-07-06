@@ -36,6 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <array>
 #include <string>
+#include <vector>
+
+#include "util/Vector.hpp"
 
 namespace trase {
 
@@ -55,7 +58,6 @@ class RGBA {
   int m_a;
 
 public:
-
   const static int default_alpha;
   const static std::array<const RGBA, 10> defaults;
   const static RGBA black;
@@ -65,7 +67,19 @@ public:
   RGBA() = default;
 
   /// constructor taking red, green, blue and alpha
-  RGBA(int r, int g, int b, int a=default_alpha) noexcept;
+  RGBA(int r, int g, int b, int a = default_alpha) noexcept;
+
+  /// constructor taking 4 float vector
+  explicit RGBA(const Vector<float, 4> &v) noexcept;
+
+  /// constructor taking 3 float vector
+  explicit RGBA(const Vector<float, 3> &v) noexcept;
+
+  /// convert to an float vector
+  explicit operator Vector<float, 4>() const noexcept {
+    return {static_cast<float>(m_r), static_cast<float>(m_g),
+            static_cast<float>(m_b), static_cast<float>(m_a)};
+  };
 
   /// convert to an rgb string of form #rrggbb
   std::string to_rgb_string() const noexcept;
@@ -97,6 +111,22 @@ public:
   /// Equality comparison
   bool operator==(const RGBA &b) const noexcept;
   bool operator!=(const RGBA &b) const noexcept;
+};
+
+/// a linear segmented colormap
+class Colormap {
+  std::vector<Vector<float, 3>> m_colors;
+
+public:
+  /// constructs the colormap from a list of rgb values scaled from 0-1
+  explicit Colormap(std::vector<Vector<float, 3>> list);
+
+  /// maps a float from 0->1 to a RGBA color
+  RGBA to_color(float i) const;
+};
+
+struct Colormaps {
+  static const Colormap viridis;
 };
 
 } // namespace trase

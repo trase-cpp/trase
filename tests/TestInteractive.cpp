@@ -51,20 +51,34 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
   const int n = 100;
   std::vector<float> x(n);
   std::vector<float> y(n);
+  std::vector<float> r(n);
   for (int i = 0; i < n; ++i) {
     x[i] = static_cast<float>(i) * 6.28 / n;
     y[i] = std::sin(5 * x[i]);
+    r[i] = 0.1;
   }
   auto static_plot = ax->plot(x, y, "static");
   auto moving_plot = ax->plot(x, y, "moving");
+
+  auto data = moving_plot->get_data(0);
+  data->color(r).size(r);
+
+  auto points = ax->points(data, "points");
+
+  std::cout << "limits of axis after points are: " << ax->limits() << std::endl;
+
   float time = 0.0;
 
   auto do_plot = [&](const float theta) {
+    time += 0.3;
     for (int i = 0; i < n; ++i) {
       y[i] = std::sin(theta * x[i]);
+      r[i] = time * 0.1;
     }
-    time += 0.3;
-    moving_plot->add_frame(x, y, time);
+    auto data = std::make_shared<DataWithAesthetic>();
+    data->x(x).y(y).color(r).size(r);
+    moving_plot->add_frame(data, time);
+    points->add_frame(data, time);
   };
 
   for (int i = 0; i < 5; ++i) {
@@ -75,6 +89,9 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
     const float theta = 5 - i;
     do_plot(theta);
   }
+
+  std::cout << "limits of axis after all  points are: " << ax->limits()
+            << std::endl;
 
   ax->xlabel("x");
   ax->ylabel("y");

@@ -34,15 +34,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PLOT1D_H_
 #define PLOT1D_H_
 
-// forward declare Plot1D so can be used in Axis
+// forward declare Axis so it can be stored in plot1d
 namespace trase {
-class Plot1D;
-}
+class Axis;
+} // namespace trase
 
 #include <memory>
 #include <vector>
 
-#include "frontend/Axis.hpp"
 #include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
 #include "frontend/Transform.hpp"
@@ -53,15 +52,15 @@ class Plot1D;
 namespace trase {
 
 class Plot1D : public Drawable {
-
-  // available geometry types
-  enum Geometry { Point, Line };
-
+protected:
   /// dataset
   std::vector<std::shared_ptr<DataWithAesthetic>> m_data;
 
   /// label
   std::string m_label;
+
+  /// colormap
+  const Colormap *m_colormap;
 
   float m_line_width;
 
@@ -75,6 +74,9 @@ class Plot1D : public Drawable {
 
 public:
   explicit Plot1D(Axis &axis);
+
+  // make it polymorphic
+  virtual ~Plot1D() = default;
 
   template <typename T1, typename T2>
   void add_frame(const std::vector<T1> &x, const std::vector<T2> &y,
@@ -90,26 +92,25 @@ public:
 
   void add_frame(const std::shared_ptr<DataWithAesthetic> &data, float time);
 
+  float get_time(const int i) const { return m_times[i]; }
+
   const std::shared_ptr<DataWithAesthetic> &get_data(const int i) const {
     return m_data[i];
   }
   std::shared_ptr<DataWithAesthetic> &get_data(const int i) {
     return m_data[i];
   }
+  size_t data_size() const { return m_data.size(); }
 
   void set_color(const RGBA &color) { m_color = color; }
   void set_label(const std::string &label) { m_label = label; }
   const std::string &get_label() const { return m_label; }
   const RGBA &get_color() const { return m_color; }
+  const float get_line_width() const { return m_line_width; }
+  const Colormap &get_colormap() const { return *m_colormap; }
 
   template <typename Backend> void serialise(Backend &backend);
-  template <typename Backend> void serialise_frames(Backend &backend);
-  template <typename Backend> void serialise_highlights(Backend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
-
-private:
-  template <typename Backend> void draw_plot(Backend &backend);
-  template <typename Backend> void draw_highlights(Backend &backend);
 };
 
 } // namespace trase

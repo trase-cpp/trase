@@ -31,35 +31,72 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "frontend/Plot1D.hpp"
-#include "frontend/Axis.hpp"
+#ifndef COLUMNITERATOR_H_
+#define COLUMNITERATOR_H_
 
-#include <numeric>
-
-#include "util/Vector.hpp"
+#include <vector>
 
 namespace trase {
 
-Plot1D::Plot1D(Axis &axis)
-    : Drawable(&axis, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
-      m_colormap(&Colormaps::viridis), m_line_width(3.f), m_axis(axis) {}
+/// An iterator that iterates through a single column of the raw data class
+/// Impliments an random access iterator with a given stride
+class ColumnIterator {
+public:
+  using pointer = float *;
+  using iterator_category = std::random_access_iterator_tag;
+  using reference = float &;
+  using value_type = float;
+  using difference_type = std::ptrdiff_t;
 
-void Plot1D::add_frame(const std::shared_ptr<DataWithAesthetic> &data,
-                       float time) {
-  // add new data frame
-  m_data.push_back(data);
+  ColumnIterator(const std::vector<float>::iterator &p, const int stride)
+      : m_p(&(*p)), m_stride(stride) {}
 
-  // add new frame time
-  if (time > 0) {
-    add_frame_time(time);
+  reference operator*() const { return dereference(); }
+
+  reference operator->() const { return dereference(); }
+
+  ColumnIterator &operator++() {
+    increment();
+    return *this;
   }
 
-  // update limits with new frame
-  m_limits += data->limits();
+  const ColumnIterator operator++(int) {
+    ColumnIterator tmp(*this);
+    operator++();
+    return tmp;
+  }
 
-  // communicate limits to parent axis
-  const float buffer = 1.05f;
-  m_axis.limits() += m_limits * Limits::vector_t::Constant(buffer);
-}
+  ColumnIterator operator+(int n) const {
+    ColumnIterator tmp(*this);
+    tmp.increment(n);
+    return tmp;
+  }
+
+  reference operator[](const int i) const { return operator+(i).dereference(); }
+
+  size_t operator-(const ColumnIterator &start) const {
+    return (m_p - start.m_p) / m_stride;
+  }
+
+  inline bool operator==(const ColumnIterator &rhs) const { return equal(rhs); }
+
+  inline bool operator!=(const ColumnIterator &rhs) const {
+    return !operator==(rhs);
+  }
+
+private:
+  bool equal(ColumnIterator const &other) const { return m_p == other.m_p; }
+
+  reference dereference() const { return *m_p; }
+
+  void increment() { m_p += m_stride; }
+
+  void increment(const int n) { m_p += n * m_stride; }
+
+  float *m_p;
+  int m_stride;
+};
 
 } // namespace trase
+
+#endif // COLUMNITERATOR_H_

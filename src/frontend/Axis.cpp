@@ -45,9 +45,10 @@ Axis::Axis(Figure &figure, const bfloat2_t &area)
 std::shared_ptr<Plot1D> Axis::plot(int n) { return m_plot1d.at(n); }
 
 std::shared_ptr<Plot1D>
-Axis::plot_impl(const std::shared_ptr<DataWithAesthetic> &values,
+Axis::plot_impl(const std::shared_ptr<Plot1D> &plot,
+                const std::shared_ptr<DataWithAesthetic> &values,
                 const std::string &label) {
-  m_plot1d.emplace_back(std::make_shared<Plot1D>(*this));
+  m_plot1d.emplace_back(plot);
   m_children.push_back(m_plot1d.back().get());
   m_plot1d.back()->add_frame(values, 0);
   m_plot1d.back()->set_color(RGBA::defaults[m_plot1d.size() - 1]);

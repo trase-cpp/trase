@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "backend/Backend.hpp"
 #include "frontend/Axis.hpp"
+#include "frontend/Geometry.hpp"
 
 namespace trase {
 
@@ -46,7 +47,7 @@ void Axis::draw(Backend &backend, const float time) {
   // draw plots
   backend.scissor(m_pixels);
   for (auto &i : m_plot1d) {
-    i->draw(backend, time);
+    draw_geometry(i, backend, time);
   }
   backend.reset_scissor();
 }
@@ -57,7 +58,7 @@ template <typename Backend> void Axis::serialise(Backend &backend) {
   // serialise plots
   backend.scissor(m_pixels);
   for (auto &i : m_plot1d) {
-    i->serialise(backend);
+    serialise_geometry(i, backend);
   }
   backend.reset_scissor();
 }
@@ -162,7 +163,8 @@ void Axis::update_tick_information() {
   // scale to pixels
   const vfloat2_t tick_dx_pixels =
       tick_dx * m_pixels.delta() / xy_limits.delta();
-  const vfloat2_t tick_min_pixels = to_pixel(tick_min);
+  const vfloat2_t tick_min_pixels = {to_display<Aesthetic::x>(tick_min[0]),
+                                     to_display<Aesthetic::y>(tick_min[1])};
 
   // Update values in the struct
   m_tick_info.clear();

@@ -31,35 +31,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef POINTS_H_
+#define POINTS_H_
+
 #include "frontend/Plot1D.hpp"
-#include "frontend/Axis.hpp"
-
-#include <numeric>
-
-#include "util/Vector.hpp"
 
 namespace trase {
 
-Plot1D::Plot1D(Axis &axis)
-    : Drawable(&axis, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
-      m_colormap(&Colormaps::viridis), m_line_width(3.f), m_axis(axis) {}
+class Points : public Plot1D {
+public:
+  explicit Points(Axis &axis) : Plot1D(axis) {}
+  template <typename Backend> void serialise(Backend &backend);
+  template <typename Backend> void draw(Backend &backend, float time);
 
-void Plot1D::add_frame(const std::shared_ptr<DataWithAesthetic> &data,
-                       float time) {
-  // add new data frame
-  m_data.push_back(data);
-
-  // add new frame time
-  if (time > 0) {
-    add_frame_time(time);
-  }
-
-  // update limits with new frame
-  m_limits += data->limits();
-
-  // communicate limits to parent axis
-  const float buffer = 1.05f;
-  m_axis.limits() += m_limits * Limits::vector_t::Constant(buffer);
-}
+private:
+  template <typename Backend> void serialise_frames(Backend &backend);
+  template <typename Backend> void draw_plot(Backend &backend);
+};
 
 } // namespace trase
+
+#endif // POINTS_H_

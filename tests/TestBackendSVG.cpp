@@ -47,6 +47,7 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   const int nframes = 10;
   std::vector<float> x(n);
   std::vector<float> y(n);
+  std::vector<float> r(n);
 
   // define x points
   for (int i = 0; i < n; ++i) {
@@ -57,6 +58,7 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   auto write_y = [&](const float amplitude, const float freq) {
     for (int i = 0; i < n; ++i) {
       y[i] = amplitude * std::sin(6.28f * freq * x[i]);
+      r[i] = static_cast<float>(i) / n * amplitude;
     }
   };
 
@@ -68,11 +70,19 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   write_y(1.f, 5.f);
   auto moving_plot = ax->plot(x, y, "moving");
 
+  auto data = std::make_shared<DataWithAesthetic>();
+  data->x(x).y(y).color(r).size(r);
+  auto points = ax->points(data, "points");
+
   for (int i = 1; i <= nframes; ++i) {
     const float nf = static_cast<float>(nframes);
     const float amplitude = 1.f - 0.5f * std::sin(6.28f * i / nf);
     write_y(amplitude, 5.f);
     moving_plot->add_frame(x, y, 3.f * i / nf);
+
+    auto data = std::make_shared<DataWithAesthetic>();
+    data->x(x).y(y).color(r).size(r);
+    points->add_frame(data, 3.f * i / nf);
   }
 
   // set label axes

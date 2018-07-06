@@ -140,6 +140,10 @@ set (trase_headers
     src/frontend/Figure.hpp
     src/frontend/Plot1D.hpp
     src/frontend/Transform.hpp
+    src/frontend/Geometry.hpp
+    src/frontend/Line.hpp
+    src/frontend/Points.hpp
+    src/util/ColumnIterator.hpp
     src/util/BBox.hpp
     src/util/Colors.hpp
     src/util/Exception.hpp
@@ -163,6 +167,8 @@ set (trase_draw_headers
     src/frontend/DrawableDraw.hpp
     src/frontend/FigureDraw.hpp
     src/frontend/Plot1DDraw.hpp
+    src/frontend/PointsDraw.hpp
+    src/frontend/LineDraw.hpp
     )
 
 

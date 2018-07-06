@@ -45,7 +45,8 @@ class Axis;
 #include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
 #include "frontend/Figure.hpp"
-#include "frontend/Plot1D.hpp"
+#include "frontend/Line.hpp"
+#include "frontend/Points.hpp"
 #include "util/Colors.hpp"
 #include "util/Exception.hpp"
 
@@ -70,7 +71,7 @@ class Axis : public Drawable {
   std::vector<std::shared_ptr<Plot1D>> m_plot1d;
 
   /// limits of all children plots
-  bbox<float, Aesthetic::size> m_limits;
+  Limits m_limits;
 
   int m_sig_digits;
   int m_nx_ticks;
@@ -125,7 +126,23 @@ public:
     auto data = std::make_shared<DataWithAesthetic>();
     data->set(Aesthetic::x(), x);
     data->set(Aesthetic::y(), y);
-    return plot_impl(data, label);
+    return plot_impl(std::make_shared<Line>(*this), data, label);
+  }
+
+  /// Create a new Points plot and return a shared pointer to it.
+  /// \param data the `DataWithAesthetic` dataset to use
+  /// \return shared pointer to the new plot
+  std::shared_ptr<Plot1D> points(const std::shared_ptr<DataWithAesthetic> &data,
+                                 const std::string &label = std::string()) {
+    return plot_impl(std::make_shared<Points>(*this), data, label);
+  }
+
+  /// Create a new Line and return a shared pointer to it.
+  /// \param data the `DataWithAesthetic` dataset to use
+  /// \return shared pointer to the new plot
+  std::shared_ptr<Plot1D> line(const std::shared_ptr<DataWithAesthetic> &data,
+                               const std::string &label = std::string()) {
+    return plot_impl(std::make_shared<Line>(*this), data, label);
   }
 
   /// Return a shared pointer to an existing plot.
@@ -137,29 +154,19 @@ public:
   template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 
-  vfloat2_t from_pixel(const vfloat2_t &i) const {
-    const bfloat2_t xy_limits({m_limits.bmin[Aesthetic::x::index],
-                               m_limits.bmin[Aesthetic::y::index]},
-                              {m_limits.bmax[Aesthetic::x::index],
-                               m_limits.bmax[Aesthetic::y::index]});
-
-    return m_pixels.to_coords(xy_limits, i);
+  template <typename Aesthetic> float from_display(const float i) const {
+    return Aesthetic::from_display(i, m_limits, m_pixels);
   }
-
-  vfloat2_t to_pixel(const vfloat2_t &i) const {
-    const bfloat2_t xy_limits({m_limits.bmin[Aesthetic::x::index],
-                               m_limits.bmin[Aesthetic::y::index]},
-                              {m_limits.bmax[Aesthetic::x::index],
-                               m_limits.bmax[Aesthetic::y::index]});
-
-    return xy_limits.to_coords(m_pixels, i);
+  template <typename Aesthetic> float to_display(const float i) const {
+    return Aesthetic::to_display(i, m_limits, m_pixels);
   }
 
   void font_face(const std::string &fontFace) { m_font_face = fontFace; }
 
 private:
   std::shared_ptr<Plot1D>
-  plot_impl(const std::shared_ptr<DataWithAesthetic> &values,
+  plot_impl(const std::shared_ptr<Plot1D> &plot,
+            const std::shared_ptr<DataWithAesthetic> &values,
             const std::string &label);
 
   void update_tick_information();

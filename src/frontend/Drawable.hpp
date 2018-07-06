@@ -95,6 +95,7 @@ public:
   void update_time_span(float time);
   void add_frame_time(float time);
   void update_frame_info(float time);
+  const FrameInfo &get_frame_info() const;
   const bfloat2_t &pixels() { return m_pixels; }
   const bfloat2_t &area() { return m_pixels; }
   template <typename Backend> void serialise(Backend &backend);
