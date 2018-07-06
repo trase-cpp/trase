@@ -42,7 +42,7 @@ class Line : public Plot1D {
 public:
   explicit Line(Axis &axis) : Plot1D(axis) {}
   template <typename Backend> void serialise(Backend &backend);
-  template <typename Backend> void draw(Backend &backend, const float time);
+  template <typename Backend> void draw(Backend &backend, float time);
 
 private:
   template <typename Backend> void serialise_frames(Backend &backend);

@@ -196,7 +196,7 @@ struct Aesthetic {
 
     static float to_display(const float data, const Limits &data_lim,
                             const bfloat2_t &display_lim) {
-      float len_ratio = 0.05 * (display_lim.bmax[1] - display_lim.bmin[1]) /
+      float len_ratio = 0.05f * (display_lim.bmax[1] - display_lim.bmin[1]) /
                         (data_lim.bmax[index] - data_lim.bmin[index]);
 
       float rel_pos = data - data_lim.bmin[index];
