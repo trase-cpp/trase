@@ -136,6 +136,7 @@ set (trase_headers
     src/backend/Backend.hpp
     src/frontend/Axis.hpp
     src/frontend/Data.hpp
+    src/frontend/Data.tcc
     src/frontend/Drawable.hpp
     src/frontend/Figure.hpp
     src/frontend/Plot1D.hpp
