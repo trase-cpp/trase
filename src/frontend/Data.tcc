@@ -34,23 +34,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 template <typename T> void RawData::add_column(const std::vector<T> &new_col) {
-  ++m_cols;
 
   // if columns already exist then add the extra memory
-  if (m_cols > 1) {
+  if (m_cols > 0) {
 
     // check number of rows in new column match
-    assert(static_cast<int>(new_col.size()) == m_rows);
+    if (static_cast<int>(new_col.size()) != m_rows) {
+      throw Exception("columns in dataset must have identical number of rows");
+    }
 
     // resize tmp vector
-    m_tmp.resize(m_rows * m_cols);
+    m_tmp.resize(m_rows * (m_cols + 1));
 
     // copy orig data and new column to m_tmp
     for (int i = 0; i < m_rows; ++i) {
-      for (int j = 0; j < m_cols - 1; ++j) {
-        m_tmp[i * m_cols + j] = m_matrix[i * (m_cols - 1) + j];
+      for (int j = 0; j < m_cols; ++j) {
+        m_tmp[i * (m_cols + 1) + j] = m_matrix[i * m_cols + j];
       }
-      m_tmp[i * m_cols + m_cols - 1] = static_cast<float>(new_col[i]);
+      m_tmp[i * (m_cols + 1) + m_cols] = static_cast<float>(new_col[i]);
     }
 
     // swap data back to m_matrix
@@ -58,14 +59,14 @@ template <typename T> void RawData::add_column(const std::vector<T> &new_col) {
   } else {
     // first column for matrix, set num rows and cols to match it
     m_rows = new_col.size();
-    m_cols = 1;
-    m_matrix.resize(m_rows * m_cols);
+    m_matrix.resize(m_rows);
 
     // copy data in (not using std::copy because visual studio complains if T
     // is not float)
     std::transform(new_col.begin(), new_col.end(), m_matrix.begin(),
                    [](auto i) { return static_cast<float>(i); });
   }
+  ++m_cols;
 }
 
 template <typename Aesthetic>

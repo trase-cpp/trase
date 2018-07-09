@@ -35,6 +35,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+ColumnIterator RawData::begin(const int i) {
+  if (i < 0 || i >= cols()) {
+    throw std::out_of_range("column does not exist");
+  }
+  return {m_matrix.begin() + i, m_cols};
+}
+
+ColumnIterator RawData::end(const int i) {
+  if (i < 0 || i >= cols()) {
+    throw std::out_of_range("column does not exist");
+  }
+  return {m_matrix.end() + i, m_cols};
+}
+
 int DataWithAesthetic::rows() const { return m_data->rows(); }
 
 const Limits &DataWithAesthetic::limits() { return m_limits; }

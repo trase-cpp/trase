@@ -235,6 +235,7 @@ endif ()
 add_executable (
     trase_tst
     tests/TestAxis.cpp
+    tests/TestData.cpp
     tests/TestBackendSVG.cpp
     tests/TestBBox.cpp
     tests/TestColors.cpp
