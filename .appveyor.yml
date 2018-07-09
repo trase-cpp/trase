@@ -23,5 +23,5 @@ build:
   project: $(APPVEYOR_BUILD_FOLDER)\$(APPVEYOR_PROJECT_NAME).sln
 
 test_script:
-- '%APPVEYOR_BUILD_FOLDER%\%CONFIGURATION%\trase_tst.exe'
+- '%APPVEYOR_BUILD_FOLDER%\%CONFIGURATION%\trase_tst.exe' -s
 
