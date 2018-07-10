@@ -70,10 +70,10 @@ public:
   template <typename T> void add_column(const std::vector<T> &new_col);
 
   /// return a ColumnIterator to the beginning of column i
-  ColumnIterator begin(const int i);
+  ColumnIterator begin(int i);
 
   /// return a ColumnIterator to the end of column i
-  ColumnIterator end(const int i);
+  ColumnIterator end(int i);
 };
 
 /// Aesthetics are a collection of tag classes that represent each aesthetic
@@ -91,9 +91,9 @@ struct Aesthetic {
   struct x {
     static const int index = 0;
     static const char *name;
-    static float to_display(const float data, const Limits &data_lim,
+    static float to_display(float data, const Limits &data_lim,
                             const bfloat2_t &display_lim);
-    static float from_display(const float display, const Limits &data_lim,
+    static float from_display(float display, const Limits &data_lim,
                               const bfloat2_t &display_lim);
   };
 
@@ -101,9 +101,9 @@ struct Aesthetic {
   struct y {
     static const int index = 1;
     static const char *name;
-    static float to_display(const float data, const Limits &data_lim,
+    static float to_display(float data, const Limits &data_lim,
                             const bfloat2_t &display_lim);
-    static float from_display(const float display, const Limits &data_lim,
+    static float from_display(float display, const Limits &data_lim,
                               const bfloat2_t &display_lim);
   };
 
@@ -112,9 +112,9 @@ struct Aesthetic {
     static const int index = 2;
     static const char *name;
 
-    static float to_display(const float data, const Limits &data_lim,
+    static float to_display(float data, const Limits &data_lim,
                             const bfloat2_t &display_lim);
-    static float from_display(const float display, const Limits &data_lim,
+    static float from_display(float display, const Limits &data_lim,
                               const bfloat2_t &display_lim);
   };
 
@@ -124,9 +124,9 @@ struct Aesthetic {
     static const int index = 3;
     static const char *name;
 
-    static float to_display(const float data, const Limits &data_lim,
+    static float to_display(float data, const Limits &data_lim,
                             const bfloat2_t &display_lim);
-    static float from_display(const float display, const Limits &data_lim,
+    static float from_display(float display, const Limits &data_lim,
                               const bfloat2_t &display_lim);
   };
 };
