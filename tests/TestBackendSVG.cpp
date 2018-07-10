@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-std::string strip_whitespace(const std::string &arg) {
+std::string strip_ws(const std::string &arg) {
   std::string ret(arg);
   ret.erase(std::remove_if(ret.begin(), ret.end(),
                            [](unsigned char x) { return std::isspace(x); }),
@@ -49,8 +49,27 @@ std::string strip_whitespace(const std::string &arg) {
   return ret;
 }
 
-bool compare_ignoring_whitespace(const std::string &a, const std::string &b) {
-  return strip_whitespace(a) == strip_whitespace(b);
+bool compare_ignoring_ws(const std::string &a, const std::string &b) {
+  return strip_ws(a) == strip_ws(b);
+}
+
+bool is_substr_ignoring_ws(const std::string &str, const std::string &substr) {
+  return strip_ws(str).find(strip_ws(substr)) != std::string::npos;
+}
+
+bool starts_with_ignoring_ws(const std::string &str,
+                             const std::string &substr) {
+  return strip_ws(str).find(strip_ws(substr)) == 0;
+}
+
+bool ends_with_ignoring_ws(const std::string &str, const std::string &substr) {
+  std::string str_s = strip_ws(str);
+  std::string substr_s = strip_ws(substr);
+  if (str_s.length() >= substr_s.length()) {
+    return str_s.compare(str_s.length() - substr_s.length(), substr_s.length(),
+                         substr_s) == 0;
+  }
+  return false;
 }
 
 } // namespace trase
@@ -127,38 +146,16 @@ TEST_CASE("svg backend init and finalise work as expected", "[svg_backend]") {
 
     backend.init(123.4f, 234.5f, 345.6f, "r@ndom^name");
 
-    const std::string expected_str =
-        R"del(<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
-  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="123.4px" height="234.5px" version="1.1" xmlns="http://www.w3.org/2000/svg">
-<desc>r@ndom^name</desc>
-<script>
-function tooltip(x,y,string,size,face) {
-    var txtElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    txtElem.setAttributeNS(null,"id","tooltip");
-    txtElem.setAttributeNS(null,"x",x);
-    txtElem.setAttributeNS(null,"y",y);
-    txtElem.setAttributeNS(null,"font-size",size);
-    txtElem.setAttributeNS(null,"font-family",face);
-
-    txtElem.appendChild(document.createTextNode(string))
-    document.documentElement.appendChild(txtElem);
-}
-function remove_tooltip() {
-    var txtElem = document.getElementById("tooltip");
-    document.documentElement.removeChild(txtElem);
-}
-</script>
-)del";
-
-    CHECK(compare_ignoring_whitespace(out_ss.str(), expected_str));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(width="123.4px")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(height="234.5px")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(<desc>r@ndom^name</desc>)"));
   }
 
   SECTION("finalise produces correct string") {
 
     backend.finalise();
-    CHECK(compare_ignoring_whitespace(out_ss.str(), "</svg>\n"));
+
+    CHECK(compare_ignoring_ws(out_ss.str(), "</svg>"));
   }
 
   SECTION("forms valid svg") {
@@ -181,19 +178,23 @@ TEST_CASE("svg backend rect work as expected", "[svg_backend]") {
 
   REQUIRE(out_ss.str().empty());
 
-  SECTION("basic rectangle produces correct string") {
+  SECTION("basic rectangle produces correct attributes") {
 
-    backend.rect({{1.23, 2.34}, {3.45, 5.67}});
+    backend.rect({{1.23f, 2.34f}, {3.45f, 5.67f}});
 
-    const std::string expected_string =
-        R"del(<rect x="1.23" y="2.34" width="2.22" height="3.33" fill="#000000" fill-opacity="1.000000" stroke="#000000" stroke-opacity="1.000000" stroke-width="1.000000"/>)del";
+    CHECK(starts_with_ignoring_ws(out_ss.str(), "<rect"));
+    CHECK(ends_with_ignoring_ws(out_ss.str(), "/>"));
 
-    CHECK(compare_ignoring_whitespace(out_ss.str(), expected_string));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(x="1.23")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(y="2.34")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(width="2.22")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(height="3.33")"));
   }
 
   SECTION("basic rectangle forms valid svg") {
+
     backend.init(10.f, 10.f, 0.f, "name");
-    backend.rect({{1.23, 2.34}, {3.45, 5.67}});
+    backend.rect({{1.23f, 2.34f}, {3.45f, 5.67f}});
     backend.finalise();
 
     std::ofstream out_f;
@@ -204,17 +205,23 @@ TEST_CASE("svg backend rect work as expected", "[svg_backend]") {
 
   SECTION("rounded rectangle produces correct string") {
 
-    backend.rounded_rect({{1.23, 2.34}, {3.45, 5.67}}, 1.78f);
+    backend.rounded_rect({{1.23f, 2.34f}, {3.45f, 5.67f}}, 1.78f);
 
-    const std::string expected_string =
-        R"del(<rect x="1.23" y="2.34" width="2.22" height="3.33" rx="1.78" ry="1.78" fill="#000000" fill-opacity="1.000000" stroke="#000000" stroke-opacity="1.000000" stroke-width="1.000000"/>)del";
+    CHECK(starts_with_ignoring_ws(out_ss.str(), "<rect"));
+    CHECK(ends_with_ignoring_ws(out_ss.str(), "/>"));
 
-    CHECK(compare_ignoring_whitespace(out_ss.str(), expected_string));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(x="1.23")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(y="2.34")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(width="2.22")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(height="3.33")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(rx="1.78")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(ry="1.78")"));
   }
 
   SECTION("rounded rectangle forms valid svg") {
+
     backend.init(10.f, 10.f, 0.f, "name");
-    backend.rounded_rect({{1.23, 2.34}, {3.45, 5.67}}, 1.f);
+    backend.rounded_rect({{1.23f, 2.34f}, {3.45f, 5.67f}}, 1.78f);
     backend.finalise();
 
     std::ofstream out_f;
