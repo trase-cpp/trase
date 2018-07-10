@@ -89,9 +89,9 @@ private:
 
   reference dereference() const { return *m_p; }
 
-  void increment() { m_p += m_stride; }
+  void increment() { std::advance(m_p, m_stride); }
 
-  void increment(const int n) { m_p += n * m_stride; }
+  void increment(const int n) { std::advance(m_p, n * m_stride); }
 
   float *m_p;
   int m_stride;
