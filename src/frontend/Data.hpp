@@ -70,10 +70,10 @@ public:
   template <typename T> void add_column(const std::vector<T> &new_col);
 
   /// return a ColumnIterator to the beginning of column i
-  ColumnIterator begin(const int i) { return {m_matrix.begin() + i, m_cols}; }
+  ColumnIterator begin(const int i);
 
   /// return a ColumnIterator to the end of column i
-  ColumnIterator end(const int i) { return {m_matrix.end() + i, m_cols}; }
+  ColumnIterator end(const int i);
 };
 
 /// Aesthetics are a collection of tag classes that represent each aesthetic
