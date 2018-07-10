@@ -98,3 +98,49 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   fig->serialise(backend);
   out.close();
 }
+
+
+TEST_CASE("svg backend init and finalise work as expected", "[svg_backend]") {
+
+  std::stringstream out;
+  BackendSVG backend(out);
+
+  REQUIRE(out.str().empty());
+
+  SECTION("init produces correct string") {
+
+    backend.init(123.4, 234.5, 345.6, "r@ndom^name");
+
+    const std::string expected_str = R"del(<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="123.4px" height="234.5px" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<desc>r@ndom^name</desc>
+<script>
+function tooltip(x,y,string,size,face) {
+    var txtElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    txtElem.setAttributeNS(null,"id","tooltip");
+    txtElem.setAttributeNS(null,"x",x);
+    txtElem.setAttributeNS(null,"y",y);
+    txtElem.setAttributeNS(null,"font-size",size);
+    txtElem.setAttributeNS(null,"font-family",face);
+
+    txtElem.appendChild(document.createTextNode(string))
+    document.documentElement.appendChild(txtElem);
+}
+function remove_tooltip() {
+    var txtElem = document.getElementById("tooltip");
+    document.documentElement.removeChild(txtElem);
+}
+</script>
+)del";
+
+    CHECK(out.str() == expected_str);
+  }
+
+  SECTION("finalise produces correct string") {
+
+    backend.finalise();
+    CHECK(out.str() == "</svg>\n");
+  }
+}
