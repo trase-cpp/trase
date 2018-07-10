@@ -38,6 +38,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "backend/BackendSVG.hpp"
 #include "trase.hpp"
 
+namespace trase {
+
+std::string strip_whitespace(const std::string &arg) {
+  std::string ret(arg);
+  ret.erase(std::remove_if(ret.begin(), ret.end(),
+                           [](unsigned char x) { return std::isspace(x); }),
+            ret.end());
+  return ret;
+}
+
+bool compare_ignoring_whitespace(const std::string &a, const std::string &b) {
+  return strip_whitespace(a) == strip_whitespace(b);
+}
+
+} // namespace trase
+
 using namespace trase;
 
 TEST_CASE("figure can written using SVG backend", "[figure]") {
@@ -99,19 +115,19 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   out.close();
 }
 
-
 TEST_CASE("svg backend init and finalise work as expected", "[svg_backend]") {
 
-  std::stringstream out;
-  BackendSVG backend(out);
+  std::stringstream out_ss;
+  BackendSVG backend(out_ss);
 
-  REQUIRE(out.str().empty());
+  REQUIRE(out_ss.str().empty());
 
   SECTION("init produces correct string") {
 
-    backend.init(123.4, 234.5, 345.6, "r@ndom^name");
+    backend.init(123.4f, 234.5f, 345.6f, "r@ndom^name");
 
-    const std::string expected_str = R"del(<?xml version="1.0" encoding="utf-8" standalone="no"?>
+    const std::string expected_str =
+        R"del(<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="123.4px" height="234.5px" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -135,12 +151,24 @@ function remove_tooltip() {
 </script>
 )del";
 
-    CHECK(out.str() == expected_str);
+    CHECK(compare_ignoring_whitespace(out_ss.str(), expected_str));
   }
 
   SECTION("finalise produces correct string") {
 
     backend.finalise();
-    CHECK(out.str() == "</svg>\n");
+    CHECK(compare_ignoring_whitespace(out_ss.str(), "</svg>\n"));
+  }
+
+  SECTION("forms valid svg") {
+
+    backend.init(123.4f, 234.5f, 345.6f, "r@ndom^name");
+    backend.finalise();
+
+    std::ofstream out_f;
+    out_f.open("backend_svg_init_finalise.svg");
+
+    out_f << out_ss.str();
+    out_f.close();
   }
 }
