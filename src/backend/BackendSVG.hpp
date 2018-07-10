@@ -74,9 +74,12 @@ public:
     fill_color({0, 0, 0, 255});
     stroke_width(1);
   }
-  void init(const float width, const float height, const float time_span,
-            const char *name);
-  void finalise();
+
+
+  void init(float width, float height, float time_span,
+            const char *name) noexcept;
+
+  void finalise() noexcept;
 
   inline bool is_interactive() { return false; }
 
@@ -90,8 +93,10 @@ public:
 
   inline void begin_path() { m_path.clear(); }
 
+  bool mouseover() const noexcept;
+
   inline void begin_animated_path() {
-    if (m_animate_values.size() < 1) {
+    if (m_animate_values.empty()) {
       m_animate_values.resize(1);
     }
     m_animate_times = "keyTimes=\"";
@@ -132,29 +137,14 @@ public:
   }
 
   inline void rounded_rect(const bfloat2_t &x, const float r) { rect(x); }
-  inline void rect(const bfloat2_t &x) {
-    const auto &delta = x.delta();
-    vfloat2_t min = x.min();
-    m_out << "<rect x=\"" << min[0] << "\" y=\"" << min[1] << "\" width=\""
-          << delta[0] << "\" height=\"" << delta[1] << "\" " << m_fill_color
-          << ' ' << m_line_color << ' ' << m_linewidth;
-    if (!m_onmouseover_fill.empty() || !m_onmouseover_stroke.empty() ||
-        !m_onmouseout_tooltip.empty()) {
-      m_out << " onmouseover=\"" << m_onmouseover_fill << m_onmouseover_stroke
-            << m_onmouseover_tooltip << '\"';
-      m_out << " onmouseout=\"" << m_onmouseout_fill << m_onmouseout_stroke
-            << m_onmouseout_tooltip << '\"';
-    }
 
-    m_out << "/>\n";
-  }
+  void rect(const bfloat2_t &x) noexcept;
 
   inline void circle_begin(const vfloat2_t &centre, float radius) {
     m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1]
           << "\" r=\"" << radius << "\" " << m_fill_color << ' ' << m_line_color
           << ' ' << m_linewidth;
-    if (!m_onmouseover_fill.empty() || !m_onmouseover_stroke.empty() ||
-        !m_onmouseout_tooltip.empty()) {
+    if (mouseover()) {
       m_out << " onmouseover=\"" << m_onmouseover_fill << m_onmouseover_stroke
             << m_onmouseover_tooltip << '\"';
       m_out << " onmouseout=\"" << m_onmouseout_fill << m_onmouseout_stroke

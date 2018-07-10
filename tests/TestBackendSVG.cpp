@@ -173,3 +173,32 @@ function remove_tooltip() {
     out_f.close();
   }
 }
+
+TEST_CASE("svg backend rect work as expected", "[svg_backend]") {
+
+  std::stringstream out_ss;
+  BackendSVG backend(out_ss);
+
+  REQUIRE(out_ss.str().empty());
+
+  SECTION("rect with no mouseover produces correct string") {
+
+    backend.rect({{1.23, 2.34}, {3.45, 5.67}});
+
+    const std::string expected_string =
+        R"del(<rect x="1.23" y="2.34" width="2.22" height="3.33" fill="#000000" fill-opacity="1.000000" stroke="#000000" stroke-opacity="1.000000" stroke-width="1.000000"/>)del";
+
+    CHECK(compare_ignoring_whitespace(out_ss.str(), expected_string));
+  }
+
+  SECTION("forms valid svg") {
+    backend.init(10.f, 10.f, 0.f, "name");
+    backend.rect({{1.23, 2.34}, {3.45, 5.67}});
+    backend.finalise();
+
+    std::ofstream out_f;
+    out_f.open("backend_svg_rect.svg");
+    out_f << out_ss.str();
+    out_f.close();
+  }
+}
