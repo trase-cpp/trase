@@ -82,14 +82,26 @@ void BackendSVG::finalise() noexcept {
   m_out.flush();
 }
 
-void BackendSVG::rect(const bfloat2_t &x) noexcept {
+void BackendSVG::rounded_rect(const bfloat2_t &x, const float r) noexcept {
+  rect(x, r);
+}
+
+void BackendSVG::rect(const bfloat2_t &x, const float r) noexcept {
 
   const auto &delta = x.delta();
   vfloat2_t min = x.min();
 
+  // Position, width and height
   m_out << "<rect x=\"" << min[0] << "\" y=\"" << min[1] << "\" width=\""
-        << delta[0] << "\" height=\"" << delta[1] << "\" " << m_fill_color
-        << ' ' << m_line_color << ' ' << m_linewidth;
+        << delta[0] << "\" height=\"" << delta[1] << "\" ";
+
+  // Rounding corners
+  if (r > 0.f) {
+    m_out << "rx=\"" << r << "\" ry=\"" << r << "\" ";
+  }
+
+  // Styling
+  m_out << m_fill_color << ' ' << m_line_color << ' ' << m_linewidth;
 
   if (mouseover()) {
     m_out << " onmouseover=\"" << m_onmouseover_fill << m_onmouseover_stroke

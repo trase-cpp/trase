@@ -136,9 +136,9 @@ public:
     m_animate_values[0].clear();
   }
 
-  inline void rounded_rect(const bfloat2_t &x, const float r) { rect(x); }
+  void rounded_rect(const bfloat2_t &x, float r) noexcept;
 
-  void rect(const bfloat2_t &x) noexcept;
+  void rect(const bfloat2_t &x, float r = 0.f) noexcept;
 
   inline void circle_begin(const vfloat2_t &centre, float radius) {
     m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1]

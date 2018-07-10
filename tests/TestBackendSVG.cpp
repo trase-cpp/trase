@@ -181,7 +181,7 @@ TEST_CASE("svg backend rect work as expected", "[svg_backend]") {
 
   REQUIRE(out_ss.str().empty());
 
-  SECTION("rect with no mouseover produces correct string") {
+  SECTION("basic rectangle produces correct string") {
 
     backend.rect({{1.23, 2.34}, {3.45, 5.67}});
 
@@ -191,13 +191,34 @@ TEST_CASE("svg backend rect work as expected", "[svg_backend]") {
     CHECK(compare_ignoring_whitespace(out_ss.str(), expected_string));
   }
 
-  SECTION("forms valid svg") {
+  SECTION("basic rectangle forms valid svg") {
     backend.init(10.f, 10.f, 0.f, "name");
     backend.rect({{1.23, 2.34}, {3.45, 5.67}});
     backend.finalise();
 
     std::ofstream out_f;
-    out_f.open("backend_svg_rect.svg");
+    out_f.open("backend_svg_basic_rect.svg");
+    out_f << out_ss.str();
+    out_f.close();
+  }
+
+  SECTION("rounded rectangle produces correct string") {
+
+    backend.rounded_rect({{1.23, 2.34}, {3.45, 5.67}}, 1.78f);
+
+    const std::string expected_string =
+        R"del(<rect x="1.23" y="2.34" width="2.22" height="3.33" rx="1.78" ry="1.78" fill="#000000" fill-opacity="1.000000" stroke="#000000" stroke-opacity="1.000000" stroke-width="1.000000"/>)del";
+
+    CHECK(compare_ignoring_whitespace(out_ss.str(), expected_string));
+  }
+
+  SECTION("rounded rectangle forms valid svg") {
+    backend.init(10.f, 10.f, 0.f, "name");
+    backend.rounded_rect({{1.23, 2.34}, {3.45, 5.67}}, 1.f);
+    backend.finalise();
+
+    std::ofstream out_f;
+    out_f.open("backend_svg_rounded_rect.svg");
     out_f << out_ss.str();
     out_f.close();
   }
