@@ -104,7 +104,7 @@ const std::array<const RGBA, 10> RGBA::defaults = {
 const RGBA RGBA::black{0, 0, 0};
 const RGBA RGBA::white{255, 255, 255};
 
-Colormap::Colormap(std::vector<Vector<float, 3>> list)
+Colormap::Colormap(std::vector<Vector<float, 3>> list) noexcept
     : m_colors(std::move(list)) {}
 
 RGBA Colormap::to_color(float i) const {

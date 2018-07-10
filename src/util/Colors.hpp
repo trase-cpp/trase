@@ -119,7 +119,7 @@ class Colormap {
 
 public:
   /// constructs the colormap from a list of rgb values scaled from 0-1
-  explicit Colormap(std::vector<Vector<float, 3>> list);
+  explicit Colormap(std::vector<Vector<float, 3>> list) noexcept;
 
   /// maps a float from 0->1 to a RGBA color
   RGBA to_color(float i) const;
