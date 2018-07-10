@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
+#include <cctype>
 #include <fstream>
 
 #include "backend/BackendSVG.hpp"
