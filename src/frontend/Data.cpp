@@ -35,6 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+int DataWithAesthetic::rows() const { return m_data->rows(); }
+
+const Limits &DataWithAesthetic::limits() { return m_limits; }
+
 const int Aesthetic::N;
 const int Aesthetic::x::index;
 const char *Aesthetic::x::name = "x";
@@ -44,5 +48,80 @@ const int Aesthetic::color::index;
 const char *Aesthetic::color::name = "color";
 const int Aesthetic::size::index;
 const char *Aesthetic::size::name = "size";
+
+float Aesthetic::x::to_display(const float data, const Limits &data_lim,
+                               const bfloat2_t &display_lim) {
+  float len_ratio = (display_lim.bmax[0] - display_lim.bmin[0]) /
+                    (data_lim.bmax[index] - data_lim.bmin[index]);
+
+  float rel_pos = data - data_lim.bmin[index];
+  return display_lim.bmin[0] + rel_pos * len_ratio;
+}
+
+float Aesthetic::x::from_display(const float display, const Limits &data_lim,
+                                 const bfloat2_t &display_lim) {
+  float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
+                    (display_lim.bmax[1] - display_lim.bmin[1]);
+
+  float rel_pos = display - display_lim.bmin[1];
+  return data_lim.bmin[index] + rel_pos * len_ratio;
+}
+
+/// the data to display on the y-axis of the plot
+float Aesthetic::y::to_display(const float data, const Limits &data_lim,
+                               const bfloat2_t &display_lim) {
+  float len_ratio = (display_lim.bmax[1] - display_lim.bmin[1]) /
+                    (data_lim.bmax[index] - data_lim.bmin[index]);
+
+  // Get the relative position and invert y by default (e.g. limits->pixels)
+  float rel_pos = data_lim.bmax[index] - data;
+  return display_lim.bmin[1] + rel_pos * len_ratio;
+}
+
+float Aesthetic::y::from_display(const float display, const Limits &data_lim,
+                                 const bfloat2_t &display_lim) {
+  float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
+                    (display_lim.bmax[1] - display_lim.bmin[1]);
+
+  float rel_pos = display_lim.bmax[1] - display;
+  return data_lim.bmin[index] + rel_pos * len_ratio;
+}
+
+float Aesthetic::color::to_display(const float data, const Limits &data_lim,
+                                   const bfloat2_t &display_lim) {
+  (void)display_lim;
+  float len_ratio = 1.f / (data_lim.bmax[index] - data_lim.bmin[index]);
+
+  float rel_pos = data - data_lim.bmin[index];
+  return rel_pos * len_ratio;
+}
+
+float Aesthetic::color::from_display(const float display,
+                                     const Limits &data_lim,
+                                     const bfloat2_t &display_lim) {
+  (void)display_lim;
+  float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]);
+
+  float rel_pos = display;
+  return data_lim.bmin[index] + rel_pos * len_ratio;
+}
+
+float Aesthetic::size::to_display(const float data, const Limits &data_lim,
+                                  const bfloat2_t &display_lim) {
+  float len_ratio = 0.05f * (display_lim.bmax[1] - display_lim.bmin[1]) /
+                    (data_lim.bmax[index] - data_lim.bmin[index]);
+
+  float rel_pos = data - data_lim.bmin[index];
+  return 1.f + rel_pos * len_ratio;
+}
+
+float Aesthetic::size::from_display(const float display, const Limits &data_lim,
+                                    const bfloat2_t &display_lim) {
+  float len_ratio = 20.f * (data_lim.bmax[index] - data_lim.bmin[index]) /
+                    (display_lim.bmax[1] - display_lim.bmin[1]);
+
+  float rel_pos = display - 1.f;
+  return data_lim.bmin[index] + rel_pos * len_ratio;
+}
 
 } // namespace trase

@@ -67,40 +67,7 @@ public:
 
   /// add a new column to the matrix. the data in `new_col` is copied into the
   /// new column
-  template <typename T> void add_column(const std::vector<T> &new_col) {
-    ++m_cols;
-
-    // if columns already exist then add the extra memory
-    if (m_cols > 1) {
-
-      // check number of rows in new column match
-      assert(static_cast<int>(new_col.size()) == m_rows);
-
-      // resize tmp vector
-      m_tmp.resize(m_rows * m_cols);
-
-      // copy orig data and new column to m_tmp
-      for (int i = 0; i < m_rows; ++i) {
-        for (int j = 0; j < m_cols - 1; ++j) {
-          m_tmp[i * m_cols + j] = m_matrix[i * (m_cols - 1) + j];
-        }
-        m_tmp[i * m_cols + m_cols - 1] = static_cast<float>(new_col[i]);
-      }
-
-      // swap data back to m_matrix
-      m_matrix.swap(m_tmp);
-    } else {
-      // first column for matrix, set num rows and cols to match it
-      m_rows = new_col.size();
-      m_cols = 1;
-      m_matrix.resize(m_rows * m_cols);
-
-      // copy data in (not using std::copy because visual studio complains if T
-      // is not float)
-      std::transform(new_col.begin(), new_col.end(), m_matrix.begin(),
-                     [](auto i) { return static_cast<float>(i); });
-    }
-  }
+  template <typename T> void add_column(const std::vector<T> &new_col);
 
   /// return a ColumnIterator to the beginning of column i
   ColumnIterator begin(const int i) { return {m_matrix.begin() + i, m_cols}; }
@@ -125,21 +92,9 @@ struct Aesthetic {
     static const int index = 0;
     static const char *name;
     static float to_display(const float data, const Limits &data_lim,
-                            const bfloat2_t &display_lim) {
-      float len_ratio = (display_lim.bmax[0] - display_lim.bmin[0]) /
-                        (data_lim.bmax[index] - data_lim.bmin[index]);
-
-      float rel_pos = data - data_lim.bmin[index];
-      return display_lim.bmin[0] + rel_pos * len_ratio;
-    }
+                            const bfloat2_t &display_lim);
     static float from_display(const float display, const Limits &data_lim,
-                              const bfloat2_t &display_lim) {
-      float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
-                        (display_lim.bmax[1] - display_lim.bmin[1]);
-
-      float rel_pos = display - display_lim.bmin[1];
-      return data_lim.bmin[index] + rel_pos * len_ratio;
-    }
+                              const bfloat2_t &display_lim);
   };
 
   /// the data to display on the y-axis of the plot
@@ -147,22 +102,9 @@ struct Aesthetic {
     static const int index = 1;
     static const char *name;
     static float to_display(const float data, const Limits &data_lim,
-                            const bfloat2_t &display_lim) {
-      float len_ratio = (display_lim.bmax[1] - display_lim.bmin[1]) /
-                        (data_lim.bmax[index] - data_lim.bmin[index]);
-
-      // Get the relative position and invert y by default (e.g. limits->pixels)
-      float rel_pos = data_lim.bmax[index] - data;
-      return display_lim.bmin[1] + rel_pos * len_ratio;
-    }
+                            const bfloat2_t &display_lim);
     static float from_display(const float display, const Limits &data_lim,
-                              const bfloat2_t &display_lim) {
-      float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
-                        (display_lim.bmax[1] - display_lim.bmin[1]);
-
-      float rel_pos = display_lim.bmax[1] - display;
-      return data_lim.bmin[index] + rel_pos * len_ratio;
-    }
+                              const bfloat2_t &display_lim);
   };
 
   /// the color of each plotting element, scaled from 0 -> 1
@@ -171,21 +113,9 @@ struct Aesthetic {
     static const char *name;
 
     static float to_display(const float data, const Limits &data_lim,
-                            const bfloat2_t &display_lim) {
-      (void)display_lim;
-      float len_ratio = 1.f / (data_lim.bmax[index] - data_lim.bmin[index]);
-
-      float rel_pos = data - data_lim.bmin[index];
-      return rel_pos * len_ratio;
-    }
+                            const bfloat2_t &display_lim);
     static float from_display(const float display, const Limits &data_lim,
-                              const bfloat2_t &display_lim) {
-      (void)display_lim;
-      float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]);
-
-      float rel_pos = display;
-      return data_lim.bmin[index] + rel_pos * len_ratio;
-    }
+                              const bfloat2_t &display_lim);
   };
 
   /// the size of each plotting element, scaled from 1 pixel to 1/20 size of
@@ -195,21 +125,9 @@ struct Aesthetic {
     static const char *name;
 
     static float to_display(const float data, const Limits &data_lim,
-                            const bfloat2_t &display_lim) {
-      float len_ratio = 0.05f * (display_lim.bmax[1] - display_lim.bmin[1]) /
-                        (data_lim.bmax[index] - data_lim.bmin[index]);
-
-      float rel_pos = data - data_lim.bmin[index];
-      return 1.f + rel_pos * len_ratio;
-    }
+                            const bfloat2_t &display_lim);
     static float from_display(const float display, const Limits &data_lim,
-                              const bfloat2_t &display_lim) {
-      float len_ratio = 20.f * (data_lim.bmax[index] - data_lim.bmin[index]) /
-                        (display_lim.bmax[1] - display_lim.bmin[1]);
-
-      float rel_pos = display - 1.f;
-      return data_lim.bmin[index] + rel_pos * len_ratio;
-    }
+                              const bfloat2_t &display_lim);
   };
 };
 
@@ -237,80 +155,36 @@ public:
 
   /// return a ColumnIterator to the beginning of the data column for aesthetic
   /// a, throws if a has not yet been set
-  template <typename Aesthetic> ColumnIterator begin(const Aesthetic &a) {
-
-    auto search = m_map.find(a.index);
-
-    if (search == m_map.end()) {
-      throw Exception(a.name + std::string(" aestheic not provided"));
-    }
-    return m_data->begin(search->second);
-  }
+  template <typename Aesthetic> ColumnIterator begin(const Aesthetic &a);
 
   /// return a ColumnIterator to the end of the data column for aesthetic a,
   /// throws if a has not yet been set
-  template <typename Aesthetic> ColumnIterator end(const Aesthetic &a) {
-
-    auto search = m_map.find(a.index);
-
-    if (search == m_map.end()) {
-      throw Exception(a.name + std::string(" aestheic not provided"));
-    }
-    return m_data->end(search->second);
-  }
+  template <typename Aesthetic> ColumnIterator end(const Aesthetic &a);
 
   /// if aesthetic a is not yet been set, this creates a new data column and
   /// copies in `data` (throws if data does not have the correct number of
   /// rows). If aesthetic a has been previously set, its data column is
   /// overwritten with `data`
   template <typename Aesthetic, typename T>
-  void set(const Aesthetic &a, const std::vector<T> &data) {
-
-    auto search = m_map.find(a.index);
-
-    if (search == m_map.end()) {
-      // if aesthetic is not in data then add a new column
-      search = m_map.insert({a.index, m_data->cols()}).first;
-      m_data->add_column(data);
-    } else {
-      // copy data to column (TODO: move this into RawData class)
-      std::transform(data.begin(), data.end(), m_data->begin(search->second),
-                     [](auto i) { return static_cast<float>(i); });
-    }
-
-    // set m_limits with new data
-    auto min_max = std::minmax_element(data.begin(), data.end());
-    m_limits.bmin[a.index] = static_cast<float>(*min_max.first);
-    m_limits.bmax[a.index] = static_cast<float>(*min_max.second);
-  }
+  void set(const Aesthetic &a, const std::vector<T> &data);
 
   /// returns number of rows in the data let
-  int rows() const { return m_data->rows(); }
+  int rows() const;
 
   /// returns the min/max limits of the data
-  const Limits &limits() { return m_limits; }
+  const Limits &limits();
 
-  template <typename T> DataWithAesthetic &x(const std::vector<T> &data) {
-    set(Aesthetic::x(), data);
-    return *this;
-  }
+  template <typename T> DataWithAesthetic &x(const std::vector<T> &data);
 
-  template <typename T> DataWithAesthetic &y(const std::vector<T> &data) {
-    set(Aesthetic::y(), data);
-    return *this;
-  }
+  template <typename T> DataWithAesthetic &y(const std::vector<T> &data);
 
-  template <typename T> DataWithAesthetic &color(const std::vector<T> &data) {
-    set(Aesthetic::color(), data);
-    return *this;
-  }
+  template <typename T> DataWithAesthetic &color(const std::vector<T> &data);
 
-  template <typename T> DataWithAesthetic &size(const std::vector<T> &data) {
-    set(Aesthetic::size(), data);
-    return *this;
-  }
+  template <typename T> DataWithAesthetic &size(const std::vector<T> &data);
 };
 
 } // namespace trase
+
+#include "Data.tcc"
 
 #endif // DATA_H_
