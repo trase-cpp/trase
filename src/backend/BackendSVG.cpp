@@ -35,11 +35,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+bool BackendSVG::mouseover() const noexcept {
+  return !m_onmouseover_fill.empty() || !m_onmouseover_stroke.empty() ||
+         !m_onmouseout_tooltip.empty();
+}
+
 void BackendSVG::init(const float width, const float height,
-                      const float time_span, const char *name) {
+                      const float time_span, const char *name) noexcept {
   m_time_span = time_span;
   m_out << R"del(<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 )del";
 
@@ -72,9 +77,66 @@ function remove_tooltip() {
 )del";
 }
 
-void BackendSVG::finalise() {
+void BackendSVG::finalise() noexcept {
   m_out << "</svg>\n";
   m_out.flush();
+}
+
+void BackendSVG::rounded_rect(const bfloat2_t &x, const float r) noexcept {
+  rect(x, r);
+}
+
+void BackendSVG::rect(const bfloat2_t &x, const float r) noexcept {
+
+  const auto &delta = x.delta();
+  vfloat2_t min = x.min();
+
+  // Position, width and height
+  m_out << "<rect x=\"" << min[0] << "\" y=\"" << min[1] << "\" width=\""
+        << delta[0] << "\" height=\"" << delta[1] << "\" ";
+
+  // Rounding corners
+  if (r > 0.f) {
+    m_out << "rx=\"" << r << "\" ry=\"" << r << "\" ";
+  }
+
+  // Styling
+  m_out << m_fill_color << ' ' << m_line_color << ' ' << m_linewidth;
+
+  if (mouseover()) {
+    m_out << " onmouseover=\"" << m_onmouseover_fill << m_onmouseover_stroke
+          << m_onmouseover_tooltip << '\"';
+    m_out << " onmouseout=\"" << m_onmouseout_fill << m_onmouseout_stroke
+          << m_onmouseout_tooltip << '\"';
+  }
+
+  m_out << "/>\n";
+}
+
+void BackendSVG::circle_begin(const vfloat2_t &centre, const float r) noexcept {
+
+  m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1] << "\" r=\""
+        << r << "\" ";
+
+  // Styling
+  m_out << m_fill_color << ' ' << m_line_color << ' ' << m_linewidth;
+
+  if (mouseover()) {
+    m_out << " onmouseover=\"" << m_onmouseover_fill << m_onmouseover_stroke
+          << m_onmouseover_tooltip << '\"';
+    m_out << " onmouseout=\"" << m_onmouseout_fill << m_onmouseout_stroke
+          << m_onmouseout_tooltip << '\"';
+  }
+
+  m_out << ">\n";
+}
+
+void BackendSVG::circle_end() noexcept { m_out << "</circle>\n"; }
+
+
+void BackendSVG::circle(const vfloat2_t &centre, float r) noexcept {
+  circle_begin(centre, r);
+  circle_end();
 }
 
 } // namespace trase

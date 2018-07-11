@@ -33,10 +33,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
+#include <cctype>
 #include <fstream>
 
 #include "backend/BackendSVG.hpp"
 #include "trase.hpp"
+
+namespace trase {
+
+std::string strip_ws(const std::string &arg) {
+  std::string ret(arg);
+  ret.erase(std::remove_if(ret.begin(), ret.end(),
+                           [](unsigned char x) { return std::isspace(x); }),
+            ret.end());
+  return ret;
+}
+
+bool compare_ignoring_ws(const std::string &a, const std::string &b) {
+  return strip_ws(a) == strip_ws(b);
+}
+
+bool is_substr_ignoring_ws(const std::string &str, const std::string &substr) {
+  return strip_ws(str).find(strip_ws(substr)) != std::string::npos;
+}
+
+bool starts_with_ignoring_ws(const std::string &str,
+                             const std::string &substr) {
+  return strip_ws(str).find(strip_ws(substr)) == 0;
+}
+
+bool ends_with_ignoring_ws(const std::string &str, const std::string &substr) {
+  std::string str_s = strip_ws(str);
+  std::string substr_s = strip_ws(substr);
+  if (str_s.length() >= substr_s.length()) {
+    return str_s.compare(str_s.length() - substr_s.length(), substr_s.length(),
+                         substr_s) == 0;
+  }
+  return false;
+}
+
+} // namespace trase
 
 using namespace trase;
 
@@ -97,4 +133,129 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   BackendSVG backend(out);
   fig->serialise(backend);
   out.close();
+}
+
+TEST_CASE("svg backend init and finalise work as expected", "[svg_backend]") {
+
+  std::stringstream out_ss;
+  BackendSVG backend(out_ss);
+
+  REQUIRE(out_ss.str().empty());
+
+  SECTION("init produces correct string") {
+
+    backend.init(123.4f, 234.5f, 345.6f, "r@ndom^name");
+
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(width="123.4px")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(height="234.5px")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(<desc>r@ndom^name</desc>)"));
+  }
+
+  SECTION("finalise produces correct string") {
+
+    backend.finalise();
+
+    CHECK(compare_ignoring_ws(out_ss.str(), "</svg>"));
+  }
+
+  SECTION("forms valid svg") {
+
+    backend.init(123.4f, 234.5f, 345.6f, "r@ndom^name");
+    backend.finalise();
+
+    std::ofstream out_f;
+    out_f.open("backend_svg_init_finalise.svg");
+
+    out_f << out_ss.str();
+    out_f.close();
+  }
+}
+
+TEST_CASE("svg backend rect works as expected", "[svg_backend]") {
+
+  std::stringstream out_ss;
+  BackendSVG backend(out_ss);
+
+  REQUIRE(out_ss.str().empty());
+
+  SECTION("basic rectangle produces correct attributes") {
+
+    backend.rect({{1.23f, 2.34f}, {3.45f, 5.67f}});
+
+    CHECK(starts_with_ignoring_ws(out_ss.str(), "<rect"));
+
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(x="1.23")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(y="2.34")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(width="2.22")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(height="3.33")"));
+  }
+
+  SECTION("basic rectangle forms valid svg") {
+
+    backend.init(10.f, 10.f, 0.f, "name");
+    backend.rect({{1.23f, 2.34f}, {3.45f, 5.67f}});
+    backend.finalise();
+
+    std::ofstream out_f;
+    out_f.open("backend_svg_basic_rect.svg");
+    out_f << out_ss.str();
+    out_f.close();
+  }
+
+  SECTION("rounded rectangle produces correct string") {
+
+    backend.rounded_rect({{1.23f, 2.34f}, {3.45f, 5.67f}}, 1.78f);
+
+    CHECK(starts_with_ignoring_ws(out_ss.str(), "<rect"));
+
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(x="1.23")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(y="2.34")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(width="2.22")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(height="3.33")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(rx="1.78")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(ry="1.78")"));
+  }
+
+  SECTION("rounded rectangle forms valid svg") {
+
+    backend.init(10.f, 10.f, 0.f, "name");
+    backend.rounded_rect({{1.23f, 2.34f}, {3.45f, 5.67f}}, 1.78f);
+    backend.finalise();
+
+    std::ofstream out_f;
+    out_f.open("backend_svg_rounded_rect.svg");
+    out_f << out_ss.str();
+    out_f.close();
+  }
+}
+
+TEST_CASE("svg backend circle works as expected", "[svg_backend]") {
+
+  std::stringstream out_ss;
+  BackendSVG backend(out_ss);
+
+  REQUIRE(out_ss.str().empty());
+
+  SECTION("basic circle produces correct attributes") {
+
+    backend.circle({1.23f, 2.34f}, 3.45f);
+
+    CHECK(starts_with_ignoring_ws(out_ss.str(), "<circle"));
+
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(cx="1.23")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(cy="2.34")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(r="3.45")"));
+  }
+
+  SECTION("basic circle forms valid svg") {
+
+    backend.init(10.f, 10.f, 0.f, "name");
+    backend.circle({1.23f, 2.34f}, 3.45f);
+    backend.finalise();
+
+    std::ofstream out_f;
+    out_f.open("backend_svg_basic_circle.svg");
+    out_f << out_ss.str();
+    out_f.close();
+  }
 }
