@@ -68,6 +68,14 @@ class BackendSVG {
   std::string m_font_face_base;
   TransformMatrix m_transform;
 
+  /// Add the opening circle tag to m_out
+  /// @param centre coordinates of the centre of the circle
+  /// @param r radius of the circle
+  void circle_begin(const vfloat2_t &centre, float r) noexcept;
+
+  /// Add the closing circle tag to m_out
+  void circle_end() noexcept;
+
 public:
   explicit BackendSVG(std::ostream &out) : m_out(out) {
     stroke_color({0, 0, 0, 255});
@@ -136,35 +144,23 @@ public:
     m_animate_values[0].clear();
   }
 
+  /// draw a rectangle with rounded corners
+  ///
+  /// @param x the bounding box of the rectangle
+  /// @param r the radius of the circle used to round the corners
   void rounded_rect(const bfloat2_t &x, float r) noexcept;
 
+  /// draw a rectangle, optionally with rounded corners
+  ///
+  /// @param x the bounding box of the rectangle
+  /// @param r the radius of the circle used to round the corners, default 0.f
   void rect(const bfloat2_t &x, float r = 0.f) noexcept;
 
-  inline void circle_begin(const vfloat2_t &centre, float radius) {
-    m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1]
-          << "\" r=\"" << radius << "\" " << m_fill_color << ' ' << m_line_color
-          << ' ' << m_linewidth;
-    if (mouseover()) {
-      m_out << " onmouseover=\"" << m_onmouseover_fill << m_onmouseover_stroke
-            << m_onmouseover_tooltip << '\"';
-      m_out << " onmouseout=\"" << m_onmouseout_fill << m_onmouseout_stroke
-            << m_onmouseout_tooltip << '\"';
-    }
-
-    m_out << ">\n";
-
-    /*
-      arc(centre, radius, 0, pi);
-      arc(centre, radius, pi, 2 * pi);
-      */
-  }
-
-  inline void circle_end() { m_out << "</circle>\n"; }
-
-  inline void circle(const vfloat2_t &centre, float radius) {
-    circle_begin(centre, radius);
-    circle_end();
-  }
+  /// draw a circle
+  ///
+  /// @param centre coordinates of the centre of the circle
+  /// @param r the radius of the circle
+  void circle(const vfloat2_t &centre, float r) noexcept;
 
   inline void add_animated_circle(const vfloat2_t &centre, float radius,
                                   float time) {

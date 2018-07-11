@@ -171,7 +171,7 @@ TEST_CASE("svg backend init and finalise work as expected", "[svg_backend]") {
   }
 }
 
-TEST_CASE("svg backend rect work as expected", "[svg_backend]") {
+TEST_CASE("svg backend rect works as expected", "[svg_backend]") {
 
   std::stringstream out_ss;
   BackendSVG backend(out_ss);
@@ -183,7 +183,6 @@ TEST_CASE("svg backend rect work as expected", "[svg_backend]") {
     backend.rect({{1.23f, 2.34f}, {3.45f, 5.67f}});
 
     CHECK(starts_with_ignoring_ws(out_ss.str(), "<rect"));
-    CHECK(ends_with_ignoring_ws(out_ss.str(), "/>"));
 
     CHECK(is_substr_ignoring_ws(out_ss.str(), R"(x="1.23")"));
     CHECK(is_substr_ignoring_ws(out_ss.str(), R"(y="2.34")"));
@@ -208,7 +207,6 @@ TEST_CASE("svg backend rect work as expected", "[svg_backend]") {
     backend.rounded_rect({{1.23f, 2.34f}, {3.45f, 5.67f}}, 1.78f);
 
     CHECK(starts_with_ignoring_ws(out_ss.str(), "<rect"));
-    CHECK(ends_with_ignoring_ws(out_ss.str(), "/>"));
 
     CHECK(is_substr_ignoring_ws(out_ss.str(), R"(x="1.23")"));
     CHECK(is_substr_ignoring_ws(out_ss.str(), R"(y="2.34")"));
@@ -226,6 +224,37 @@ TEST_CASE("svg backend rect work as expected", "[svg_backend]") {
 
     std::ofstream out_f;
     out_f.open("backend_svg_rounded_rect.svg");
+    out_f << out_ss.str();
+    out_f.close();
+  }
+}
+
+TEST_CASE("svg backend circle works as expected", "[svg_backend]") {
+
+  std::stringstream out_ss;
+  BackendSVG backend(out_ss);
+
+  REQUIRE(out_ss.str().empty());
+
+  SECTION("basic circle produces correct attributes") {
+
+    backend.circle({1.23f, 2.34f}, 3.45f);
+
+    CHECK(starts_with_ignoring_ws(out_ss.str(), "<circle"));
+
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(cx="1.23")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(cy="2.34")"));
+    CHECK(is_substr_ignoring_ws(out_ss.str(), R"(r="3.45")"));
+  }
+
+  SECTION("basic circle forms valid svg") {
+
+    backend.init(10.f, 10.f, 0.f, "name");
+    backend.circle({1.23f, 2.34f}, 3.45f);
+    backend.finalise();
+
+    std::ofstream out_f;
+    out_f.open("backend_svg_basic_circle.svg");
     out_f << out_ss.str();
     out_f.close();
   }

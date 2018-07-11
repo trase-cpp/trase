@@ -113,6 +113,32 @@ void BackendSVG::rect(const bfloat2_t &x, const float r) noexcept {
   m_out << "/>\n";
 }
 
+void BackendSVG::circle_begin(const vfloat2_t &centre, const float r) noexcept {
+
+  m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1] << "\" r=\""
+        << r << "\" ";
+
+  // Styling
+  m_out << m_fill_color << ' ' << m_line_color << ' ' << m_linewidth;
+
+  if (mouseover()) {
+    m_out << " onmouseover=\"" << m_onmouseover_fill << m_onmouseover_stroke
+          << m_onmouseover_tooltip << '\"';
+    m_out << " onmouseout=\"" << m_onmouseout_fill << m_onmouseout_stroke
+          << m_onmouseout_tooltip << '\"';
+  }
+
+  m_out << ">\n";
+}
+
+void BackendSVG::circle_end() noexcept { m_out << "</circle>\n"; }
+
+
+void BackendSVG::circle(const vfloat2_t &centre, float r) noexcept {
+  circle_begin(centre, r);
+  circle_end();
+}
+
 } // namespace trase
 
 #include "frontend/DrawableDraw.hpp"
