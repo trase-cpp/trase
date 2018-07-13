@@ -91,13 +91,13 @@ TEST_CASE("add some cols to raw data", "[data]") {
 TEST_CASE("create data with aesthetics", "[data]") {
   DataWithAesthetic data_w_aes(std::make_shared<RawData>());
 
-  CHECK_THROWS_AS(data_w_aes.begin(Aesthetic::x()), Exception);
-  CHECK_THROWS_AS(data_w_aes.begin(Aesthetic::y()), Exception);
+  CHECK_THROWS_AS(data_w_aes.begin<Aesthetic::x>(), Exception);
+  CHECK_THROWS_AS(data_w_aes.begin<Aesthetic::y>(), Exception);
   CHECK(data_w_aes.rows() == 0);
 
   DataWithAesthetic data_w_aes2;
 
-  CHECK_THROWS_AS(data_w_aes2.begin(Aesthetic::x()), Exception);
+  CHECK_THROWS_AS(data_w_aes2.begin<Aesthetic::x>(), Exception);
   CHECK(data_w_aes2.rows() == 0);
 
   auto data = std::make_shared<RawData>();
@@ -108,10 +108,10 @@ TEST_CASE("create data with aesthetics", "[data]") {
 
   CHECK(data_w_aes3.rows() == 3);
 
-  CHECK_THROWS_AS(data_w_aes3.begin(Aesthetic::x()), Exception);
-  CHECK_THROWS_AS(data_w_aes3.begin(Aesthetic::y()), Exception);
-  CHECK_THROWS_AS(data_w_aes3.begin(Aesthetic::size()), Exception);
-  CHECK_THROWS_AS(data_w_aes3.begin(Aesthetic::color()), Exception);
+  CHECK_THROWS_AS(data_w_aes3.begin<Aesthetic::x>(), Exception);
+  CHECK_THROWS_AS(data_w_aes3.begin<Aesthetic::y>(), Exception);
+  CHECK_THROWS_AS(data_w_aes3.begin<Aesthetic::size>(), Exception);
+  CHECK_THROWS_AS(data_w_aes3.begin<Aesthetic::color>(), Exception);
 }
 
 TEST_CASE("use data with aesthetics", "[data]") {
@@ -127,7 +127,7 @@ TEST_CASE("use data with aesthetics", "[data]") {
 
   {
     int ii = 0;
-    for (auto i = data.begin(Aesthetic::x()); i != data.end(Aesthetic::x());
+    for (auto i = data.begin<Aesthetic::x>(); i != data.end<Aesthetic::x>();
          ++i, ++ii) {
       CHECK(*i == x[ii]);
     }
@@ -135,7 +135,7 @@ TEST_CASE("use data with aesthetics", "[data]") {
 
   {
     int ii = 0;
-    for (auto i = data.begin(Aesthetic::y()); i != data.end(Aesthetic::y());
+    for (auto i = data.begin<Aesthetic::y>(); i != data.end<Aesthetic::y>();
          ++i, ++ii) {
       CHECK(*i == y[ii]);
     }
@@ -143,8 +143,8 @@ TEST_CASE("use data with aesthetics", "[data]") {
 
   {
     int ii = 0;
-    for (auto i = data.begin(Aesthetic::color());
-         i != data.end(Aesthetic::color()); ++i, ++ii) {
+    for (auto i = data.begin<Aesthetic::color>();
+         i != data.end<Aesthetic::color>(); ++i, ++ii) {
       CHECK(*i == color[ii]);
     }
   }

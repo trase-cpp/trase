@@ -155,11 +155,11 @@ public:
 
   /// return a ColumnIterator to the beginning of the data column for aesthetic
   /// a, throws if a has not yet been set
-  template <typename Aesthetic> ColumnIterator begin(const Aesthetic &a);
+  template <typename Aesthetic> ColumnIterator begin();
 
   /// return a ColumnIterator to the end of the data column for aesthetic a,
   /// throws if a has not yet been set
-  template <typename Aesthetic> ColumnIterator end(const Aesthetic &a);
+  template <typename Aesthetic> ColumnIterator end();
 
   /// if aesthetic a is not yet been set, this creates a new data column and
   /// copies in `data` (throws if data does not have the correct number of

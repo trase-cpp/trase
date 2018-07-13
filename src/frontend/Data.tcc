@@ -69,28 +69,6 @@ template <typename T> void RawData::add_column(const std::vector<T> &new_col) {
   ++m_cols;
 }
 
-template <typename Aesthetic>
-ColumnIterator DataWithAesthetic::begin(const Aesthetic &a) {
-
-  auto search = m_map.find(a.index);
-
-  if (search == m_map.end()) {
-    throw Exception(a.name + std::string(" aestheic not provided"));
-  }
-  return m_data->begin(search->second);
-}
-
-template <typename Aesthetic>
-ColumnIterator DataWithAesthetic::end(const Aesthetic &a) {
-
-  auto search = m_map.find(a.index);
-
-  if (search == m_map.end()) {
-    throw Exception(a.name + std::string(" aestheic not provided"));
-  }
-  return m_data->end(search->second);
-}
-
 template <typename Aesthetic, typename T>
 void DataWithAesthetic::set(const Aesthetic &a, const std::vector<T> &data) {
 
