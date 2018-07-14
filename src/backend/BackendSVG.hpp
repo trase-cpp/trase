@@ -40,9 +40,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "util/Exception.hpp"
 #include "util/Vector.hpp"
 
+#include <iomanip>
 #include <ostream>
+#include <sstream>
 
 namespace trase {
+
+/// Helper class for BackendSVG to format attributes as 'name="val" '
+class AttributeFormatter {
+  std::stringstream m_ss;
+  int m_precision = 4;
+
+public:
+  AttributeFormatter() { m_ss << std::setprecision(m_precision); }
+
+  /// Format as 'name="val" ' (inc quotes and space), and return a string
+  ///
+  /// @tparam T type of val
+  /// @param name name of attribute
+  /// @param val value of attribute
+  /// @return string of 'name="val" '
+  template <typename T>
+  std::string operator()(const std::string &name, const T val) {
+    m_ss.str("");
+    m_ss << name << "=\"" << val << "\" ";
+    return m_ss.str();
+  }
+};
 
 class BackendSVG {
   std::ostream &m_out;
@@ -67,6 +91,7 @@ class BackendSVG {
   std::string m_font_size_base;
   std::string m_font_face_base;
   TransformMatrix m_transform;
+  AttributeFormatter m_att;
 
   /// Add the opening circle tag to m_out
   /// @param centre coordinates of the centre of the circle

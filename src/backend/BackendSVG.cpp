@@ -91,13 +91,15 @@ void BackendSVG::rect(const bfloat2_t &x, const float r) noexcept {
   const auto &delta = x.delta();
   vfloat2_t min = x.min();
 
+  m_out << "<rect ";
+
   // Position, width and height
-  m_out << "<rect x=\"" << min[0] << "\" y=\"" << min[1] << "\" width=\""
-        << delta[0] << "\" height=\"" << delta[1] << "\" ";
+  m_out << m_att("x", min[0]) << m_att("y", min[1]) << m_att("width", delta[0])
+        << m_att("height", delta[1]);
 
   // Rounding corners
   if (r > 0.f) {
-    m_out << "rx=\"" << r << "\" ry=\"" << r << "\" ";
+    m_out << m_att("rx", r) << m_att("ry", r);
   }
 
   // Styling
@@ -115,8 +117,8 @@ void BackendSVG::rect(const bfloat2_t &x, const float r) noexcept {
 
 void BackendSVG::circle_begin(const vfloat2_t &centre, const float r) noexcept {
 
-  m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1] << "\" r=\""
-        << r << "\" ";
+  m_out << "<circle ";
+  m_out << m_att("cx", centre[0]) << m_att("cy", centre[1]) << m_att("r", r);
 
   // Styling
   m_out << m_fill_color << ' ' << m_line_color << ' ' << m_linewidth;
@@ -132,7 +134,6 @@ void BackendSVG::circle_begin(const vfloat2_t &centre, const float r) noexcept {
 }
 
 void BackendSVG::circle_end() noexcept { m_out << "</circle>\n"; }
-
 
 void BackendSVG::circle(const vfloat2_t &centre, float r) noexcept {
   circle_begin(centre, r);
