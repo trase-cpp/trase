@@ -45,6 +45,7 @@ class Axis;
 #include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
 #include "frontend/Figure.hpp"
+#include "frontend/Histogram.hpp"
 #include "frontend/Line.hpp"
 #include "frontend/Points.hpp"
 #include "util/Colors.hpp"
@@ -132,17 +133,32 @@ public:
   /// Create a new Points plot and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
   /// \return shared pointer to the new plot
-  std::shared_ptr<Plot1D> points(const std::shared_ptr<DataWithAesthetic> &data,
-                                 const std::string &label = std::string()) {
-    return plot_impl(std::make_shared<Points>(*this), data, label);
+  std::shared_ptr<Plot1D>
+  points(const std::shared_ptr<DataWithAesthetic> &data,
+         const Transform &transform = Transform(Identity()),
+         const std::string &label = std::string()) {
+    return plot_impl(std::make_shared<Points>(*this), transform(data), label);
   }
 
   /// Create a new Line and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
   /// \return shared pointer to the new plot
-  std::shared_ptr<Plot1D> line(const std::shared_ptr<DataWithAesthetic> &data,
-                               const std::string &label = std::string()) {
-    return plot_impl(std::make_shared<Line>(*this), data, label);
+  std::shared_ptr<Plot1D>
+  line(const std::shared_ptr<DataWithAesthetic> &data,
+       const Transform &transform = Transform(Identity()),
+       const std::string &label = std::string()) {
+    return plot_impl(std::make_shared<Line>(*this), transform(data), label);
+  }
+
+  /// Create a new histogram and return a shared pointer to it.
+  /// \param data the `DataWithAesthetic` dataset to use
+  /// \return shared pointer to the new plot
+  std::shared_ptr<Plot1D>
+  histogram(const std::shared_ptr<DataWithAesthetic> &data,
+            const Transform &transform = Transform(BinX()),
+            const std::string &label = std::string()) {
+    return plot_impl(std::make_shared<Histogram>(*this), transform(data),
+                     label);
   }
 
   /// Return a shared pointer to an existing plot.

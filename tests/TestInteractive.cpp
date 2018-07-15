@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include <limits>
+#include <random>
 #include <type_traits>
 
 #include "backend/BackendGL.hpp"
@@ -64,6 +64,58 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
   data->color(r).size(r);
 
   auto points = ax->points(data, "points");
+
+  std::cout << "limits of axis after points are: " << ax->limits() << std::endl;
+
+  float time = 0.0;
+
+  auto do_plot = [&](const float theta) {
+    time += 0.3;
+    for (int i = 0; i < n; ++i) {
+      y[i] = std::sin(theta * x[i]);
+      r[i] = time * 0.1;
+    }
+    auto data = std::make_shared<DataWithAesthetic>();
+    data->x(x).y(y).color(r).size(r);
+    moving_plot->add_frame(data, time);
+    points->add_frame(data, time);
+  };
+
+  for (int i = 0; i < 5; ++i) {
+    const float theta = 5 - i;
+    do_plot(theta);
+  }
+  for (int i = 4; i >= 0; --i) {
+    const float theta = 5 - i;
+    do_plot(theta);
+  }
+
+  std::cout << "limits of axis after all  points are: " << ax->limits()
+            << std::endl;
+
+  ax->xlabel("x");
+  ax->ylabel("y");
+  ax->title("the interactive test");
+  ax->legend();
+
+  BackendGL backend;
+  fig->show(backend);
+}
+
+TEST_CASE("histogram", "[interactive]") {
+
+  auto fig = figure();
+  auto ax = fig->axis();
+  const int n = 100;
+  std::vector<float> x(n);
+  std::default_random_engine gen;
+  std::normal_distribution<float> normal;
+  std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+
+  auto data = std::make_shared<DataWithAesthetic>();
+  data->x(x);
+
+  auto hist = ax->histogram(data, "hist");
 
   std::cout << "limits of axis after points are: " << ax->limits() << std::endl;
 
