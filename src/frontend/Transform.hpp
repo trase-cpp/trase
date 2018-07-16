@@ -56,14 +56,16 @@ public:
   explicit Transform(const T &transform) : m_transform(transform) {}
 
   /// perform mapping on `data`, return result
-  DataWithAesthetic operator()(const DataWithAesthetic &data) {
+  DataWithAesthetic operator()(const DataWithAesthetic &data) const {
     return m_transform(data);
   }
 };
 
 /// Identity transform, just pass through...
 struct Identity {
-  DataWithAesthetic operator()(const DataWithAesthetic &data) { return data; }
+  DataWithAesthetic operator()(const DataWithAesthetic &data) const {
+    return data;
+  }
 };
 
 /// bin x coordinates
@@ -73,7 +75,7 @@ struct BinX {
   int m_number_of_bins{-1};
   BinX() {}
   BinX(const int number_of_bins) : m_number_of_bins(number_of_bins) {}
-  DataWithAesthetic operator()(const DataWithAesthetic &data) {
+  DataWithAesthetic operator()(const DataWithAesthetic &data) const {
     auto x_begin = data.begin<Aesthetic::x>();
     auto x_end = data.end<Aesthetic::x>();
     int n;
@@ -82,7 +84,7 @@ struct BinX {
       auto mean = sum / data.rows();
 
       // note: use std::transform_reduce after c++17
-      std::vector<float> diff(data.size());
+      std::vector<float> diff(data.rows());
       std::transform(x_begin, x_end, diff.begin(),
                      [mean](double x) { return x - mean; });
       double sq_sum =
@@ -113,10 +115,8 @@ struct BinX {
                     ++(bin_y[i]);
                   });
 
-    data.set<Aesthetic::x>(bin_x);
-    data.set<Aesthetic::y>(bin_y);
-
-    return data;
+    // return new data set
+    return DataWithAesthetic().x(bin_x).y(bin_y);
   }
 };
 

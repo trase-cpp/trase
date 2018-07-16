@@ -119,46 +119,39 @@ public:
   /// \return shared pointer to the new plot
   template <typename T1, typename T2>
   std::shared_ptr<Plot1D> plot(const std::vector<T1> &x,
-                               const std::vector<T2> &y,
-                               const std::string &label = std::string()) {
+                               const std::vector<T2> &y) {
     if (x.size() != y.size()) {
       throw Exception("x and y vector sizes do not match");
     }
-    auto data = std::make_shared<DataWithAesthetic>();
-    data->set(Aesthetic::x(), x);
-    data->set(Aesthetic::y(), y);
-    return plot_impl(std::make_shared<Line>(*this), data, label);
+    return plot_impl(std::make_shared<Line>(*this),
+                     DataWithAesthetic().x(x).y(y));
   }
 
   /// Create a new Points plot and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
   /// \return shared pointer to the new plot
   std::shared_ptr<Plot1D>
-  points(const std::shared_ptr<DataWithAesthetic> &data,
-         const Transform &transform = Transform(Identity()),
-         const std::string &label = std::string()) {
-    return plot_impl(std::make_shared<Points>(*this), transform(data), label);
+  points(const DataWithAesthetic &data,
+         const Transform &transform = Transform(Identity())) {
+    return plot_impl(std::make_shared<Points>(*this), transform(data));
   }
 
   /// Create a new Line and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
   /// \return shared pointer to the new plot
   std::shared_ptr<Plot1D>
-  line(const std::shared_ptr<DataWithAesthetic> &data,
-       const Transform &transform = Transform(Identity()),
-       const std::string &label = std::string()) {
-    return plot_impl(std::make_shared<Line>(*this), transform(data), label);
+  line(const DataWithAesthetic &data,
+       const Transform &transform = Transform(Identity())) {
+    return plot_impl(std::make_shared<Line>(*this), transform(data));
   }
 
   /// Create a new histogram and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
   /// \return shared pointer to the new plot
   std::shared_ptr<Plot1D>
-  histogram(const std::shared_ptr<DataWithAesthetic> &data,
-            const Transform &transform = Transform(BinX()),
-            const std::string &label = std::string()) {
-    return plot_impl(std::make_shared<Histogram>(*this), transform(data),
-                     label);
+  histogram(const DataWithAesthetic &data,
+            const Transform &transform = Transform(BinX())) {
+    return plot_impl(std::make_shared<Histogram>(*this), transform(data));
   }
 
   /// Return a shared pointer to an existing plot.
@@ -180,10 +173,8 @@ public:
   void font_face(const std::string &fontFace) { m_font_face = fontFace; }
 
 private:
-  std::shared_ptr<Plot1D>
-  plot_impl(const std::shared_ptr<Plot1D> &plot,
-            const std::shared_ptr<DataWithAesthetic> &values,
-            const std::string &label);
+  std::shared_ptr<Plot1D> plot_impl(const std::shared_ptr<Plot1D> &plot,
+                                    const DataWithAesthetic &values);
 
   void update_tick_information();
   vfloat2_t calculate_num_ticks();

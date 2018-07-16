@@ -69,48 +69,67 @@ template <typename T> void RawData::add_column(const std::vector<T> &new_col) {
   ++m_cols;
 }
 
-template <typename Aesthetic, typename T>
-void DataWithAesthetic::set(const Aesthetic &a, const std::vector<T> &data) {
+template <typename T>
+void RawData::set_column(const int i, const std::vector<T> &new_col) {
 
-  auto search = m_map.find(a.index);
+  // check column exists
+  if (i < 0 || i > cols()) {
+    throw std::out_of_range("column index out of range");
+  }
+
+  // check number of rows in new column match
+  if (static_cast<int>(new_col.size()) != m_rows) {
+    throw Exception("columns in dataset must have identical number of rows");
+  }
+
+  // copy column
+  for (int j = 0; j < m_rows; ++j) {
+    m_matrix[j * m_cols + i] = new_col[j];
+  }
+}
+
+template <typename Aesthetic, typename T>
+void DataWithAesthetic::set(const std::vector<T> &data) {
+
+  auto search = m_map.find(Aesthetic::index);
 
   if (search == m_map.end()) {
     // if aesthetic is not in data then add a new column
-    search = m_map.insert({a.index, m_data->cols()}).first;
+    search = m_map.insert({Aesthetic::index, m_data->cols()}).first;
     m_data->add_column(data);
   } else {
+
     // copy data to column (TODO: move this into RawData class)
-    std::transform(data.begin(), data.end(), m_data->begin(search->second),
-                   [](auto i) { return static_cast<float>(i); });
+    m_data->set_column(search->second, data);
   }
 
   // set m_limits with new data
   auto min_max = std::minmax_element(data.begin(), data.end());
-  m_limits.bmin[a.index] = static_cast<float>(*min_max.first);
-  m_limits.bmax[a.index] = static_cast<float>(*min_max.second);
+  m_limits.bmin[Aesthetic::index] = static_cast<float>(*min_max.first);
+  m_limits.bmax[Aesthetic::index] = static_cast<float>(*min_max.second);
 }
 
 template <typename T>
 DataWithAesthetic &DataWithAesthetic::x(const std::vector<T> &data) {
-  set(Aesthetic::x(), data);
+  set<Aesthetic::x>(data);
   return *this;
 }
 
 template <typename T>
 DataWithAesthetic &DataWithAesthetic::y(const std::vector<T> &data) {
-  set(Aesthetic::y(), data);
+  set<Aesthetic::y>(data);
   return *this;
 }
 
 template <typename T>
 DataWithAesthetic &DataWithAesthetic::color(const std::vector<T> &data) {
-  set(Aesthetic::color(), data);
+  set<Aesthetic::color>(data);
   return *this;
 }
 
 template <typename T>
 DataWithAesthetic &DataWithAesthetic::size(const std::vector<T> &data) {
-  set(Aesthetic::size(), data);
+  set<Aesthetic::size>(data);
   return *this;
 }
 

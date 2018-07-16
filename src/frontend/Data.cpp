@@ -35,25 +35,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-ColumnIterator RawData::begin(const int i) {
+ColumnIterator RawData::begin(const int i) const {
   if (i < 0 || i >= cols()) {
     throw std::out_of_range("column does not exist");
   }
-  return {m_matrix.begin() + i, m_cols};
+  return {m_matrix.cbegin() + i, m_cols};
 }
 
-ColumnIterator RawData::end(const int i) {
+ColumnIterator RawData::end(const int i) const {
   if (i < 0 || i >= cols()) {
     throw std::out_of_range("column does not exist");
   }
-  return {m_matrix.end() + i, m_cols};
+  return {m_matrix.cend() + i, m_cols};
 }
 
 int DataWithAesthetic::rows() const { return m_data->rows(); }
 
-const Limits &DataWithAesthetic::limits() { return m_limits; }
+const Limits &DataWithAesthetic::limits() const { return m_limits; }
 
-template <typename Aesthetic> ColumnIterator DataWithAesthetic::begin() {
+template <typename Aesthetic> ColumnIterator DataWithAesthetic::begin() const {
 
   auto search = m_map.find(Aesthetic::index);
 
@@ -63,7 +63,7 @@ template <typename Aesthetic> ColumnIterator DataWithAesthetic::begin() {
   return m_data->begin(search->second);
 }
 
-template <typename Aesthetic> ColumnIterator DataWithAesthetic::end() {
+template <typename Aesthetic> ColumnIterator DataWithAesthetic::end() const {
 
   auto search = m_map.find(Aesthetic::index);
 
@@ -73,15 +73,15 @@ template <typename Aesthetic> ColumnIterator DataWithAesthetic::end() {
   return m_data->end(search->second);
 }
 
-template ColumnIterator DataWithAesthetic::begin<Aesthetic::x>();
-template ColumnIterator DataWithAesthetic::begin<Aesthetic::y>();
-template ColumnIterator DataWithAesthetic::begin<Aesthetic::color>();
-template ColumnIterator DataWithAesthetic::begin<Aesthetic::size>();
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::x>() const;
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::y>() const;
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::color>() const;
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::size>() const;
 
-template ColumnIterator DataWithAesthetic::end<Aesthetic::x>();
-template ColumnIterator DataWithAesthetic::end<Aesthetic::y>();
-template ColumnIterator DataWithAesthetic::end<Aesthetic::color>();
-template ColumnIterator DataWithAesthetic::end<Aesthetic::size>();
+template ColumnIterator DataWithAesthetic::end<Aesthetic::x>() const;
+template ColumnIterator DataWithAesthetic::end<Aesthetic::y>() const;
+template ColumnIterator DataWithAesthetic::end<Aesthetic::color>() const;
+template ColumnIterator DataWithAesthetic::end<Aesthetic::size>() const;
 
 const int Aesthetic::N;
 const int Aesthetic::x::index;

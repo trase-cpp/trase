@@ -60,20 +60,24 @@ class RawData {
 
 public:
   /// return the number of columns
-  int cols() { return m_cols; };
+  int cols() const { return m_cols; };
 
   /// return the number of rows
-  int rows() { return m_rows; };
+  int rows() const { return m_rows; };
 
   /// add a new column to the matrix. the data in `new_col` is copied into the
   /// new column
   template <typename T> void add_column(const std::vector<T> &new_col);
 
+  /// set a column in the matrix. the data in `new_col` is copied into column i
+  template <typename T>
+  void set_column(const int i, const std::vector<T> &new_col);
+
   /// return a ColumnIterator to the beginning of column i
-  ColumnIterator begin(int i);
+  ColumnIterator begin(int i) const;
 
   /// return a ColumnIterator to the end of column i
-  ColumnIterator end(int i);
+  ColumnIterator end(int i) const;
 };
 
 /// Aesthetics are a collection of tag classes that represent each aesthetic
@@ -155,24 +159,24 @@ public:
 
   /// return a ColumnIterator to the beginning of the data column for aesthetic
   /// a, throws if a has not yet been set
-  template <typename Aesthetic> ColumnIterator begin();
+  template <typename Aesthetic> ColumnIterator begin() const;
 
   /// return a ColumnIterator to the end of the data column for aesthetic a,
   /// throws if a has not yet been set
-  template <typename Aesthetic> ColumnIterator end();
+  template <typename Aesthetic> ColumnIterator end() const;
 
   /// if aesthetic a is not yet been set, this creates a new data column and
   /// copies in `data` (throws if data does not have the correct number of
   /// rows). If aesthetic a has been previously set, its data column is
   /// overwritten with `data`
   template <typename Aesthetic, typename T>
-  void set(const Aesthetic &a, const std::vector<T> &data);
+  void set(const std::vector<T> &data);
 
   /// returns number of rows in the data let
   int rows() const;
 
   /// returns the min/max limits of the data
-  const Limits &limits();
+  const Limits &limits() const;
 
   template <typename T> DataWithAesthetic &x(const std::vector<T> &data);
 

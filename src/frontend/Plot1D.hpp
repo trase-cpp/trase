@@ -54,7 +54,7 @@ namespace trase {
 class Plot1D : public Drawable {
 protected:
   /// dataset
-  std::vector<std::shared_ptr<DataWithAesthetic>> m_data;
+  std::vector<DataWithAesthetic> m_data;
 
   /// label
   std::string m_label;
@@ -84,22 +84,15 @@ public:
     if (x.size() != y.size()) {
       throw Exception("x and y vector sizes do not match");
     }
-    auto data = std::make_shared<DataWithAesthetic>();
-    data->set(Aesthetic::x(), x);
-    data->set(Aesthetic::y(), y);
-    return add_frame(data, time);
+    return add_frame(DataWithAesthetic().x(x).y(y), time);
   }
 
-  void add_frame(const std::shared_ptr<DataWithAesthetic> &data, float time);
+  void add_frame(const DataWithAesthetic &data, float time);
 
   float get_time(const int i) const { return m_times[i]; }
 
-  const std::shared_ptr<DataWithAesthetic> &get_data(const int i) const {
-    return m_data[i];
-  }
-  std::shared_ptr<DataWithAesthetic> &get_data(const int i) {
-    return m_data[i];
-  }
+  const DataWithAesthetic &get_data(const int i) const { return m_data[i]; }
+  DataWithAesthetic &get_data(const int i) { return m_data[i]; }
   size_t data_size() const { return m_data.size(); }
 
   void set_color(const RGBA &color) { m_color = color; }
