@@ -53,6 +53,36 @@ int DataWithAesthetic::rows() const { return m_data->rows(); }
 
 const Limits &DataWithAesthetic::limits() { return m_limits; }
 
+template <typename Aesthetic> ColumnIterator DataWithAesthetic::begin() {
+
+  auto search = m_map.find(Aesthetic::index);
+
+  if (search == m_map.end()) {
+    throw Exception(Aesthetic::name + std::string(" aestheic not provided"));
+  }
+  return m_data->begin(search->second);
+}
+
+template <typename Aesthetic> ColumnIterator DataWithAesthetic::end() {
+
+  auto search = m_map.find(Aesthetic::index);
+
+  if (search == m_map.end()) {
+    throw Exception(Aesthetic::name + std::string(" aestheic not provided"));
+  }
+  return m_data->end(search->second);
+}
+
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::x>();
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::y>();
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::color>();
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::size>();
+
+template ColumnIterator DataWithAesthetic::end<Aesthetic::x>();
+template ColumnIterator DataWithAesthetic::end<Aesthetic::y>();
+template ColumnIterator DataWithAesthetic::end<Aesthetic::color>();
+template ColumnIterator DataWithAesthetic::end<Aesthetic::size>();
+
 const int Aesthetic::N;
 const int Aesthetic::x::index;
 const char *Aesthetic::x::name = "x";
