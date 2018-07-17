@@ -100,15 +100,17 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
 
   // create a static sin(x) function
   write_y(1.f, 2.f);
-  auto static_plot = ax->plot(x, y, "static");
+  auto static_plot = ax->plot(x, y);
+  static_plot->set_label("static");
 
   // create a moving sin(x) function with varying amplitude
   write_y(1.f, 5.f);
-  auto moving_plot = ax->plot(x, y, "moving");
+  auto moving_plot = ax->plot(x, y);
+  moving_plot->set_label("moving");
 
-  auto data = std::make_shared<DataWithAesthetic>();
-  data->x(x).y(y).color(r).size(r);
-  auto points = ax->points(data, "points");
+  auto data = DataWithAesthetic().x(x).y(y).color(r).size(r);
+  auto points = ax->points(data);
+  points->set_label("points");
 
   for (int i = 1; i <= nframes; ++i) {
     const float nf = static_cast<float>(nframes);
@@ -116,8 +118,7 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
     write_y(amplitude, 5.f);
     moving_plot->add_frame(x, y, 3.f * i / nf);
 
-    auto data = std::make_shared<DataWithAesthetic>();
-    data->x(x).y(y).color(r).size(r);
+    auto data = DataWithAesthetic().x(x).y(y).color(r).size(r);
     points->add_frame(data, 3.f * i / nf);
   }
 
