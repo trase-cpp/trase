@@ -61,7 +61,7 @@ endif ()
 option (trase_BUILD_OPENGL "Build OpenGL backend and interactive test" ON)
 
 if (trase_BUILD_OPENGL)
-    set (imgui_dir imgui)
+    set (imgui_dir third-party/imgui)
     set (imgui_source
         ${imgui_dir}/imgui.cpp
         ${imgui_dir}/imgui.h
@@ -76,13 +76,13 @@ if (trase_BUILD_OPENGL)
         ${imgui_dir}/imgui_impl_glfw_gl3.cpp
         )
 
-    set (glext_dir glad)
+    set (glext_dir third-party/glad)
     set (glext_source
         ${glext_dir}/glad.c
         ${glext_dir}/glad.h
         )
 
-    set (nanovg_dir nanovg)
+    set (nanovg_dir third-party/nanovg)
     set (nanovg_source
         ${nanovg_dir}/fontstash.h
         ${nanovg_dir}/nanovg.c
@@ -123,11 +123,12 @@ if (trase_BUILD_OPENGL)
 endif (trase_BUILD_OPENGL)
 
 if (WIN32)
-    set (dirent_headers dirent/dirent.h)
+    set (dirent_dir third-party/dirent)
+    set (dirent_headers ${dirent_dir}/dirent.h)
     add_library (dirent INTERFACE)
     #target_sources(dirent INTERFACE dirent/dirent.h)
     target_include_directories (dirent INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dirent>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${dirent_dir}>
         $<INSTALL_INTERFACE:include>)
 endif ()
 
