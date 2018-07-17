@@ -49,17 +49,17 @@ template <typename Backend> void Histogram::serialise_frames(Backend &backend) {
 
   backend.stroke_color(m_color);
   backend.stroke_width(m_line_width);
-  backend.fill_color(m_fill_color);
+  backend.fill_color(m_color);
 
   // x should be constant and regular spaced
-  auto x_begin = m_data[0]->begin<Aesthetic::x>();
-  auto x_end = m_data[0]->end<Aesthetic::x>();
+  auto x_begin = m_data[0].begin<Aesthetic::x>();
+  auto x_end = m_data[0].end<Aesthetic::x>();
   const float min = m_axis.to_display<Aesthetic::x>(*x_begin);
   const float dx = m_axis.to_display<Aesthetic::x>(x_begin[1] - x_begin[0]);
 
-  for (int i = 0; i < m_data[0]->rows(); ++i) {
+  for (int i = 0; i < m_data[0].rows(); ++i) {
     for (size_t f = 0; f < m_times.size(); ++f) {
-      auto y_data = m_data[f]->begin<Aesthetic::y>()[i];
+      auto y_data = m_data[f].begin<Aesthetic::y>()[i];
       auto y = m_axis.to_display<Aesthetic::y>(y_data);
       auto x_min = (i - 0.5f) * dx;
       auto x_max = (i + 0.5f) * dx;
@@ -78,18 +78,16 @@ template <typename Backend> void Histogram::draw_plot(Backend &backend) {
 
   backend.stroke_color(m_color);
   backend.stroke_width(m_line_width);
-  backend.fill_color(m_fill_color);
+  backend.fill_color(m_color);
 
   // x should be constant and regular spaced
-  auto x_begin = m_data[0]->begin<Aesthetic::x>();
-  auto x_end = m_data[0]->end<Aesthetic::x>();
-  const float min = m_axis.to_display<Aesthetic::x>(*x_begin);
+  auto x_begin = m_data[0].begin<Aesthetic::x>();
   const float dx = m_axis.to_display<Aesthetic::x>(x_begin[1] - x_begin[0]);
 
   if (w2 == 0.0f) {
     // exactly on a single frame
-    auto y_data = m_data[f]->begin<Aesthetic::y>();
-    for (int i = 1; i < m_data[0]->rows(); ++i) {
+    auto y_data = m_data[f].begin<Aesthetic::y>();
+    for (int i = 1; i < m_data[0].rows(); ++i) {
       auto x_min = (i - 0.5f) * dx;
       auto x_max = (i + 0.5f) * dx;
       auto y = m_axis.to_display<Aesthetic::y>(y_data[i]);
@@ -97,9 +95,9 @@ template <typename Backend> void Histogram::draw_plot(Backend &backend) {
     }
 
   } else {
-    auto y0 = m_data[f - 1]->begin<Aesthetic::y>();
-    auto y1 = m_data[f]->begin<Aesthetic::y>();
-    for (int i = 1; i < m_data[0]->rows(); ++i) {
+    auto y0 = m_data[f - 1].begin<Aesthetic::y>();
+    auto y1 = m_data[f].begin<Aesthetic::y>();
+    for (int i = 1; i < m_data[0].rows(); ++i) {
       auto x_min = (i - 0.5f) * dx;
       auto x_max = (i + 0.5f) * dx;
       auto y = w1 * m_axis.to_display<Aesthetic::y>(y1[i]) +

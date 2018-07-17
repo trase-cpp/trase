@@ -73,11 +73,15 @@ struct Identity {
 /// Requires x aesthetic.
 struct BinX {
   int m_number_of_bins{-1};
-  BinX() {}
-  BinX(const int number_of_bins) : m_number_of_bins(number_of_bins) {}
+  BinX() = default;
+  explicit BinX(const int number_of_bins) : m_number_of_bins(number_of_bins) {}
   DataWithAesthetic operator()(const DataWithAesthetic &data) const {
     auto x_begin = data.begin<Aesthetic::x>();
     auto x_end = data.end<Aesthetic::x>();
+    auto minmax = std::minmax_element(x_begin, x_end);
+    const auto span = *minmax.second - *minmax.first;
+
+    double dx;
     int n;
     if (m_number_of_bins == -1) {
       auto sum = std::accumulate(x_begin, x_end, 0.f);
@@ -94,13 +98,14 @@ struct BinX {
       // Scott, D. 1979.
       // On optimal and data-based histograms.
       // Biometrika, 66:605-610.
-      n = 3.49f * stdev * std::pow(data.rows(), -0.33f);
+      dx = 3.49f * stdev * std::pow(data.rows(), -0.33f);
+      n = static_cast<int>(std::round(span / dx));
+      dx = span / n;
     } else {
+      dx = span / m_number_of_bins;
       n = m_number_of_bins;
     }
 
-    auto minmax = std::minmax_element(x_begin, x_end);
-    const auto dx = *minmax.second - *minmax.first;
     std::vector<float> bin_x(n), bin_y(n);
 
     // fill x bin coordinates as centre of each bin

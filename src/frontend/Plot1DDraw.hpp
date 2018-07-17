@@ -33,9 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 
-#include "frontend/LineDraw.hpp"
 #include "frontend/Plot1D.hpp"
-#include "frontend/PointsDraw.hpp"
 
 namespace trase {
 

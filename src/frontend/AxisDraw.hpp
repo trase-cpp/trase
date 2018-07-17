@@ -37,6 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "backend/Backend.hpp"
 #include "frontend/Axis.hpp"
 #include "frontend/Geometry.hpp"
+#include "frontend/HistogramDraw.hpp"
+#include "frontend/LineDraw.hpp"
+#include "frontend/PointsDraw.hpp"
 
 namespace trase {
 

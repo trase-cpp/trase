@@ -70,8 +70,7 @@ public:
   template <typename T> void add_column(const std::vector<T> &new_col);
 
   /// set a column in the matrix. the data in `new_col` is copied into column i
-  template <typename T>
-  void set_column(const int i, const std::vector<T> &new_col);
+  template <typename T> void set_column(int i, const std::vector<T> &new_col);
 
   /// return a ColumnIterator to the beginning of column i
   ColumnIterator begin(int i) const;
