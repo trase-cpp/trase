@@ -195,7 +195,7 @@ public:
   /// @param x the bounding box of the rectangle
   /// @param r the radius of the circle used to round the corners, default 0.f
   /// @param time the time of the keyframe
-  void add_animated_rect(const bfloat2_t &x, float r = 0.f, float time);
+  void add_animated_rect(const bfloat2_t &x, float time);
 
   /// end an animated rectangle
   ///

@@ -123,7 +123,7 @@ public:
     if (x.size() != y.size()) {
       throw Exception("x and y vector sizes do not match");
     }
-    return plot_impl(std::make_shared<Line>(*this),
+    return plot_impl(std::make_shared<Line>(*this), Transform(Identity()),
                      DataWithAesthetic().x(x).y(y));
   }
 
@@ -133,7 +133,7 @@ public:
   std::shared_ptr<Plot1D>
   points(const DataWithAesthetic &data,
          const Transform &transform = Transform(Identity())) {
-    return plot_impl(std::make_shared<Points>(*this), transform(data));
+    return plot_impl(std::make_shared<Points>(*this), transform, data);
   }
 
   /// Create a new Line and return a shared pointer to it.
@@ -142,7 +142,7 @@ public:
   std::shared_ptr<Plot1D>
   line(const DataWithAesthetic &data,
        const Transform &transform = Transform(Identity())) {
-    return plot_impl(std::make_shared<Line>(*this), transform(data));
+    return plot_impl(std::make_shared<Line>(*this), transform, data);
   }
 
   /// Create a new histogram and return a shared pointer to it.
@@ -151,7 +151,7 @@ public:
   std::shared_ptr<Plot1D>
   histogram(const DataWithAesthetic &data,
             const Transform &transform = Transform(BinX())) {
-    return plot_impl(std::make_shared<Histogram>(*this), transform(data));
+    return plot_impl(std::make_shared<Histogram>(*this), transform, data);
   }
 
   /// Return a shared pointer to an existing plot.
@@ -174,6 +174,7 @@ public:
 
 private:
   std::shared_ptr<Plot1D> plot_impl(const std::shared_ptr<Plot1D> &plot,
+                                    const Transform &transform,
                                     const DataWithAesthetic &values);
 
   void update_tick_information();

@@ -122,15 +122,14 @@ void BackendSVG::rect(const bfloat2_t &x, const float r) noexcept {
   rect_end();
 }
 
-void BackendSVG::add_animated_rect(const bfloat2_t &x, const float r,
-                                   float time) {
+void BackendSVG::add_animated_rect(const bfloat2_t &x, float time) {
 
   const auto &delta = x.delta();
   vfloat2_t min = x.min();
 
   // check if first rect
   if (m_animate_times.empty()) {
-    rect_begin(x, r);
+    rect_begin(x, 0.f);
 
     if (m_animate_values.size() < 4) {
       m_animate_values.resize(4);

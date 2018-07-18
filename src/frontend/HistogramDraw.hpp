@@ -53,17 +53,18 @@ template <typename Backend> void Histogram::serialise_frames(Backend &backend) {
 
   // x should be constant and regular spaced
   auto x_begin = m_data[0].begin<Aesthetic::x>();
-  auto x_end = m_data[0].end<Aesthetic::x>();
-  const float min = m_axis.to_display<Aesthetic::x>(*x_begin);
-  const float dx = m_axis.to_display<Aesthetic::x>(x_begin[1] - x_begin[0]);
+  const float x0 = m_axis.to_display<Aesthetic::x>(x_begin[0]);
+  const float x1 = m_axis.to_display<Aesthetic::x>(x_begin[1]);
+  const float dx = x1 - x0;
 
   for (int i = 0; i < m_data[0].rows(); ++i) {
     for (size_t f = 0; f < m_times.size(); ++f) {
       auto y_data = m_data[f].begin<Aesthetic::y>()[i];
-      auto y = m_axis.to_display<Aesthetic::y>(y_data);
-      auto x_min = (i - 0.5f) * dx;
-      auto x_max = (i + 0.5f) * dx;
-      backend.add_animated_rect(bfloat2_t({x_min, 0.f}, {x_max, y}),
+      auto y_max = m_axis.to_display<Aesthetic::y>(y_data);
+      auto y_min = m_axis.to_display<Aesthetic::y>(0.f);
+      auto x_min = (i - 0.5f) * dx + x0;
+      auto x_max = (i + 0.5f) * dx + x0;
+      backend.add_animated_rect(bfloat2_t({x_min, y_min}, {x_max, y_max}),
                                 m_times[f]);
     }
     backend.end_animated_rect();
@@ -82,27 +83,29 @@ template <typename Backend> void Histogram::draw_plot(Backend &backend) {
 
   // x should be constant and regular spaced
   auto x_begin = m_data[0].begin<Aesthetic::x>();
-  const float dx = m_axis.to_display<Aesthetic::x>(x_begin[1] - x_begin[0]);
+  const float x0 = m_axis.to_display<Aesthetic::x>(x_begin[0]);
+  const float x1 = m_axis.to_display<Aesthetic::x>(x_begin[1]);
+  const float dx = x1 - x0;
 
   if (w2 == 0.0f) {
     // exactly on a single frame
     auto y_data = m_data[f].begin<Aesthetic::y>();
-    for (int i = 1; i < m_data[0].rows(); ++i) {
-      auto x_min = (i - 0.5f) * dx;
-      auto x_max = (i + 0.5f) * dx;
+    for (int i = 0; i < m_data[0].rows(); ++i) {
+      auto x_min = (i - 0.5f) * dx + x0;
+      auto x_max = (i + 0.5f) * dx + x0;
       auto y = m_axis.to_display<Aesthetic::y>(y_data[i]);
       backend.rect(bfloat2_t({x_min, 0.f}, {x_max, y}));
     }
-
   } else {
     auto y0 = m_data[f - 1].begin<Aesthetic::y>();
     auto y1 = m_data[f].begin<Aesthetic::y>();
-    for (int i = 1; i < m_data[0].rows(); ++i) {
-      auto x_min = (i - 0.5f) * dx;
-      auto x_max = (i + 0.5f) * dx;
-      auto y = w1 * m_axis.to_display<Aesthetic::y>(y1[i]) +
-               w2 * m_axis.to_display<Aesthetic::y>(y0[i]);
-      backend.rect(bfloat2_t({x_min, 0.f}, {x_max, y}));
+    for (int i = 0; i < m_data[0].rows(); ++i) {
+      auto x_min = (i - 0.5f) * dx + x0;
+      auto x_max = (i + 0.5f) * dx + x0;
+      auto y_min = m_axis.to_display<Aesthetic::y>(0.f);
+      auto y_max = w1 * m_axis.to_display<Aesthetic::y>(y1[i]) +
+                   w2 * m_axis.to_display<Aesthetic::y>(y0[i]);
+      backend.rect(bfloat2_t({x_min, y_min}, {x_max, y_max}));
     }
   }
 }

@@ -72,6 +72,9 @@ protected:
   /// parent axis
   Axis &m_axis;
 
+  /// transform
+  Transform m_transform;
+
 public:
   explicit Plot1D(Axis &axis);
 
@@ -95,6 +98,7 @@ public:
   DataWithAesthetic &get_data(const int i) { return m_data[i]; }
   size_t data_size() const { return m_data.size(); }
 
+  void set_transform(const Transform &transform) { m_transform = transform; }
   void set_color(const RGBA &color) { m_color = color; }
   void set_label(const std::string &label) { m_label = label; }
   const std::string &get_label() const { return m_label; }
