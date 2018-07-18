@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cctype>
 #include <fstream>
+#include <random>
 
 #include "backend/BackendSVG.hpp"
 #include "trase.hpp"
@@ -131,6 +132,49 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   // output to svg
   std::ofstream out;
   out.open("test_figure.svg");
+  BackendSVG backend(out);
+  fig->serialise(backend);
+  out.close();
+}
+
+TEST_CASE("histogram looks ok", "[svg_backend]") {
+
+  auto fig = figure();
+  auto ax = fig->axis();
+  const int n = 100;
+  std::vector<float> x(n);
+  std::default_random_engine gen;
+  std::normal_distribution<float> normal(0, 1);
+  std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+
+  auto data = DataWithAesthetic().x(x);
+
+  auto hist = ax->histogram(data);
+  hist->set_label("hist");
+
+  float time = 0.0;
+
+  auto do_plot = [&](const float theta) {
+    time += 0.3;
+    std::normal_distribution<float> normal(theta, 1);
+    std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+    auto data = DataWithAesthetic().x(x);
+    hist->add_frame(data, time);
+  };
+
+  for (int i = 0; i < 5; ++i) {
+    const float theta = i / 5.f;
+    do_plot(theta);
+  }
+
+  ax->xlabel("x");
+  ax->ylabel("y");
+  ax->title("histogram test");
+  ax->legend();
+
+  // output to svg
+  std::ofstream out;
+  out.open("test_histogram.svg");
   BackendSVG backend(out);
   fig->serialise(backend);
   out.close();

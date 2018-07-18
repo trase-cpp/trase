@@ -122,14 +122,14 @@ TEST_CASE("histogram", "[interactive]") {
 
   auto do_plot = [&](const float theta) {
     time += 0.3;
-    std::normal_distribution<float> normal(0, 1 + time);
+    std::normal_distribution<float> normal(theta, 1);
     std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
     auto data = DataWithAesthetic().x(x);
     hist->add_frame(data, time);
   };
 
   for (int i = 0; i < 5; ++i) {
-    const float theta = 5 - i;
+    const float theta = i / 5.f;
     do_plot(theta);
   }
 

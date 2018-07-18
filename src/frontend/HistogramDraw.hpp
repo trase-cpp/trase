@@ -60,10 +60,12 @@ template <typename Backend> void Histogram::serialise_frames(Backend &backend) {
   for (int i = 0; i < m_data[0].rows(); ++i) {
     for (size_t f = 0; f < m_times.size(); ++f) {
       auto y_data = m_data[f].begin<Aesthetic::y>()[i];
-      auto y_max = m_axis.to_display<Aesthetic::y>(y_data);
-      auto y_min = m_axis.to_display<Aesthetic::y>(0.f);
+      auto y_min = m_axis.to_display<Aesthetic::y>(y_data);
+      auto y_max = m_axis.to_display<Aesthetic::y>(0.f);
       auto x_min = (i - 0.5f) * dx + x0;
       auto x_max = (i + 0.5f) * dx + x0;
+      std::cout << "adding rect with "
+                << bfloat2_t({x_min, y_min}, {x_max, y_max}) << std::endl;
       backend.add_animated_rect(bfloat2_t({x_min, y_min}, {x_max, y_max}),
                                 m_times[f]);
     }
@@ -93,8 +95,9 @@ template <typename Backend> void Histogram::draw_plot(Backend &backend) {
     for (int i = 0; i < m_data[0].rows(); ++i) {
       auto x_min = (i - 0.5f) * dx + x0;
       auto x_max = (i + 0.5f) * dx + x0;
-      auto y = m_axis.to_display<Aesthetic::y>(y_data[i]);
-      backend.rect(bfloat2_t({x_min, 0.f}, {x_max, y}));
+      auto y_min = m_axis.to_display<Aesthetic::y>(y_data[i]);
+      auto y_max = m_axis.to_display<Aesthetic::y>(0.f);
+      backend.rect(bfloat2_t({x_min, y_min}, {x_max, y_max}));
     }
   } else {
     auto y0 = m_data[f - 1].begin<Aesthetic::y>();
@@ -102,9 +105,9 @@ template <typename Backend> void Histogram::draw_plot(Backend &backend) {
     for (int i = 0; i < m_data[0].rows(); ++i) {
       auto x_min = (i - 0.5f) * dx + x0;
       auto x_max = (i + 0.5f) * dx + x0;
-      auto y_min = m_axis.to_display<Aesthetic::y>(0.f);
-      auto y_max = w1 * m_axis.to_display<Aesthetic::y>(y1[i]) +
+      auto y_min = w1 * m_axis.to_display<Aesthetic::y>(y1[i]) +
                    w2 * m_axis.to_display<Aesthetic::y>(y0[i]);
+      auto y_max = m_axis.to_display<Aesthetic::y>(0.f);
       backend.rect(bfloat2_t({x_min, y_min}, {x_max, y_max}));
     }
   }

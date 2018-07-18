@@ -73,7 +73,7 @@ template <typename T>
 void RawData::set_column(const int i, const std::vector<T> &new_col) {
 
   // check column exists
-  if (i < 0 || i > cols()) {
+  if (i < 0 || i >= cols()) {
     throw std::out_of_range("column index out of range");
   }
 

@@ -151,20 +151,20 @@ void BackendSVG::add_animated_rect(const bfloat2_t &x, float time) {
 void BackendSVG::end_animated_rect() {
 
   m_animate_times.back() = '\"';
-  for (int i = 0; i < 3; ++i) {
+  for (int i = 0; i < 4; ++i) {
     m_animate_values[i].back() = '\"';
   }
-  const std::string names[3] = {"cx", "cy", "r"};
-  for (int i = 0; i < 3; ++i) {
+  const std::string names[4] = {"x", "y", "width", "height"};
+  for (int i = 0; i < 4; ++i) {
     m_out << "<animate attributeName=\"" + names[i] +
                  "\" repeatCount=\"indefinite\" begin =\"0s\" dur=\""
           << m_time_span << "s\" " << m_animate_values[i] << ' '
           << m_animate_times << "/>\n";
   }
-  circle_end();
+  rect_end();
   m_animate_times.clear();
 
-  for (int i = 0; i < 3; ++i) {
+  for (int i = 0; i < 4; ++i) {
     m_animate_values[i].clear();
   }
 }
