@@ -55,9 +55,9 @@ DataWithAesthetic BinX::operator()(const DataWithAesthetic &data) {
     // increase the span slightly so round-off doesn't cause points to fall
     // outside the domain
     m_span.bmin[0] =
-        *minmax.first - 1e4 * std::numeric_limits<float>::epsilon();
+        *minmax.first - 1e4f * std::numeric_limits<float>::epsilon();
     m_span.bmin[1] =
-        *minmax.second + 1e4 * std::numeric_limits<float>::epsilon();
+        *minmax.second + 1e4f * std::numeric_limits<float>::epsilon();
   }
 
   if (m_number_of_bins == -1) {
@@ -75,7 +75,8 @@ DataWithAesthetic BinX::operator()(const DataWithAesthetic &data) {
     // Scott, D. 1979.
     // On optimal and data-based histograms.
     // Biometrika, 66:605-610.
-    const float dx = 3.49f * stdev * std::pow(data.rows(), -0.33f);
+    const float dx =
+        3.49f * stdev * std::pow(static_cast<float>(data.rows()), -0.33f);
     m_number_of_bins = static_cast<int>(std::round(m_span.delta()[0] / dx));
   }
 
