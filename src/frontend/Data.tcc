@@ -84,7 +84,7 @@ void RawData::set_column(const int i, const std::vector<T> &new_col) {
 
   // copy column
   for (int j = 0; j < m_rows; ++j) {
-    m_matrix[j * m_cols + i] = new_col[j];
+    m_matrix[j * m_cols + i] = static_cast<float>(new_col[j]);
   }
 }
 

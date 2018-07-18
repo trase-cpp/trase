@@ -155,7 +155,7 @@ TEST_CASE("histogram looks ok", "[svg_backend]") {
   float time = 0.0;
 
   auto do_plot = [&](const float theta) {
-    time += 0.3;
+    time += 0.3f;
     std::normal_distribution<float> normal(theta, 1);
     std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
     auto data = DataWithAesthetic().x(x);
