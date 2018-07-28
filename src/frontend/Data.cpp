@@ -168,4 +168,30 @@ float Aesthetic::size::from_display(const float display, const Limits &data_lim,
   return data_lim.bmin[index] + rel_pos * len_ratio;
 }
 
+template <typename Aesthetic>
+void DataWithAesthetic::set(const float min, const float max) {
+  m_limits.bmin[Aesthetic::index] = min;
+  m_limits.bmax[Aesthetic::index] = max;
+}
+
+DataWithAesthetic &DataWithAesthetic::x(const float min, const float max) {
+  set<Aesthetic::x>(min, max);
+  return *this;
+}
+
+DataWithAesthetic &DataWithAesthetic::y(const float min, const float max) {
+  set<Aesthetic::y>(min, max);
+  return *this;
+}
+
+DataWithAesthetic &DataWithAesthetic::color(const float min, const float max) {
+  set<Aesthetic::color>(min, max);
+  return *this;
+}
+
+DataWithAesthetic &DataWithAesthetic::size(const float min, const float max) {
+  set<Aesthetic::size>(min, max);
+  return *this;
+}
+
 } // namespace trase

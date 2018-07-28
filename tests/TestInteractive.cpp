@@ -91,9 +91,6 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
     do_plot(theta);
   }
 
-  std::cout << "limits of axis after all  points are: " << ax->limits()
-            << std::endl;
-
   ax->xlabel("x");
   ax->ylabel("y");
   ax->title("the interactive test");
@@ -127,6 +124,9 @@ TEST_CASE("histogram", "[interactive]") {
     auto data = DataWithAesthetic().x(x);
     hist->add_frame(data, time);
   };
+
+  std::cout << "limits of axis after all  histograms are: " << ax->limits()
+            << std::endl;
 
   for (int i = 0; i < 5; ++i) {
     const float theta = i / 5.f;

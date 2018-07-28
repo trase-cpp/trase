@@ -82,13 +82,10 @@ DataWithAesthetic BinX::operator()(const DataWithAesthetic &data) {
 
   const float dx = m_span.delta()[0] / m_number_of_bins;
 
-  std::vector<float> bin_x(m_number_of_bins), bin_y(m_number_of_bins);
+  std::vector<float> bin_y(m_number_of_bins);
 
-  // fill x bin coordinates as centre of each bin, zero y bin values
-  for (int i = 0; i < m_number_of_bins; ++i) {
-    bin_x[i] = m_span.bmin[0] + (i + 0.5f) * dx;
-    bin_y[i] = 0.f;
-  }
+  // zero y bin values
+  std::fill(bin_y.begin(), bin_y.end(), 0.f);
 
   //  accumulate data into histogram
   std::for_each(x_begin, x_end, [&](const float x) {
@@ -98,8 +95,11 @@ DataWithAesthetic BinX::operator()(const DataWithAesthetic &data) {
     }
   });
 
-  // return new data set
-  return DataWithAesthetic().x(bin_x).y(bin_y);
+  // return new data set, making sure to set ymin to zero
+  DataWithAesthetic ret;
+  ret.x(m_span.bmin[0], m_span.bmax[0]).y(bin_y);
+  ret.y(0.f, ret.limits().bmax[Aesthetic::y::index]);
+  return ret;
 }
 
 } // namespace trase

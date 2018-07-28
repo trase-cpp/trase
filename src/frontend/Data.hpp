@@ -171,6 +171,12 @@ public:
   template <typename Aesthetic, typename T>
   void set(const std::vector<T> &data);
 
+  /// rather than adding new data, this allows the limits of a given aesthetic
+  /// to be manually set. This is used, for example, with geometries where the
+  /// data is implicitly defined over a range (e.g. histograms with regular bin
+  /// widths)
+  template <typename Aesthetic> void set(float min, float max);
+
   /// returns number of rows in the data let
   int rows() const;
 
@@ -178,12 +184,16 @@ public:
   const Limits &limits() const;
 
   template <typename T> DataWithAesthetic &x(const std::vector<T> &data);
+  DataWithAesthetic &x(float min, float max);
 
   template <typename T> DataWithAesthetic &y(const std::vector<T> &data);
+  DataWithAesthetic &y(float min, float max);
 
   template <typename T> DataWithAesthetic &color(const std::vector<T> &data);
+  DataWithAesthetic &color(float min, float max);
 
   template <typename T> DataWithAesthetic &size(const std::vector<T> &data);
+  DataWithAesthetic &size(float min, float max);
 };
 
 } // namespace trase

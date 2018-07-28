@@ -57,8 +57,8 @@ class BinX {
 
 public:
   BinX() = default;
-  explicit BinX(const int number_of_bins);
-  explicit BinX(const int number_of_bins, const float min, const float max);
+  explicit BinX(int number_of_bins);
+  explicit BinX(int number_of_bins, float min, float max);
   DataWithAesthetic operator()(const DataWithAesthetic &data);
 };
 
