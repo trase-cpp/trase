@@ -90,6 +90,14 @@ public:
     return add_frame(DataWithAesthetic().x(x).y(y), time);
   }
 
+  /// Adds a new data frame to this plot
+  ///
+  /// The limits of the new data frame will be added to the limits of this
+  /// plot, and the parent axis
+  ///
+  /// \param data the new data frame
+  /// \param time the timestamp for this frame. This must be greater than the
+  /// time for all previously added frames
   void add_frame(const DataWithAesthetic &data, float time);
 
   float get_time(const int i) const { return m_times[i]; }
@@ -98,9 +106,23 @@ public:
   DataWithAesthetic &get_data(const int i) { return m_data[i]; }
   size_t data_size() const { return m_data.size(); }
 
+  /// Sets the transform
+  ///
+  /// \param transform the new transform
+  ///
+  /// All new data frames added to the plot will have this transform applied
+  /// before the data is stored internally
   void set_transform(const Transform &transform) { m_transform = transform; }
+
   void set_color(const RGBA &color) { m_color = color; }
+
+  /// Set the label
+  ///
+  /// This label describes the plot and is shown on the axis legend
+  ///
+  /// \param label a string description of the plot
   void set_label(const std::string &label) { m_label = label; }
+
   const std::string &get_label() const { return m_label; }
   const RGBA &get_color() const { return m_color; }
   const float get_line_width() const { return m_line_width; }

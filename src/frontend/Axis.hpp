@@ -129,6 +129,7 @@ public:
 
   /// Create a new Points plot and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
+  /// \param transform (optional) the transform to apply
   /// \return shared pointer to the new plot
   std::shared_ptr<Plot1D>
   points(const DataWithAesthetic &data,
@@ -138,6 +139,7 @@ public:
 
   /// Create a new Line and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
+  /// \param transform (optional) the transform to apply
   /// \return shared pointer to the new plot
   std::shared_ptr<Plot1D>
   line(const DataWithAesthetic &data,
@@ -147,6 +149,7 @@ public:
 
   /// Create a new histogram and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
+  /// \param transform (optional) the transform to apply
   /// \return shared pointer to the new plot
   std::shared_ptr<Plot1D>
   histogram(const DataWithAesthetic &data,
@@ -163,9 +166,14 @@ public:
   template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 
+  /// convert from display coordinates to data coordinates, using the given
+  /// Aesthetic
   template <typename Aesthetic> float from_display(const float i) const {
     return Aesthetic::from_display(i, m_limits, m_pixels);
   }
+
+  /// convert from data coordinates to display coordinates, using the given
+  /// Aesthetic
   template <typename Aesthetic> float to_display(const float i) const {
     return Aesthetic::to_display(i, m_limits, m_pixels);
   }
@@ -173,6 +181,16 @@ public:
   void font_face(const std::string &fontFace) { m_font_face = fontFace; }
 
 private:
+  /// Create a new Plot1D on this axis and return a shared pointer to it.
+  ///
+  /// All the plotting functions go through this function, which does the actual
+  /// work of adding the new Plot1D, its data and transform to the axis. A
+  /// default color is given to the new plot based on the number of already
+  /// existing plots (see Colors.hpp for list of default colors)
+  ///
+  /// \param data the `DataWithAesthetic` dataset to use
+  /// \param transform the transform to apply
+  /// \return shared pointer to the new plot
   std::shared_ptr<Plot1D> plot_impl(const std::shared_ptr<Plot1D> &plot,
                                     const Transform &transform,
                                     const DataWithAesthetic &values);
