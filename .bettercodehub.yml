@@ -4,19 +4,15 @@ languages:
   production:
     exclude:
       - /tests/.*\.cpp
-      - /dirent/.*
+      - /third-party/.*
+      - /docs/.*
       - /font/.*
-      - /nanovg/.*
-      - /imgui/.*
-      - /glad/.*
       - /tests/catch.hpp
   test:
     include:
       - /tests/.*\.cpp
     exclude:
-      - /dirent/.*
+      - /third-party/.*
+      - /docs/.*
       - /font/.*
-      - /nanovg/.*
-      - /imgui/.*
-      - /glad/.*
       - /tests/catch.hpp
