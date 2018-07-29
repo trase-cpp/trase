@@ -194,4 +194,6 @@ DataWithAesthetic &DataWithAesthetic::size(const float min, const float max) {
   return *this;
 }
 
+DataWithAesthetic create_data() { return DataWithAesthetic(); }
+
 } // namespace trase
