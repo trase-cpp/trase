@@ -30,6 +30,7 @@ For example, the above svg image was generated with the following code.
   const int nframes = 10;
   std::vector<float> x(n);
   std::vector<float> y(n);
+  std::vector<float> r(n);
 
   // define x points
   for (int i = 0; i < n; ++i) {
@@ -40,20 +41,23 @@ For example, the above svg image was generated with the following code.
   auto write_y = [&](const float amplitude, const float freq) {
     for (int i = 0; i < n; ++i) {
       y[i] = amplitude * std::sin(6.28f * freq * x[i]);
+      r[i] = static_cast<float>(i) / n * amplitude;
     }
   };
 
   // create a static sin(x) function
   write_y(1.f, 2.f);
-  auto static_plot = ax->plot(x, y, "static");
+  auto static_plot = ax->plot(x, y);
+  static_plot->set_label("static");
 
   // create a moving sin(x) function with varying amplitude
   write_y(1.f, 5.f);
-  auto moving_plot = ax->plot(x, y, "moving");
+  auto moving_plot = ax->plot(x, y);
+  moving_plot->set_label("moving");
 
   for (int i = 1; i <= nframes; ++i) {
     const float nf = static_cast<float>(nframes);
-    const float amplitude = 1.f - 0.5f * std::sin(6.28 * i / nf);
+    const float amplitude = 1.f - 0.5f * std::sin(6.28f * i / nf);
     write_y(amplitude, 5.f);
     moving_plot->add_frame(x, y, 3.f * i / nf);
   }

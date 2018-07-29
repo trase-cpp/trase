@@ -1,2 +1,3 @@
-INPUT                  = src docs
+INPUT                  = README.md src docs
 RECURSIVE              = YES
+USE_MDFILE_AS_MAINPAGE = README.md
