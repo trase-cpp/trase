@@ -3,7 +3,7 @@
   <!-- Navigation index tabs for HTML output -->
   <navindex>
     <tab type="mainpage" visible="yes" title=""/>
-    <tab type="examples" visible="yes" url="md_docs_examples.html"  title="Wiki"/>
+    <tab type="user" visible="yes" url="md_docs_examples.html"  title="examples"/>
     <tab type="pages" visible="yes" title="" intro=""/>
     <tab type="modules" visible="yes" title="" intro=""/>
     <tab type="namespaces" visible="yes" title="">
