@@ -109,7 +109,7 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   auto moving_plot = ax->plot(x, y);
   moving_plot->set_label("moving");
 
-  auto data = DataWithAesthetic().x(x).y(y).color(r).size(r);
+  auto data = create_data().x(x).y(y).color(r).size(r);
   auto points = ax->points(data);
   points->set_label("points");
 
@@ -119,7 +119,7 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
     write_y(amplitude, 5.f);
     moving_plot->add_frame(x, y, 3.f * i / nf);
 
-    auto data = DataWithAesthetic().x(x).y(y).color(r).size(r);
+    auto data = create_data().x(x).y(y).color(r).size(r);
     points->add_frame(data, 3.f * i / nf);
   }
 
@@ -147,7 +147,7 @@ TEST_CASE("histogram looks ok", "[svg_backend]") {
   std::normal_distribution<float> normal(0, 1);
   std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
 
-  auto data = DataWithAesthetic().x(x);
+  auto data = create_data().x(x);
 
   auto hist = ax->histogram(data);
   hist->set_label("hist");
@@ -158,7 +158,7 @@ TEST_CASE("histogram looks ok", "[svg_backend]") {
     time += 0.3f;
     std::normal_distribution<float> normal(theta, 1);
     std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
-    auto data = DataWithAesthetic().x(x);
+    auto data = create_data().x(x);
     hist->add_frame(data, time);
   };
 

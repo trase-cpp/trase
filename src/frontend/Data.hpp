@@ -196,6 +196,9 @@ public:
   DataWithAesthetic &size(float min, float max);
 };
 
+/// creates a new, empty dataset
+DataWithAesthetic create_data();
+
 } // namespace trase
 
 #include "Data.tcc"

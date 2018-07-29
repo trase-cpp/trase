@@ -77,7 +77,7 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
       y[i] = std::sin(theta * x[i]);
       r[i] = time * 0.1;
     }
-    auto data = DataWithAesthetic().x(x).y(y).color(r).size(r);
+    auto data = create_data().x(x).y(y).color(r).size(r);
     moving_plot->add_frame(data, time);
     points->add_frame(data, time);
   };
@@ -110,7 +110,7 @@ TEST_CASE("histogram", "[interactive]") {
   std::normal_distribution<float> normal(0, 1);
   std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
 
-  auto data = DataWithAesthetic().x(x);
+  auto data = create_data().x(x);
 
   auto hist = ax->histogram(data);
   hist->set_label("hist");
@@ -121,7 +121,7 @@ TEST_CASE("histogram", "[interactive]") {
     time += 0.3;
     std::normal_distribution<float> normal(theta, 1);
     std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
-    auto data = DataWithAesthetic().x(x);
+    auto data = create_data().x(x);
     hist->add_frame(data, time);
   };
 
