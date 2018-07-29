@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
 
+#include "frontend/Histogram.hpp"
 #include "frontend/Line.hpp"
 #include "frontend/Plot1D.hpp"
 #include "frontend/Points.hpp"
@@ -49,6 +50,8 @@ void serialise_geometry(std::shared_ptr<Plot1D> &plot, Backend &backend) {
     points->serialise(backend);
   } else if (auto line = dynamic_cast<Line *>(plot.get())) {
     line->serialise(backend);
+  } else if (auto histogram = dynamic_cast<Histogram *>(plot.get())) {
+    histogram->serialise(backend);
   } else {
     throw Exception("unknown geometry class");
   }
@@ -61,6 +64,8 @@ void draw_geometry(std::shared_ptr<Plot1D> &plot, Backend &backend,
     points->draw(backend, time);
   } else if (auto line = dynamic_cast<Line *>(plot.get())) {
     line->draw(backend, time);
+  } else if (auto histogram = dynamic_cast<Histogram *>(plot.get())) {
+    histogram->draw(backend, time);
   } else {
     throw Exception("unknown geometry class");
   }

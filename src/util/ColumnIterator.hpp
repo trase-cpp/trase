@@ -38,17 +38,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-/// An iterator that iterates through a single column of the raw data class
+/// A const iterator that iterates through a single column of the raw data class
 /// Impliments an random access iterator with a given stride
 class ColumnIterator {
 public:
-  using pointer = float *;
+  using pointer = float const *;
   using iterator_category = std::random_access_iterator_tag;
-  using reference = float &;
-  using value_type = float;
+  using reference = float const &;
+  using value_type = float const;
   using difference_type = std::ptrdiff_t;
 
-  ColumnIterator(const std::vector<float>::iterator &p, const int stride)
+  ColumnIterator() = default;
+
+  ColumnIterator(const std::vector<float>::const_iterator &p, const int stride)
       : m_p(&(*p)), m_stride(stride) {}
 
   reference operator*() const { return dereference(); }
@@ -93,7 +95,7 @@ private:
 
   void increment(const int n) { std::advance(m_p, n * m_stride); }
 
-  float *m_p;
+  pointer m_p;
   int m_stride;
 };
 

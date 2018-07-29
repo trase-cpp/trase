@@ -44,10 +44,9 @@ Plot1D::Plot1D(Axis &axis)
     : Drawable(&axis, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
       m_colormap(&Colormaps::viridis), m_line_width(3.f), m_axis(axis) {}
 
-void Plot1D::add_frame(const std::shared_ptr<DataWithAesthetic> &data,
-                       float time) {
+void Plot1D::add_frame(const DataWithAesthetic &data, float time) {
   // add new data frame
-  m_data.push_back(data);
+  m_data.push_back(m_transform(data));
 
   // add new frame time
   if (time > 0) {
@@ -55,7 +54,7 @@ void Plot1D::add_frame(const std::shared_ptr<DataWithAesthetic> &data,
   }
 
   // update limits with new frame
-  m_limits += data->limits();
+  m_limits += m_data.back().limits();
 
   // communicate limits to parent axis
   const float buffer = 1.05f;

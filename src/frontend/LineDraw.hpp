@@ -58,20 +58,20 @@ template <typename Backend> void Line::serialise_frames(Backend &backend) {
                      m_axis.to_display<Aesthetic::y>(y)};
   };
 
-  auto x = m_data[0]->begin<Aesthetic::x>();
-  auto y = m_data[0]->begin<Aesthetic::y>();
+  auto x = m_data[0].begin<Aesthetic::x>();
+  auto y = m_data[0].begin<Aesthetic::y>();
   backend.move_to(to_pixel(x[0], y[0]));
-  for (int i = 1; i < m_data[0]->rows(); ++i) {
+  for (int i = 1; i < m_data[0].rows(); ++i) {
     backend.line_to(to_pixel(x[i], y[i]));
   }
 
   // other frames
   for (size_t f = 1; f < m_times.size(); ++f) {
-    auto x = m_data[f]->begin<Aesthetic::x>();
-    auto y = m_data[f]->begin<Aesthetic::y>();
+    auto x = m_data[f].begin<Aesthetic::x>();
+    auto y = m_data[f].begin<Aesthetic::y>();
     backend.add_animated_path(m_times[f - 1]);
     backend.move_to(to_pixel(x[0], y[0]));
-    for (int i = 1; i < m_data[0]->rows(); ++i) {
+    for (int i = 1; i < m_data[0].rows(); ++i) {
       backend.line_to(to_pixel(x[i], y[i]));
     }
   }
@@ -89,9 +89,9 @@ template <typename Backend> void Line::serialise_highlights(Backend &backend) {
     backend.stroke_color(RGBA(0, 0, 0, 0));
     backend.fill_color(color, m_color);
 
-    auto x = m_data[0]->begin<Aesthetic::x>();
-    auto y = m_data[0]->begin<Aesthetic::y>();
-    for (int i = 0; i < m_data[0]->rows(); ++i) {
+    auto x = m_data[0].begin<Aesthetic::x>();
+    auto y = m_data[0].begin<Aesthetic::y>();
+    for (int i = 0; i < m_data[0].rows(); ++i) {
       vfloat2_t point = {x[i], y[i]};
       vfloat2_t point_pixel = {m_axis.to_display<Aesthetic::x>(x[i]),
                                m_axis.to_display<Aesthetic::y>(y[i])};
@@ -118,20 +118,20 @@ template <typename Backend> void Line::draw_plot(Backend &backend) {
 
   if (w2 == 0.0f) {
     // exactly on a single frame
-    auto x = m_data[f]->begin<Aesthetic::x>();
-    auto y = m_data[f]->begin<Aesthetic::y>();
+    auto x = m_data[f].begin<Aesthetic::x>();
+    auto y = m_data[f].begin<Aesthetic::y>();
     backend.move_to(to_pixel(x[0], y[0]));
-    for (int i = 1; i < m_data[0]->rows(); ++i) {
+    for (int i = 1; i < m_data[0].rows(); ++i) {
       backend.line_to(to_pixel(x[i], y[i]));
     }
   } else {
     // between two frames
-    auto x0 = m_data[f - 1]->begin<Aesthetic::x>();
-    auto y0 = m_data[f - 1]->begin<Aesthetic::y>();
-    auto x1 = m_data[f]->begin<Aesthetic::x>();
-    auto y1 = m_data[f]->begin<Aesthetic::y>();
+    auto x0 = m_data[f - 1].begin<Aesthetic::x>();
+    auto y0 = m_data[f - 1].begin<Aesthetic::y>();
+    auto x1 = m_data[f].begin<Aesthetic::x>();
+    auto y1 = m_data[f].begin<Aesthetic::y>();
     backend.move_to(w1 * to_pixel(x1[0], y1[0]) + w2 * to_pixel(x0[0], y0[0]));
-    for (int i = 1; i < m_data[0]->rows(); ++i) {
+    for (int i = 1; i < m_data[0].rows(); ++i) {
       backend.line_to(w1 * to_pixel(x1[i], y1[i]) +
                       w2 * to_pixel(x0[i], y0[i]));
     }
@@ -163,9 +163,9 @@ template <typename Backend> void Line::draw_highlights(Backend &backend) {
     float min_r2 = std::numeric_limits<float>::max();
     vfloat2_t min_point{};
     // exactly on a frame
-    auto x = m_data[m_frame_info.frame_above]->begin<Aesthetic::x>();
-    auto y = m_data[m_frame_info.frame_above]->begin<Aesthetic::y>();
-    for (int i = 0; i < m_data[0]->rows(); ++i) {
+    auto x = m_data[m_frame_info.frame_above].begin<Aesthetic::x>();
+    auto y = m_data[m_frame_info.frame_above].begin<Aesthetic::y>();
+    for (int i = 0; i < m_data[0].rows(); ++i) {
       const vfloat2_t point = {x[i], y[i]};
       auto point_r2 = (point - pos).squaredNorm();
       if (point_r2 < min_r2) {

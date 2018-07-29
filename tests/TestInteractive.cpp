@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include <limits>
+#include <random>
 #include <type_traits>
 
 #include "backend/BackendGL.hpp"
@@ -57,13 +57,15 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
     y[i] = std::sin(5 * x[i]);
     r[i] = 0.1;
   }
-  auto static_plot = ax->plot(x, y, "static");
-  auto moving_plot = ax->plot(x, y, "moving");
+  auto static_plot = ax->plot(x, y);
+  static_plot->set_label("static");
+  auto moving_plot = ax->plot(x, y);
+  moving_plot->set_label("moving");
 
-  auto data = moving_plot->get_data(0);
-  data->color(r).size(r);
+  auto data = moving_plot->get_data(0).color(r).size(r);
 
-  auto points = ax->points(data, "points");
+  auto points = ax->points(data);
+  points->set_label("points");
 
   std::cout << "limits of axis after points are: " << ax->limits() << std::endl;
 
@@ -75,8 +77,7 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
       y[i] = std::sin(theta * x[i]);
       r[i] = time * 0.1;
     }
-    auto data = std::make_shared<DataWithAesthetic>();
-    data->x(x).y(y).color(r).size(r);
+    auto data = DataWithAesthetic().x(x).y(y).color(r).size(r);
     moving_plot->add_frame(data, time);
     points->add_frame(data, time);
   };
@@ -90,12 +91,51 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
     do_plot(theta);
   }
 
-  std::cout << "limits of axis after all  points are: " << ax->limits()
-            << std::endl;
-
   ax->xlabel("x");
   ax->ylabel("y");
   ax->title("the interactive test");
+  ax->legend();
+
+  BackendGL backend;
+  fig->show(backend);
+}
+
+TEST_CASE("histogram", "[interactive]") {
+
+  auto fig = figure();
+  auto ax = fig->axis();
+  const int n = 100;
+  std::vector<float> x(n);
+  std::default_random_engine gen;
+  std::normal_distribution<float> normal(0, 1);
+  std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+
+  auto data = DataWithAesthetic().x(x);
+
+  auto hist = ax->histogram(data);
+  hist->set_label("hist");
+
+  float time = 0.0;
+
+  auto do_plot = [&](const float theta) {
+    time += 0.3;
+    std::normal_distribution<float> normal(theta, 1);
+    std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+    auto data = DataWithAesthetic().x(x);
+    hist->add_frame(data, time);
+  };
+
+  std::cout << "limits of axis after all  histograms are: " << ax->limits()
+            << std::endl;
+
+  for (int i = 0; i < 5; ++i) {
+    const float theta = i / 5.f;
+    do_plot(theta);
+  }
+
+  ax->xlabel("x");
+  ax->ylabel("y");
+  ax->title("histogram test");
   ax->legend();
 
   BackendGL backend;

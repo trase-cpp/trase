@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cctype>
 #include <fstream>
+#include <random>
 
 #include "backend/BackendSVG.hpp"
 #include "trase.hpp"
@@ -100,15 +101,17 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
 
   // create a static sin(x) function
   write_y(1.f, 2.f);
-  auto static_plot = ax->plot(x, y, "static");
+  auto static_plot = ax->plot(x, y);
+  static_plot->set_label("static");
 
   // create a moving sin(x) function with varying amplitude
   write_y(1.f, 5.f);
-  auto moving_plot = ax->plot(x, y, "moving");
+  auto moving_plot = ax->plot(x, y);
+  moving_plot->set_label("moving");
 
-  auto data = std::make_shared<DataWithAesthetic>();
-  data->x(x).y(y).color(r).size(r);
-  auto points = ax->points(data, "points");
+  auto data = DataWithAesthetic().x(x).y(y).color(r).size(r);
+  auto points = ax->points(data);
+  points->set_label("points");
 
   for (int i = 1; i <= nframes; ++i) {
     const float nf = static_cast<float>(nframes);
@@ -116,8 +119,7 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
     write_y(amplitude, 5.f);
     moving_plot->add_frame(x, y, 3.f * i / nf);
 
-    auto data = std::make_shared<DataWithAesthetic>();
-    data->x(x).y(y).color(r).size(r);
+    auto data = DataWithAesthetic().x(x).y(y).color(r).size(r);
     points->add_frame(data, 3.f * i / nf);
   }
 
@@ -130,6 +132,49 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   // output to svg
   std::ofstream out;
   out.open("test_figure.svg");
+  BackendSVG backend(out);
+  fig->serialise(backend);
+  out.close();
+}
+
+TEST_CASE("histogram looks ok", "[svg_backend]") {
+
+  auto fig = figure();
+  auto ax = fig->axis();
+  const int n = 100;
+  std::vector<float> x(n);
+  std::default_random_engine gen;
+  std::normal_distribution<float> normal(0, 1);
+  std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+
+  auto data = DataWithAesthetic().x(x);
+
+  auto hist = ax->histogram(data);
+  hist->set_label("hist");
+
+  float time = 0.0;
+
+  auto do_plot = [&](const float theta) {
+    time += 0.3f;
+    std::normal_distribution<float> normal(theta, 1);
+    std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+    auto data = DataWithAesthetic().x(x);
+    hist->add_frame(data, time);
+  };
+
+  for (int i = 0; i < 5; ++i) {
+    const float theta = i / 5.f;
+    do_plot(theta);
+  }
+
+  ax->xlabel("x");
+  ax->ylabel("y");
+  ax->title("histogram test");
+  ax->legend();
+
+  // output to svg
+  std::ofstream out;
+  out.open("test_histogram.svg");
   BackendSVG backend(out);
   fig->serialise(backend);
   out.close();

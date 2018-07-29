@@ -104,9 +104,11 @@ TEST_CASE("labels", "[axis]") {
   auto ax = fig->axis();
   const std::vector<float> x = {1.f, 2.f, 3.f};
   const std::vector<float> y = {1.f, 2.f, 3.f};
-  auto plot1 = ax->plot(x, y, "plot1");
+  auto plot1 = ax->plot(x, y);
+  plot1->set_label("plot1");
   CHECK(plot1->get_label() == "plot1");
-  auto plot2 = ax->plot(x, y, "plot2");
+  auto plot2 = ax->plot(x, y);
+  plot2->set_label("plot2");
   CHECK(plot1->get_label() == "plot1");
   CHECK(plot2->get_label() == "plot2");
   auto plot3 = ax->plot(x, y);

@@ -37,14 +37,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <functional>
 
 #include "frontend/Data.hpp"
+#include "util/BBox.hpp"
 
 namespace trase {
+
+/// Identity transform, just pass through...
+struct Identity {
+  DataWithAesthetic operator()(const DataWithAesthetic &data) const {
+    return data;
+  }
+};
+
+/// bin x coordinates
+///
+/// Requires x aesthetic.
+class BinX {
+  int m_number_of_bins{-1};
+  bbox<float, 1> m_span;
+
+public:
+  BinX() = default;
+  explicit BinX(int number_of_bins);
+  explicit BinX(int number_of_bins, float min, float max);
+  DataWithAesthetic operator()(const DataWithAesthetic &data);
+};
 
 /// holds a `std::function` that maps between two DataWithAesthetic classes
 class Transform {
   std::function<DataWithAesthetic(const DataWithAesthetic &)> m_transform;
 
 public:
+  /// construct an identity transform
+  Transform() : m_transform(Identity()) {}
+
   /// construct a Transform wrapping the given transform function T. The
   /// function T can be any function or function object that is compatible with
   /// `std::function`
@@ -55,11 +80,6 @@ public:
   DataWithAesthetic operator()(const DataWithAesthetic &data) {
     return m_transform(data);
   }
-};
-
-/// Identity transform, just pass through...
-struct Identity {
-  DataWithAesthetic operator()(const DataWithAesthetic &data) { return data; }
 };
 
 } // namespace trase

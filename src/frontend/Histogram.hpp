@@ -31,15 +31,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <algorithm>
+#ifndef HISTOGRAM_H_
+#define HISTOGRAM_H_
 
 #include "frontend/Plot1D.hpp"
 
 namespace trase {
 
-template <typename Backend> void Plot1D::serialise(Backend &backend) {}
+class Histogram : public Plot1D {
+public:
+  explicit Histogram(Axis &axis) : Plot1D(axis) {}
+  template <typename Backend> void serialise(Backend &backend);
+  template <typename Backend> void draw(Backend &backend, float time);
 
-template <typename Backend>
-void Plot1D::draw(Backend &backend, const float time) {}
+private:
+  template <typename Backend> void serialise_frames(Backend &backend);
+  template <typename Backend> void serialise_highlights(Backend &backend);
+  template <typename Backend> void draw_plot(Backend &backend);
+  template <typename Backend> void draw_highlights(Backend &backend);
+};
 
 } // namespace trase
+
+#endif // LINE_H_

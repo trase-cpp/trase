@@ -86,7 +86,7 @@ void BackendSVG::rounded_rect(const bfloat2_t &x, const float r) noexcept {
   rect(x, r);
 }
 
-void BackendSVG::rect(const bfloat2_t &x, const float r) noexcept {
+void BackendSVG::rect_begin(const bfloat2_t &x, float r) noexcept {
 
   const auto &delta = x.delta();
   vfloat2_t min = x.min();
@@ -112,7 +112,61 @@ void BackendSVG::rect(const bfloat2_t &x, const float r) noexcept {
           << m_onmouseout_tooltip << '\"';
   }
 
-  m_out << "/>\n";
+  m_out << ">\n";
+}
+
+void BackendSVG::rect_end() noexcept { m_out << "</rect>\n"; }
+
+void BackendSVG::rect(const bfloat2_t &x, const float r) noexcept {
+  rect_begin(x, r);
+  rect_end();
+}
+
+void BackendSVG::add_animated_rect(const bfloat2_t &x, float time) {
+
+  const auto &delta = x.delta();
+  vfloat2_t min = x.min();
+
+  // check if first rect
+  if (m_animate_times.empty()) {
+    rect_begin(x, 0.f);
+
+    if (m_animate_values.size() < 4) {
+      m_animate_values.resize(4);
+    }
+    m_animate_times = "keyTimes=\"" + std::to_string(time / m_time_span) + ';';
+    m_animate_values[0] = "values=\"" + std::to_string(min[0]) + ';';
+    m_animate_values[1] = "values=\"" + std::to_string(min[1]) + ';';
+    m_animate_values[2] = "values=\"" + std::to_string(delta[0]) + ';';
+    m_animate_values[3] = "values=\"" + std::to_string(delta[1]) + ';';
+  } else {
+    m_animate_times += std::to_string(time / m_time_span) + ';';
+    m_animate_values[0] += std::to_string(min[0]) + ';';
+    m_animate_values[1] += std::to_string(min[1]) + ';';
+    m_animate_values[2] += std::to_string(delta[0]) + ';';
+    m_animate_values[3] += std::to_string(delta[1]) + ';';
+  }
+}
+
+void BackendSVG::end_animated_rect() {
+
+  m_animate_times.back() = '\"';
+  for (int i = 0; i < 4; ++i) {
+    m_animate_values[i].back() = '\"';
+  }
+  const std::string names[4] = {"x", "y", "width", "height"};
+  for (int i = 0; i < 4; ++i) {
+    m_out << "<animate attributeName=\"" + names[i] +
+                 "\" repeatCount=\"indefinite\" begin =\"0s\" dur=\""
+          << m_time_span << "s\" " << m_animate_values[i] << ' '
+          << m_animate_times << "/>\n";
+  }
+  rect_end();
+  m_animate_times.clear();
+
+  for (int i = 0; i < 4; ++i) {
+    m_animate_values[i].clear();
+  }
 }
 
 void BackendSVG::circle_begin(const vfloat2_t &centre, const float r) noexcept {

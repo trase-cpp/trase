@@ -31,15 +31,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <algorithm>
+#include "frontend/Histogram.hpp"
 
-#include "frontend/Plot1D.hpp"
-
-namespace trase {
-
-template <typename Backend> void Plot1D::serialise(Backend &backend) {}
-
-template <typename Backend>
-void Plot1D::draw(Backend &backend, const float time) {}
-
-} // namespace trase
+namespace trase {} // namespace trase

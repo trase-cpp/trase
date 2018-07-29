@@ -101,13 +101,21 @@ class BackendSVG {
   /// Add the closing circle tag to m_out
   void circle_end() noexcept;
 
+  /// Add the opening rect tag to m_out
+  ///
+  /// @param x the bounding box of the rectangle
+  /// @param r the radius of the circle used to round the corners
+  void rect_begin(const bfloat2_t &x, float r) noexcept;
+
+  /// Add the closing rect tag to m_out
+  void rect_end() noexcept;
+
 public:
   explicit BackendSVG(std::ostream &out) : m_out(out) {
     stroke_color({0, 0, 0, 255});
     fill_color({0, 0, 0, 255});
     stroke_width(1);
   }
-
 
   void init(float width, float height, float time_span,
             const char *name) noexcept;
@@ -180,6 +188,18 @@ public:
   /// @param x the bounding box of the rectangle
   /// @param r the radius of the circle used to round the corners, default 0.f
   void rect(const bfloat2_t &x, float r = 0.f) noexcept;
+
+  /// start/continue an animated rectangle, optimally with rounded corners.
+  /// subsequent calls to this method will add extra keyframe to the animation.
+  ///
+  /// @param x the bounding box of the rectangle
+  /// @param r the radius of the circle used to round the corners, default 0.f
+  /// @param time the time of the keyframe
+  void add_animated_rect(const bfloat2_t &x, float time);
+
+  /// end an animated rectangle
+  ///
+  void end_animated_rect();
 
   /// draw a circle
   ///

@@ -86,6 +86,28 @@ TEST_CASE("add some cols to raw data", "[data]") {
       CHECK(*i == second_col[ii]);
     }
   }
+
+  std::vector<float> second_col_overwrite_incorrect = {3, 2, 1, 0};
+  std::vector<float> second_col_overwrite = {3, 2, 1};
+
+  CHECK_THROWS_AS(data.set_column(1, second_col_incorrect), Exception);
+  CHECK_THROWS_AS(data.set_column(-1, second_col_overwrite), std::out_of_range);
+  CHECK_THROWS_AS(data.set_column(2, second_col_overwrite), std::out_of_range);
+  data.set_column(1, second_col_overwrite);
+
+  {
+    int ii = 0;
+    for (auto i = data.begin(0); i != data.end(0); ++i, ++ii) {
+      CHECK(*i == first_col[ii]);
+    }
+  }
+
+  {
+    int ii = 0;
+    for (auto i = data.begin(1); i != data.end(1); ++i, ++ii) {
+      CHECK(*i == second_col_overwrite[ii]);
+    }
+  }
 }
 
 TEST_CASE("create data with aesthetics", "[data]") {

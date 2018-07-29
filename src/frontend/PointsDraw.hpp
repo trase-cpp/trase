@@ -55,12 +55,12 @@ template <typename Backend> void Points::serialise_frames(Backend &backend) {
   };
 
   backend.stroke_width(0);
-  for (int i = 0; i < m_data[0]->rows(); ++i) {
+  for (int i = 0; i < m_data[0].rows(); ++i) {
     for (size_t f = 0; f < m_times.size(); ++f) {
-      auto p = to_pixel(m_data[f]->begin<Aesthetic::x>()[i],
-                        m_data[f]->begin<Aesthetic::y>()[i],
-                        m_data[f]->begin<Aesthetic::color>()[i],
-                        m_data[f]->begin<Aesthetic::size>()[i]);
+      auto p = to_pixel(m_data[f].begin<Aesthetic::x>()[i],
+                        m_data[f].begin<Aesthetic::y>()[i],
+                        m_data[f].begin<Aesthetic::color>()[i],
+                        m_data[f].begin<Aesthetic::size>()[i]);
 
       backend.fill_color(m_colormap->to_color(p[2]));
       backend.add_animated_circle({p[0], p[1]}, p[3], m_times[f]);
@@ -86,26 +86,26 @@ template <typename Backend> void Points::draw_plot(Backend &backend) {
 
   if (w2 == 0.0f) {
     // exactly on a single frame
-    auto x = m_data[f]->begin<Aesthetic::x>();
-    auto y = m_data[f]->begin<Aesthetic::y>();
-    auto color = m_data[f]->begin<Aesthetic::color>();
-    auto size = m_data[f]->begin<Aesthetic::size>();
-    for (int i = 0; i < m_data[0]->rows(); ++i) {
+    auto x = m_data[f].begin<Aesthetic::x>();
+    auto y = m_data[f].begin<Aesthetic::y>();
+    auto color = m_data[f].begin<Aesthetic::color>();
+    auto size = m_data[f].begin<Aesthetic::size>();
+    for (int i = 0; i < m_data[0].rows(); ++i) {
       const auto p = to_pixel(x[i], y[i], color[i], size[i]);
       backend.fill_color(m_colormap->to_color(p[2]));
       backend.circle({p[0], p[1]}, p[3]);
     }
   } else {
     // between two frames
-    auto x0 = m_data[f - 1]->begin<Aesthetic::x>();
-    auto y0 = m_data[f - 1]->begin<Aesthetic::y>();
-    auto color0 = m_data[f - 1]->begin<Aesthetic::color>();
-    auto size0 = m_data[f - 1]->begin<Aesthetic::size>();
-    auto x1 = m_data[f]->begin<Aesthetic::x>();
-    auto y1 = m_data[f]->begin<Aesthetic::y>();
-    auto color1 = m_data[f]->begin<Aesthetic::color>();
-    auto size1 = m_data[f]->begin<Aesthetic::size>();
-    for (int i = 0; i < m_data[0]->rows(); ++i) {
+    auto x0 = m_data[f - 1].begin<Aesthetic::x>();
+    auto y0 = m_data[f - 1].begin<Aesthetic::y>();
+    auto color0 = m_data[f - 1].begin<Aesthetic::color>();
+    auto size0 = m_data[f - 1].begin<Aesthetic::size>();
+    auto x1 = m_data[f].begin<Aesthetic::x>();
+    auto y1 = m_data[f].begin<Aesthetic::y>();
+    auto color1 = m_data[f].begin<Aesthetic::color>();
+    auto size1 = m_data[f].begin<Aesthetic::size>();
+    for (int i = 0; i < m_data[0].rows(); ++i) {
       const auto p = w1 * to_pixel(x1[i], y1[i], color1[i], size1[i]) +
                      w2 * to_pixel(x0[i], y0[i], color0[i], size0[i]);
       backend.fill_color(m_colormap->to_color(p[2]));

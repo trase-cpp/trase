@@ -45,6 +45,7 @@ class Axis;
 #include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
 #include "frontend/Figure.hpp"
+#include "frontend/Histogram.hpp"
 #include "frontend/Line.hpp"
 #include "frontend/Points.hpp"
 #include "util/Colors.hpp"
@@ -118,31 +119,42 @@ public:
   /// \return shared pointer to the new plot
   template <typename T1, typename T2>
   std::shared_ptr<Plot1D> plot(const std::vector<T1> &x,
-                               const std::vector<T2> &y,
-                               const std::string &label = std::string()) {
+                               const std::vector<T2> &y) {
     if (x.size() != y.size()) {
       throw Exception("x and y vector sizes do not match");
     }
-    auto data = std::make_shared<DataWithAesthetic>();
-    data->set(Aesthetic::x(), x);
-    data->set(Aesthetic::y(), y);
-    return plot_impl(std::make_shared<Line>(*this), data, label);
+    return plot_impl(std::make_shared<Line>(*this), Transform(Identity()),
+                     DataWithAesthetic().x(x).y(y));
   }
 
   /// Create a new Points plot and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
+  /// \param transform (optional) the transform to apply
   /// \return shared pointer to the new plot
-  std::shared_ptr<Plot1D> points(const std::shared_ptr<DataWithAesthetic> &data,
-                                 const std::string &label = std::string()) {
-    return plot_impl(std::make_shared<Points>(*this), data, label);
+  std::shared_ptr<Plot1D>
+  points(const DataWithAesthetic &data,
+         const Transform &transform = Transform(Identity())) {
+    return plot_impl(std::make_shared<Points>(*this), transform, data);
   }
 
   /// Create a new Line and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
+  /// \param transform (optional) the transform to apply
   /// \return shared pointer to the new plot
-  std::shared_ptr<Plot1D> line(const std::shared_ptr<DataWithAesthetic> &data,
-                               const std::string &label = std::string()) {
-    return plot_impl(std::make_shared<Line>(*this), data, label);
+  std::shared_ptr<Plot1D>
+  line(const DataWithAesthetic &data,
+       const Transform &transform = Transform(Identity())) {
+    return plot_impl(std::make_shared<Line>(*this), transform, data);
+  }
+
+  /// Create a new histogram and return a shared pointer to it.
+  /// \param data the `DataWithAesthetic` dataset to use
+  /// \param transform (optional) the transform to apply
+  /// \return shared pointer to the new plot
+  std::shared_ptr<Plot1D>
+  histogram(const DataWithAesthetic &data,
+            const Transform &transform = Transform(BinX())) {
+    return plot_impl(std::make_shared<Histogram>(*this), transform, data);
   }
 
   /// Return a shared pointer to an existing plot.
@@ -154,9 +166,14 @@ public:
   template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 
+  /// convert from display coordinates to data coordinates, using the given
+  /// Aesthetic
   template <typename Aesthetic> float from_display(const float i) const {
     return Aesthetic::from_display(i, m_limits, m_pixels);
   }
+
+  /// convert from data coordinates to display coordinates, using the given
+  /// Aesthetic
   template <typename Aesthetic> float to_display(const float i) const {
     return Aesthetic::to_display(i, m_limits, m_pixels);
   }
@@ -164,10 +181,19 @@ public:
   void font_face(const std::string &fontFace) { m_font_face = fontFace; }
 
 private:
-  std::shared_ptr<Plot1D>
-  plot_impl(const std::shared_ptr<Plot1D> &plot,
-            const std::shared_ptr<DataWithAesthetic> &values,
-            const std::string &label);
+  /// Create a new Plot1D on this axis and return a shared pointer to it.
+  ///
+  /// All the plotting functions go through this function, which does the actual
+  /// work of adding the new Plot1D, its data and transform to the axis. A
+  /// default color is given to the new plot based on the number of already
+  /// existing plots (see Colors.hpp for list of default colors)
+  ///
+  /// \param data the `DataWithAesthetic` dataset to use
+  /// \param transform the transform to apply
+  /// \return shared pointer to the new plot
+  std::shared_ptr<Plot1D> plot_impl(const std::shared_ptr<Plot1D> &plot,
+                                    const Transform &transform,
+                                    const DataWithAesthetic &values);
 
   void update_tick_information();
   vfloat2_t calculate_num_ticks();
