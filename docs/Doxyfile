@@ -1,3 +1,4 @@
-INPUT                  = README.md src docs
+INPUT                  = README.md src docs tests/TestLine.cpp
 RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = README.md
+LAYOUT_FILE            = docs/DoxygenLayout.xml
