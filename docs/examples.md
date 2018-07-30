@@ -1,11 +1,7 @@
-# Examples
+Examples
+========
 
-This should be a list of examples
+This should be a list of examples:
 
-The includes 
+-   \ref line\_example
 
-\snippet tests/TestLine.cpp line example includes
-
-the rest...
-
-\snippet tests/TestLine.cpp line example

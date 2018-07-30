@@ -42,7 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace trase;
 
 TEST_CASE("line example", "[line]") {
-  //! [line example]
+  /// \page line_example Example of using the line geometry
+  ///  This is an example for the line geometry
+  ///
+  /// \snippet tests/TestLine.cpp line example includes
+  /// \snippet tests/TestLine.cpp line example
+
+  /// [line example]
   // create figure and axis
   auto fig = figure();
   auto ax = fig->axis();
