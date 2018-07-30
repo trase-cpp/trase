@@ -2,3 +2,4 @@ INPUT                  = README.md src docs docs/examples.md tests/TestLine.cpp
 RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = README.md
 LAYOUT_FILE            = docs/DoxygenLayout.xml
+EXAMPLE_PATH           = tests
