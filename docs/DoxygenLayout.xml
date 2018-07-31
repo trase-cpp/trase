@@ -3,9 +3,6 @@
   <!-- Navigation index tabs for HTML output -->
   <navindex>
     <tab type="mainpage" visible="yes" title=""/>
-    <tab type="user" visible="yes" url="md_docs_examples.html"  title="Examples">
-      <tab type="user" visible="yes" url="@ref line_example"  title="Line"/>
-    </tab>
     <tab type="pages" visible="yes" title="" intro=""/>
     <tab type="modules" visible="yes" title="" intro=""/>
     <tab type="namespaces" visible="yes" title="">

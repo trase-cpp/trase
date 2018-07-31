@@ -3,3 +3,4 @@ RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = README.md
 LAYOUT_FILE            = docs/DoxygenLayout.xml
 EXAMPLE_PATH           = tests
+GENERATE_TREEVIEW      = YES
