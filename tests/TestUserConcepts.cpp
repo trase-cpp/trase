@@ -33,44 +33,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
-//! [line example includes]
 #include "backend/BackendSVG.hpp"
 #include "trase.hpp"
 #include <fstream>
-//! [line example includes]
 
-using namespace trase;
+TEST_CASE("snippits for user_concepts.md", "[documentation]") {
+  /// [data_set_with_aesthetic]
+  using namespace trase;
+  std::vector<float> x = {1, 2, 3, 4};
+  std::vector<float> y = {2, 4, 6, 8};
 
-TEST_CASE("line example", "[line]") {
-  /// \page line_example Example of using the line geometry
-  ///  This is an example for the line geometry
-  ///
-  /// \snippet tests/TestLine.cpp line example includes
-  /// \snippet tests/TestLine.cpp line example
-
-  /// [line example]
-  // create figure and axis
-  auto fig = figure();
-  auto ax = fig->axis();
-
-  // create x and y vectors and set y = sin(x)
-  const int n = 100;
-  std::vector<float> x(n);
-  std::vector<float> y(n);
-  for (int i = 0; i < n; ++i) {
-    x[i] = 6.28f * static_cast<float>(i) / n;
-    y[i] = std::sin(x[i]);
-  }
-
-  // create a trase dataset and then plot it using a line geometry
   auto data = create_data().x(x).y(y);
-  auto plt = ax->line(data);
-
-  // output to svg
-  std::ofstream out;
-  out.open("example_line.svg");
-  BackendSVG backend(out);
-  fig->serialise(backend);
-  out.close();
-  /// [line example]
+  /// [data_set_with_aesthetic]
 }
