@@ -8,3 +8,4 @@ CITE_BIB_FILES         = docs/bibliography.bib
 HTML_EXTRA_STYLESHEET  = docs/customdoxygen.css
 HTML_FOOTER            = docs/footer.html
 HTML_HEADER            = docs/header.html
+HAVE_DOT               = YES
