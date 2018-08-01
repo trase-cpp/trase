@@ -69,6 +69,20 @@ struct FrameInfo {
   }
 };
 
+/// Base class for drawable objects in a figure
+///
+/// A figure consists of a tree structure of Drawable objects, with the Figure
+/// object at the top of the tree. Each Drawable in the tree has a parent
+/// Drawable and zero or more child Drawables.
+///
+/// Each Drawable is given a size as a ratio of its parents size, so that
+/// resizing of the entire tree can be done easily.
+///
+/// Each Drawable also has a set of times at which animation frames are defined
+/// and, given a time, can calculate where this time sits in the list of frames
+///
+/// Finally, each Drawable has functions for drawing itself, given a Backend as
+/// a templated argument
 class Drawable {
 protected:
   /// a list of Drawables that are children of this object
