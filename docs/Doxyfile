@@ -9,3 +9,7 @@ HTML_EXTRA_STYLESHEET  = docs/customdoxygen.css
 HTML_FOOTER            = docs/footer.html
 HTML_HEADER            = docs/header.html
 HAVE_DOT               = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+DOT_IMAGE_FORMAT       = svg
+INTERACTIVE_SVG        = YES
