@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+/// \file BBox.hpp
+
 #ifndef BBOX_H_
 #define BBOX_H_
 
