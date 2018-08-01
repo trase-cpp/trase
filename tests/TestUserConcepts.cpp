@@ -38,11 +38,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 
 TEST_CASE("snippits for user_concepts.md", "[documentation]") {
-  /// [data_set_with_aesthetic]
+  /// [user_concepts_data_set]
   using namespace trase;
   std::vector<float> x = {1, 2, 3, 4};
   std::vector<float> y = {2, 4, 6, 8};
 
   auto data = create_data().x(x).y(y);
-  /// [data_set_with_aesthetic]
+  /// [user_concepts_data_set]
+  /// [user_concepts_geometry]
+  auto fig = figure();
+  auto ax = fig->axis();
+  auto plt = ax->line(data);
+  /// [user_concepts_geometry]
 }
