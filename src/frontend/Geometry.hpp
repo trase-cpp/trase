@@ -31,6 +31,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/// \file Geometry.hpp
+/// available geometry types are Points, Line. Any new sub-classes need to be
+/// added here
+
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
 
@@ -40,9 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "frontend/Points.hpp"
 
 namespace trase {
-
-// available geometry types are Points, Line. Any new sub-classes need to be
-// added here
 
 template <typename Backend>
 void serialise_geometry(std::shared_ptr<Plot1D> &plot, Backend &backend) {

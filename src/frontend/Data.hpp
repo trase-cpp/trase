@@ -31,6 +31,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/// \file Data.hpp
+/// Contains classes and functions for handling data and aesthetics
+
 #ifndef DATA_H_
 #define DATA_H_
 
@@ -197,6 +200,7 @@ public:
 };
 
 /// creates a new, empty dataset
+/// \return an empty DataWithAesthetic
 DataWithAesthetic create_data();
 
 } // namespace trase

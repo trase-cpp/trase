@@ -31,6 +31,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/// \file Plot1DDraw.hpp
+/// Contains member functions that draw (i.e. require a backend) an Plot1D.
+/// These are included only when compiling the backends
+
 #include <algorithm>
 
 #include "frontend/Plot1D.hpp"

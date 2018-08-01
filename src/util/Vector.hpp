@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+/// \file Vector.hpp
+
 #ifndef VECTOR_H_
 #define VECTOR_H_
 

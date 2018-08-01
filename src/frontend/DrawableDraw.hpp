@@ -31,6 +31,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/// \file DrawableDraw.hpp
+/// Contains member functions that draw (i.e. require a backend) an Drawable.
+/// These are included only when compiling the backends
+
 #include "frontend/Drawable.hpp"
 
 namespace trase {
