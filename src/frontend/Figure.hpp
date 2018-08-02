@@ -84,7 +84,7 @@ public:
   /// This function takes control of the render loop and animates the
   /// Figure until the window is closed.
   ///
-  /// TODO: only works for the BackendGL backend
+  /// TODO: issue #86 - only works for the BackendGL backend
   ///
   /// \param backend the Backend used to draw the figure.
   template <typename Backend> void show(Backend &backend);
