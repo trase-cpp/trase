@@ -32,8 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /// \file AxisDraw.hpp
-/// Contains member functions that draw (i.e. require a backend) an axis. These
-/// are included only when compiling the backends
+/// How to draw an Axis
+///
+/// This is included only when compiling the backends
 
 #include <cmath>
 #include <limits>

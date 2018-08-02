@@ -32,8 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /// \file LineDraw.hpp
-/// Contains member functions that draw (i.e. require a backend) a Line.
-/// These are included only when compiling the backends
+///
+/// How to draw a Line
+///
+/// This is included only when compiling the backends
 
 #include "frontend/Line.hpp"
 

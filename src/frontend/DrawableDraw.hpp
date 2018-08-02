@@ -32,7 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /// \file DrawableDraw.hpp
-/// Contains member functions that draw (i.e. require a backend) an Drawable.
+///
+/// How to draw Drawable
+///
 /// These are included only when compiling the backends
 
 #include "frontend/Drawable.hpp"

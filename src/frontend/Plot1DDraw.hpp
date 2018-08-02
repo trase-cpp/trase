@@ -32,8 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /// \file Plot1DDraw.hpp
-/// Contains member functions that draw (i.e. require a backend) an Plot1D.
-/// These are included only when compiling the backends
+///
+/// How to draw a Plot1D
+///
+/// This is included only when compiling the backends
 
 #include <algorithm>
 

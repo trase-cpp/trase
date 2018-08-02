@@ -32,8 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /// \file FigureDraw.hpp
-/// Contains member functions that draw (i.e. require a backend) an Figure.
-/// These are included only when compiling the backends
+///
+/// How to draw a Figure.
+///
+/// This is included only when compiling the backends
 
 #include <array>
 #include <string>

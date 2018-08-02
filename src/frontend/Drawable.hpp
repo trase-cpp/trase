@@ -69,6 +69,24 @@ struct FrameInfo {
   }
 };
 
+/// Base class for drawable objects in a figure
+///
+/// A figure consists of a tree structure of Drawable objects, with the
+/// Figure object at the top of the tree. Each Drawable in the tree has a parent
+/// Drawable and zero or more child Drawables.
+///
+/// Each Drawable is given a size as a ratio of its parents size, so that
+/// resizing of the entire tree can be done easily.
+///
+/// Each Drawable also has a set of times at which animation frames are defined
+/// and, given a time, can calculate where this time sits in the list of frames
+///
+/// Finally, each Drawable has functions for drawing itself, given a Backend as
+/// a templated argument. These are overridden in derived classes (but can't be
+/// virtual as they are templated on the Backend type). Instead, each draw
+/// function is implemented in a header file ending in *Draw.hpp (e.g.
+/// AxisDraw.hpp), and included when compiling each Backend
+///
 class Drawable {
 protected:
   /// a list of Drawables that are children of this object
@@ -80,27 +98,58 @@ protected:
   /// the area of this object as a ratio of its parent object
   bfloat2_t m_area;
 
-  /// the area of this object in raw pixels
+  /// the area of this object in raw pixels (updated by resize())
   bfloat2_t m_pixels;
 
-  /// the animation time span
+  /// the animation time span (see update_time_span())
   float m_time_span;
 
-  /// the animation frame times
+  /// the animation frame times (see add_frame_time())
   std::vector<float> m_times;
 
+  /// stores information on the current draw time (see update_frame_info())
   FrameInfo m_frame_info;
 
 public:
+  /// constructs a Drawable under \p parent in the tree structure, and assigns
+  /// it an drawable area given by \p area_of_parent
+  ///
+  /// \param parent the parent \Drawable object
+  /// \param area_of_parent the drawable area assigned to this Drawable as a
+  /// ratio of the parent size
   Drawable(Drawable *parent, const bfloat2_t &area_of_parent);
+
+  /// resize the drawable area (in raw pixels) using the parents area (in raw
+  /// pixels)
   void resize(const bfloat2_t &parent_pixels);
+
+  /// if \p time is outside the current animation time span of this object then
+  /// this time span is increased to include it
   void update_time_span(float time);
+
+  /// adds a keyframe time to the animation
   void add_frame_time(float time);
+
+  /// fills out m_frame_info using a given \p time
+  ///
+  /// \see get_frame_info()
   void update_frame_info(float time);
+
+  /// returns the current FrameInfo
+  ///
+  /// \see update_frame_info()
   const FrameInfo &get_frame_info() const;
+
+  /// returns this objects drawable area in raw pixels
   const bfloat2_t &pixels() { return m_pixels; }
+
+  /// returns this objects drawable area as a ratio of the parents drawable area
   const bfloat2_t &area() { return m_pixels; }
+
+  /// draw this object using the given Backend
   template <typename Backend> void serialise(Backend &backend);
+
+  /// draw this object using the given Backend
   template <typename Backend> void draw(Backend &backend, float time);
 };
 
