@@ -44,6 +44,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+/// a base class for all the backends that support drawing a single frame
+class Backend {};
+
+/// a base class for all the backends that support animation over time
+class AnimatedBackend : public Backend {};
+
 // pi constant
 const float pi =
     3.141592653589793238462643383279502884197169399375105820974944592307816406286f;

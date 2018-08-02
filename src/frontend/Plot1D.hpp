@@ -130,7 +130,7 @@ public:
   const float get_line_width() const { return m_line_width; }
   const Colormap &get_colormap() const { return *m_colormap; }
 
-  template <typename Backend> void serialise(Backend &backend);
+  template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 };
 

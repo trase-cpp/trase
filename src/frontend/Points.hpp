@@ -43,11 +43,12 @@ namespace trase {
 class Points : public Plot1D {
 public:
   explicit Points(Axis &axis) : Plot1D(axis) {}
-  template <typename Backend> void serialise(Backend &backend);
+  template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 
 private:
-  template <typename Backend> void serialise_frames(Backend &backend);
+  template <typename AnimatedBackend>
+  void draw_frames(AnimatedBackend &backend);
   template <typename Backend> void draw_plot(Backend &backend);
 };
 

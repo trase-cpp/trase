@@ -70,7 +70,7 @@ TEST_CASE("line example", "[line]") {
   std::ofstream out;
   out.open("example_line.svg");
   BackendSVG backend(out);
-  fig->serialise(backend);
+  fig->draw(backend);
   out.close();
   /// [line example]
 }

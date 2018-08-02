@@ -45,14 +45,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend>
-void serialise_geometry(std::shared_ptr<Plot1D> &plot, Backend &backend) {
+template <typename AnimatedBackend>
+void draw_geometry(std::shared_ptr<Plot1D> &plot, AnimatedBackend &backend) {
   if (auto points = dynamic_cast<Points *>(plot.get())) {
-    points->serialise(backend);
+    points->draw(backend);
   } else if (auto line = dynamic_cast<Line *>(plot.get())) {
-    line->serialise(backend);
+    line->draw(backend);
   } else if (auto histogram = dynamic_cast<Histogram *>(plot.get())) {
-    histogram->serialise(backend);
+    histogram->draw(backend);
   } else {
     throw Exception("unknown geometry class");
   }

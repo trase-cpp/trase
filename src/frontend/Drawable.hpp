@@ -146,8 +146,8 @@ public:
   /// returns this objects drawable area as a ratio of the parents drawable area
   const bfloat2_t &area() { return m_pixels; }
 
-  /// draw this object using the given Backend
-  template <typename Backend> void serialise(Backend &backend);
+  /// draw this object using the given AnimatedBackend
+  template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
 
   /// draw this object using the given Backend
   template <typename Backend> void draw(Backend &backend, float time);

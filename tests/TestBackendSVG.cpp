@@ -133,7 +133,7 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
   std::ofstream out;
   out.open("test_figure.svg");
   BackendSVG backend(out);
-  fig->serialise(backend);
+  fig->draw(backend);
   out.close();
 }
 
@@ -176,7 +176,7 @@ TEST_CASE("histogram looks ok", "[svg_backend]") {
   std::ofstream out;
   out.open("test_histogram.svg");
   BackendSVG backend(out);
-  fig->serialise(backend);
+  fig->draw(backend);
   out.close();
 }
 

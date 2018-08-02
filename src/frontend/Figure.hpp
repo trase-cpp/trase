@@ -72,8 +72,9 @@ public:
   /// \return a shared pointer to the nth axis
   std::shared_ptr<Axis> axis(int n);
 
-  template <typename Backend> void serialise(Backend &backend);
   template <typename Backend> void show(Backend &backend);
+
+  template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 };
 

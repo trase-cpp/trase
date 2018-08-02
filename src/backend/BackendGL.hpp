@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-class BackendGL {
+class BackendGL : public Backend {
   GLFWwindow *m_window;
   NVGcontext *m_vg;
   FontManager m_fm;

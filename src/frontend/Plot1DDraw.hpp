@@ -43,7 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend> void Plot1D::serialise(Backend &backend) {}
+template <typename AnimatedBackend>
+void Plot1D::draw(AnimatedBackend &backend) {}
 
 template <typename Backend>
 void Plot1D::draw(Backend &backend, const float time) {}

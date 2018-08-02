@@ -44,11 +44,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend> void Figure::serialise(Backend &backend) {
+template <typename AnimatedBackend>
+void Figure::draw(AnimatedBackend &backend) {
   auto name = "Figure " + std::to_string(m_id);
   backend.init(m_pixels.bmax[0], m_pixels.bmax[1], m_time_span, name.c_str());
   for (const auto &axis : m_axes) {
-    axis->serialise(backend);
+    axis->draw(backend);
   }
   backend.finalise();
 }
