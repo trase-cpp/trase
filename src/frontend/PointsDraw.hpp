@@ -41,8 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend> void Points::serialise(Backend &backend) {
-  serialise_frames(backend);
+template <typename AnimatedBackend>
+void Points::draw(AnimatedBackend &backend) {
+  draw_frames(backend);
 }
 
 template <typename Backend>
@@ -51,7 +52,8 @@ void Points::draw(Backend &backend, const float time) {
   draw_plot(backend);
 }
 
-template <typename Backend> void Points::serialise_frames(Backend &backend) {
+template <typename AnimatedBackend>
+void Points::draw_frames(AnimatedBackend &backend) {
 
   auto to_pixel = [&](auto x, auto y, auto c, auto s) {
     return Vector<float, 4>{m_axis.to_display<Aesthetic::x>(x),

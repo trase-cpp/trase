@@ -60,13 +60,13 @@ void Axis::draw(Backend &backend, const float time) {
   backend.reset_scissor();
 }
 
-template <typename Backend> void Axis::serialise(Backend &backend) {
+template <typename AnimatedBackend> void Axis::draw(AnimatedBackend &backend) {
   draw_common(backend);
 
   // serialise plots
   backend.scissor(m_pixels);
   for (auto &i : m_plot1d) {
-    serialise_geometry(i, backend);
+    draw_geometry(i, backend);
   }
   backend.reset_scissor();
 }

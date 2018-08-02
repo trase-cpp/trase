@@ -199,24 +199,24 @@ void BackendSVG::circle(const vfloat2_t &centre, float r) noexcept {
 #include "frontend/DrawableDraw.hpp"
 
 namespace trase {
-template void Drawable::serialise<BackendSVG>(BackendSVG &backend);
+template void Drawable::draw<BackendSVG>(BackendSVG &backend);
 } // namespace trase
 
 #include "frontend/FigureDraw.hpp"
 
 namespace trase {
-template void Figure::serialise<BackendSVG>(BackendSVG &backend);
+template void Figure::draw<BackendSVG>(BackendSVG &backend);
 } // namespace trase
 
 #include "frontend/AxisDraw.hpp"
 
 namespace trase {
-template void Axis::serialise<BackendSVG>(BackendSVG &backend);
+template void Axis::draw<BackendSVG>(BackendSVG &backend);
 template void Axis::draw_common<BackendSVG>(BackendSVG &backend);
 } // namespace trase
 
 #include "frontend/Plot1DDraw.hpp"
 
 namespace trase {
-template void Plot1D::serialise<BackendSVG>(BackendSVG &backend);
+template void Plot1D::draw<BackendSVG>(BackendSVG &backend);
 } // namespace trase

@@ -41,9 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend> void Line::serialise(Backend &backend) {
-  serialise_frames(backend);
-  serialise_highlights(backend);
+template <typename AnimatedBackend> void Line::draw(AnimatedBackend &backend) {
+  draw_frames(backend);
+  draw_anim_highlights(backend);
 }
 
 template <typename Backend>
@@ -53,7 +53,8 @@ void Line::draw(Backend &backend, const float time) {
   draw_highlights(backend);
 }
 
-template <typename Backend> void Line::serialise_frames(Backend &backend) {
+template <typename AnimatedBackend>
+void Line::draw_frames(AnimatedBackend &backend) {
 
   backend.begin_animated_path();
   backend.stroke_color(m_color);
@@ -85,7 +86,8 @@ template <typename Backend> void Line::serialise_frames(Backend &backend) {
   backend.end_animated_path(m_times.back());
 }
 
-template <typename Backend> void Line::serialise_highlights(Backend &backend) {
+template <typename AnimatedBackend>
+void Line::draw_anim_highlights(AnimatedBackend &backend) {
 
   // highlighted points just for frame 0 and for stationary lines
   if (m_times.size() == 1) {

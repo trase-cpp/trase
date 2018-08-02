@@ -165,7 +165,7 @@ public:
   /// \return a shared pointer to the nth plot
   std::shared_ptr<Plot1D> plot(int n);
 
-  template <typename Backend> void serialise(Backend &backend);
+  template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 
   /// convert from display coordinates to data coordinates, using the given

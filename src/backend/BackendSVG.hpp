@@ -70,7 +70,7 @@ public:
   }
 };
 
-class BackendSVG {
+class BackendSVG : public AnimatedBackend {
   std::ostream &m_out;
   std::string m_linewidth;
   std::string m_line_color;

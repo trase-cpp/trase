@@ -41,8 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename Backend> void Histogram::serialise(Backend &backend) {
-  serialise_frames(backend);
+template <typename AnimatedBackend>
+void Histogram::draw(AnimatedBackend &backend) {
+  draw_frames(backend);
 }
 
 template <typename Backend>
@@ -51,7 +52,8 @@ void Histogram::draw(Backend &backend, const float time) {
   draw_plot(backend);
 }
 
-template <typename Backend> void Histogram::serialise_frames(Backend &backend) {
+template <typename AnimatedBackend>
+void Histogram::draw_frames(AnimatedBackend &backend) {
 
   backend.stroke_color(m_color);
   backend.stroke_width(m_line_width);
