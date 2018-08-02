@@ -49,6 +49,10 @@ class Figure;
 
 namespace trase {
 
+/// The primary Drawable for each figure
+///
+/// Each Figure points to one or more Axis objects that are drawn within the
+/// Figure.
 class Figure : public Drawable {
   /// a unique id for this figure
   int m_id;
@@ -60,6 +64,9 @@ class Figure : public Drawable {
   static int m_num_windows;
 
 public:
+  /// create a new figure with the given number of pixels
+  ///
+  /// \param pixels the number of pixels along the {width, height} of the figure
   explicit Figure(const std::array<float, 2> &pixels);
 
   /// Create a new axis and return a shared pointer to it
@@ -72,12 +79,32 @@ public:
   /// \return a shared pointer to the nth axis
   std::shared_ptr<Axis> axis(int n);
 
+  /// Draw the Figure using the Backend provided
+  ///
+  /// This function takes control of the render loop and animates the
+  /// Figure until the window is closed.
+  ///
+  /// TODO: issue #86 - only works for the BackendGL backend
+  ///
+  /// \param backend the Backend used to draw the figure.
   template <typename Backend> void show(Backend &backend);
 
+  /// Draw the Figure using the AnimatedBackend provided
+  ///
+  /// \param backend the AnimatedBackend used to draw the figure.
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
+
+  /// Draw the Figure at a given time using the Backend provided
+  ///
+  /// \param backend the Backend used to draw the figure.
+  /// \param time the Figure is drawn at this time
   template <typename Backend> void draw(Backend &backend, float time);
 };
 
+/// create a new Figure
+///
+/// \param pixels (optional) the number of pixels along the {width, height} of
+/// the figure
 inline std::shared_ptr<Figure> figure(std::array<float, 2> pixels = {
                                           {800.0, 600.0}}) {
   return std::make_shared<Figure>(pixels);
