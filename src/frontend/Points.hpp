@@ -42,7 +42,8 @@ namespace trase {
 
 class Points : public Plot1D {
 public:
-  explicit Points(Axis &axis) : Plot1D(axis) {}
+  explicit Points(Drawable &parent) : Plot1D(parent) {}
+  DEFINE_VISITABLE()
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 

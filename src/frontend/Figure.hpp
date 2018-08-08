@@ -36,11 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FIGURE_H_
 #define FIGURE_H_
 
-// forward declare Figure so can be stored in Axis
-namespace trase {
-class Figure;
-}
-
 #include <array>
 #include <memory>
 
@@ -56,9 +51,6 @@ namespace trase {
 class Figure : public Drawable {
   /// a unique id for this figure
   int m_id;
-
-  /// the axis object for this figure
-  std::vector<std::shared_ptr<Axis>> m_axes;
 
   /// total number of figures currentl created
   static int m_num_windows;

@@ -36,17 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AXIS_H_
 #define AXIS_H_
 
-// forward declare Axis so can be stored in Plot1D
-namespace trase {
-class Axis;
-}
-
 #include <array>
 #include <memory>
 
 #include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
-#include "frontend/Figure.hpp"
 #include "frontend/Histogram.hpp"
 #include "frontend/Line.hpp"
 #include "frontend/Points.hpp"
@@ -87,8 +81,6 @@ struct TickInfo {
 ///     * a label for the y axis
 ///     * a legend that identifies each Plot1D
 class Axis : public Drawable {
-  std::vector<std::shared_ptr<Plot1D>> m_plot1d;
-
   /// limits of all children plots
   Limits m_limits;
 
@@ -133,7 +125,9 @@ public:
   /// \param figure the parent \Drawable object
   /// \param area the drawable area assigned to this Drawable as a ratio of the
   /// parent size
-  Axis(Figure &figure, const bfloat2_t &area);
+  Axis(Drawable &parent, const bfloat2_t &area);
+
+  DEFINE_VISITABLE()
 
   /// returns the current Aesthetic limits
   const Limits &limits() const { return m_limits; }

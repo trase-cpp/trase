@@ -32,28 +32,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "frontend/Axis.hpp"
-#include "frontend/Figure.hpp"
 #include "util/Vector.hpp"
 
 namespace trase {
 
-Axis::Axis(Figure &figure, const bfloat2_t &area)
-    : Drawable(&figure, area), m_sig_digits(2), m_nx_ticks(0), m_ny_ticks(0),
+Axis::Axis(Drawable &parent, const bfloat2_t &area)
+    : Drawable(parent, area), m_sig_digits(2), m_nx_ticks(0), m_ny_ticks(0),
       m_tick_len(10.f), m_line_width(3.f), m_font_size(18.f),
       m_font_face("Roboto"), m_legend(false) {}
 
-std::shared_ptr<Plot1D> Axis::plot(int n) { return m_plot1d.at(n); }
+std::shared_ptr<Plot1D> Axis::plot(int n) {
+  return std::dynamic_pointer_cast<Plot1D>(m_children.at(n));
+}
 
 std::shared_ptr<Plot1D> Axis::plot_impl(const std::shared_ptr<Plot1D> &plot,
                                         const Transform &transform,
                                         const DataWithAesthetic &values) {
-  m_plot1d.emplace_back(plot);
-  m_children.push_back(m_plot1d.back().get());
-  m_plot1d.back()->set_transform(transform);
-  m_plot1d.back()->add_frame(values, 0);
-  m_plot1d.back()->set_color(RGBA::defaults[m_plot1d.size() - 1]);
-  m_plot1d.back()->resize(m_pixels);
-  return m_plot1d.back();
+  plot->set_transform(transform);
+  plot->add_frame(values, 0);
+  plot->set_color(RGBA::defaults[m_plot1d.size() - 1]);
+  plot->resize(m_pixels);
+  m_children.push_back(plot);
+  return plot;
 }
 
 } // namespace trase

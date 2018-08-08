@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ostream>
 #include <vector>
 
+#include "backend/Backend.hpp"
 #include "util/BBox.hpp"
 
 namespace trase {
@@ -90,7 +91,7 @@ struct FrameInfo {
 class Drawable {
 protected:
   /// a list of Drawables that are children of this object
-  std::vector<Drawable *> m_children;
+  std::vector<std::shared_ptr<Drawable>> m_children;
 
   /// parent of this object
   Drawable *m_parent;
@@ -117,7 +118,7 @@ public:
   /// \param parent the parent \Drawable object
   /// \param area_of_parent the drawable area assigned to this Drawable as a
   /// ratio of the parent size
-  Drawable(Drawable *parent, const bfloat2_t &area_of_parent);
+  Drawable(Drawable &parent, const bfloat2_t &area_of_parent);
 
   /// resize the drawable area (in raw pixels) using the parents area (in raw
   /// pixels)
@@ -146,12 +147,18 @@ public:
   /// returns this objects drawable area as a ratio of the parents drawable area
   const bfloat2_t &area() { return m_pixels; }
 
+  /// accept a visitor backend
+  virtual void accept(Backend &backend) = 0;
+
   /// draw this object using the given AnimatedBackend
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
 
   /// draw this object using the given Backend
   template <typename Backend> void draw(Backend &backend, float time);
 };
+
+#define DEFINE_VISITABLE()                                                     \
+  void accept(Backend &backend) override { backend.dispatch(*this); }
 
 } // namespace trase
 

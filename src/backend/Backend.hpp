@@ -40,15 +40,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <vector>
 
+#include "frontend/Histogram.hpp"
+#include "frontend/Line.hpp"
+#include "frontend/Plot1D.hpp"
+#include "frontend/Points.hpp"
 #include "util/Vector.hpp"
 
 namespace trase {
 
 /// a base class for all the backends that support drawing a single frame
-class Backend {};
+class Backend {
+public:
+  // Declare overloads for each kind of a Drawable to dispatch
+  virtual void dispatch(Axis &file, float time) = 0;
+  virtual void dispatch(Line &file, float time) = 0;
+  virtual void dispatch(Points &file, float time) = 0;
+  virtual void dispatch(Histogram &file, float time) = 0;
+};
 
 /// a base class for all the backends that support animation over time
-class AnimatedBackend : public Backend {};
+class AnimatedBackend : public Backend {
+  // Declare overloads for each kind of a Drawable to dispatch
+  virtual void dispatch(Axis &file) = 0;
+  virtual void dispatch(Line &file) = 0;
+  virtual void dispatch(Points &file) = 0;
+  virtual void dispatch(Histogram &file) = 0;
+};
 
 // pi constant
 const float pi =

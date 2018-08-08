@@ -64,6 +64,11 @@ class BackendGL : public Backend {
   RGBA m_fill_color_mouseover;
 
 public:
+  void dispatch(Axis &axis) override { axis.draw<BackendGL>(); }
+  void dispatch(Line &line) override { line.draw<BackendGL>(); }
+  void dispatch(Points &points) override { points.draw<BackendGL>(); }
+  void dispatch(Histogram &histogram) override { histogram.draw<BackendGL>(); }
+
   void init(int x_pixels, int y_pixels, const char *name);
   void finalise();
   vfloat2_t begin_frame();

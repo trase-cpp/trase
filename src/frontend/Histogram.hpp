@@ -42,7 +42,8 @@ namespace trase {
 
 class Histogram : public Plot1D {
 public:
-  explicit Histogram(Axis &axis) : Plot1D(axis) {}
+  explicit Histogram(Drawable &parent) : Plot1D(parent) {}
+  DEFINE_VISITABLE()
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 

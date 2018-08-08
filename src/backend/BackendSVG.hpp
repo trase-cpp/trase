@@ -119,6 +119,11 @@ public:
     stroke_width(1);
   }
 
+  void dispatch(Axis &axis) override { axis.draw<BackendSVG>(); }
+  void dispatch(Line &line) override { line.draw<BackendSVG>(); }
+  void dispatch(Points &points) override { points.draw<BackendSVG>(); }
+  void dispatch(Histogram &histogram) override { histogram.draw<BackendSVG>(); }
+
   void init(float width, float height, float time_span,
             const char *name) noexcept;
 
