@@ -37,13 +37,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DRAWABLE_H_
 
 #include <array>
+#include <memory>
 #include <ostream>
 #include <vector>
 
-#include "backend/Backend.hpp"
 #include "util/BBox.hpp"
 
 namespace trase {
+
+class Backend;
+class AnimatedBackend;
 
 /// A helper struct for Drawable that holds frame-related information
 struct FrameInfo {
@@ -118,7 +121,7 @@ public:
   /// \param parent the parent \Drawable object
   /// \param area_of_parent the drawable area assigned to this Drawable as a
   /// ratio of the parent size
-  Drawable(Drawable &parent, const bfloat2_t &area_of_parent);
+  Drawable(Drawable *parent, const bfloat2_t &area_of_parent);
 
   /// resize the drawable area (in raw pixels) using the parents area (in raw
   /// pixels)
@@ -148,7 +151,10 @@ public:
   const bfloat2_t &area() { return m_pixels; }
 
   /// accept a visitor backend
-  virtual void accept(Backend &backend) = 0;
+  virtual void accept(Backend &backend, float time) = 0;
+
+  /// accept a visitor backend
+  virtual void accept(AnimatedBackend &backend) = 0;
 
   /// draw this object using the given AnimatedBackend
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
@@ -157,9 +163,14 @@ public:
   template <typename Backend> void draw(Backend &backend, float time);
 };
 
-#define DEFINE_VISITABLE()                                                     \
-  void accept(Backend &backend) override { backend.dispatch(*this); }
-
 } // namespace trase
+
+#define TRASE_VISITABLE()                                                      \
+  void accept(Backend &backend, float time) override {                         \
+    backend.dispatch(*this, time);                                             \
+  }                                                                            \
+  void accept(AnimatedBackend &backend) override { backend.dispatch(*this); }
+
+#include "backend/Backend.hpp"
 
 #endif // DRAWABLE_H_

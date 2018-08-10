@@ -61,6 +61,8 @@ public:
   /// \param pixels the number of pixels along the {width, height} of the figure
   explicit Figure(const std::array<float, 2> &pixels);
 
+  TRASE_VISITABLE()
+
   /// Create a new axis and return a shared pointer to it
   /// \return a shared pointer to the new axis
   std::shared_ptr<Axis> axis() noexcept;
@@ -103,5 +105,7 @@ inline std::shared_ptr<Figure> figure(std::array<float, 2> pixels = {
 }
 
 } // namespace trase
+
+#include "frontend/Figure.tcc"
 
 #endif // FIGURE_H_

@@ -31,12 +31,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file FigureDraw.hpp
-///
-/// How to draw a Figure.
-///
-/// This is included only when compiling the backends
-
 #include <array>
 #include <string>
 
@@ -48,8 +42,8 @@ template <typename AnimatedBackend>
 void Figure::draw(AnimatedBackend &backend) {
   auto name = "Figure " + std::to_string(m_id);
   backend.init(m_pixels.bmax[0], m_pixels.bmax[1], m_time_span, name.c_str());
-  for (const auto &axis : m_axes) {
-    axis->draw(backend);
+  for (const auto &i : m_children) {
+    i->accept(backend);
   }
   backend.finalise();
 }
@@ -63,14 +57,15 @@ template <typename Backend> void Figure::show(Backend &backend) {
     const vfloat2_t win_limits = backend.begin_frame();
     if ((win_limits != m_pixels.bmax).any()) {
       m_pixels.bmax = win_limits;
-      for (const auto &axis : m_axes) {
-        axis->resize(m_pixels);
+      for (const auto &i : m_children) {
+        i->resize(m_pixels);
       }
     }
 
     if (backend.mouse_dragging()) {
       vfloat2_t delta = backend.mouse_drag_delta();
-      for (const auto &axis : m_axes) {
+      for (const auto &drawable : m_children) {
+        auto axis = std::dynamic_pointer_cast<Axis>(drawable);
         // scale by axis pixel area
         vfloat2_t ax_delta = delta / (axis->pixels().bmax * vfloat2_t(-1, 1));
 
@@ -99,8 +94,8 @@ template <typename Backend> void Figure::show(Backend &backend) {
 
 template <typename Backend>
 void Figure::draw(Backend &backend, const float time) {
-  for (const auto &axis : m_axes) {
-    axis->draw(backend, time);
+  for (const auto &i : m_children) {
+    i->accept(backend, time);
   }
 }
 

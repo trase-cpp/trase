@@ -40,9 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-Plot1D::Plot1D(Drawable &parent)
+Plot1D::Plot1D(Axis *parent)
     : Drawable(parent, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
-      m_colormap(&Colormaps::viridis), m_line_width(3.f) {}
+      m_colormap(&Colormaps::viridis), m_line_width(3.f), m_axis(parent) {}
 
 void Plot1D::add_frame(const DataWithAesthetic &data, float time) {
   // add new data frame

@@ -31,22 +31,25 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file AxisDraw.hpp
-/// How to draw an Axis
-///
-/// This is included only when compiling the backends
-
 #include <cmath>
 #include <limits>
 
 #include "backend/Backend.hpp"
 #include "frontend/Axis.hpp"
-#include "frontend/Geometry.hpp"
-#include "frontend/HistogramDraw.hpp"
-#include "frontend/LineDraw.hpp"
-#include "frontend/PointsDraw.hpp"
+#include "frontend/Line.hpp"
+#include "frontend/Plot1D.hpp"
 
 namespace trase {
+
+template <typename T1, typename T2>
+std::shared_ptr<Plot1D> Axis::plot(const std::vector<T1> &x,
+                                   const std::vector<T2> &y) {
+  if (x.size() != y.size()) {
+    throw Exception("x and y vector sizes do not match");
+  }
+  return plot_impl(std::make_shared<Line>(this), Transform(Identity()),
+                   DataWithAesthetic().x(x).y(y));
+}
 
 template <typename Backend>
 void Axis::draw(Backend &backend, const float time) {
@@ -54,8 +57,8 @@ void Axis::draw(Backend &backend, const float time) {
 
   // draw plots
   backend.scissor(m_pixels);
-  for (auto &i : m_plot1d) {
-    draw_geometry(i, backend, time);
+  for (auto &i : m_children) {
+    i->accept(backend, time);
   }
   backend.reset_scissor();
 }
@@ -65,8 +68,8 @@ template <typename AnimatedBackend> void Axis::draw(AnimatedBackend &backend) {
 
   // serialise plots
   backend.scissor(m_pixels);
-  for (auto &i : m_plot1d) {
-    draw_geometry(i, backend);
+  for (auto &i : m_children) {
+    i->accept(backend);
   }
   backend.reset_scissor();
 }
@@ -132,6 +135,19 @@ template <typename Backend> void Axis::draw_common_ticks(Backend &backend) {
   backend.stroke();
 }
 
+template <typename Backend> void Axis::draw_common_title(Backend &backend) {
+
+  if (m_title.empty()) {
+    return;
+  }
+
+  backend.text_align(ALIGN_CENTER | ALIGN_BOTTOM);
+  backend.text(vfloat2_t(0.5f * (m_pixels.bmax[0] + m_pixels.bmin[0]),
+                         m_pixels.bmin[1] -
+                             0.05f * (m_pixels.bmax[1] - m_pixels.bmin[1])),
+               m_title.c_str(), NULL);
+}
+
 template <typename Backend> void Axis::draw_common_gridlines(Backend &backend) {
 
   backend.begin_path();
@@ -151,77 +167,6 @@ template <typename Backend> void Axis::draw_common_gridlines(Backend &backend) {
   backend.stroke_color(RGBA(255, 255, 255, 255));
   backend.stroke_width(m_line_width / 2.f);
   backend.stroke();
-}
-
-void Axis::update_tick_information() {
-
-  // Use num ticks if user defined, or calculate with defaults
-  vfloat2_t n_ticks = calculate_num_ticks();
-
-  // Calculate ideal distance between ticks in limits coords
-  bfloat2_t xy_limits(
-      {m_limits.bmin[Aesthetic::x::index], m_limits.bmin[Aesthetic::y::index]},
-      {m_limits.bmax[Aesthetic::x::index], m_limits.bmax[Aesthetic::y::index]});
-  const vfloat2_t tick_dx =
-      round_off(xy_limits.delta() / n_ticks, m_sig_digits);
-
-  // Idealise the lowest pick position
-  const vfloat2_t tick_min = ceil(xy_limits.bmin / tick_dx) * tick_dx;
-
-  // scale to pixels
-  const vfloat2_t tick_dx_pixels =
-      tick_dx * m_pixels.delta() / xy_limits.delta();
-  const vfloat2_t tick_min_pixels = {to_display<Aesthetic::x>(tick_min[0]),
-                                     to_display<Aesthetic::y>(tick_min[1])};
-
-  // Update values in the struct
-  m_tick_info.clear();
-
-  // x tick values and positions
-  for (int i = 0; i < static_cast<int>(n_ticks[0]); ++i) {
-    m_tick_info.x_val.emplace_back(tick_min[0] + i * tick_dx[0]);
-    m_tick_info.x_pos.emplace_back(tick_min_pixels[0] + i * tick_dx_pixels[0]);
-  }
-
-  // y tick values and positions
-  for (int i = 0; i < static_cast<int>(n_ticks[1]); ++i) {
-    m_tick_info.y_val.emplace_back(tick_min[1] + i * tick_dx[1]);
-    m_tick_info.y_pos.emplace_back(tick_min_pixels[1] - i * tick_dx_pixels[1]);
-  }
-}
-
-vfloat2_t Axis::calculate_num_ticks() {
-
-  if (m_nx_ticks > 0 && m_ny_ticks > 0) {
-    return {static_cast<float>(m_nx_ticks), static_cast<float>(m_ny_ticks)};
-  }
-
-  const float pix_ratio = m_pixels.delta()[0] / m_pixels.delta()[1];
-
-  if (m_nx_ticks > 0) {
-    const float n = static_cast<float>(m_nx_ticks);
-    return {n, std::floor(n / pix_ratio)};
-  }
-
-  if (m_ny_ticks > 0) {
-    const float n = static_cast<float>(m_ny_ticks);
-    return {std::floor(n * pix_ratio), n};
-  }
-
-  return {std::floor(5.f * pix_ratio), 5.f};
-}
-
-template <typename Backend> void Axis::draw_common_title(Backend &backend) {
-
-  if (m_title.empty()) {
-    return;
-  }
-
-  backend.text_align(ALIGN_CENTER | ALIGN_BOTTOM);
-  backend.text(vfloat2_t(0.5f * (m_pixels.bmax[0] + m_pixels.bmin[0]),
-                         m_pixels.bmin[1] -
-                             0.05f * (m_pixels.bmax[1] - m_pixels.bmin[1])),
-               m_title.c_str(), NULL);
 }
 
 template <typename Backend> void Axis::draw_common_xlabel(Backend &backend) {
@@ -266,16 +211,18 @@ template <typename Backend> void Axis::draw_common_legend(Backend &backend) {
   vfloat2_t text_loc = upper_right_corner;
   backend.text_align(ALIGN_RIGHT | ALIGN_TOP);
   backend.stroke_width(m_line_width);
-  for (const auto &i : m_plot1d) {
+  for (const auto &drawable : m_children) {
+    auto plot1d = std::dynamic_pointer_cast<Plot1D>(drawable);
+
     backend.begin_path();
     backend.move_to(text_loc +
                     vfloat2_t(-sample_length / 3.f, m_font_size / 2.f));
     backend.line_to(text_loc +
                     vfloat2_t(-(4.f / 3.f) * sample_length, m_font_size / 2.f));
-    backend.stroke_color(i->get_color());
+    backend.stroke_color(plot1d->get_color());
     backend.stroke();
     backend.text(text_loc + vfloat2_t(-(5.f / 3.f) * sample_length, 0.f),
-                 i->get_label().c_str(), nullptr);
+                 plot1d->get_label().c_str(), nullptr);
     text_loc[1] += m_font_size;
   }
 }

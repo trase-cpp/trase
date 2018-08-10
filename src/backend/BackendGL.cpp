@@ -168,29 +168,3 @@ void BackendGL::init_imgui(GLFWwindow *window) {
 }
 
 } // namespace trase
-
-#include "frontend/DrawableDraw.hpp"
-
-namespace trase {
-template void Drawable::draw<BackendGL>(BackendGL &backend, const float time);
-} // namespace trase
-
-#include "frontend/FigureDraw.hpp"
-
-namespace trase {
-template void Figure::draw<BackendGL>(BackendGL &backend, const float time);
-template void Figure::show<BackendGL>(BackendGL &backend);
-} // namespace trase
-
-#include "frontend/AxisDraw.hpp"
-
-namespace trase {
-template void Axis::draw<BackendGL>(BackendGL &backend, const float time);
-template void Axis::draw_common<BackendGL>(BackendGL &backend);
-} // namespace trase
-
-#include "frontend/Plot1DDraw.hpp"
-
-namespace trase {
-template void Plot1D::draw<BackendGL>(BackendGL &backend, const float time);
-} // namespace trase

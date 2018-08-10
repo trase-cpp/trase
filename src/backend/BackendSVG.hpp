@@ -46,6 +46,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ostream>
 #include <sstream>
 
+#include "frontend/Axis.hpp"
+#include "frontend/Figure.hpp"
+#include "frontend/Histogram.hpp"
+#include "frontend/Line.hpp"
+#include "frontend/Plot1D.hpp"
+#include "frontend/Points.hpp"
+
 namespace trase {
 
 /// Helper class for BackendSVG to format attributes as 'name="val" '
@@ -119,10 +126,8 @@ public:
     stroke_width(1);
   }
 
-  void dispatch(Axis &axis) override { axis.draw<BackendSVG>(); }
-  void dispatch(Line &line) override { line.draw<BackendSVG>(); }
-  void dispatch(Points &points) override { points.draw<BackendSVG>(); }
-  void dispatch(Histogram &histogram) override { histogram.draw<BackendSVG>(); }
+  TRASE_BACKEND_VISITOR()
+  TRASE_ANIMATED_BACKEND_VISITOR()
 
   void init(float width, float height, float time_span,
             const char *name) noexcept;
@@ -130,6 +135,8 @@ public:
   void finalise() noexcept;
 
   inline bool is_interactive() { return false; }
+
+  inline vfloat2_t get_mouse_pos() { return vfloat2_t(0, 0); }
 
   inline void scissor(const bfloat2_t &x) {}
 

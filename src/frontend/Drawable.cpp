@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-Drawable::Drawable(Drawable &parent, const bfloat2_t &area_of_parent)
-    : m_parent(&parent), m_area(area_of_parent), m_time_span(0), m_times({0}) {}
+Drawable::Drawable(Drawable *parent, const bfloat2_t &area_of_parent)
+    : m_parent(parent), m_area(area_of_parent), m_time_span(0), m_times({0}) {}
 
 void Drawable::resize(const bfloat2_t &parent_pixels) {
   m_pixels.bmin = m_area.bmin * parent_pixels.delta() + parent_pixels.min();

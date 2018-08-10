@@ -42,8 +42,8 @@ namespace trase {
 
 class Points : public Plot1D {
 public:
-  explicit Points(Drawable &parent) : Plot1D(parent) {}
-  DEFINE_VISITABLE()
+  explicit Points(Axis *parent) : Plot1D(parent) {}
+  TRASE_VISITABLE()
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 
@@ -54,5 +54,7 @@ private:
 };
 
 } // namespace trase
+
+#include "frontend/Points.tcc"
 
 #endif // POINTS_H_

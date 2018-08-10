@@ -40,32 +40,58 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <vector>
 
-#include "frontend/Histogram.hpp"
-#include "frontend/Line.hpp"
-#include "frontend/Plot1D.hpp"
-#include "frontend/Points.hpp"
 #include "util/Vector.hpp"
 
 namespace trase {
+
+// need to forward declare all drawables here
+class Axis;
+class Line;
+class Points;
+class Histogram;
+class Figure;
 
 /// a base class for all the backends that support drawing a single frame
 class Backend {
 public:
   // Declare overloads for each kind of a Drawable to dispatch
+  virtual void dispatch(Figure &figure, float time) = 0;
   virtual void dispatch(Axis &file, float time) = 0;
   virtual void dispatch(Line &file, float time) = 0;
   virtual void dispatch(Points &file, float time) = 0;
   virtual void dispatch(Histogram &file, float time) = 0;
 };
 
+#define TRASE_BACKEND_VISITOR()                                                \
+  void dispatch(Figure &figure, float time) override {                         \
+    figure.draw(*this, time);                                                  \
+  }                                                                            \
+  void dispatch(Axis &axis, float time) override { axis.draw(*this, time); }   \
+  void dispatch(Line &line, float time) override { line.draw(*this, time); }   \
+  void dispatch(Points &points, float time) override {                         \
+    points.draw(*this, time);                                                  \
+  }                                                                            \
+  void dispatch(Histogram &histogram, float time) override {                   \
+    histogram.draw(*this, time);                                               \
+  }
+
 /// a base class for all the backends that support animation over time
 class AnimatedBackend : public Backend {
+public:
   // Declare overloads for each kind of a Drawable to dispatch
+  virtual void dispatch(Figure &figure) = 0;
   virtual void dispatch(Axis &file) = 0;
   virtual void dispatch(Line &file) = 0;
   virtual void dispatch(Points &file) = 0;
   virtual void dispatch(Histogram &file) = 0;
 };
+
+#define TRASE_ANIMATED_BACKEND_VISITOR()                                       \
+  void dispatch(Figure &fig) override { fig.draw(*this); }                     \
+  void dispatch(Axis &axis) override { axis.draw(*this); }                     \
+  void dispatch(Line &line) override { line.draw(*this); }                     \
+  void dispatch(Points &points) override { points.draw(*this); }               \
+  void dispatch(Histogram &histogram) override { histogram.draw(*this); }
 
 // pi constant
 const float pi =
@@ -185,5 +211,12 @@ private:
 };
 
 } // namespace trase
+
+#include "frontend/Axis.hpp"
+#include "frontend/Figure.hpp"
+#include "frontend/Histogram.hpp"
+#include "frontend/Line.hpp"
+#include "frontend/Plot1D.hpp"
+#include "frontend/Points.hpp"
 
 #endif // BACKEND_H_

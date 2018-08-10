@@ -31,12 +31,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file PointsDraw.hpp
-///
-/// How to draw a Points
-///
-/// This is included only when compiling the backends
-
 #include "frontend/Points.hpp"
 
 namespace trase {
@@ -56,10 +50,10 @@ template <typename AnimatedBackend>
 void Points::draw_frames(AnimatedBackend &backend) {
 
   auto to_pixel = [&](auto x, auto y, auto c, auto s) {
-    return Vector<float, 4>{m_axis.to_display<Aesthetic::x>(x),
-                            m_axis.to_display<Aesthetic::y>(y),
-                            m_axis.to_display<Aesthetic::color>(c),
-                            m_axis.to_display<Aesthetic::size>(s)};
+    return Vector<float, 4>{m_axis->to_display<Aesthetic::x>(x),
+                            m_axis->to_display<Aesthetic::y>(y),
+                            m_axis->to_display<Aesthetic::color>(c),
+                            m_axis->to_display<Aesthetic::size>(s)};
   };
 
   backend.stroke_width(0);
@@ -86,10 +80,10 @@ template <typename Backend> void Points::draw_plot(Backend &backend) {
   backend.stroke_width(0);
 
   auto to_pixel = [&](auto x, auto y, auto c, auto s) {
-    return Vector<float, 4>{m_axis.to_display<Aesthetic::x>(x),
-                            m_axis.to_display<Aesthetic::y>(y),
-                            m_axis.to_display<Aesthetic::color>(c),
-                            m_axis.to_display<Aesthetic::size>(s)};
+    return Vector<float, 4>{m_axis->to_display<Aesthetic::x>(x),
+                            m_axis->to_display<Aesthetic::y>(y),
+                            m_axis->to_display<Aesthetic::color>(c),
+                            m_axis->to_display<Aesthetic::size>(s)};
   };
 
   if (w2 == 0.0f) {

@@ -31,12 +31,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file LineDraw.hpp
-///
-/// How to draw a Line
-///
-/// This is included only when compiling the backends
-
 #include "frontend/Line.hpp"
 
 namespace trase {
@@ -61,8 +55,8 @@ void Line::draw_frames(AnimatedBackend &backend) {
   backend.stroke_width(m_line_width);
 
   auto to_pixel = [&](auto x, auto y) {
-    return vfloat2_t{m_axis.to_display<Aesthetic::x>(x),
-                     m_axis.to_display<Aesthetic::y>(y)};
+    return vfloat2_t{m_axis->to_display<Aesthetic::x>(x),
+                     m_axis->to_display<Aesthetic::y>(y)};
   };
 
   auto x = m_data[0].begin<Aesthetic::x>();
@@ -101,8 +95,8 @@ void Line::draw_anim_highlights(AnimatedBackend &backend) {
     auto y = m_data[0].begin<Aesthetic::y>();
     for (int i = 0; i < m_data[0].rows(); ++i) {
       vfloat2_t point = {x[i], y[i]};
-      vfloat2_t point_pixel = {m_axis.to_display<Aesthetic::x>(x[i]),
-                               m_axis.to_display<Aesthetic::y>(y[i])};
+      vfloat2_t point_pixel = {m_axis->to_display<Aesthetic::x>(x[i]),
+                               m_axis->to_display<Aesthetic::y>(y[i])};
       std::snprintf(buffer, sizeof(buffer), "(%f,%f)", point[0], point[1]);
       backend.tooltip(
           point_pixel + 2.f * vfloat2_t(m_line_width, -m_line_width), buffer);
@@ -120,8 +114,8 @@ template <typename Backend> void Line::draw_plot(Backend &backend) {
   const float w2 = m_frame_info.w2;
 
   auto to_pixel = [&](auto x, auto y) {
-    return vfloat2_t{m_axis.to_display<Aesthetic::x>(x),
-                     m_axis.to_display<Aesthetic::y>(y)};
+    return vfloat2_t{m_axis->to_display<Aesthetic::x>(x),
+                     m_axis->to_display<Aesthetic::y>(y)};
   };
 
   if (w2 == 0.0f) {
@@ -161,8 +155,8 @@ template <typename Backend> void Line::draw_highlights(Backend &backend) {
     mouse_pos = backend.get_mouse_pos();
     if ((mouse_pos > m_pixels.bmin).all() &&
         (mouse_pos < m_pixels.bmax).all()) {
-      pos = {m_axis.from_display<Aesthetic::x>(mouse_pos[0]),
-             m_axis.from_display<Aesthetic::x>(mouse_pos[1])};
+      pos = {m_axis->from_display<Aesthetic::x>(mouse_pos[0]),
+             m_axis->from_display<Aesthetic::x>(mouse_pos[1])};
     }
   }
 
@@ -184,8 +178,8 @@ template <typename Backend> void Line::draw_highlights(Backend &backend) {
 
     // define search radius
     const vfloat2_t point_pixel = {
-        m_axis.to_display<Aesthetic::x>(min_point[0]),
-        m_axis.to_display<Aesthetic::x>(min_point[1])};
+        m_axis->to_display<Aesthetic::x>(min_point[0]),
+        m_axis->to_display<Aesthetic::x>(min_point[1])};
 
     // if a point is within r2, then draw it
     if ((mouse_pos - point_pixel).squaredNorm() <

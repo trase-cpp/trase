@@ -52,7 +52,7 @@ Figure::Figure(const std::array<float, 2> &pixels)
 
 std::shared_ptr<Axis> Figure::axis() noexcept {
   auto new_axis =
-      std::make_shared<Axis>(*this, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f}));
+      std::make_shared<Axis>(this, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f}));
   new_axis->resize(m_pixels);
   m_children.push_back(new_axis);
   return new_axis;

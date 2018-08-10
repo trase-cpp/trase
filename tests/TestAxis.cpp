@@ -42,8 +42,7 @@ using namespace trase;
 
 TEST_CASE("axis can be created", "[axis]") {
   auto fig = figure({800, 600});
-
-  Axis ax(*fig, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f}));
+  auto ax = fig->axis();
 }
 
 TEST_CASE("check plot methods can be invoked", "[axis]") {
