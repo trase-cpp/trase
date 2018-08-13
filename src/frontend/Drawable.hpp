@@ -168,8 +168,16 @@ public:
 #define TRASE_VISITABLE()                                                      \
   void accept(Backend &backend, float time) override {                         \
     backend.dispatch(*this, time);                                             \
+    for (auto &i : m_children) {                                               \
+      i->accept(backend, time);                                                \
+    }                                                                          \
   }                                                                            \
-  void accept(AnimatedBackend &backend) override { backend.dispatch(*this); }
+  void accept(AnimatedBackend &backend) override {                             \
+    backend.dispatch(*this);                                                   \
+    for (auto &i : m_children) {                                               \
+      i->accept(backend);                                                      \
+    }                                                                          \
+  }
 
 #include "backend/Backend.hpp"
 

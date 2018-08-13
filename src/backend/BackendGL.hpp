@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nanovg.h"
 
 #include "backend/Backend.hpp"
+#include "frontend/DrawableDerived.hpp"
 #include "util/BBox.hpp"
 #include "util/Colors.hpp"
 #include "util/Exception.hpp"

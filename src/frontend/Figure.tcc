@@ -85,6 +85,7 @@ template <typename Backend> void Figure::show(Backend &backend) {
 
     const float time = backend.get_time();
     const float looped_time = std::fmod(time, m_time_span);
+
     draw(backend, looped_time);
 
     backend.end_frame();

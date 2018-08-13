@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BACKENDSVG_H_
 
 #include "backend/Backend.hpp"
+#include "frontend/DrawableDerived.hpp"
 #include "util/BBox.hpp"
 #include "util/Colors.hpp"
 #include "util/Exception.hpp"
@@ -45,13 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 #include <ostream>
 #include <sstream>
-
-#include "frontend/Axis.hpp"
-#include "frontend/Figure.hpp"
-#include "frontend/Histogram.hpp"
-#include "frontend/Line.hpp"
-#include "frontend/Plot1D.hpp"
-#include "frontend/Points.hpp"
 
 namespace trase {
 

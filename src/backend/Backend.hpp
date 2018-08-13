@@ -212,11 +212,4 @@ private:
 
 } // namespace trase
 
-#include "frontend/Axis.hpp"
-#include "frontend/Figure.hpp"
-#include "frontend/Histogram.hpp"
-#include "frontend/Line.hpp"
-#include "frontend/Plot1D.hpp"
-#include "frontend/Points.hpp"
-
 #endif // BACKEND_H_

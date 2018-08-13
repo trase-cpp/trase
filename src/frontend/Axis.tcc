@@ -54,24 +54,14 @@ std::shared_ptr<Plot1D> Axis::plot(const std::vector<T1> &x,
 template <typename Backend>
 void Axis::draw(Backend &backend, const float time) {
   draw_common(backend);
-
-  // draw plots
+  // make sure all child elements are cut to the axis pixel limits
   backend.scissor(m_pixels);
-  for (auto &i : m_children) {
-    i->accept(backend, time);
-  }
-  backend.reset_scissor();
 }
 
 template <typename AnimatedBackend> void Axis::draw(AnimatedBackend &backend) {
   draw_common(backend);
-
-  // serialise plots
+  // make sure all child elements are cut to the axis pixel limits
   backend.scissor(m_pixels);
-  for (auto &i : m_children) {
-    i->accept(backend);
-  }
-  backend.reset_scissor();
 }
 
 template <typename Backend> void Axis::draw_common(Backend &backend) {

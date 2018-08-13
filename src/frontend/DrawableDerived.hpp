@@ -35,43 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// available geometry types are Points, Line. Any new sub-classes need to be
 /// added here
 
-#ifndef GEOMETRY_H_
-#define GEOMETRY_H_
+#ifndef DRAWABLE_DERIVED_H_
+#define DRAWABLE_DERIVED_H_
 
+#include "frontend/Axis.hpp"
+#include "frontend/Figure.hpp"
 #include "frontend/Histogram.hpp"
 #include "frontend/Line.hpp"
 #include "frontend/Plot1D.hpp"
 #include "frontend/Points.hpp"
 
-namespace trase {
-
-template <typename AnimatedBackend>
-void draw_geometry(std::shared_ptr<Plot1D> &plot, AnimatedBackend &backend) {
-  if (auto points = dynamic_cast<Points *>(plot.get())) {
-    points->draw(backend);
-  } else if (auto line = dynamic_cast<Line *>(plot.get())) {
-    line->draw(backend);
-  } else if (auto histogram = dynamic_cast<Histogram *>(plot.get())) {
-    histogram->draw(backend);
-  } else {
-    throw Exception("unknown geometry class");
-  }
-}
-
-template <typename Backend>
-void draw_geometry(std::shared_ptr<Plot1D> &plot, Backend &backend,
-                   const float time) {
-  if (auto points = dynamic_cast<Points *>(plot.get())) {
-    points->draw(backend, time);
-  } else if (auto line = dynamic_cast<Line *>(plot.get())) {
-    line->draw(backend, time);
-  } else if (auto histogram = dynamic_cast<Histogram *>(plot.get())) {
-    histogram->draw(backend, time);
-  } else {
-    throw Exception("unknown geometry class");
-  }
-}
-
-} // namespace trase
-
-#endif // GEOMETRY_H_
+#endif // DRAWABLE_DERIVED_H_
