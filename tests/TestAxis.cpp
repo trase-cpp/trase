@@ -48,6 +48,10 @@ void dummy_draw(std::shared_ptr<Figure> &fig) {
   BackendSVG backend(out);
   fig->draw(backend);
   out.close();
+  out.open("test_axis" + std::to_string(++m_num_dummy_draw) + ".svg");
+  BackendSVG backend_single(out);
+  fig->draw(backend_single, 0);
+  out.close();
 }
 
 TEST_CASE("axis can be created", "[axis]") {

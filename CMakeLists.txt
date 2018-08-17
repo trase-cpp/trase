@@ -226,6 +226,7 @@ add_executable (
     tests/TestFontManager.cpp
     tests/TestPlot1D.cpp
     tests/TestLine.cpp
+    tests/TestHistogram.cpp
     tests/TestUserConcepts.cpp
     tests/TestStyle.cpp
     tests/TestTransformMatrix.cpp

@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 
 //! [line example includes]
-#include "backend/BackendSVG.hpp"
 #include "trase.hpp"
 #include <fstream>
 //! [line example includes]
