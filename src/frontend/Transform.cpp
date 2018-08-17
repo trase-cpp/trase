@@ -49,6 +49,13 @@ BinX::BinX(const int number_of_bins, const float min, const float max)
 DataWithAesthetic BinX::operator()(const DataWithAesthetic &data) {
   auto x_begin = data.begin<Aesthetic::x>();
   auto x_end = data.end<Aesthetic::x>();
+
+  // if input data is empty then create an empty y aesthetic
+  if (std::distance(x_begin, x_end) == 0) {
+    std::vector<float> y;
+    return create_data().y(y);
+  }
+
   auto minmax = std::minmax_element(x_begin, x_end);
 
   if (m_span.is_empty()) {

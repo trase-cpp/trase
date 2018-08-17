@@ -37,22 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <limits>
 #include <type_traits>
 
+#include "DummyDraw.hpp"
 #include "trase.hpp"
 
 using namespace trase;
-
-static int m_num_dummy_draw = 0;
-void dummy_draw(std::shared_ptr<Figure> &fig) {
-  std::ofstream out;
-  out.open("test_axis" + std::to_string(++m_num_dummy_draw) + ".svg");
-  BackendSVG backend(out);
-  fig->draw(backend);
-  out.close();
-  out.open("test_axis" + std::to_string(++m_num_dummy_draw) + ".svg");
-  BackendSVG backend_single(out);
-  fig->draw(backend_single, 0);
-  out.close();
-}
 
 TEST_CASE("axis can be created", "[axis]") {
   auto fig = figure({800, 600});
@@ -139,13 +127,13 @@ TEST_CASE("set number of ticks", "[axis]") {
   auto line = ax->line(data);
   CHECK(ax->get_ticks()[0] == 0);
   CHECK(ax->get_ticks()[1] == 0);
-  dummy_draw(fig);
+  DummyDraw::draw("axis", fig);
   ax->set_ticks({10, 0});
-  dummy_draw(fig);
+  DummyDraw::draw("axis", fig);
   CHECK(ax->get_ticks()[0] == 10);
   CHECK(ax->get_ticks()[1] == 0);
   ax->set_ticks({10, 10});
-  dummy_draw(fig);
+  DummyDraw::draw("axis", fig);
   CHECK(ax->get_ticks()[0] == 10);
   CHECK(ax->get_ticks()[1] == 10);
 }

@@ -217,6 +217,8 @@ endif ()
 
 add_executable (
     trase_tst
+    tests/DummyDraw.hpp
+    tests/DummyDraw.cpp
     tests/TestAxis.cpp
     tests/TestData.cpp
     tests/TestBackendSVG.cpp

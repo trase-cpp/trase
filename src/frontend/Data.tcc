@@ -103,10 +103,12 @@ void DataWithAesthetic::set(const std::vector<T> &data) {
     m_data->set_column(search->second, data);
   }
 
-  // set m_limits with new data
-  auto min_max = std::minmax_element(data.begin(), data.end());
-  m_limits.bmin[Aesthetic::index] = static_cast<float>(*min_max.first);
-  m_limits.bmax[Aesthetic::index] = static_cast<float>(*min_max.second);
+  if (!data.empty()) {
+    // set m_limits with new data
+    auto min_max = std::minmax_element(data.begin(), data.end());
+    m_limits.bmin[Aesthetic::index] = static_cast<float>(*min_max.first);
+    m_limits.bmax[Aesthetic::index] = static_cast<float>(*min_max.second);
+  }
 }
 
 template <typename T>

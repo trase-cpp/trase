@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
+#include "DummyDraw.hpp"
+
 //! [histogram example includes]
 #include "trase.hpp"
 #include <fstream>
@@ -89,4 +91,23 @@ TEST_CASE("histogram example", "[histogram]") {
   fig->draw(backend);
   out.close();
   /// [histogram example]
+}
+
+TEST_CASE("histogram creation", "[histogram]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  std::vector<float> x;
+  ax->histogram(create_data().x(x));
+  DummyDraw::draw("histogram", fig);
+  x.resize(1);
+  x[0] = 0.1;
+  ax->histogram(create_data().x(x));
+  DummyDraw::draw("histogram", fig);
+  x.resize(5);
+  x[1] = 0.2;
+  x[2] = 0.3;
+  x[3] = 0.4;
+  x[4] = 0.5;
+  ax->histogram(create_data().x(x));
+  DummyDraw::draw("histogram", fig);
 }
