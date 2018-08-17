@@ -42,14 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <GLFW/glfw3.h>
 
 #include <array>
+#include <cstdio>
 #include <iostream>
-#include <stdio.h>
 
 #include "imgui.h"
 #include "nanovg.h"
 
 #include "backend/Backend.hpp"
-#include "frontend/DrawableDerived.hpp"
 #include "util/BBox.hpp"
 #include "util/Colors.hpp"
 #include "util/Exception.hpp"
@@ -65,7 +64,7 @@ class BackendGL : public Backend {
   RGBA m_fill_color_mouseover;
 
 public:
-  TRASE_BACKEND_VISITOR()
+  TRASE_BACKEND_VISITABLE()
 
   void init(int x_pixels, int y_pixels, const char *name);
   void finalise();
@@ -78,14 +77,14 @@ public:
 
   inline vfloat2_t get_mouse_pos() {
     auto pos = ImGui::GetMousePos();
-    return vfloat2_t(pos[0], pos[1]);
+    return {pos[0], pos[1]};
   }
 
   inline bool mouse_dragging() { return ImGui::IsMouseDragging(); }
 
   vfloat2_t mouse_drag_delta() {
     ImVec2 delta = ImGui::GetMouseDragDelta();
-    return vfloat2_t(delta[0], delta[1]);
+    return {delta[0], delta[1]};
   }
 
   inline void mouse_drag_reset_delta() { ImGui::ResetMouseDragDelta(); }
@@ -137,7 +136,7 @@ public:
   inline void font_face(const char *face) {
     if (nvgFindFont(m_vg, face) == -1) {
       auto filename = m_fm.find_font(face, "");
-      if (filename == "") {
+      if (filename.empty()) {
         throw Exception("Could not find font" + std::string(face));
       }
       int font_id = nvgCreateFont(m_vg, face, filename.c_str());
@@ -168,7 +167,9 @@ public:
     return ret;
   }
 
-  inline bool should_close() { return glfwWindowShouldClose(m_window); }
+  inline bool should_close() {
+    return static_cast<bool>(glfwWindowShouldClose(m_window));
+  }
 
 private:
   NVGcontext *init_nanovg(int x_pixels, int y_pixels);

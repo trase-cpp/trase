@@ -126,7 +126,7 @@ public:
   /// parent size
   Axis(Drawable *parent, const bfloat2_t &area);
 
-  TRASE_VISITABLE()
+  TRASE_DISPATCH_BACKENDS
 
   /// returns the current Aesthetic limits
   const Limits &limits() const { return m_limits; }

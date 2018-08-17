@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <limits>
 
-#include "backend/Backend.hpp"
 #include "frontend/Axis.hpp"
 #include "frontend/Line.hpp"
 #include "frontend/Plot1D.hpp"

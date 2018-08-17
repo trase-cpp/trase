@@ -61,7 +61,7 @@ public:
   /// \param pixels the number of pixels along the {width, height} of the figure
   explicit Figure(const std::array<float, 2> &pixels);
 
-  TRASE_VISITABLE()
+  TRASE_DISPATCH_BACKENDS
 
   /// Create a new axis and return a shared pointer to it
   /// \return a shared pointer to the new axis

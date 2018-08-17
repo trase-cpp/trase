@@ -44,7 +44,7 @@ class Line : public Plot1D {
 public:
   explicit Line(Axis *parent) : Plot1D(parent) {}
 
-  TRASE_VISITABLE()
+  TRASE_DISPATCH_BACKENDS
 
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);

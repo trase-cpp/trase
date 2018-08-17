@@ -73,6 +73,10 @@ struct FrameInfo {
   }
 };
 
+// forward declare all backends here
+class BackendGL;
+class BackendSVG;
+
 /// Base class for drawable objects in a figure
 ///
 /// A figure consists of a tree structure of Drawable objects, with the
@@ -150,11 +154,11 @@ public:
   /// returns this objects drawable area as a ratio of the parents drawable area
   const bfloat2_t &area() { return m_pixels; }
 
-  /// accept a visitor backend
-  virtual void accept(Backend &backend, float time) = 0;
-
-  /// accept a visitor backend
-  virtual void accept(AnimatedBackend &backend) = 0;
+#ifdef TRASE_BACKEND_GL
+  virtual void dispatch(BackendGL &figure, float time) = 0;
+#endif
+  virtual void dispatch(BackendSVG &file, float time) = 0;
+  virtual void dispatch(BackendSVG &file) = 0;
 
   /// draw this object using the given AnimatedBackend
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
@@ -165,20 +169,39 @@ public:
 
 } // namespace trase
 
-#define TRASE_VISITABLE()                                                      \
-  void accept(Backend &backend, float time) override {                         \
-    backend.dispatch(*this, time);                                             \
+#define TRASE_DISPATCH(backend_type)                                           \
+  void dispatch(backend_type &backend, float time) override {                  \
+    draw(backend, time);                                                       \
     for (auto &i : m_children) {                                               \
-      i->accept(backend, time);                                                \
-    }                                                                          \
-  }                                                                            \
-  void accept(AnimatedBackend &backend) override {                             \
-    backend.dispatch(*this);                                                   \
-    for (auto &i : m_children) {                                               \
-      i->accept(backend);                                                      \
+      i->dispatch(backend, time);                                              \
     }                                                                          \
   }
 
-#include "backend/Backend.hpp"
+#define TRASE_ANIMATED_DISPATCH(backend_type)                                  \
+  void dispatch(backend_type &backend) override {                              \
+    draw(backend);                                                             \
+    for (auto &i : m_children) {                                               \
+      i->dispatch(backend);                                                    \
+    }                                                                          \
+  }
+
+#define TRASE_DISPATCH_SVG                                                     \
+  TRASE_DISPATCH(BackendSVG)                                                   \
+  TRASE_ANIMATED_DISPATCH(BackendSVG)
+
+#ifdef TRASE_BACKEND_GL
+#define TRASE_DISPATCH_GL TRASE_DISPATCH(BackendGL)
+#else
+#define TRASE_DISPATCH_GL
+#endif
+
+#define TRASE_DISPATCH_BACKENDS                                                \
+  TRASE_DISPATCH_SVG                                                           \
+  TRASE_DISPATCH_GL
+
+#ifdef TRASE_BACKEND_GL
+#include "backend/BackendGL.hpp"
+#endif
+#include "backend/BackendSVG.hpp"
 
 #endif // DRAWABLE_H_
