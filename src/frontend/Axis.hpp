@@ -218,6 +218,18 @@ public:
 
   void font_face(const std::string &fontFace) { m_font_face = fontFace; }
 
+  /// set the number of ticks on this axis
+  /// \param arg a length 2 int vector with the requested number of ticks along
+  /// each axis (i.e. [x_ticks,y_ticks]). Setting the number of ticks on either
+  /// axis to zero uses the default number of ticks
+  void set_ticks(Vector<int, 2> arg) {
+    m_nx_ticks = arg[0];
+    m_ny_ticks = arg[1];
+  }
+
+  /// gets the number of ticks on this axis
+  Vector<int, 2> get_ticks() const { return {m_nx_ticks, m_ny_ticks}; }
+
 private:
   /// Create a new Plot1D on this axis and return a shared pointer to it.
   ///
@@ -244,8 +256,6 @@ private:
   template <typename Backend> void draw_common_xlabel(Backend &backend);
   template <typename Backend> void draw_common_ylabel(Backend &backend);
   template <typename Backend> void draw_common_legend(Backend &backend);
-
-  void set_auto_ticks();
 };
 
 } // namespace trase
