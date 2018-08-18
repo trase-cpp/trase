@@ -84,7 +84,14 @@ DataWithAesthetic BinX::operator()(const DataWithAesthetic &data) {
     // Biometrika, 66:605-610.
     const float dx =
         3.49f * stdev * std::pow(static_cast<float>(data.rows()), -0.33f);
-    m_number_of_bins = static_cast<int>(std::round(m_span.delta()[0] / dx));
+
+    // if calculated dx is too small then set number of bins to pre-determined
+    // number
+    if (dx > m_span.delta()[0] / 200.f) {
+      m_number_of_bins = static_cast<int>(std::round(m_span.delta()[0] / dx));
+    } else {
+      m_number_of_bins = 200;
+    }
   }
 
   const float dx = m_span.delta()[0] / m_number_of_bins;
