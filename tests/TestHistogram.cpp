@@ -67,7 +67,7 @@ TEST_CASE("histogram example", "[histogram]") {
   float time = 0.0;
 
   auto do_plot = [&](const float theta) {
-    time += 0.3;
+    time += 0.3f;
     std::normal_distribution<float> normal(theta, 1);
     std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
     auto data = create_data().x(x);
@@ -100,14 +100,14 @@ TEST_CASE("histogram creation", "[histogram]") {
   ax->histogram(create_data().x(x));
   DummyDraw::draw("histogram", fig);
   x.resize(1);
-  x[0] = 0.1;
+  x[0] = 0.1f;
   ax->histogram(create_data().x(x));
   DummyDraw::draw("histogram", fig);
   x.resize(5);
-  x[1] = 0.2;
-  x[2] = 0.3;
-  x[3] = 0.4;
-  x[4] = 0.5;
+  x[1] = 0.2f;
+  x[2] = 0.3f;
+  x[3] = 0.4f;
+  x[4] = 0.5f;
   ax->histogram(create_data().x(x));
   DummyDraw::draw("histogram", fig);
 }
