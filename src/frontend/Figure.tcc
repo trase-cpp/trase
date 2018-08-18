@@ -95,9 +95,12 @@ template <typename Backend> void Figure::show(Backend &backend) {
 
 template <typename Backend>
 void Figure::draw(Backend &backend, const float time) {
+  auto name = "Figure " + std::to_string(m_id);
+  backend.init(m_pixels.bmax[0], m_pixels.bmax[1], m_time_span, name.c_str());
   for (const auto &i : m_children) {
     i->dispatch(backend, time);
   }
+  backend.finalise();
 }
 
 } // namespace trase
