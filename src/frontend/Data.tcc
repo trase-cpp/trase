@@ -112,9 +112,9 @@ void DataWithAesthetic::set(const std::vector<T> &data) {
     // if limits are equal spread them out by 2*1e4*eps to stop zeros later on
     if (m_limits.bmin[Aesthetic::index] == m_limits.bmin[Aesthetic::index]) {
       m_limits.bmin[Aesthetic::index] -=
-          1e4 * std::numeric_limits<float>::epsilon();
+          1e4f * std::numeric_limits<float>::epsilon();
       m_limits.bmax[Aesthetic::index] +=
-          1e4 * std::numeric_limits<float>::epsilon();
+          1e4f * std::numeric_limits<float>::epsilon();
     }
   }
 }
