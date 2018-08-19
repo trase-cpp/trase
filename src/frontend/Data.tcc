@@ -108,6 +108,14 @@ void DataWithAesthetic::set(const std::vector<T> &data) {
     auto min_max = std::minmax_element(data.begin(), data.end());
     m_limits.bmin[Aesthetic::index] = static_cast<float>(*min_max.first);
     m_limits.bmax[Aesthetic::index] = static_cast<float>(*min_max.second);
+
+    // if limits are equal spread them out by 2*1e4*eps to stop zeros later on
+    if (m_limits.bmin[Aesthetic::index] == m_limits.bmin[Aesthetic::index]) {
+      m_limits.bmin[Aesthetic::index] -=
+          1e4 * std::numeric_limits<float>::epsilon();
+      m_limits.bmax[Aesthetic::index] +=
+          1e4 * std::numeric_limits<float>::epsilon();
+    }
   }
 }
 

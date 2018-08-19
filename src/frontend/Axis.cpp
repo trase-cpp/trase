@@ -85,10 +85,9 @@ void Axis::update_tick_information() {
       {m_limits.bmin[Aesthetic::x::index], m_limits.bmin[Aesthetic::y::index]},
       {m_limits.bmax[Aesthetic::x::index], m_limits.bmax[Aesthetic::y::index]});
 
-  // if any limits are empty use a sensible default (0 -> 1)
+  // if any limits are empty (no values) use a sensible default (0 -> 1)
   for (int i = 0; i < 2; ++i) {
-    if (xy_limits.bmax[i] <
-        xy_limits.bmin[i] + 3 * std::numeric_limits<double>::epsilon()) {
+    if (xy_limits.bmax[i] < xy_limits.bmin[i]) {
       xy_limits.bmin[i] = 0.f;
       xy_limits.bmax[i] = 1.f;
     }
