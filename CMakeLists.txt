@@ -229,6 +229,7 @@ add_executable (
     tests/TestPlot1D.cpp
     tests/TestLine.cpp
     tests/TestHistogram.cpp
+    tests/TestPoints.cpp
     tests/TestUserConcepts.cpp
     tests/TestStyle.cpp
     tests/TestTransformMatrix.cpp
