@@ -32,28 +32,105 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "frontend/Axis.hpp"
-#include "frontend/Figure.hpp"
+#include "frontend/Histogram.hpp"
+#include "frontend/Line.hpp"
+#include "frontend/Plot1D.hpp"
+#include "frontend/Points.hpp"
 #include "util/Vector.hpp"
 
 namespace trase {
 
-Axis::Axis(Figure &figure, const bfloat2_t &area)
-    : Drawable(&figure, area), m_sig_digits(2), m_nx_ticks(0), m_ny_ticks(0),
+Axis::Axis(Drawable *parent, const bfloat2_t &area)
+    : Drawable(parent, area), m_sig_digits(2), m_nx_ticks(0), m_ny_ticks(0),
       m_tick_len(10.f), m_line_width(3.f), m_font_size(18.f),
       m_font_face("Roboto"), m_legend(false) {}
 
-std::shared_ptr<Plot1D> Axis::plot(int n) { return m_plot1d.at(n); }
+std::shared_ptr<Plot1D> Axis::plot(int n) {
+  return std::dynamic_pointer_cast<Plot1D>(m_children.at(n));
+}
 
 std::shared_ptr<Plot1D> Axis::plot_impl(const std::shared_ptr<Plot1D> &plot,
                                         const Transform &transform,
                                         const DataWithAesthetic &values) {
-  m_plot1d.emplace_back(plot);
-  m_children.push_back(m_plot1d.back().get());
-  m_plot1d.back()->set_transform(transform);
-  m_plot1d.back()->add_frame(values, 0);
-  m_plot1d.back()->set_color(RGBA::defaults[m_plot1d.size() - 1]);
-  m_plot1d.back()->resize(m_pixels);
-  return m_plot1d.back();
+  plot->set_transform(transform);
+  plot->add_frame(values, 0);
+  plot->set_color(RGBA::defaults[m_children.size()]);
+  plot->resize(m_pixels);
+  m_children.push_back(plot);
+  return plot;
+}
+
+std::shared_ptr<Plot1D> Axis::points(const DataWithAesthetic &data,
+                                     const Transform &transform) {
+  return plot_impl(std::make_shared<Points>(this), transform, data);
+}
+
+std::shared_ptr<Plot1D> Axis::line(const DataWithAesthetic &data,
+                                   const Transform &transform) {
+  return plot_impl(std::make_shared<Line>(this), transform, data);
+}
+
+std::shared_ptr<Plot1D> Axis::histogram(const DataWithAesthetic &data,
+                                        const Transform &transform) {
+  return plot_impl(std::make_shared<Histogram>(this), transform, data);
+}
+
+void Axis::update_tick_information() {
+
+  // Use num ticks if user defined, or calculate with defaults
+  vfloat2_t n_ticks = calculate_num_ticks();
+
+  // Calculate ideal distance between ticks in limits coords
+  bfloat2_t xy_limits(
+      {m_limits.bmin[Aesthetic::x::index], m_limits.bmin[Aesthetic::y::index]},
+      {m_limits.bmax[Aesthetic::x::index], m_limits.bmax[Aesthetic::y::index]});
+  const vfloat2_t tick_dx =
+      round_off(xy_limits.delta() / n_ticks, m_sig_digits);
+
+  // Idealise the lowest pick position
+  const vfloat2_t tick_min = ceil(xy_limits.bmin / tick_dx) * tick_dx;
+
+  // scale to pixels
+  const vfloat2_t tick_dx_pixels =
+      tick_dx * m_pixels.delta() / xy_limits.delta();
+  const vfloat2_t tick_min_pixels = {to_display<Aesthetic::x>(tick_min[0]),
+                                     to_display<Aesthetic::y>(tick_min[1])};
+
+  // Update values in the struct
+  m_tick_info.clear();
+
+  // x tick values and positions
+  for (int i = 0; i < static_cast<int>(n_ticks[0]); ++i) {
+    m_tick_info.x_val.emplace_back(tick_min[0] + i * tick_dx[0]);
+    m_tick_info.x_pos.emplace_back(tick_min_pixels[0] + i * tick_dx_pixels[0]);
+  }
+
+  // y tick values and positions
+  for (int i = 0; i < static_cast<int>(n_ticks[1]); ++i) {
+    m_tick_info.y_val.emplace_back(tick_min[1] + i * tick_dx[1]);
+    m_tick_info.y_pos.emplace_back(tick_min_pixels[1] - i * tick_dx_pixels[1]);
+  }
+}
+
+vfloat2_t Axis::calculate_num_ticks() {
+
+  if (m_nx_ticks > 0 && m_ny_ticks > 0) {
+    return {static_cast<float>(m_nx_ticks), static_cast<float>(m_ny_ticks)};
+  }
+
+  const float pix_ratio = m_pixels.delta()[0] / m_pixels.delta()[1];
+
+  if (m_nx_ticks > 0) {
+    const auto n = static_cast<float>(m_nx_ticks);
+    return {n, std::floor(n / pix_ratio)};
+  }
+
+  if (m_ny_ticks > 0) {
+    const auto n = static_cast<float>(m_ny_ticks);
+    return {std::floor(n * pix_ratio), n};
+  }
+
+  return {std::floor(5.f * pix_ratio), 5.f};
 }
 
 } // namespace trase

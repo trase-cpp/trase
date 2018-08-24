@@ -37,12 +37,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DRAWABLE_H_
 
 #include <array>
+#include <memory>
 #include <ostream>
 #include <vector>
 
 #include "util/BBox.hpp"
 
 namespace trase {
+
+class Backend;
+class AnimatedBackend;
 
 /// A helper struct for Drawable that holds frame-related information
 struct FrameInfo {
@@ -69,6 +73,10 @@ struct FrameInfo {
   }
 };
 
+// forward declare all backends here
+class BackendGL;
+class BackendSVG;
+
 /// Base class for drawable objects in a figure
 ///
 /// A figure consists of a tree structure of Drawable objects, with the
@@ -90,7 +98,7 @@ struct FrameInfo {
 class Drawable {
 protected:
   /// a list of Drawables that are children of this object
-  std::vector<Drawable *> m_children;
+  std::vector<std::shared_ptr<Drawable>> m_children;
 
   /// parent of this object
   Drawable *m_parent;
@@ -146,6 +154,12 @@ public:
   /// returns this objects drawable area as a ratio of the parents drawable area
   const bfloat2_t &area() { return m_pixels; }
 
+#ifdef TRASE_BACKEND_GL
+  virtual void dispatch(BackendGL &figure, float time) = 0;
+#endif
+  virtual void dispatch(BackendSVG &file, float time) = 0;
+  virtual void dispatch(BackendSVG &file) = 0;
+
   /// draw this object using the given AnimatedBackend
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
 
@@ -154,5 +168,40 @@ public:
 };
 
 } // namespace trase
+
+#define TRASE_DISPATCH(backend_type)                                           \
+  void dispatch(backend_type &backend, float time) override {                  \
+    draw(backend, time);                                                       \
+    for (auto &i : m_children) {                                               \
+      i->dispatch(backend, time);                                              \
+    }                                                                          \
+  }
+
+#define TRASE_ANIMATED_DISPATCH(backend_type)                                  \
+  void dispatch(backend_type &backend) override {                              \
+    draw(backend);                                                             \
+    for (auto &i : m_children) {                                               \
+      i->dispatch(backend);                                                    \
+    }                                                                          \
+  }
+
+#define TRASE_DISPATCH_SVG                                                     \
+  TRASE_DISPATCH(BackendSVG)                                                   \
+  TRASE_ANIMATED_DISPATCH(BackendSVG)
+
+#ifdef TRASE_BACKEND_GL
+#define TRASE_DISPATCH_GL TRASE_DISPATCH(BackendGL)
+#else
+#define TRASE_DISPATCH_GL
+#endif
+
+#define TRASE_DISPATCH_BACKENDS                                                \
+  TRASE_DISPATCH_SVG                                                           \
+  TRASE_DISPATCH_GL
+
+#ifdef TRASE_BACKEND_GL
+#include "backend/BackendGL.hpp"
+#endif
+#include "backend/BackendSVG.hpp"
 
 #endif // DRAWABLE_H_

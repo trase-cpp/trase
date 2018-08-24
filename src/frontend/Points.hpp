@@ -42,7 +42,8 @@ namespace trase {
 
 class Points : public Plot1D {
 public:
-  explicit Points(Axis &axis) : Plot1D(axis) {}
+  explicit Points(Axis *parent) : Plot1D(parent) {}
+  TRASE_DISPATCH_BACKENDS
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 
@@ -53,5 +54,7 @@ private:
 };
 
 } // namespace trase
+
+#include "frontend/Points.tcc"
 
 #endif // POINTS_H_

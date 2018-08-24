@@ -31,12 +31,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file HistogramDraw.hpp
-///
-/// How to draw a Histogram
-///
-/// This is included only when compiling the backends
-
+#include "frontend/Axis.hpp"
 #include "frontend/Histogram.hpp"
 
 namespace trase {
@@ -68,12 +63,10 @@ void Histogram::draw_frames(AnimatedBackend &backend) {
   for (int i = 0; i < m_data[0].rows(); ++i) {
     for (size_t f = 0; f < m_times.size(); ++f) {
       auto y_data = m_data[f].begin<Aesthetic::y>()[i];
-      auto y_min = m_axis.to_display<Aesthetic::y>(y_data);
-      auto y_max = m_axis.to_display<Aesthetic::y>(0.f);
-      auto x_min = m_axis.to_display<Aesthetic::x>(i * dx + x0);
-      auto x_max = m_axis.to_display<Aesthetic::x>((i + 1.f) * dx + x0);
-      std::cout << "adding rect with "
-                << bfloat2_t({x_min, y_min}, {x_max, y_max}) << std::endl;
+      auto y_min = m_axis->to_display<Aesthetic::y>(y_data);
+      auto y_max = m_axis->to_display<Aesthetic::y>(0.f);
+      auto x_min = m_axis->to_display<Aesthetic::x>(i * dx + x0);
+      auto x_max = m_axis->to_display<Aesthetic::x>((i + 1.f) * dx + x0);
       backend.add_animated_rect(bfloat2_t({x_min, y_min}, {x_max, y_max}),
                                 m_times[f]);
     }
@@ -101,21 +94,21 @@ template <typename Backend> void Histogram::draw_plot(Backend &backend) {
     // exactly on a single frame
     auto y_data = m_data[f].begin<Aesthetic::y>();
     for (int i = 0; i < m_data[0].rows(); ++i) {
-      auto x_min = m_axis.to_display<Aesthetic::x>(i * dx + x0);
-      auto x_max = m_axis.to_display<Aesthetic::x>((i + 1.f) * dx + x0);
-      auto y_min = m_axis.to_display<Aesthetic::y>(y_data[i]);
-      auto y_max = m_axis.to_display<Aesthetic::y>(0.f);
+      auto x_min = m_axis->to_display<Aesthetic::x>(i * dx + x0);
+      auto x_max = m_axis->to_display<Aesthetic::x>((i + 1.f) * dx + x0);
+      auto y_min = m_axis->to_display<Aesthetic::y>(y_data[i]);
+      auto y_max = m_axis->to_display<Aesthetic::y>(0.f);
       backend.rect(bfloat2_t({x_min, y_min}, {x_max, y_max}));
     }
   } else {
     auto y0 = m_data[f - 1].begin<Aesthetic::y>();
     auto y1 = m_data[f].begin<Aesthetic::y>();
     for (int i = 0; i < m_data[0].rows(); ++i) {
-      auto x_min = m_axis.to_display<Aesthetic::x>(i * dx + x0);
-      auto x_max = m_axis.to_display<Aesthetic::x>((i + 1.f) * dx + x0);
-      auto y_min = w1 * m_axis.to_display<Aesthetic::y>(y1[i]) +
-                   w2 * m_axis.to_display<Aesthetic::y>(y0[i]);
-      auto y_max = m_axis.to_display<Aesthetic::y>(0.f);
+      auto x_min = m_axis->to_display<Aesthetic::x>(i * dx + x0);
+      auto x_max = m_axis->to_display<Aesthetic::x>((i + 1.f) * dx + x0);
+      auto y_min = w1 * m_axis->to_display<Aesthetic::y>(y1[i]) +
+                   w2 * m_axis->to_display<Aesthetic::y>(y0[i]);
+      auto y_max = m_axis->to_display<Aesthetic::y>(0.f);
       backend.rect(bfloat2_t({x_min, y_min}, {x_max, y_max}));
     }
   }

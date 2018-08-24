@@ -51,13 +51,15 @@ Figure::Figure(const std::array<float, 2> &pixels)
 }
 
 std::shared_ptr<Axis> Figure::axis() noexcept {
-  m_axes.emplace_back(
-      std::make_shared<Axis>(*this, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f})));
-  m_axes.back()->resize(m_pixels);
-  m_children.push_back(m_axes.back().get());
-  return m_axes.back();
+  auto new_axis =
+      std::make_shared<Axis>(this, bfloat2_t({0.1f, 0.1f}, {0.9f, 0.9f}));
+  new_axis->resize(m_pixels);
+  m_children.push_back(new_axis);
+  return new_axis;
 }
 
-std::shared_ptr<Axis> Figure::axis(int n) { return m_axes.at(n); }
+std::shared_ptr<Axis> Figure::axis(int n) {
+  return std::dynamic_pointer_cast<Axis>(m_children.at(n));
+}
 
 } // namespace trase

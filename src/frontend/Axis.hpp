@@ -36,20 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AXIS_H_
 #define AXIS_H_
 
-// forward declare Axis so can be stored in Plot1D
-namespace trase {
-class Axis;
-}
-
 #include <array>
 #include <memory>
 
 #include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
-#include "frontend/Figure.hpp"
-#include "frontend/Histogram.hpp"
-#include "frontend/Line.hpp"
-#include "frontend/Points.hpp"
+#include "frontend/Plot1D.hpp"
+
 #include "util/Colors.hpp"
 #include "util/Exception.hpp"
 
@@ -87,8 +80,6 @@ struct TickInfo {
 ///     * a label for the y axis
 ///     * a legend that identifies each Plot1D
 class Axis : public Drawable {
-  std::vector<std::shared_ptr<Plot1D>> m_plot1d;
-
   /// limits of all children plots
   Limits m_limits;
 
@@ -133,7 +124,9 @@ public:
   /// \param figure the parent \Drawable object
   /// \param area the drawable area assigned to this Drawable as a ratio of the
   /// parent size
-  Axis(Figure &figure, const bfloat2_t &area);
+  Axis(Drawable *parent, const bfloat2_t &area);
+
+  TRASE_DISPATCH_BACKENDS
 
   /// returns the current Aesthetic limits
   const Limits &limits() const { return m_limits; }
@@ -176,13 +169,7 @@ public:
   /// \return shared pointer to the new plot
   template <typename T1, typename T2>
   std::shared_ptr<Plot1D> plot(const std::vector<T1> &x,
-                               const std::vector<T2> &y) {
-    if (x.size() != y.size()) {
-      throw Exception("x and y vector sizes do not match");
-    }
-    return plot_impl(std::make_shared<Line>(*this), Transform(Identity()),
-                     DataWithAesthetic().x(x).y(y));
-  }
+                               const std::vector<T2> &y);
 
   /// Create a new Points plot and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
@@ -190,9 +177,7 @@ public:
   /// \return shared pointer to the new plot
   std::shared_ptr<Plot1D>
   points(const DataWithAesthetic &data,
-         const Transform &transform = Transform(Identity())) {
-    return plot_impl(std::make_shared<Points>(*this), transform, data);
-  }
+         const Transform &transform = Transform(Identity()));
 
   /// Create a new Line and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
@@ -200,9 +185,7 @@ public:
   /// \return shared pointer to the new plot
   std::shared_ptr<Plot1D>
   line(const DataWithAesthetic &data,
-       const Transform &transform = Transform(Identity())) {
-    return plot_impl(std::make_shared<Line>(*this), transform, data);
-  }
+       const Transform &transform = Transform(Identity()));
 
   /// Create a new histogram and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
@@ -210,9 +193,7 @@ public:
   /// \return shared pointer to the new plot
   std::shared_ptr<Plot1D>
   histogram(const DataWithAesthetic &data,
-            const Transform &transform = Transform(BinX())) {
-    return plot_impl(std::make_shared<Histogram>(*this), transform, data);
-  }
+            const Transform &transform = Transform(BinX()));
 
   /// Return a shared pointer to an existing plot.
   /// Throws std::out_of_range exception if out of range.
@@ -225,13 +206,13 @@ public:
 
   /// convert from display coordinates to data coordinates, using the given
   /// Aesthetic
-  template <typename Aesthetic> float from_display(const float i) const {
+  template <typename Aesthetic> float from_display(float i) const {
     return Aesthetic::from_display(i, m_limits, m_pixels);
   }
 
   /// convert from data coordinates to display coordinates, using the given
   /// Aesthetic
-  template <typename Aesthetic> float to_display(const float i) const {
+  template <typename Aesthetic> float to_display(float i) const {
     return Aesthetic::to_display(i, m_limits, m_pixels);
   }
 
@@ -268,5 +249,7 @@ private:
 };
 
 } // namespace trase
+
+#include "frontend/Axis.tcc"
 
 #endif // AXIS_H_

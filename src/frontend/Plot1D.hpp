@@ -36,11 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PLOT1D_H_
 #define PLOT1D_H_
 
-// forward declare Axis so it can be stored in plot1d
-namespace trase {
-class Axis;
-} // namespace trase
-
 #include <memory>
 #include <vector>
 
@@ -52,6 +47,9 @@ class Axis;
 #include "util/Exception.hpp"
 
 namespace trase {
+
+// forward declare to be able to store a pointer in Axis
+class Axis;
 
 class Plot1D : public Drawable {
 protected:
@@ -71,17 +69,14 @@ protected:
   /// min/max limits of m_data across all frames
   Limits m_limits;
 
-  /// parent axis
-  Axis &m_axis;
-
   /// transform
   Transform m_transform;
 
-public:
-  explicit Plot1D(Axis &axis);
+  /// parent axis
+  Axis *m_axis;
 
-  // make it polymorphic
-  virtual ~Plot1D() = default;
+public:
+  explicit Plot1D(Axis *parent);
 
   template <typename T1, typename T2>
   void add_frame(const std::vector<T1> &x, const std::vector<T2> &y,
@@ -135,5 +130,7 @@ public:
 };
 
 } // namespace trase
+
+#include "frontend/Plot1D.tcc"
 
 #endif // PLOT1D_H_

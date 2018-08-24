@@ -31,12 +31,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file Plot1DDraw.hpp
-///
-/// How to draw a Plot1D
-///
-/// This is included only when compiling the backends
-
 #include <algorithm>
 
 #include "frontend/Plot1D.hpp"

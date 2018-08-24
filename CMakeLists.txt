@@ -135,6 +135,7 @@ endif ()
 set (trase_headers
     src/trase.hpp
     src/backend/Backend.hpp
+    src/backend/BackendSVG.hpp
     src/frontend/Axis.hpp
     src/frontend/Data.hpp
     src/frontend/Data.tcc
@@ -142,7 +143,6 @@ set (trase_headers
     src/frontend/Figure.hpp
     src/frontend/Plot1D.hpp
     src/frontend/Transform.hpp
-    src/frontend/Geometry.hpp
     src/frontend/Line.hpp
     src/frontend/Points.hpp
     src/frontend/Histogram.hpp
@@ -154,8 +154,10 @@ set (trase_headers
     src/util/Vector.hpp
     )
 
+
 set (trase_source
     src/backend/Backend.cpp
+    src/backend/BackendSVG.cpp
     src/frontend/Axis.cpp
     src/frontend/Data.cpp
     src/frontend/Drawable.cpp
@@ -167,14 +169,10 @@ set (trase_source
     src/util/Style.cpp
     )
 
-set (trase_draw_headers
-    src/frontend/AxisDraw.hpp
-    src/frontend/DrawableDraw.hpp
-    src/frontend/FigureDraw.hpp
-    src/frontend/Plot1DDraw.hpp
-    src/frontend/PointsDraw.hpp
-    src/frontend/LineDraw.hpp
-    )
+if (trase_BUILD_OPENGL)
+    list(APPEND trase_headers src/backend/BackendGL.hpp)
+    list(APPEND trase_source src/backend/BackendGL.cpp)
+endif()
 
 
 add_library (trase
@@ -182,13 +180,23 @@ add_library (trase
     ${trase_headers}
     )
 
-target_include_directories (trase PRIVATE
+target_include_directories (trase PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include>)
 
 if (WIN32)
     target_link_libraries (trase PUBLIC dirent)
 endif ()
+
+
+target_compile_definitions (trase PRIVATE TRASE_SOURCE_DIR="${trase_SOURCE_DIR}" TRASE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}")
+
+
+if (trase_BUILD_OPENGL)
+    target_compile_definitions (trase PRIVATE TRASE_BACKEND_GL)
+    target_link_libraries (trase PUBLIC glext nanovg imgui)
+endif ()
+
 
 set (trase_fonts
     font/entypo.ttf
@@ -198,42 +206,13 @@ set (trase_fonts
     font/Roboto-Regular.ttf
     )
 
-target_compile_definitions (trase PRIVATE TRASE_SOURCE_DIR="${trase_SOURCE_DIR}" TRASE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}")
-
-
-if (trase_BUILD_OPENGL)
-    set (trase_gl_headers
-        src/backend/BackendGL.hpp
-        )
-    add_library (backendGL
-        ${trase_draw_headers}
-        ${trase_gl_headers}
-        src/backend/BackendGL.cpp
-        )
-
-    target_include_directories (backendGL PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-        $<INSTALL_INTERFACE:include>)
-    target_link_libraries (backendGL PUBLIC trase glext nanovg imgui)
-endif ()
-
-set (trase_svg_headers
-    src/backend/BackendSVG.hpp
-    )
-add_library (backendSVG
-    ${trase_draw_headers}
-    ${trase_svg_headers}
-    src/backend/BackendSVG.cpp
-    )
-target_include_directories (backendSVG PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src> $<INSTALL_INTERFACE:include>)
-target_link_libraries (backendSVG PUBLIC trase)
 
 enable_testing ()
 
 if (trase_BUILD_OPENGL)
     add_executable (interactive_tst tests/TestInteractive.cpp)
     target_include_directories (interactive_tst PRIVATE tests)
-    target_link_libraries (interactive_tst PRIVATE trase backendGL)
+    target_link_libraries (interactive_tst PRIVATE trase)
 endif ()
 
 add_executable (
@@ -253,7 +232,7 @@ add_executable (
     tests/TestVector.cpp
 )
 target_include_directories (trase_tst PRIVATE tests)
-target_link_libraries (trase_tst PRIVATE trase backendSVG)
+target_link_libraries (trase_tst PRIVATE trase)
 add_test (the_trase_tst trase_tst)
 
 
@@ -301,12 +280,12 @@ if (trase_ENABLE_COVERAGE)
 endif ()
 
 # install stuff
-set (install-targets trase backendSVG)
+set (install-targets trase)
 if (WIN32)
     list (APPEND install-targets dirent)
 endif ()
 if (trase_BUILD_OPENGL)
-    list (APPEND install-targets backendGL glext nanovg imgui)
+    list (APPEND install-targets glext nanovg imgui)
 endif ()
 
 set (install-headers ${trase_headers} ${trase_svg_headers})

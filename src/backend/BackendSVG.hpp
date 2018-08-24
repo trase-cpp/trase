@@ -119,12 +119,17 @@ public:
     stroke_width(1);
   }
 
+  TRASE_BACKEND_VISITABLE()
+  TRASE_ANIMATED_BACKEND_VISITABLE()
+
   void init(float width, float height, float time_span,
             const char *name) noexcept;
 
   void finalise() noexcept;
 
   inline bool is_interactive() { return false; }
+
+  inline vfloat2_t get_mouse_pos() { return vfloat2_t(0, 0); }
 
   inline void scissor(const bfloat2_t &x) {}
 
@@ -370,7 +375,7 @@ public:
   inline void import_web_font(const std::string &url) { m_web_font = url; }
 
   inline void font_blur(const float blur) {}
-  inline void text_align(const int align) {
+  inline void text_align(const unsigned int align) {
     std::string align_text;
     if (align & ALIGN_LEFT) {
       align_text = "start";

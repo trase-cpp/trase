@@ -42,7 +42,10 @@ namespace trase {
 
 class Line : public Plot1D {
 public:
-  explicit Line(Axis &axis) : Plot1D(axis) {}
+  explicit Line(Axis *parent) : Plot1D(parent) {}
+
+  TRASE_DISPATCH_BACKENDS
+
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
 
@@ -56,5 +59,7 @@ private:
 };
 
 } // namespace trase
+
+#include "frontend/Line.tcc"
 
 #endif // LINE_H_

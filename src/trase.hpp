@@ -36,6 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TRASE_H_
 #define TRASE_H_
 
+#include "backend/BackendSVG.hpp"
+#ifdef TRASE_BACKEND_GL
+#include "backend/BackendGL.hpp"
+#endif
+
 #include "frontend/Figure.hpp"
 
 #endif // TRASE_H_

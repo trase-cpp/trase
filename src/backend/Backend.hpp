@@ -44,11 +44,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+class Drawable;
+
 /// a base class for all the backends that support drawing a single frame
-class Backend {};
+class Backend {
+public:
+  // Declare overloads for each kind of a Drawable to dispatch
+  virtual void accept(Drawable &drawable, float time) = 0;
+};
+
+#define TRASE_BACKEND_VISITABLE()                                              \
+  void accept(Drawable &drawable, float time) override {                       \
+    drawable.dispatch(*this, time);                                            \
+  }
 
 /// a base class for all the backends that support animation over time
-class AnimatedBackend : public Backend {};
+class AnimatedBackend : public Backend {
+public:
+  // Declare overloads for each kind of a Drawable to dispatch
+  virtual void accept(Drawable &drawable) = 0;
+};
+
+#define TRASE_ANIMATED_BACKEND_VISITABLE()                                     \
+  void accept(Drawable &drawable) override { drawable.dispatch(*this); }
 
 // pi constant
 const float pi =
@@ -168,5 +186,7 @@ private:
 };
 
 } // namespace trase
+
+#include "frontend/Drawable.hpp"
 
 #endif // BACKEND_H_
