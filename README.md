@@ -71,7 +71,7 @@ For example, the above svg image was generated with the following code.
   std::ofstream out;
   out.open("test_figure.svg");
   BackendSVG backend(out);
-  fig->serialise(backend);
+  fig->draw(backend);
   out.close();
 ```
 
