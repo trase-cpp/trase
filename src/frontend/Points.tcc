@@ -46,23 +46,39 @@ void Points::draw(Backend &backend, const float time) {
   draw_plot(backend);
 }
 
+template <typename T> bool check_aesthetic(const DataWithAesthetic &data) {
+  bool have_aes = true;
+  try {
+    data.begin<T>();
+  } catch (Exception) {
+    have_aes = false;
+  }
+  return have_aes;
+}
+
 template <typename AnimatedBackend>
 void Points::draw_frames(AnimatedBackend &backend) {
+  // TODO: assumption that same aesthetics are provided for each frame
+  bool have_color = check_aesthetic<Aesthetic::color>(m_data[0]);
+  bool have_size = check_aesthetic<Aesthetic::size>(m_data[0]);
 
   auto to_pixel = [&](auto x, auto y, auto c, auto s) {
-    return Vector<float, 4>{m_axis->to_display<Aesthetic::x>(x),
-                            m_axis->to_display<Aesthetic::y>(y),
-                            m_axis->to_display<Aesthetic::color>(c),
-                            m_axis->to_display<Aesthetic::size>(s)};
+    // if color or size is not provided use the bottom of the scale
+    return Vector<float, 4>{
+        m_axis->to_display<Aesthetic::x>(x),
+        m_axis->to_display<Aesthetic::y>(y),
+        have_color ? m_axis->to_display<Aesthetic::color>(c) : 0.f,
+        have_size ? m_axis->to_display<Aesthetic::size>(s) : 1.f};
   };
 
   backend.stroke_width(0);
   for (int i = 0; i < m_data[0].rows(); ++i) {
     for (size_t f = 0; f < m_times.size(); ++f) {
-      auto p = to_pixel(m_data[f].begin<Aesthetic::x>()[i],
-                        m_data[f].begin<Aesthetic::y>()[i],
-                        m_data[f].begin<Aesthetic::color>()[i],
-                        m_data[f].begin<Aesthetic::size>()[i]);
+      auto p =
+          to_pixel(m_data[f].begin<Aesthetic::x>()[i],
+                   m_data[f].begin<Aesthetic::y>()[i],
+                   have_color ? m_data[f].begin<Aesthetic::color>()[i] : 0.f,
+                   have_size ? m_data[f].begin<Aesthetic::size>()[i] : 0.f);
 
       backend.fill_color(m_colormap->to_color(p[2]));
       backend.add_animated_circle({p[0], p[1]}, p[3], m_times[f]);
@@ -77,21 +93,28 @@ template <typename Backend> void Points::draw_plot(Backend &backend) {
   const float w1 = m_frame_info.w1;
   const float w2 = m_frame_info.w2;
 
+  // TODO: assumption that same aesthetics are provided for each frame
+  bool have_color = check_aesthetic<Aesthetic::color>(m_data[f]);
+  bool have_size = check_aesthetic<Aesthetic::size>(m_data[f]);
+
   backend.stroke_width(0);
 
   auto to_pixel = [&](auto x, auto y, auto c, auto s) {
-    return Vector<float, 4>{m_axis->to_display<Aesthetic::x>(x),
-                            m_axis->to_display<Aesthetic::y>(y),
-                            m_axis->to_display<Aesthetic::color>(c),
-                            m_axis->to_display<Aesthetic::size>(s)};
+    // if color or size is not provided use the bottom of the scale
+    return Vector<float, 4>{
+        m_axis->to_display<Aesthetic::x>(x),
+        m_axis->to_display<Aesthetic::y>(y),
+        have_color ? m_axis->to_display<Aesthetic::color>(c) : 0.f,
+        have_size ? m_axis->to_display<Aesthetic::size>(s) : 1.f};
   };
 
   if (w2 == 0.0f) {
     // exactly on a single frame
     auto x = m_data[f].begin<Aesthetic::x>();
     auto y = m_data[f].begin<Aesthetic::y>();
-    auto color = m_data[f].begin<Aesthetic::color>();
-    auto size = m_data[f].begin<Aesthetic::size>();
+    // if color or size not provided give a dummy iterator here, not used
+    auto color = have_color ? m_data[f].begin<Aesthetic::color>() : x;
+    auto size = have_size ? m_data[f].begin<Aesthetic::size>() : x;
     for (int i = 0; i < m_data[0].rows(); ++i) {
       const auto p = to_pixel(x[i], y[i], color[i], size[i]);
       backend.fill_color(m_colormap->to_color(p[2]));
@@ -101,12 +124,14 @@ template <typename Backend> void Points::draw_plot(Backend &backend) {
     // between two frames
     auto x0 = m_data[f - 1].begin<Aesthetic::x>();
     auto y0 = m_data[f - 1].begin<Aesthetic::y>();
-    auto color0 = m_data[f - 1].begin<Aesthetic::color>();
-    auto size0 = m_data[f - 1].begin<Aesthetic::size>();
+    // if color or size not provided give a dummy iterator here, not used
+    auto color0 = have_color ? m_data[f - 1].begin<Aesthetic::color>() : x0;
+    auto size0 = have_size ? m_data[f - 1].begin<Aesthetic::size>() : x0;
     auto x1 = m_data[f].begin<Aesthetic::x>();
     auto y1 = m_data[f].begin<Aesthetic::y>();
-    auto color1 = m_data[f].begin<Aesthetic::color>();
-    auto size1 = m_data[f].begin<Aesthetic::size>();
+    // if color or size not provided give a dummy iterator here, not used
+    auto color1 = have_color ? m_data[f].begin<Aesthetic::color>() : x1;
+    auto size1 = have_size ? m_data[f].begin<Aesthetic::size>() : x1;
     for (int i = 0; i < m_data[0].rows(); ++i) {
       const auto p = w1 * to_pixel(x1[i], y1[i], color1[i], size1[i]) +
                      w2 * to_pixel(x0[i], y0[i], color0[i], size0[i]);

@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of the Oxford RSE C++ Template project.
+This file is part of trase.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,45 +31,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "catch.hpp"
+/// \file Style.hpp
 
-//! [line example includes]
+#ifndef DUMMY_DRAW_H_
+#define DUMMY_DRAW_H_
+
 #include "trase.hpp"
-#include <fstream>
-//! [line example includes]
+#include <memory>
+#include <string>
 
-using namespace trase;
+namespace trase {
+struct DummyDraw {
+  static int m_num_dummy_draw;
+  static void draw(const std::string &base_name, std::shared_ptr<Figure> &fig);
+};
+} // namespace trase
 
-TEST_CASE("line example", "[line]") {
-  /// \page line_example Example of using the line geometry
-  ///  This is an example for the line geometry
-  ///
-  /// \snippet tests/TestLine.cpp line example includes
-  /// \snippet tests/TestLine.cpp line example
-
-  /// [line example]
-  // create figure and axis
-  auto fig = figure();
-  auto ax = fig->axis();
-
-  // create x and y vectors and set y = sin(x)
-  const int n = 100;
-  std::vector<float> x(n);
-  std::vector<float> y(n);
-  for (int i = 0; i < n; ++i) {
-    x[i] = 6.28f * static_cast<float>(i) / n;
-    y[i] = std::sin(x[i]);
-  }
-
-  // create a trase dataset and then plot it using a line geometry
-  auto data = create_data().x(x).y(y);
-  auto plt = ax->line(data);
-
-  // output to svg
-  std::ofstream out;
-  out.open("example_line.svg");
-  BackendSVG backend(out);
-  fig->draw(backend);
-  out.close();
-  /// [line example]
-}
+#endif // DUMMY_DRAW_H_

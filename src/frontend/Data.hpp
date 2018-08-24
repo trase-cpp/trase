@@ -180,8 +180,11 @@ public:
   /// widths)
   template <typename Aesthetic> void set(float min, float max);
 
-  /// returns number of rows in the data let
+  /// returns number of rows in the data set
   int rows() const;
+
+  /// returns number of cols in the data set
+  int cols() const;
 
   /// returns the min/max limits of the data
   const Limits &limits() const;

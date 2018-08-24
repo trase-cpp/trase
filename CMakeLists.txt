@@ -193,7 +193,7 @@ target_compile_definitions (trase PRIVATE TRASE_SOURCE_DIR="${trase_SOURCE_DIR}"
 
 
 if (trase_BUILD_OPENGL)
-    target_compile_definitions (trase PRIVATE TRASE_BACKEND_GL)
+    target_compile_definitions (trase PUBLIC TRASE_BACKEND_GL)
     target_link_libraries (trase PUBLIC glext nanovg imgui)
 endif ()
 
@@ -217,6 +217,8 @@ endif ()
 
 add_executable (
     trase_tst
+    tests/DummyDraw.hpp
+    tests/DummyDraw.cpp
     tests/TestAxis.cpp
     tests/TestData.cpp
     tests/TestBackendSVG.cpp
@@ -226,6 +228,8 @@ add_executable (
     tests/TestFontManager.cpp
     tests/TestPlot1D.cpp
     tests/TestLine.cpp
+    tests/TestHistogram.cpp
+    tests/TestPoints.cpp
     tests/TestUserConcepts.cpp
     tests/TestStyle.cpp
     tests/TestTransformMatrix.cpp

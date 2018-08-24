@@ -51,6 +51,8 @@ ColumnIterator RawData::end(const int i) const {
 
 int DataWithAesthetic::rows() const { return m_data->rows(); }
 
+int DataWithAesthetic::cols() const { return m_data->cols(); }
+
 const Limits &DataWithAesthetic::limits() const { return m_limits; }
 
 template <typename Aesthetic> ColumnIterator DataWithAesthetic::begin() const {

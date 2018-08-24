@@ -84,6 +84,16 @@ void Axis::update_tick_information() {
   bfloat2_t xy_limits(
       {m_limits.bmin[Aesthetic::x::index], m_limits.bmin[Aesthetic::y::index]},
       {m_limits.bmax[Aesthetic::x::index], m_limits.bmax[Aesthetic::y::index]});
+
+  // if any limits are empty (no values) use a sensible default (0 -> 1)
+  for (int i = 0; i < 2; ++i) {
+    if (xy_limits.bmax[i] < xy_limits.bmin[i]) {
+      xy_limits.bmin[i] = 0.f;
+      xy_limits.bmax[i] = 1.f;
+    }
+  }
+
+  // work out a sensible spacing between ticks, based on the number of ticks
   const vfloat2_t tick_dx =
       round_off(xy_limits.delta() / n_ticks, m_sig_digits);
 

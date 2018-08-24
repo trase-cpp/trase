@@ -31,107 +31,97 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This tells Catch to provide a main() - only do this in one cpp file
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include <random>
-#include <type_traits>
+#include "DummyDraw.hpp"
 
+//! [points example includes]
 #include "trase.hpp"
+#include <fstream>
+#include <random>
+//! [points example includes]
 
 using namespace trase;
 
-// This tests the output of the `get_nth_prime` function
-TEST_CASE("interactive test (only run by a human)", "[interactive]") {
+TEST_CASE("points example", "[points]") {
+  /// \page line_example Example of using the points geometry
+  ///  This is an example for the points geometry
+  ///
+  /// \snippet tests/TestPoints.cpp points example includes
+  /// \snippet tests/TestPoints.cpp points example
 
+  /// [points example]
   auto fig = figure();
   auto ax = fig->axis();
   const int n = 100;
-  std::vector<float> x(n);
-  std::vector<float> y(n);
-  std::vector<float> r(n);
-  for (int i = 0; i < n; ++i) {
-    x[i] = static_cast<float>(i) * 6.28 / n;
-    y[i] = std::sin(5 * x[i]);
-    r[i] = 0.1;
-  }
-  auto static_plot = ax->plot(x, y);
-  static_plot->set_label("static");
-  auto moving_plot = ax->plot(x, y);
-  moving_plot->set_label("moving");
+  std::vector<float> x(n), y(n), r(n), c(n);
+  std::default_random_engine gen;
+  std::normal_distribution<float> normal(0, 1);
+  std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+  std::generate(y.begin(), y.end(), [&]() { return normal(gen); });
+  std::generate(r.begin(), r.end(), [&]() { return normal(gen); });
+  std::generate(c.begin(), c.end(), [&]() { return normal(gen); });
 
-  auto data = moving_plot->get_data(0).color(r).size(r);
+  auto data = create_data().x(x).y(y).size(r).color(c);
 
   auto points = ax->points(data);
   points->set_label("points");
 
   float time = 0.0;
 
-  auto do_plot = [&](const float theta) {
-    time += 0.3;
-    for (int i = 0; i < n; ++i) {
-      y[i] = std::sin(theta * x[i]);
-      r[i] = time * 0.1;
-    }
-    auto data = create_data().x(x).y(y).color(r).size(r);
-    moving_plot->add_frame(data, time);
+  auto do_plot = [&]() {
+    time += 0.3f;
+    std::normal_distribution<float> normal(0, 1);
+    std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+    std::generate(y.begin(), y.end(), [&]() { return normal(gen); });
+    std::generate(r.begin(), r.end(), [&]() { return normal(gen); });
+    std::generate(c.begin(), c.end(), [&]() { return normal(gen); });
+    auto data = create_data().x(x).y(y).size(r).color(c);
     points->add_frame(data, time);
   };
 
   for (int i = 0; i < 5; ++i) {
-    const float theta = 5 - i;
-    do_plot(theta);
-  }
-  for (int i = 4; i >= 0; --i) {
-    const float theta = 5 - i;
-    do_plot(theta);
+    do_plot();
   }
 
   ax->xlabel("x");
   ax->ylabel("y");
-  ax->title("the interactive test");
+  ax->title("points test");
   ax->legend();
 
-  BackendGL backend;
-  fig->show(backend);
+  // output to svg
+  std::ofstream out;
+  out.open("example_points.svg");
+  BackendSVG backend(out);
+  fig->draw(backend);
+  out.close();
+  /// [points example]
 }
 
-TEST_CASE("histogram", "[interactive]") {
-
+TEST_CASE("points creation", "[points]") {
   auto fig = figure();
   auto ax = fig->axis();
-  const int n = 100;
-  std::vector<float> x(n);
-  std::default_random_engine gen;
-  std::normal_distribution<float> normal(0, 1);
-  std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
-
-  auto data = create_data().x(x);
-
-  auto hist = ax->histogram(data);
-  hist->set_label("hist");
-
-  float time = 0.0;
-
-  auto do_plot = [&](const float theta) {
-    time += 0.3;
-    std::normal_distribution<float> normal(theta, 1);
-    std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
-    auto data = create_data().x(x);
-    hist->add_frame(data, time);
-  };
-
+  std::vector<float> x, y, r, c;
+  ax->points(create_data().x(x).y(y));
+  DummyDraw::draw("points", fig);
+  x.resize(1);
+  y.resize(1);
+  r.resize(1);
+  x[0] = 0.1f;
+  y[0] = 0.2f;
+  r[0] = 1.0f;
+  ax->points(create_data().x(x).y(y).size(r));
+  DummyDraw::draw("points", fig);
+  x.resize(5);
+  y.resize(5);
+  r.resize(5);
+  c.resize(5);
   for (int i = 0; i < 5; ++i) {
-    const float theta = i / 5.f;
-    do_plot(theta);
+    x[1] = 0.1f * i;
+    y[1] = 0.1f * i;
+    r[1] = 0.1f * i;
+    c[1] = 0.1f * i;
   }
-
-  ax->xlabel("x");
-  ax->ylabel("y");
-  ax->title("histogram test");
-  ax->legend();
-
-  BackendGL backend;
-  fig->show(backend);
+  ax->points(create_data().x(x).y(y).size(r).color(c));
+  DummyDraw::draw("points", fig);
 }

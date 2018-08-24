@@ -49,6 +49,13 @@ BinX::BinX(const int number_of_bins, const float min, const float max)
 DataWithAesthetic BinX::operator()(const DataWithAesthetic &data) {
   auto x_begin = data.begin<Aesthetic::x>();
   auto x_end = data.end<Aesthetic::x>();
+
+  // if input data is empty then create an empty y aesthetic
+  if (std::distance(x_begin, x_end) == 0) {
+    std::vector<float> y;
+    return create_data().y(y);
+  }
+
   auto minmax = std::minmax_element(x_begin, x_end);
 
   if (m_span.is_empty()) {
@@ -77,7 +84,14 @@ DataWithAesthetic BinX::operator()(const DataWithAesthetic &data) {
     // Biometrika, 66:605-610.
     const float dx =
         3.49f * stdev * std::pow(static_cast<float>(data.rows()), -0.33f);
-    m_number_of_bins = static_cast<int>(std::round(m_span.delta()[0] / dx));
+
+    // if calculated dx is too small then set number of bins to pre-determined
+    // number
+    if (dx > m_span.delta()[0] / 200.f) {
+      m_number_of_bins = static_cast<int>(std::round(m_span.delta()[0] / dx));
+    } else {
+      m_number_of_bins = 200;
+    }
   }
 
   const float dx = m_span.delta()[0] / m_number_of_bins;

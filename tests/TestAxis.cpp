@@ -33,9 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
+#include <fstream>
 #include <limits>
 #include <type_traits>
 
+#include "DummyDraw.hpp"
 #include "trase.hpp"
 
 using namespace trase;
@@ -54,15 +56,16 @@ TEST_CASE("check plot methods can be invoked", "[axis]") {
   auto fig = figure();
   auto ax = fig->axis();
 
-  CHECK_NOTHROW(ax->plot(three_ints_a, three_ints_b));
-  CHECK_NOTHROW(ax->plot(three_ints_a, three_ints_b));
+  CHECK_NOTHROW(ax->line(create_data().x(three_ints_a).y(three_ints_b)));
+  CHECK_NOTHROW(ax->line(create_data().x(three_ints_a).y(three_ints_b)));
   CHECK_NOTHROW(ax->plot(0));
   CHECK_NOTHROW(ax->plot(1));
 
   CHECK_THROWS_AS(ax->plot(2), std::out_of_range);
   CHECK_THROWS_AS(ax->plot(-1), std::out_of_range);
 
-  CHECK_THROWS_AS(ax->plot(three_ints_a, four_ints), Exception);
+  CHECK_THROWS_AS(ax->line(create_data().x(three_ints_a).y(four_ints)),
+                  Exception);
 }
 
 TEST_CASE("check limit setting", "[axis]") {
@@ -103,13 +106,34 @@ TEST_CASE("labels", "[axis]") {
   auto ax = fig->axis();
   const std::vector<float> x = {1.f, 2.f, 3.f};
   const std::vector<float> y = {1.f, 2.f, 3.f};
-  auto plot1 = ax->plot(x, y);
+  auto data = create_data().x(x).y(y);
+  auto plot1 = ax->line(data);
   plot1->set_label("plot1");
   CHECK(plot1->get_label() == "plot1");
-  auto plot2 = ax->plot(x, y);
+  auto plot2 = ax->line(data);
   plot2->set_label("plot2");
   CHECK(plot1->get_label() == "plot1");
   CHECK(plot2->get_label() == "plot2");
-  auto plot3 = ax->plot(x, y);
+  auto plot3 = ax->line(data);
   CHECK(plot3->get_label() == "");
+}
+
+TEST_CASE("set number of ticks", "[axis]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  const std::vector<float> x = {1.f, 2.f, 3.f};
+  const std::vector<float> y = {1.f, 2.f, 3.f};
+  auto data = create_data().x(x).y(y);
+  auto line = ax->line(data);
+  CHECK(ax->get_ticks()[0] == 0);
+  CHECK(ax->get_ticks()[1] == 0);
+  DummyDraw::draw("axis", fig);
+  ax->set_ticks({10, 0});
+  DummyDraw::draw("axis", fig);
+  CHECK(ax->get_ticks()[0] == 10);
+  CHECK(ax->get_ticks()[1] == 0);
+  ax->set_ticks({10, 10});
+  DummyDraw::draw("axis", fig);
+  CHECK(ax->get_ticks()[0] == 10);
+  CHECK(ax->get_ticks()[1] == 10);
 }
