@@ -58,6 +58,8 @@ std::shared_ptr<Axis> Figure::axis() noexcept {
   return new_axis;
 }
 
+std::shared_ptr<Axis> axis(int i, int j) noexcept;
+
 std::shared_ptr<Axis> Figure::axis(int n) {
   return std::dynamic_pointer_cast<Axis>(m_children.at(n));
 }

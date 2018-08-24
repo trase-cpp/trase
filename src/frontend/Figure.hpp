@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <array>
 #include <memory>
+#include <unordered_map>
 
 #include "frontend/Axis.hpp"
 #include "frontend/Drawable.hpp"
@@ -52,6 +53,13 @@ class Figure : public Drawable {
   /// a unique id for this figure
   int m_id;
 
+  /// number of axis subplots in each direction
+  vint2_t m_axis_layout;
+
+  /// axis subplots
+  std::unordered_map<vint2_t, std::shared_ptr<Axis>, vint2_hash, vint2_equal>
+      m_axis_subplots;
+
   /// total number of figures currentl created
   static int m_num_windows;
 
@@ -63,9 +71,15 @@ public:
 
   TRASE_DISPATCH_BACKENDS
 
-  /// Create a new axis and return a shared pointer to it
+  /// Create a new axis at position (0,0) and return a shared pointer to it
+  /// If the axis already exists returns a pointer to the existing axis
   /// \return a shared pointer to the new axis
   std::shared_ptr<Axis> axis() noexcept;
+
+  /// Create a new axis at position (\p i, \p j) and return a shared pointer to
+  /// it If the axis already exists returns a pointer to the existing axis
+  /// \return a shared pointer to the new axis
+  std::shared_ptr<Axis> axis(int i, int j) noexcept;
 
   /// Return a shared pointer to an existing axis.
   /// Throws std::out_of_range exception if out of range.
