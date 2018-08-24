@@ -40,8 +40,8 @@ bool BackendSVG::mouseover() const noexcept {
          !m_onmouseout_tooltip.empty();
 }
 
-void BackendSVG::init(const float width, const float height,
-                      const float time_span, const char *name) noexcept {
+void BackendSVG::init(const float width, const float height, const char *name,
+                      const float time_span) noexcept {
   m_time_span = time_span;
   m_out << R"del(<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"

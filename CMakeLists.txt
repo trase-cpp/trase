@@ -193,7 +193,7 @@ target_compile_definitions (trase PRIVATE TRASE_SOURCE_DIR="${trase_SOURCE_DIR}"
 
 
 if (trase_BUILD_OPENGL)
-    target_compile_definitions (trase PRIVATE TRASE_BACKEND_GL)
+    target_compile_definitions (trase PUBLIC TRASE_BACKEND_GL)
     target_link_libraries (trase PUBLIC glext nanovg imgui)
 endif ()
 

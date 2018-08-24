@@ -122,8 +122,8 @@ public:
   TRASE_BACKEND_VISITABLE()
   TRASE_ANIMATED_BACKEND_VISITABLE()
 
-  void init(float width, float height, float time_span,
-            const char *name) noexcept;
+  void init(float width, float height, const char *name,
+            float time_span = 0.f) noexcept;
 
   void finalise() noexcept;
 
