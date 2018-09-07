@@ -74,18 +74,12 @@ public:
   /// Create a new axis at position (0,0) and return a shared pointer to it
   /// If the axis already exists returns a pointer to the existing axis
   /// \return a shared pointer to the new axis
-  std::shared_ptr<Axis> axis() noexcept;
+  std::shared_ptr<Axis> axis();
 
   /// Create a new axis at position (\p i, \p j) and return a shared pointer to
   /// it If the axis already exists returns a pointer to the existing axis
   /// \return a shared pointer to the new axis
-  std::shared_ptr<Axis> axis(int i, int j) noexcept;
-
-  /// Return a shared pointer to an existing axis.
-  /// Throws std::out_of_range exception if out of range.
-  /// \param n the axis to return
-  /// \return a shared pointer to the nth axis
-  std::shared_ptr<Axis> axis(int n);
+  std::shared_ptr<Axis> axis(int i, int j);
 
   /// Draw the Figure using the Backend provided
   ///
@@ -107,6 +101,14 @@ public:
   /// \param backend the Backend used to draw the figure.
   /// \param time the Figure is drawn at this time
   template <typename Backend> void draw(Backend &backend, float time);
+
+private:
+  /// creates a new Axis at position \p new_position of the subplot array, or
+  /// returns existing Axis if one exists at this position. If \p new_position
+  /// is larger than the maximum extent of the current subplot array (see
+  /// m_axis_layout), then the subplot array is extended to cover the new
+  /// position, and all existing Axis children are resized accordingly
+  std::shared_ptr<Axis> update_layout(const vint2_t &new_position);
 };
 
 /// create a new Figure
