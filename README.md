@@ -46,19 +46,19 @@ For example, the above svg image was generated with the following code.
 
   // create a static sin(x) function
   write_y(1.f, 2.f);
-  auto static_plot = ax->plot(x, y);
+  auto static_plot = ax->line(create_data().x(x).y(y));
   static_plot->set_label("static");
 
   // create a moving sin(x) function with varying amplitude
   write_y(1.f, 5.f);
-  auto moving_plot = ax->plot(x, y);
+  auto moving_plot = ax->line(create_data().x(x).y(y));
   moving_plot->set_label("moving");
 
   for (int i = 1; i <= nframes; ++i) {
     const float nf = static_cast<float>(nframes);
     const float amplitude = 1.f - 0.5f * std::sin(6.28f * i / nf);
     write_y(amplitude, 5.f);
-    moving_plot->add_frame(x, y, 3.f * i / nf);
+    moving_plot->add_frame(create_data().x(x).y(y), 3.f * i / nf);
   }
 
   // set label axes
