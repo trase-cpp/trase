@@ -246,7 +246,7 @@ private:
                                     const DataWithAesthetic &values);
 
   void update_tick_information();
-  vfloat2_t calculate_num_ticks();
+  vint2_t calculate_num_ticks();
 
   template <typename Backend> void draw_common(Backend &backend);
   template <typename Backend> void draw_common_axis_box(Backend &backend);

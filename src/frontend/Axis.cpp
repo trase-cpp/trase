@@ -78,7 +78,7 @@ std::shared_ptr<Plot1D> Axis::histogram(const DataWithAesthetic &data,
 void Axis::update_tick_information() {
 
   // Use num ticks if user defined, or calculate with defaults
-  vfloat2_t n_ticks = calculate_num_ticks();
+  vint2_t n_ticks = calculate_num_ticks();
 
   // Calculate ideal distance between ticks in limits coords
   bfloat2_t xy_limits(
@@ -95,10 +95,23 @@ void Axis::update_tick_information() {
 
   // work out a sensible spacing between ticks, based on the number of ticks
   const vfloat2_t tick_dx =
-      round_off(xy_limits.delta() / n_ticks, m_sig_digits);
+      round_off(xy_limits.delta() / n_ticks.cast<float>(), m_sig_digits);
 
   // Idealise the lowest pick position
   const vfloat2_t tick_min = ceil(xy_limits.bmin / tick_dx) * tick_dx;
+
+  // Adjust n_ticks due to round_off in tick_dx
+  vfloat2_t tick_max = tick_min + (n_ticks - 1).cast<float>() * tick_dx;
+  for (int i = 0; i < 2; ++i) {
+    while (tick_max[i] > xy_limits.bmax[i]) {
+      --n_ticks[i];
+      tick_max[i] -= tick_dx[i];
+    }
+    while (tick_max[i] + tick_dx[i] < xy_limits.bmax[i]) {
+      ++n_ticks[i];
+      tick_max[i] += tick_dx[i];
+    }
+  }
 
   // scale to pixels
   const vfloat2_t tick_dx_pixels =
@@ -110,37 +123,37 @@ void Axis::update_tick_information() {
   m_tick_info.clear();
 
   // x tick values and positions
-  for (int i = 0; i < static_cast<int>(n_ticks[0]); ++i) {
+  for (int i = 0; i < n_ticks[0]; ++i) {
     m_tick_info.x_val.emplace_back(tick_min[0] + i * tick_dx[0]);
     m_tick_info.x_pos.emplace_back(tick_min_pixels[0] + i * tick_dx_pixels[0]);
   }
 
   // y tick values and positions
-  for (int i = 0; i < static_cast<int>(n_ticks[1]); ++i) {
+  for (int i = 0; i < n_ticks[1]; ++i) {
     m_tick_info.y_val.emplace_back(tick_min[1] + i * tick_dx[1]);
     m_tick_info.y_pos.emplace_back(tick_min_pixels[1] - i * tick_dx_pixels[1]);
   }
 }
 
-vfloat2_t Axis::calculate_num_ticks() {
+vint2_t Axis::calculate_num_ticks() {
 
   if (m_nx_ticks > 0 && m_ny_ticks > 0) {
-    return {static_cast<float>(m_nx_ticks), static_cast<float>(m_ny_ticks)};
+    return {m_nx_ticks, m_ny_ticks};
   }
 
   const float pix_ratio = m_pixels.delta()[0] / m_pixels.delta()[1];
 
   if (m_nx_ticks > 0) {
     const auto n = static_cast<float>(m_nx_ticks);
-    return {n, std::floor(n / pix_ratio)};
+    return {m_nx_ticks, static_cast<int>(std::floor(n / pix_ratio))};
   }
 
   if (m_ny_ticks > 0) {
     const auto n = static_cast<float>(m_ny_ticks);
-    return {std::floor(n * pix_ratio), n};
+    return {static_cast<int>(std::floor(n * pix_ratio)), m_ny_ticks};
   }
 
-  return {std::floor(5.f * pix_ratio), 5.f};
+  return {static_cast<int>(std::floor(5.f * pix_ratio)), 5};
 }
 
 } // namespace trase
