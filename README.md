@@ -29,7 +29,6 @@ For example, the above svg image was generated with the following code.
   const int nframes = 10;
   std::vector<float> x(n);
   std::vector<float> y(n);
-  std::vector<float> r(n);
 
   // define x points
   for (int i = 0; i < n; ++i) {
@@ -40,7 +39,6 @@ For example, the above svg image was generated with the following code.
   auto write_y = [&](const float amplitude, const float freq) {
     for (int i = 0; i < n; ++i) {
       y[i] = amplitude * std::sin(6.28f * freq * x[i]);
-      r[i] = static_cast<float>(i) / n * amplitude;
     }
   };
 
