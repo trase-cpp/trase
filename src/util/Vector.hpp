@@ -611,6 +611,22 @@ std::istream &operator>>(std::istream &out, Vector<T, N> &v) {
 }
 
 using vfloat2_t = Vector<float, 2>;
+using vint2_t = Vector<int, 2>;
+
+/// hash function for an STL map of 2d int vectors
+struct vint2_hash {
+  std::size_t operator()(const vint2_t &s) const noexcept {
+    // Cantor's enumeration of pairs
+    return ((s[0] + s[1]) * (s[0] + s[1] + 1) / 2) + s[1];
+  }
+};
+
+/// equality function for an STL map of 2d int vectors
+struct vint2_equal {
+  bool operator()(const vint2_t &a, const vint2_t &b) const noexcept {
+    return a[0] == b[0] && a[1] == b[1];
+  }
+};
 
 } // namespace trase
 

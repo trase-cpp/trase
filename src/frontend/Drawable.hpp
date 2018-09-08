@@ -149,10 +149,13 @@ public:
   const FrameInfo &get_frame_info() const;
 
   /// returns this objects drawable area in raw pixels
-  const bfloat2_t &pixels() { return m_pixels; }
+  const bfloat2_t &pixels() const { return m_pixels; }
 
   /// returns this objects drawable area as a ratio of the parents drawable area
-  const bfloat2_t &area() { return m_pixels; }
+  const bfloat2_t &area() const { return m_area; }
+
+  /// returns this objects drawable area as a ratio of the parents drawable area
+  bfloat2_t &area() { return m_area; }
 
 #ifdef TRASE_BACKEND_GL
   virtual void dispatch(BackendGL &figure, float time) = 0;

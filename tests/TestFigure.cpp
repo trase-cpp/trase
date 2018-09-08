@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <limits>
 #include <type_traits>
 
+#include "DummyDraw.hpp"
 #include "trase.hpp"
 
 using namespace trase;
@@ -48,16 +49,55 @@ TEST_CASE("check figure can be created", "[figure]") {
   auto fig2 = figure({800, 600});
 }
 
-TEST_CASE("check axis methods can be invoked", "[figure]") {
+TEST_CASE("adding a single Axis object to Figure", "[figure]") {
   auto fig = figure();
 
-  CHECK_NOTHROW(fig->axis());
-  CHECK_NOTHROW(fig->axis());
-  CHECK_NOTHROW(fig->axis(0));
-  CHECK_NOTHROW(fig->axis(1));
+  auto ax = fig->axis();
+  const std::vector<float> x = {1.f, 2.f, 3.f};
+  const std::vector<float> y = {1.f, 2.f, 3.f};
+  auto data = create_data().x(x).y(y);
+  auto line = ax->line(data);
 
-  CHECK_THROWS_AS(fig->axis(2), std::out_of_range);
-  CHECK_THROWS_AS(fig->axis(-1), std::out_of_range);
+  CHECK(fig->axis() == ax);
+  CHECK(fig->axis(0, 0) == ax);
+  DummyDraw::draw("figure", fig);
+
+  CHECK_THROWS_AS(fig->axis(-1, 1), std::out_of_range);
+  CHECK_THROWS_AS(fig->axis(1, -1), std::out_of_range);
+  CHECK_THROWS_AS(fig->axis(-1, -1), std::out_of_range);
+}
+
+TEST_CASE("adding various Axis objects to Figure", "[figure]") {
+  auto fig = figure();
+
+  auto ax = fig->axis();
+  const std::vector<float> x = {1.f, 2.f, 3.f};
+  const std::vector<float> y = {1.f, 2.f, 3.f};
+  auto data = create_data().x(x).y(y);
+  auto line = ax->line(data);
+
+  CHECK(fig->axis() == ax);
+  CHECK(fig->axis(0, 0) == ax);
+
+  auto ax2 = fig->axis(1, 1);
+  CHECK(ax2 != ax);
+  const std::vector<float> y2 = {3.f, 2.f, 1.f};
+  auto data2 = create_data().x(x).y(y2);
+  ax2->points(data2);
+  DummyDraw::draw("figure", fig);
+
+  auto ax3 = fig->axis(0, 1);
+  CHECK(ax3 != ax);
+  CHECK(ax3 != ax2);
+  ax3->line(data2);
+  DummyDraw::draw("figure", fig);
+
+  auto ax4 = fig->axis(0, 5);
+  CHECK(ax4 != ax);
+  CHECK(ax4 != ax2);
+  CHECK(ax4 != ax3);
+  ax4->points(data);
+  DummyDraw::draw("figure", fig);
 }
 
 TEST_CASE("readme", "[figure]") {
