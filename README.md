@@ -36,27 +36,25 @@ For example, the above svg image was generated with the following code.
   }
 
   // define y = sin(x) with given amplitude and frequency
-  auto write_y = [&](const float amplitude, const float freq) {
+  auto get_ysinx = [&](const float amplitude, const float freq) {
     for (int i = 0; i < n; ++i) {
       y[i] = amplitude * std::sin(6.28f * freq * x[i]);
     }
+    return create_data().x(x).y(y);
   };
 
   // create a static sin(x) function
-  write_y(1.f, 2.f);
-  auto static_plot = ax->line(create_data().x(x).y(y));
+  auto static_plot = ax->line(get_ysinx(1.f, 2.f));
   static_plot->set_label("static");
 
   // create a moving sin(x) function with varying amplitude
-  write_y(1.f, 5.f);
-  auto moving_plot = ax->line(create_data().x(x).y(y));
+  auto moving_plot = ax->line(get_ysinx(1.f, 5.f));
   moving_plot->set_label("moving");
 
   for (int i = 1; i <= nframes; ++i) {
     const float nf = static_cast<float>(nframes);
     const float amplitude = 1.f - 0.5f * std::sin(6.28f * i / nf);
-    write_y(amplitude, 5.f);
-    moving_plot->add_frame(create_data().x(x).y(y), 3.f * i / nf);
+    moving_plot->add_frame(get_ysinx(amplitude, 5.f), 3.f * i / nf);
   }
 
   // set label axes
@@ -67,7 +65,7 @@ For example, the above svg image was generated with the following code.
 
   // output to svg
   std::ofstream out;
-  out.open("test_figure.svg");
+  out.open("readme.svg");
   BackendSVG backend(out);
   fig->draw(backend);
   out.close();
