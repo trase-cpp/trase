@@ -129,7 +129,3 @@ Trase uses [Dear ImGui](https://github.com/ocornut/imgui) and
 [NanoVG](https://github.com/memononen/nanovg) for the OpenGL backend. The 
 [Dirent port](https://github.com/tronkko/dirent) for Windows is used for finding 
 local font files.
-
-## Examples
-
-See [here](docs/examples.md)
