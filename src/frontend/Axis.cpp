@@ -32,9 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "frontend/Axis.hpp"
+#include "frontend/Geometry.hpp"
 #include "frontend/Histogram.hpp"
 #include "frontend/Line.hpp"
-#include "frontend/Plot1D.hpp"
 #include "frontend/Points.hpp"
 #include "util/Vector.hpp"
 
@@ -45,13 +45,13 @@ Axis::Axis(Drawable *parent, const bfloat2_t &area)
       m_tick_len(10.f), m_line_width(3.f), m_font_size(18.f),
       m_font_face("Roboto"), m_legend(false) {}
 
-std::shared_ptr<Plot1D> Axis::plot(int n) {
-  return std::dynamic_pointer_cast<Plot1D>(m_children.at(n));
+std::shared_ptr<Geometry> Axis::plot(int n) {
+  return std::dynamic_pointer_cast<Geometry>(m_children.at(n));
 }
 
-std::shared_ptr<Plot1D> Axis::plot_impl(const std::shared_ptr<Plot1D> &plot,
-                                        const Transform &transform,
-                                        const DataWithAesthetic &values) {
+std::shared_ptr<Geometry> Axis::plot_impl(const std::shared_ptr<Geometry> &plot,
+                                          const Transform &transform,
+                                          const DataWithAesthetic &values) {
   plot->set_transform(transform);
   plot->add_frame(values, 0);
   plot->set_color(RGBA::defaults[m_children.size()]);
@@ -60,18 +60,18 @@ std::shared_ptr<Plot1D> Axis::plot_impl(const std::shared_ptr<Plot1D> &plot,
   return plot;
 }
 
-std::shared_ptr<Plot1D> Axis::points(const DataWithAesthetic &data,
-                                     const Transform &transform) {
+std::shared_ptr<Geometry> Axis::points(const DataWithAesthetic &data,
+                                       const Transform &transform) {
   return plot_impl(std::make_shared<Points>(this), transform, data);
 }
 
-std::shared_ptr<Plot1D> Axis::line(const DataWithAesthetic &data,
-                                   const Transform &transform) {
+std::shared_ptr<Geometry> Axis::line(const DataWithAesthetic &data,
+                                     const Transform &transform) {
   return plot_impl(std::make_shared<Line>(this), transform, data);
 }
 
-std::shared_ptr<Plot1D> Axis::histogram(const DataWithAesthetic &data,
-                                        const Transform &transform) {
+std::shared_ptr<Geometry> Axis::histogram(const DataWithAesthetic &data,
+                                          const Transform &transform) {
   return plot_impl(std::make_shared<Histogram>(this), transform, data);
 }
 

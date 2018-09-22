@@ -1,4 +1,4 @@
-INPUT                  = README.md src docs docs/examples.md tests/TestUserConcepts.cpp tests/TestLine.cpp 
+INPUT                  = README.md src docs docs/examples.md tests/TestUserConcepts.cpp tests/TestLine.cpp
 RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = README.md
 LAYOUT_FILE            = docs/DoxygenLayout.xml
@@ -8,3 +8,4 @@ CITE_BIB_FILES         = docs/bibliography.bib
 HTML_EXTRA_STYLESHEET  = docs/customdoxygen.css
 HTML_FOOTER            = docs/footer.html
 HTML_HEADER            = docs/header.html
+IMAGE_PATH             = docs/figs

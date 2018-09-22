@@ -138,10 +138,9 @@ set (trase_headers
     src/backend/BackendSVG.hpp
     src/frontend/Axis.hpp
     src/frontend/Data.hpp
-    src/frontend/Data.tcc
     src/frontend/Drawable.hpp
     src/frontend/Figure.hpp
-    src/frontend/Plot1D.hpp
+    src/frontend/Geometry.hpp
     src/frontend/Transform.hpp
     src/frontend/Line.hpp
     src/frontend/Points.hpp
@@ -162,7 +161,7 @@ set (trase_source
     src/frontend/Data.cpp
     src/frontend/Drawable.cpp
     src/frontend/Figure.cpp
-    src/frontend/Plot1D.cpp
+    src/frontend/Geometry.cpp
     src/frontend/Transform.cpp
     src/frontend/Histogram.cpp
     src/util/Colors.cpp
@@ -226,7 +225,7 @@ add_executable (
     tests/TestColors.cpp
     tests/TestFigure.cpp
     tests/TestFontManager.cpp
-    tests/TestPlot1D.cpp
+    tests/TestGeometry.cpp
     tests/TestLine.cpp
     tests/TestHistogram.cpp
     tests/TestPoints.cpp

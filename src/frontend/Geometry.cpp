@@ -31,8 +31,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "frontend/Plot1D.hpp"
 #include "frontend/Axis.hpp"
+#include "frontend/Geometry.hpp"
 
 #include <numeric>
 
@@ -40,11 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-Plot1D::Plot1D(Axis *parent)
+Geometry::Geometry(Axis *parent)
     : Drawable(parent, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
       m_colormap(&Colormaps::viridis), m_line_width(3.f), m_axis(parent) {}
 
-void Plot1D::add_frame(const DataWithAesthetic &data, float time) {
+void Geometry::add_frame(const DataWithAesthetic &data, float time) {
   // add new data frame
   m_data.push_back(m_transform(data));
 

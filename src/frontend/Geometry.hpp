@@ -31,10 +31,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file Plot1D.hpp
+/// \file Geometry.hpp
 
-#ifndef PLOT1D_H_
-#define PLOT1D_H_
+#ifndef GEOMETRY_H_
+#define GEOMETRY_H_
 
 #include <memory>
 #include <vector>
@@ -51,7 +51,7 @@ namespace trase {
 // forward declare to be able to store a pointer in Axis
 class Axis;
 
-class Plot1D : public Drawable {
+class Geometry : public Drawable {
 protected:
   /// dataset
   std::vector<DataWithAesthetic> m_data;
@@ -76,7 +76,7 @@ protected:
   Axis *m_axis;
 
 public:
-  explicit Plot1D(Axis *parent);
+  explicit Geometry(Axis *parent);
 
   template <typename T1, typename T2>
   void add_frame(const std::vector<T1> &x, const std::vector<T2> &y,
@@ -131,6 +131,6 @@ public:
 
 } // namespace trase
 
-#include "frontend/Plot1D.tcc"
+#include "frontend/Geometry.tcc"
 
 #endif // PLOT1D_H_

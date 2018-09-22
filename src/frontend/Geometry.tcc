@@ -33,14 +33,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 
-#include "frontend/Plot1D.hpp"
+#include "frontend/Geometry.hpp"
 
 namespace trase {
 
 template <typename AnimatedBackend>
-void Plot1D::draw(AnimatedBackend &backend) {}
+void Geometry::draw(AnimatedBackend &backend) {}
 
 template <typename Backend>
-void Plot1D::draw(Backend &backend, const float time) {}
+void Geometry::draw(Backend &backend, const float time) {}
 
 } // namespace trase

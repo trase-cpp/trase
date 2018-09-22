@@ -46,6 +46,7 @@ TEST_CASE("line example", "[line]") {
   ///
   /// \snippet tests/TestLine.cpp line example includes
   /// \snippet tests/TestLine.cpp line example
+  /// \image html example_line.svg "Output"
 
   /// [line example]
   // create figure and axis
@@ -64,6 +65,10 @@ TEST_CASE("line example", "[line]") {
   // create a trase dataset and then plot it using a line geometry
   auto data = create_data().x(x).y(y);
   auto plt = ax->line(data);
+
+  // label axis
+  ax->xlabel("x");
+  ax->ylabel("y");
 
   // output to svg
   std::ofstream out;
