@@ -36,13 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef HISTOGRAM_H_
 #define HISTOGRAM_H_
 
-#include "frontend/Plot1D.hpp"
+#include "frontend/Geometry.hpp"
 
 namespace trase {
 
-class Histogram : public Plot1D {
+class Histogram : public Geometry {
 public:
-  explicit Histogram(Axis *parent) : Plot1D(parent) {}
+  explicit Histogram(Axis *parent) : Geometry(parent) {}
   TRASE_DISPATCH_BACKENDS
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);

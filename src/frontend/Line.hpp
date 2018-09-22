@@ -36,13 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef LINE_H_
 #define LINE_H_
 
-#include "frontend/Plot1D.hpp"
+#include "frontend/Geometry.hpp"
 
 namespace trase {
 
-class Line : public Plot1D {
+class Line : public Geometry {
 public:
-  explicit Line(Axis *parent) : Plot1D(parent) {}
+  explicit Line(Axis *parent) : Geometry(parent) {}
 
   TRASE_DISPATCH_BACKENDS
 

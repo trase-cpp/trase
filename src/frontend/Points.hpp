@@ -36,13 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef POINTS_H_
 #define POINTS_H_
 
-#include "frontend/Plot1D.hpp"
+#include "frontend/Geometry.hpp"
 
 namespace trase {
 
-class Points : public Plot1D {
+class Points : public Geometry {
 public:
-  explicit Points(Axis *parent) : Plot1D(parent) {}
+  explicit Points(Axis *parent) : Geometry(parent) {}
   TRASE_DISPATCH_BACKENDS
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);

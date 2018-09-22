@@ -35,14 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <limits>
 
 #include "frontend/Axis.hpp"
+#include "frontend/Geometry.hpp"
 #include "frontend/Line.hpp"
-#include "frontend/Plot1D.hpp"
 
 namespace trase {
 
 template <typename T1, typename T2>
-std::shared_ptr<Plot1D> Axis::plot(const std::vector<T1> &x,
-                                   const std::vector<T2> &y) {
+std::shared_ptr<Geometry> Axis::plot(const std::vector<T1> &x,
+                                     const std::vector<T2> &y) {
   if (x.size() != y.size()) {
     throw Exception("x and y vector sizes do not match");
   }
@@ -201,7 +201,7 @@ template <typename Backend> void Axis::draw_common_legend(Backend &backend) {
   backend.text_align(ALIGN_RIGHT | ALIGN_TOP);
   backend.stroke_width(m_line_width);
   for (const auto &drawable : m_children) {
-    auto plot1d = std::dynamic_pointer_cast<Plot1D>(drawable);
+    auto plot1d = std::dynamic_pointer_cast<Geometry>(drawable);
 
     backend.begin_path();
     backend.move_to(text_loc +

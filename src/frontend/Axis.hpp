@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "frontend/Data.hpp"
 #include "frontend/Drawable.hpp"
-#include "frontend/Plot1D.hpp"
+#include "frontend/Geometry.hpp"
 
 #include "util/Colors.hpp"
 #include "util/Exception.hpp"
@@ -63,22 +63,22 @@ struct TickInfo {
   }
 };
 
-/// An 2D axis that can contain zero or more Plot1D objects
+/// An 2D axis that can contain zero or more Geometry objects
 ///
 /// Each axis stores minimum and maximum limits for each Aesthetic, these are
 /// used to both set the ticks displayed on the x and y axis, and to scale the
-/// drawn Plot1D objects (how each Plot1D is scaled depends on the specifics of
-/// the Geometry used). Each time a new Plot1D is added to the Axis, it updates
-/// these limits using the limits of the its DataWithAestheic.
+/// drawn Geometry objects (how each Geometry is scaled depends on the specifics
+/// of the Geometry used). Each time a new Geometry is added to the Axis, it
+/// updates these limits using the limits of the its DataWithAestheic.
 ///
-/// TODO: issue #87, the name of the Plot1D class will probably change to
+/// TODO: issue #87, the name of the Geometry class will probably change to
 /// Geometry in the future
 ///
 /// An Axis can optionally contain:
 ///     * a title
 ///     * a label for the x axis
 ///     * a label for the y axis
-///     * a legend that identifies each Plot1D
+///     * a legend that identifies each Geometry
 class Axis : public Drawable {
   /// limits of all children plots
   Limits m_limits;
@@ -155,7 +155,7 @@ public:
   /// set the title of the Axis
   void title(const char *string) { m_title.assign(string); }
 
-  /// show a legend identifying each Plot1D in the Axis
+  /// show a legend identifying each Geometry in the Axis
   void legend() { m_legend = true; }
 
   /// Create a new plot and return a shared pointer to it.
@@ -168,14 +168,14 @@ public:
   /// \param label the plot label. Defaults to empty string.
   /// \return shared pointer to the new plot
   template <typename T1, typename T2>
-  std::shared_ptr<Plot1D> plot(const std::vector<T1> &x,
-                               const std::vector<T2> &y);
+  std::shared_ptr<Geometry> plot(const std::vector<T1> &x,
+                                 const std::vector<T2> &y);
 
   /// Create a new Points plot and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
   /// \param transform (optional) the transform to apply
   /// \return shared pointer to the new plot
-  std::shared_ptr<Plot1D>
+  std::shared_ptr<Geometry>
   points(const DataWithAesthetic &data,
          const Transform &transform = Transform(Identity()));
 
@@ -183,7 +183,7 @@ public:
   /// \param data the `DataWithAesthetic` dataset to use
   /// \param transform (optional) the transform to apply
   /// \return shared pointer to the new plot
-  std::shared_ptr<Plot1D>
+  std::shared_ptr<Geometry>
   line(const DataWithAesthetic &data,
        const Transform &transform = Transform(Identity()));
 
@@ -191,7 +191,7 @@ public:
   /// \param data the `DataWithAesthetic` dataset to use
   /// \param transform (optional) the transform to apply
   /// \return shared pointer to the new plot
-  std::shared_ptr<Plot1D>
+  std::shared_ptr<Geometry>
   histogram(const DataWithAesthetic &data,
             const Transform &transform = Transform(BinX()));
 
@@ -199,7 +199,7 @@ public:
   /// Throws std::out_of_range exception if out of range.
   /// \param n the plot to return
   /// \return a shared pointer to the nth plot
-  std::shared_ptr<Plot1D> plot(int n);
+  std::shared_ptr<Geometry> plot(int n);
 
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
@@ -231,19 +231,19 @@ public:
   Vector<int, 2> get_ticks() const { return {m_nx_ticks, m_ny_ticks}; }
 
 private:
-  /// Create a new Plot1D on this axis and return a shared pointer to it.
+  /// Create a new Geometry on this axis and return a shared pointer to it.
   ///
   /// All the plotting functions go through this function, which does the actual
-  /// work of adding the new Plot1D, its data and transform to the axis. A
+  /// work of adding the new Geometry, its data and transform to the axis. A
   /// default color is given to the new plot based on the number of already
   /// existing plots (see Colors.hpp for list of default colors)
   ///
   /// \param data the `DataWithAesthetic` dataset to use
   /// \param transform the transform to apply
   /// \return shared pointer to the new plot
-  std::shared_ptr<Plot1D> plot_impl(const std::shared_ptr<Plot1D> &plot,
-                                    const Transform &transform,
-                                    const DataWithAesthetic &values);
+  std::shared_ptr<Geometry> plot_impl(const std::shared_ptr<Geometry> &plot,
+                                      const Transform &transform,
+                                      const DataWithAesthetic &values);
 
   void update_tick_information();
   vint2_t calculate_num_ticks();
