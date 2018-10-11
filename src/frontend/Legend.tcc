@@ -39,32 +39,42 @@ namespace trase {
 
 template <typename AnimatedBackend>
 void Legend::draw(AnimatedBackend &backend) {
-
   const float sample_length = 20.f;
 
   // draw legend in upper right corner
-  const vfloat2_t upper_right_corner = {m_pixels.bmax[0], m_pixels.bmin[1]};
-  vfloat2_t text_loc = upper_right_corner;
+  vfloat2_t upper_right_corner = {m_pixels.bmax[0], m_pixels.bmin[1]};
+  const vfloat2_t sample_size = {sample_length, m_font_size};
   backend.text_align(ALIGN_RIGHT | ALIGN_TOP);
   backend.stroke_width(m_line_width);
   backend.fill_color(m_color);
   for (const auto &geometry : m_entries) {
-    backend.begin_path();
-    backend.move_to(text_loc +
-                    vfloat2_t(-sample_length / 3.f, m_font_size / 2.f));
-    backend.line_to(text_loc +
-                    vfloat2_t(-(4.f / 3.f) * sample_length, m_font_size / 2.f));
-    backend.stroke_color(geometry->get_color());
-    backend.stroke();
+    const bfloat2_t sample_box = {upper_right_corner - sample_size,
+                                  upper_right_corner};
+    geometry->dispatch_legend(backend, sample_box);
     backend.text(text_loc + vfloat2_t(-(5.f / 3.f) * sample_length, 0.f),
                  geometry->get_label().c_str(), nullptr);
-    text_loc[1] += m_font_size;
+    upper_right_corner[1] += m_font_size;
   }
 }
 
 template <typename Backend>
 void Legend::draw(Backend &backend, const float time) {
-  draw(backend);
+  const float sample_length = 20.f;
+
+  // draw legend in upper right corner
+  vfloat2_t upper_right_corner = {m_pixels.bmax[0], m_pixels.bmin[1]};
+  const vfloat2_t sample_size = {sample_length, m_font_size};
+  backend.text_align(ALIGN_RIGHT | ALIGN_TOP);
+  backend.stroke_width(m_line_width);
+  backend.fill_color(m_color);
+  for (const auto &geometry : m_entries) {
+    const bfloat2_t sample_box = {upper_right_corner - sample_size,
+                                  upper_right_corner};
+    geometry->dispatch_legend(backend, time, sample_box);
+    backend.text(text_loc + vfloat2_t(-(5.f / 3.f) * sample_length, 0.f),
+                 geometry->get_label().c_str(), nullptr);
+    upper_right_corner[1] += m_font_size;
+  }
 }
 
 } // namespace trase

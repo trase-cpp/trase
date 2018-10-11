@@ -48,6 +48,23 @@ void Line::draw(Backend &backend, const float time) {
 }
 
 template <typename AnimatedBackend>
+void Line::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
+  backend.stroke_color(m_color);
+  backend.stroke_width(m_line_width);
+  const double y_coord = 0.5 * (box.bmin[1] + box.bmax[1]);
+  backend.move_to({box.bmax[0], y_coord});
+  backend.line_to({box.bmin[0], y_coord});
+  backend.stroke();
+}
+
+template <typename Backend>
+void Line::draw_legend(Backend &backend, const float time,
+                       const bfloat2_t &box) {
+
+  draw_legend(backend, box);
+}
+
+template <typename AnimatedBackend>
 void Line::draw_frames(AnimatedBackend &backend) {
 
   backend.begin_animated_path();

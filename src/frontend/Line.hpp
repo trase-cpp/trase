@@ -48,6 +48,10 @@ public:
 
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
+  template <typename AnimatedBackend>
+  void draw_legend(AnimatedBackend &backend, const bfloat2_t &box);
+  template <typename Backend>
+  void draw_legend(Backend &backend, float time, const bfloat2_t &box);
 
 private:
   template <typename AnimatedBackend>
