@@ -145,6 +145,7 @@ set (trase_headers
     src/frontend/Line.hpp
     src/frontend/Points.hpp
     src/frontend/Histogram.hpp
+    src/frontend/Legend.hpp
     src/util/ColumnIterator.hpp
     src/util/BBox.hpp
     src/util/Colors.hpp
@@ -162,6 +163,7 @@ set (trase_source
     src/frontend/Drawable.cpp
     src/frontend/Figure.cpp
     src/frontend/Geometry.cpp
+    src/frontend/Legend.cpp
     src/frontend/Transform.cpp
     src/frontend/Histogram.cpp
     src/util/Colors.cpp

@@ -113,9 +113,6 @@ class Axis : public Drawable {
   /// the Axis title
   std::string m_title;
 
-  /// true if legend is visible
-  bool m_legend;
-
   /// tick helper
   TickInfo m_tick_info;
 
@@ -156,7 +153,7 @@ public:
   void title(const char *string) { m_title.assign(string); }
 
   /// show a legend identifying each Geometry in the Axis
-  void legend() { m_legend = true; }
+  void legend();
 
   /// Create a new plot and return a shared pointer to it.
   ///

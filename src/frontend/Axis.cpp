@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "frontend/Axis.hpp"
 #include "frontend/Geometry.hpp"
 #include "frontend/Histogram.hpp"
+#include "frontend/Legend.hpp"
 #include "frontend/Line.hpp"
 #include "frontend/Points.hpp"
 #include "util/Vector.hpp"
@@ -156,4 +157,25 @@ vint2_t Axis::calculate_num_ticks() {
   return {static_cast<int>(std::floor(5.f * pix_ratio)), 5};
 }
 
-} // namespace trase
+void Axis::legend(const bool show) {
+  auto legend_drawable =
+      std::find_if(m_children.begin(), m_children.end(), [](const auto &i) {
+        return static_cast<bool>(std::dynamic_pointer_cast<Legend>(i));
+      });
+  const bool found_legend = legend_drawable != m_children.end();
+  if (show && !found_legend) {
+    auto new_legend = std::make_shared<Legend>(this);
+    std::vector<std::shared_ptr<Geometry>> geometry_drawables;
+    for (auto i = m_children.begin(), i != m_children.end(), ++i) {
+      if (auto geometry = std::dynamic_pointer_cast<Geometry>(*i)) {
+        new_legend.add_entry(geometry);
+      }
+    }
+
+    m_children.push_back(new_legend);
+  } else if (!show && found_legend) {
+    m_children.erase(legend_drawable);
+  }
+}
+
+void Axis::update_legend(const bool show) {} // namespace trase
