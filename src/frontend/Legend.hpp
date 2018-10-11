@@ -36,23 +36,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef LEGEND_H_
 #define LEGEND_H_
 
-#include "Axis.hpp"
-#include "Colors.hpp"
-#include "Drawable.hpp"
-#include "Exception.hpp"
+#include "frontend/Axis.hpp"
+#include "frontend/Drawable.hpp"
 #include <array>
 
 namespace trase {
 
 class Legend : public Drawable {
-  std::vector<const Geometry *> m_entries;
+  std::vector<std::shared_ptr<Geometry>> m_entries;
+
+  /// the linewidth used
+  float m_line_width;
+
+  /// the font size used
+  float m_font_size;
+
+  /// the font used
+  std::string m_font_face;
+
+  /// the color used
+  RGBA m_color;
 
 public:
-  explicit Legend(Axis *parent);
+  Legend(Drawable *parent, const bfloat2_t &area);
 
   TRASE_DISPATCH_BACKENDS
 
-  void add_entry(const Geometry &entry) { m_entries.push_back(entry); }
+  void add_entry(const std::shared_ptr<Geometry> &entry) {
+    m_entries.push_back(entry);
+  }
 
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);

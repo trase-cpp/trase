@@ -44,7 +44,7 @@ namespace trase {
 Axis::Axis(Drawable *parent, const bfloat2_t &area)
     : Drawable(parent, area), m_sig_digits(2), m_nx_ticks(0), m_ny_ticks(0),
       m_tick_len(10.f), m_line_width(3.f), m_font_size(18.f),
-      m_font_face("Roboto"), m_legend(false) {}
+      m_font_face("Roboto"), m_has_legend(false) {}
 
 std::shared_ptr<Geometry> Axis::plot(int n) {
   return std::dynamic_pointer_cast<Geometry>(m_children.at(n));
@@ -58,6 +58,7 @@ std::shared_ptr<Geometry> Axis::plot_impl(const std::shared_ptr<Geometry> &plot,
   plot->set_color(RGBA::defaults[m_children.size()]);
   plot->resize(m_pixels);
   m_children.push_back(plot);
+  add_geometry_to_legend(plot);
   return plot;
 }
 
@@ -158,24 +159,46 @@ vint2_t Axis::calculate_num_ticks() {
 }
 
 void Axis::legend(const bool show) {
+  // check if we already have a legend
   auto legend_drawable =
       std::find_if(m_children.begin(), m_children.end(), [](const auto &i) {
         return static_cast<bool>(std::dynamic_pointer_cast<Legend>(i));
       });
   const bool found_legend = legend_drawable != m_children.end();
+
   if (show && !found_legend) {
-    auto new_legend = std::make_shared<Legend>(this);
+    // user wants us to show a legend and none currently exists, so make one
+    bfloat2_t bounding_box({0, 0}, {1, 1});
+    auto new_legend = std::make_shared<Legend>(this, bounding_box);
+    new_legend->resize(m_pixels);
+
+    // add current geometries to legend
     std::vector<std::shared_ptr<Geometry>> geometry_drawables;
-    for (auto i = m_children.begin(), i != m_children.end(), ++i) {
+    for (auto i = m_children.begin(); i != m_children.end(); ++i) {
       if (auto geometry = std::dynamic_pointer_cast<Geometry>(*i)) {
-        new_legend.add_entry(geometry);
+        new_legend->add_entry(geometry);
       }
     }
-
     m_children.push_back(new_legend);
   } else if (!show && found_legend) {
+    // user doesn't want a legend and we have one, so erase it
     m_children.erase(legend_drawable);
   }
 }
 
-void Axis::update_legend(const bool show) {} // namespace trase
+void Axis::add_geometry_to_legend(const std::shared_ptr<Geometry> &geometry) {
+  // check if we already have a legend
+  auto legend_drawable =
+      std::find_if(m_children.begin(), m_children.end(), [](const auto &i) {
+        return static_cast<bool>(std::dynamic_pointer_cast<Legend>(i));
+      });
+  const bool found_legend = legend_drawable != m_children.end();
+
+  // if we do add the new geometry to it
+  if (found_legend) {
+    auto legend_geometry = std::dynamic_pointer_cast<Legend>(*legend_drawable);
+    legend_geometry->add_entry(geometry);
+  }
+}
+
+} // namespace trase

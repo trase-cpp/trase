@@ -235,6 +235,7 @@ add_executable (
     tests/TestStyle.cpp
     tests/TestTransformMatrix.cpp
     tests/TestVector.cpp
+    tests/TestLegend.cpp
 )
 target_include_directories (trase_tst PRIVATE tests)
 target_link_libraries (trase_tst PRIVATE trase)

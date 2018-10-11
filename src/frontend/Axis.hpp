@@ -116,6 +116,9 @@ class Axis : public Drawable {
   /// tick helper
   TickInfo m_tick_info;
 
+  /// true if axis has a Legend
+  bool m_has_legend;
+
 public:
   /// create a new Axis contained in the given Figure
   /// \param figure the parent \Drawable object
@@ -153,7 +156,7 @@ public:
   void title(const char *string) { m_title.assign(string); }
 
   /// show a legend identifying each Geometry in the Axis
-  void legend();
+  void legend(const bool show = true);
 
   /// Create a new plot and return a shared pointer to it.
   ///
@@ -244,6 +247,7 @@ private:
 
   void update_tick_information();
   vint2_t calculate_num_ticks();
+  void add_geometry_to_legend(const std::shared_ptr<Geometry> &geometry);
 
   template <typename Backend> void draw_common(Backend &backend);
   template <typename Backend> void draw_common_axis_box(Backend &backend);
@@ -252,7 +256,6 @@ private:
   template <typename Backend> void draw_common_title(Backend &backend);
   template <typename Backend> void draw_common_xlabel(Backend &backend);
   template <typename Backend> void draw_common_ylabel(Backend &backend);
-  template <typename Backend> void draw_common_legend(Backend &backend);
 };
 
 } // namespace trase

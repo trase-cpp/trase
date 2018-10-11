@@ -33,4 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Legend.hpp"
 
-namespace trase {} // namespace trase
+namespace trase {
+
+Legend::Legend(Drawable *parent, const bfloat2_t &area)
+    : Drawable(parent, area), m_line_width(3.f), m_font_size(18.f),
+      m_font_face("Roboto") {}
+
+} // namespace trase

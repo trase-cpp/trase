@@ -48,22 +48,20 @@ TEST_CASE("legend creation", "[legend]") {
   std::vector<float> y(n);
   for (int i = 0; i < n; ++i) {
     x[i] = 6.28f * static_cast<float>(i) / n;
-    y[i] = std::sin(x[i]);
+    y[i] = (n / 2) * std::sin(x[i]);
   }
   auto data = create_data().x(x).y(y);
-  ax->histogram(data);
-  ax->line(data);
-  ax->points(data);
-  DummyDraw::draw("histogram", fig);
-  x.resize(1);
-  x[0] = 0.1f;
-  ax->histogram(create_data().x(x));
-  DummyDraw::draw("histogram", fig);
-  x.resize(5);
-  x[1] = 0.2f;
-  x[2] = 0.3f;
-  x[3] = 0.4f;
-  x[4] = 0.5f;
-  ax->histogram(create_data().x(x));
-  DummyDraw::draw("histogram", fig);
+  auto geom = ax->histogram(data);
+  geom->set_label("histogram");
+  DummyDraw::draw("legend", fig);
+  ax->legend(true);
+  DummyDraw::draw("legend", fig);
+  geom = ax->line(data);
+  geom->set_label("line");
+  DummyDraw::draw("legend", fig);
+  geom = ax->points(data);
+  geom->set_label("points");
+  DummyDraw::draw("legend", fig);
+  ax->legend(false);
+  DummyDraw::draw("legend", fig);
 }

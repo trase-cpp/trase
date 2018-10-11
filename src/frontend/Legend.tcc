@@ -47,6 +47,7 @@ void Legend::draw(AnimatedBackend &backend) {
   vfloat2_t text_loc = upper_right_corner;
   backend.text_align(ALIGN_RIGHT | ALIGN_TOP);
   backend.stroke_width(m_line_width);
+  backend.fill_color(m_color);
   for (const auto &geometry : m_entries) {
     backend.begin_path();
     backend.move_to(text_loc +
