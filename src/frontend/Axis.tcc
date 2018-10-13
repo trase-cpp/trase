@@ -72,7 +72,6 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
   draw_common_title(backend);
   draw_common_xlabel(backend);
   draw_common_ylabel(backend);
-  draw_common_legend(backend);
 }
 
 template <typename Backend> void Axis::draw_common_axis_box(Backend &backend) {
@@ -185,35 +184,6 @@ template <typename Backend> void Axis::draw_common_ylabel(Backend &backend) {
   backend.rotate(-pi / 2.0f);
   backend.text(vfloat2_t(0.f, 0.f), m_ylabel.c_str(), NULL);
   backend.reset_transform();
-}
-
-template <typename Backend> void Axis::draw_common_legend(Backend &backend) {
-
-  if (!m_legend) {
-    return;
-  }
-
-  const float sample_length = 20.f;
-
-  // draw legend in upper right corner
-  const vfloat2_t upper_right_corner = {m_pixels.bmax[0], m_pixels.bmin[1]};
-  vfloat2_t text_loc = upper_right_corner;
-  backend.text_align(ALIGN_RIGHT | ALIGN_TOP);
-  backend.stroke_width(m_line_width);
-  for (const auto &drawable : m_children) {
-    auto plot1d = std::dynamic_pointer_cast<Geometry>(drawable);
-
-    backend.begin_path();
-    backend.move_to(text_loc +
-                    vfloat2_t(-sample_length / 3.f, m_font_size / 2.f));
-    backend.line_to(text_loc +
-                    vfloat2_t(-(4.f / 3.f) * sample_length, m_font_size / 2.f));
-    backend.stroke_color(plot1d->get_color());
-    backend.stroke();
-    backend.text(text_loc + vfloat2_t(-(5.f / 3.f) * sample_length, 0.f),
-                 plot1d->get_label().c_str(), nullptr);
-    text_loc[1] += m_font_size;
-  }
 }
 
 } // namespace trase

@@ -125,11 +125,50 @@ public:
   const float get_line_width() const { return m_line_width; }
   const Colormap &get_colormap() const { return *m_colormap; }
 
+#ifdef TRASE_BACKEND_GL
+  virtual void dispatch_legend(BackendGL &figure, float time,
+                               const bfloat2_t &box) = 0;
+#endif
+  virtual void dispatch_legend(BackendSVG &file, float time,
+                               const bfloat2_t &box) = 0;
+  virtual void dispatch_legend(BackendSVG &file, const bfloat2_t &box) = 0;
+
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
+  template <typename AnimatedBackend>
+  void draw_legend(AnimatedBackend &backend, const bfloat2_t &box);
+  template <typename Backend>
+  void draw_legend(Backend &backend, float time, const bfloat2_t &box);
 };
 
 } // namespace trase
+
+#define TRASE_DISPATCH_LEGEND(backend_type)                                    \
+  void dispatch_legend(backend_type &backend, float time,                      \
+                       const bfloat2_t &box) override {                        \
+    draw_legend(backend, time, box);                                           \
+  }
+
+#define TRASE_ANIMATED_DISPATCH_LEGEND(backend_type)                           \
+  void dispatch_legend(backend_type &backend, const bfloat2_t &box) override { \
+    draw_legend(backend, box);                                                 \
+  }
+
+#define TRASE_DISPATCH_LEGEND_SVG                                              \
+  TRASE_DISPATCH_LEGEND(BackendSVG)                                            \
+  TRASE_ANIMATED_DISPATCH_LEGEND(BackendSVG)
+
+#ifdef TRASE_BACKEND_GL
+#define TRASE_DISPATCH_LEGEND_GL TRASE_DISPATCH_LEGEND(BackendGL)
+#else
+#define TRASE_DISPATCH_LEGEND_GL
+#endif
+
+#define TRASE_GEOMETRY_DISPATCH_BACKENDS                                       \
+  TRASE_DISPATCH_SVG                                                           \
+  TRASE_DISPATCH_GL                                                            \
+  TRASE_DISPATCH_LEGEND_SVG                                                    \
+  TRASE_DISPATCH_LEGEND_GL
 
 #include "frontend/Geometry.tcc"
 

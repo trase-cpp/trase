@@ -48,6 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+// forward declare since Axis has some functions returning legends
+class Legend;
+
 /// A helper struct for Axis that holds tick-related information
 struct TickInfo {
   std::vector<float> x_val;
@@ -113,11 +116,11 @@ class Axis : public Drawable {
   /// the Axis title
   std::string m_title;
 
-  /// true if legend is visible
-  bool m_legend;
-
   /// tick helper
   TickInfo m_tick_info;
+
+  /// true if axis has a Legend
+  bool m_has_legend;
 
 public:
   /// create a new Axis contained in the given Figure
@@ -156,7 +159,7 @@ public:
   void title(const char *string) { m_title.assign(string); }
 
   /// show a legend identifying each Geometry in the Axis
-  void legend() { m_legend = true; }
+  std::shared_ptr<Legend> legend();
 
   /// Create a new plot and return a shared pointer to it.
   ///
@@ -247,6 +250,8 @@ private:
 
   void update_tick_information();
   vint2_t calculate_num_ticks();
+  void add_geometry_to_legend(const std::shared_ptr<Geometry> &geometry);
+  std::shared_ptr<Legend> add_legend();
 
   template <typename Backend> void draw_common(Backend &backend);
   template <typename Backend> void draw_common_axis_box(Backend &backend);
@@ -255,7 +260,6 @@ private:
   template <typename Backend> void draw_common_title(Backend &backend);
   template <typename Backend> void draw_common_xlabel(Backend &backend);
   template <typename Backend> void draw_common_ylabel(Backend &backend);
-  template <typename Backend> void draw_common_legend(Backend &backend);
 };
 
 } // namespace trase

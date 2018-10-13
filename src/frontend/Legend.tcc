@@ -31,39 +31,50 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file Line.hpp
+#include <algorithm>
 
-#ifndef LINE_H_
-#define LINE_H_
-
-#include "frontend/Geometry.hpp"
+#include "frontend/Legend.hpp"
 
 namespace trase {
 
-class Line : public Geometry {
-public:
-  explicit Line(Axis *parent) : Geometry(parent) {}
+template <typename AnimatedBackend>
+void Legend::draw(AnimatedBackend &backend) {
+  draw_common(backend, [&](const bfloat2_t &sample_box,
+                           const std::shared_ptr<Geometry> &geometry) {
+    geometry->dispatch_legend(backend, sample_box);
+  });
+}
 
-  TRASE_GEOMETRY_DISPATCH_BACKENDS
+template <typename Backend>
+void Legend::draw(Backend &backend, const float time) {
+  draw_common(backend, [&](const bfloat2_t &sample_box,
+                           const std::shared_ptr<Geometry> &geometry) {
+    geometry->dispatch_legend(backend, time, sample_box);
+  });
+}
 
-  template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
-  template <typename Backend> void draw(Backend &backend, float time);
-  template <typename AnimatedBackend>
-  void draw_legend(AnimatedBackend &backend, const bfloat2_t &box);
-  template <typename Backend>
-  void draw_legend(Backend &backend, float time, const bfloat2_t &box);
+template <typename Backend, typename Callback>
+void Legend::draw_common(Backend &backend, const Callback &callback) {
+  const float sample_length = 20.f;
 
-private:
-  template <typename AnimatedBackend>
-  void draw_frames(AnimatedBackend &backend);
-  template <typename AnimatedBackend>
-  void draw_anim_highlights(AnimatedBackend &backend);
-  template <typename Backend> void draw_plot(Backend &backend);
-  template <typename Backend> void draw_highlights(Backend &backend);
-};
-
+  // draw legend in upper right corner
+  vfloat2_t upper_right_corner = {m_pixels.bmax[0], m_pixels.bmin[1]};
+  backend.text_align(ALIGN_RIGHT | ALIGN_TOP);
+  backend.stroke_width(m_line_width);
+  backend.fill_color(m_color);
+  for (const auto &geometry : m_entries) {
+    const vfloat2_t upper_left_corner =
+        upper_right_corner - vfloat2_t{sample_length, 0};
+    const vfloat2_t lower_right_corner =
+        upper_right_corner + vfloat2_t{0, m_font_size};
+    const bfloat2_t sample_box = {upper_left_corner, lower_right_corner};
+    callback(sample_box, geometry);
+    backend.fill_color(m_color);
+    backend.text(upper_right_corner +
+                     vfloat2_t(-(5.f / 3.f) * sample_length, 0.f),
+                 geometry->get_label().c_str(), nullptr);
+    upper_right_corner[1] += m_font_size;
+  }
 } // namespace trase
 
-#include "frontend/Line.tcc"
-
-#endif // LINE_H_
+} // namespace trase

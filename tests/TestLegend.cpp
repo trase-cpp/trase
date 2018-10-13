@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of trase.
+This file is part of the Oxford RSE C++ Template project.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,39 +31,62 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file Line.hpp
+#include "catch.hpp"
 
-#ifndef LINE_H_
-#define LINE_H_
+#include "DummyDraw.hpp"
 
-#include "frontend/Geometry.hpp"
+#include "trase.hpp"
+#include <fstream>
 
-namespace trase {
+using namespace trase;
 
-class Line : public Geometry {
-public:
-  explicit Line(Axis *parent) : Geometry(parent) {}
+TEST_CASE("legend creation", "[legend]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  const int n = 100;
+  std::vector<float> x(n);
+  std::vector<float> y(n);
+  for (int i = 0; i < n; ++i) {
+    x[i] = 6.28f * static_cast<float>(i) / n;
+    y[i] = (n / 2) * std::sin(x[i]);
+  }
+  auto data = create_data().x(x).y(y);
+  auto geom = ax->histogram(data);
+  geom->set_label("histogram");
+  DummyDraw::draw("legend", fig);
+  ax->legend();
+  DummyDraw::draw("legend", fig);
+  geom = ax->line(data);
+  geom->set_label("line");
+  DummyDraw::draw("legend", fig);
+  geom = ax->points(data);
+  geom->set_label("points");
+  DummyDraw::draw("legend", fig);
+}
 
-  TRASE_GEOMETRY_DISPATCH_BACKENDS
+TEST_CASE("animated points", "[legend]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  const int n = 100;
+  std::vector<float> x(n);
+  std::vector<float> y(n);
+  std::vector<float> c(n);
 
-  template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
-  template <typename Backend> void draw(Backend &backend, float time);
-  template <typename AnimatedBackend>
-  void draw_legend(AnimatedBackend &backend, const bfloat2_t &box);
-  template <typename Backend>
-  void draw_legend(Backend &backend, float time, const bfloat2_t &box);
+  std::vector<DataWithAesthetic> datas(5);
+  for (int i = 0; i < 5; ++i) {
+    for (int j = 0; j < n; ++j) {
+      x[j] = 6.28f * static_cast<float>(j) / n;
+      y[j] = (n / 2) * std::sin(x[j]);
+      c[j] = (n / 2) * std::sin(x[j] + i * 6.28f / 5.f);
+    }
+    datas[i].x(x).y(y).color(c);
+  }
 
-private:
-  template <typename AnimatedBackend>
-  void draw_frames(AnimatedBackend &backend);
-  template <typename AnimatedBackend>
-  void draw_anim_highlights(AnimatedBackend &backend);
-  template <typename Backend> void draw_plot(Backend &backend);
-  template <typename Backend> void draw_highlights(Backend &backend);
-};
-
-} // namespace trase
-
-#include "frontend/Line.tcc"
-
-#endif // LINE_H_
+  auto geom = ax->points(datas[0]);
+  for (int i = 1; i < 5; ++i) {
+    geom->add_frame(datas[i], static_cast<float>(i) / 5.f);
+  }
+  geom->set_label("points");
+  ax->legend();
+  DummyDraw::draw("legend_animated_points", fig);
+}

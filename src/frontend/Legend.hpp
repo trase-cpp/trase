@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of trase.
+This file is part of the Oxford RSE C++ Template project.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,39 +31,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file Line.hpp
+/// \file Legend.hpp
 
-#ifndef LINE_H_
-#define LINE_H_
+#ifndef LEGEND_H_
+#define LEGEND_H_
 
-#include "frontend/Geometry.hpp"
+#include "frontend/Axis.hpp"
+#include "frontend/Drawable.hpp"
+#include <array>
 
 namespace trase {
 
-class Line : public Geometry {
-public:
-  explicit Line(Axis *parent) : Geometry(parent) {}
+class Legend : public Drawable {
+  std::vector<std::shared_ptr<Geometry>> m_entries;
 
-  TRASE_GEOMETRY_DISPATCH_BACKENDS
+  /// the linewidth used
+  float m_line_width;
+
+  /// the font size used
+  float m_font_size;
+
+  /// the font used
+  std::string m_font_face;
+
+  /// the color used
+  RGBA m_color;
+
+public:
+  Legend(Drawable *parent, const bfloat2_t &area);
+
+  TRASE_DISPATCH_BACKENDS
+
+  void add_entry(const std::shared_ptr<Geometry> &entry) {
+    m_entries.push_back(entry);
+  }
 
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
-  template <typename AnimatedBackend>
-  void draw_legend(AnimatedBackend &backend, const bfloat2_t &box);
-  template <typename Backend>
-  void draw_legend(Backend &backend, float time, const bfloat2_t &box);
 
 private:
-  template <typename AnimatedBackend>
-  void draw_frames(AnimatedBackend &backend);
-  template <typename AnimatedBackend>
-  void draw_anim_highlights(AnimatedBackend &backend);
-  template <typename Backend> void draw_plot(Backend &backend);
-  template <typename Backend> void draw_highlights(Backend &backend);
+  template <typename Backend, typename DispatchF>
+  void draw_common(Backend &backend, const DispatchF &dispatch);
 };
 
 } // namespace trase
 
-#include "frontend/Line.tcc"
+#include "frontend/Legend.tcc"
 
-#endif // LINE_H_
+#endif // PLOT1D_H_

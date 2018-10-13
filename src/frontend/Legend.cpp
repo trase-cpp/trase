@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of trase.
+This file is part of the Oxford RSE C++ Template project.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,39 +31,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file Line.hpp
-
-#ifndef LINE_H_
-#define LINE_H_
-
-#include "frontend/Geometry.hpp"
+#include "Legend.hpp"
 
 namespace trase {
 
-class Line : public Geometry {
-public:
-  explicit Line(Axis *parent) : Geometry(parent) {}
-
-  TRASE_GEOMETRY_DISPATCH_BACKENDS
-
-  template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
-  template <typename Backend> void draw(Backend &backend, float time);
-  template <typename AnimatedBackend>
-  void draw_legend(AnimatedBackend &backend, const bfloat2_t &box);
-  template <typename Backend>
-  void draw_legend(Backend &backend, float time, const bfloat2_t &box);
-
-private:
-  template <typename AnimatedBackend>
-  void draw_frames(AnimatedBackend &backend);
-  template <typename AnimatedBackend>
-  void draw_anim_highlights(AnimatedBackend &backend);
-  template <typename Backend> void draw_plot(Backend &backend);
-  template <typename Backend> void draw_highlights(Backend &backend);
-};
+Legend::Legend(Drawable *parent, const bfloat2_t &area)
+    : Drawable(parent, area), m_line_width(3.f), m_font_size(18.f),
+      m_font_face("Roboto"), m_color(0, 0, 0) {}
 
 } // namespace trase
-
-#include "frontend/Line.tcc"
-
-#endif // LINE_H_

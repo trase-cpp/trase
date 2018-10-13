@@ -48,6 +48,20 @@ void Histogram::draw(Backend &backend, const float time) {
 }
 
 template <typename AnimatedBackend>
+void Histogram::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
+  backend.stroke_color(m_color);
+  backend.stroke_width(m_line_width);
+  backend.fill_color(m_color);
+  backend.rect(box * vfloat2_t{0.75f, 0.75f});
+}
+
+template <typename Backend>
+void Histogram::draw_legend(Backend &backend, const float time,
+                            const bfloat2_t &box) {
+  draw_legend(backend, box);
+}
+
+template <typename AnimatedBackend>
 void Histogram::draw_frames(AnimatedBackend &backend) {
 
   backend.stroke_color(m_color);
