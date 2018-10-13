@@ -37,6 +37,6 @@ namespace trase {
 
 Legend::Legend(Drawable *parent, const bfloat2_t &area)
     : Drawable(parent, area), m_line_width(3.f), m_font_size(18.f),
-      m_font_face("Roboto"), m_color(RGBA::black) {}
+      m_font_face("Roboto"), m_color(0, 0, 0) {}
 
 } // namespace trase

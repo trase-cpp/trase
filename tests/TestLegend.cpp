@@ -65,3 +65,30 @@ TEST_CASE("legend creation", "[legend]") {
   ax->legend(false);
   DummyDraw::draw("legend", fig);
 }
+
+TEST_CASE("animated points", "[legend]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  const int n = 100;
+  std::vector<float> x(n);
+  std::vector<float> y(n);
+  std::vector<float> c(n);
+
+  std::vector<DataWithAesthetic> datas(5);
+  for (int i = 0; i < 5; ++i) {
+    for (int j = 0; j < n; ++j) {
+      x[j] = 6.28f * static_cast<float>(j) / n;
+      y[j] = (n / 2) * std::sin(x[j]);
+      c[j] = (n / 2) * std::sin(x[j] + i * 6.28f / 5.f);
+    }
+    datas[i].x(x).y(y).color(c);
+  }
+
+  auto geom = ax->points(datas[0]);
+  for (int i = 1; i < 5; ++i) {
+    geom->add_frame(datas[i], i);
+  }
+  geom->set_label("points");
+  ax->legend();
+  DummyDraw::draw("legend_animated_points", fig);
+}

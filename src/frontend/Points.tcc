@@ -135,7 +135,8 @@ void Points::draw_frames(AnimatedBackend &backend) {
         m_axis->to_display<Aesthetic::x>(x),
         m_axis->to_display<Aesthetic::y>(y),
         have_color ? m_axis->to_display<Aesthetic::color>(c) : 0.f,
-        have_size ? m_axis->to_display<Aesthetic::size>(s) : 1.f};
+        have_size ? m_axis->to_display<Aesthetic::size>(s)
+                  : (m_pixels.bmax[1] - m_pixels.bmin[1]) / 80.f};
   };
 
   backend.stroke_width(0);
@@ -171,7 +172,8 @@ template <typename Backend> void Points::draw_plot(Backend &backend) {
         m_axis->to_display<Aesthetic::x>(x),
         m_axis->to_display<Aesthetic::y>(y),
         have_color ? m_axis->to_display<Aesthetic::color>(c) : 0.f,
-        have_size ? m_axis->to_display<Aesthetic::size>(s) : 1.f};
+        have_size ? m_axis->to_display<Aesthetic::size>(s)
+                  : (m_pixels.bmax[1] - m_pixels.bmin[1]) / 80.f};
   };
 
   if (w2 == 0.0f) {
