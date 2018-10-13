@@ -180,6 +180,9 @@ public:
   /// widths)
   template <typename Aesthetic> void set(float min, float max);
 
+  /// returns true if Aesthetic has been set
+  template <typename Aesthetic> bool has() const;
+
   /// returns number of rows in the data set
   int rows() const;
 

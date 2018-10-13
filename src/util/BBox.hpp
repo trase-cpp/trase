@@ -132,7 +132,7 @@ template <typename T, int N> struct bbox {
   ///
   /// @return scale the bounding box
   ///
-  inline bbox operator*(const vector_t &arg) {
+  inline bbox operator*(const vector_t &arg) const {
     bbox bounds = *this;
     bounds *= arg;
     return bounds;

@@ -119,6 +119,12 @@ void DataWithAesthetic::set(const std::vector<T> &data) {
   }
 }
 
+/// returns true if Aesthetic has been set
+template <typename Aesthetic> bool DataWithAesthetic::has() const {
+  auto search = m_map.find(Aesthetic::index);
+  return search != m_map.end();
+}
+
 template <typename T>
 DataWithAesthetic &DataWithAesthetic::x(const std::vector<T> &data) {
   set<Aesthetic::x>(data);

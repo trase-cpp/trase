@@ -51,7 +51,7 @@ template <typename AnimatedBackend>
 void Line::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
   backend.stroke_color(m_color);
   backend.stroke_width(m_line_width);
-  const double y_coord = 0.5 * (box.bmin[1] + box.bmax[1]);
+  const float y_coord = 0.5f * (box.bmin[1] + box.bmax[1]);
   backend.move_to({box.bmax[0], y_coord});
   backend.line_to({box.bmin[0], y_coord});
   backend.stroke();

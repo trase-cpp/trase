@@ -44,7 +44,7 @@ class Line : public Geometry {
 public:
   explicit Line(Axis *parent) : Geometry(parent) {}
 
-  TRASE_DISPATCH_BACKENDS
+  TRASE_GEOMETRY_DISPATCH_BACKENDS
 
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);

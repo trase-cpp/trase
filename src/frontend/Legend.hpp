@@ -68,6 +68,10 @@ public:
 
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
+
+private:
+  template <typename Backend, typename DispatchF>
+  void draw_common(Backend &backend, const DispatchF &dispatch);
 };
 
 } // namespace trase

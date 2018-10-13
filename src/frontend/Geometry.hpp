@@ -125,6 +125,14 @@ public:
   const float get_line_width() const { return m_line_width; }
   const Colormap &get_colormap() const { return *m_colormap; }
 
+#ifdef TRASE_BACKEND_GL
+  virtual void dispatch_legend(BackendGL &figure, float time,
+                               const bfloat2_t &box) = 0;
+#endif
+  virtual void dispatch_legend(BackendSVG &file, float time,
+                               const bfloat2_t &box) = 0;
+  virtual void dispatch_legend(BackendSVG &file, const bfloat2_t &box) = 0;
+
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);
   template <typename AnimatedBackend>
