@@ -54,15 +54,13 @@ TEST_CASE("legend creation", "[legend]") {
   auto geom = ax->histogram(data);
   geom->set_label("histogram");
   DummyDraw::draw("legend", fig);
-  ax->legend(true);
+  ax->legend();
   DummyDraw::draw("legend", fig);
   geom = ax->line(data);
   geom->set_label("line");
   DummyDraw::draw("legend", fig);
   geom = ax->points(data);
   geom->set_label("points");
-  DummyDraw::draw("legend", fig);
-  ax->legend(false);
   DummyDraw::draw("legend", fig);
 }
 

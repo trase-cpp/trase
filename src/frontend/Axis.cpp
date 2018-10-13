@@ -158,44 +158,48 @@ vint2_t Axis::calculate_num_ticks() {
   return {static_cast<int>(std::floor(5.f * pix_ratio)), 5};
 }
 
-void Axis::legend(const bool show) {
-  // check if we already have a legend
+std::shared_ptr<Legend> Axis::add_legend() {
+  bfloat2_t bounding_box({0, 0}, {1, 1});
+  auto new_legend = std::make_shared<Legend>(this, bounding_box);
+  new_legend->resize(m_pixels);
+
+  // add current geometries to legend
+  std::vector<std::shared_ptr<Geometry>> geometry_drawables;
+  for (auto i = m_children.begin(); i != m_children.end(); ++i) {
+    if (auto geometry = std::dynamic_pointer_cast<Geometry>(*i)) {
+      new_legend->add_entry(geometry);
+    }
+  }
+  m_children.push_back(new_legend);
+  m_has_legend = true;
+  return new_legend;
+}
+
+std::shared_ptr<Legend> Axis::legend() {
+  // if we don't have a legend make one
+  if (!m_has_legend) {
+    return add_legend();
+  }
+
+  // we already have a legend, find it
   auto legend_drawable =
       std::find_if(m_children.begin(), m_children.end(), [](const auto &i) {
         return static_cast<bool>(std::dynamic_pointer_cast<Legend>(i));
       });
-  const bool found_legend = legend_drawable != m_children.end();
 
-  if (show && !found_legend) {
-    // user wants us to show a legend and none currently exists, so make one
-    bfloat2_t bounding_box({0, 0}, {1, 1});
-    auto new_legend = std::make_shared<Legend>(this, bounding_box);
-    new_legend->resize(m_pixels);
-
-    // add current geometries to legend
-    std::vector<std::shared_ptr<Geometry>> geometry_drawables;
-    for (auto i = m_children.begin(); i != m_children.end(); ++i) {
-      if (auto geometry = std::dynamic_pointer_cast<Geometry>(*i)) {
-        new_legend->add_entry(geometry);
-      }
-    }
-    m_children.push_back(new_legend);
-  } else if (!show && found_legend) {
-    // user doesn't want a legend and we have one, so erase it
-    m_children.erase(legend_drawable);
-  }
+  // return found legend
+  return std::dynamic_pointer_cast<Legend>(*legend_drawable);
 }
 
 void Axis::add_geometry_to_legend(const std::shared_ptr<Geometry> &geometry) {
-  // check if we already have a legend
+  // find legend
   auto legend_drawable =
       std::find_if(m_children.begin(), m_children.end(), [](const auto &i) {
         return static_cast<bool>(std::dynamic_pointer_cast<Legend>(i));
       });
-  const bool found_legend = legend_drawable != m_children.end();
 
-  // if we do add the new geometry to it
-  if (found_legend) {
+  // if we found the legend, add the new geometry to it
+  if (legend_drawable != m_children.end()) {
     auto legend_geometry = std::dynamic_pointer_cast<Legend>(*legend_drawable);
     legend_geometry->add_entry(geometry);
   }
