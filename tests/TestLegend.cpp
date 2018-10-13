@@ -84,7 +84,7 @@ TEST_CASE("animated points", "[legend]") {
 
   auto geom = ax->points(datas[0]);
   for (int i = 1; i < 5; ++i) {
-    geom->add_frame(datas[i], i);
+    geom->add_frame(datas[i], static_cast<float>(i) / 5.f);
   }
   geom->set_label("points");
   ax->legend();
