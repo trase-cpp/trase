@@ -99,17 +99,20 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
     }
   };
 
+  // create data
+
   // create a static sin(x) function
   write_y(1.f, 2.f);
-  auto static_plot = ax->plot(x, y);
+  auto data = create_data().x(x).y(y);
+  auto static_plot = ax->line(data);
   static_plot->set_label("static");
 
   // create a moving sin(x) function with varying amplitude
   write_y(1.f, 5.f);
-  auto moving_plot = ax->plot(x, y);
+  data = create_data().x(x).y(y).color(r).size(r);
+  auto moving_plot = ax->line(data);
   moving_plot->set_label("moving");
 
-  auto data = create_data().x(x).y(y).color(r).size(r);
   auto points = ax->points(data);
   points->set_label("points");
 
@@ -117,9 +120,8 @@ TEST_CASE("figure can written using SVG backend", "[figure]") {
     const float nf = static_cast<float>(nframes);
     const float amplitude = 1.f - 0.5f * std::sin(6.28f * i / nf);
     write_y(amplitude, 5.f);
-    moving_plot->add_frame(x, y, 3.f * i / nf);
-
     auto data = create_data().x(x).y(y).color(r).size(r);
+    moving_plot->add_frame(data, 3.f * i / nf);
     points->add_frame(data, 3.f * i / nf);
   }
 

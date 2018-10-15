@@ -40,16 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename T1, typename T2>
-std::shared_ptr<Geometry> Axis::plot(const std::vector<T1> &x,
-                                     const std::vector<T2> &y) {
-  if (x.size() != y.size()) {
-    throw Exception("x and y vector sizes do not match");
-  }
-  return plot_impl(std::make_shared<Line>(this), Transform(Identity()),
-                   DataWithAesthetic().x(x).y(y));
-}
-
 template <typename Backend>
 void Axis::draw(Backend &backend, const float time) {
   draw_common(backend);

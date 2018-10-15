@@ -56,12 +56,11 @@ TEST_CASE("interactive test (only run by a human)", "[interactive]") {
     y[i] = std::sin(5 * x[i]);
     r[i] = 0.1;
   }
-  auto static_plot = ax->plot(x, y);
+  auto data = create_data().x(x).y(y).color(r).size(r);
+  auto static_plot = ax->line(data);
   static_plot->set_label("static");
-  auto moving_plot = ax->plot(x, y);
+  auto moving_plot = ax->line(data);
   moving_plot->set_label("moving");
-
-  auto data = moving_plot->get_data(0).color(r).size(r);
 
   auto points = ax->points(data);
   points->set_label("points");

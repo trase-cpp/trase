@@ -161,19 +161,6 @@ public:
   /// show a legend identifying each Geometry in the Axis
   std::shared_ptr<Legend> legend();
 
-  /// Create a new plot and return a shared pointer to it.
-  ///
-  /// TODO: issue 88 - this function might be removed in the future, use line()
-  /// instead
-  ///
-  /// \param x the x-values to plot
-  /// \param y the y-values to plot
-  /// \param label the plot label. Defaults to empty string.
-  /// \return shared pointer to the new plot
-  template <typename T1, typename T2>
-  std::shared_ptr<Geometry> plot(const std::vector<T1> &x,
-                                 const std::vector<T2> &y);
-
   /// Create a new Points plot and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
   /// \param transform (optional) the transform to apply
