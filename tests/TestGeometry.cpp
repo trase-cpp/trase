@@ -41,24 +41,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace trase;
 
-TEST_CASE("plot1d can be created", "[plot1d]") {
+TEST_CASE("line geometry can be created", "[geometry]") {
   auto fig = figure();
   auto ax = fig->axis();
-  auto pl1 = ax->plot(std::vector<float>({0.0f, 0.1f, 0.5f}),
-                      std::vector<float>({0.0f, 0.1f, 0.5f}));
-  auto pl2 = ax->plot(std::vector<int>({0, 1, 2}),
-                      std::vector<float>({0.0f, 0.1f, 0.5f}));
-
-  auto pl3 = ax->plot(std::vector<int>({0, 1, 2}), std::vector<int>({0, 2, 4}));
+  auto pl1 = ax->line(create_data()
+                          .x(std::vector<float>({0.0f, 0.1f, 0.5f}))
+                          .y(std::vector<float>({0.0f, 0.1f, 0.5f})));
+  auto pl2 = ax->line(create_data()
+                          .x(std::vector<int>({0, 1, 2}))
+                          .y(std::vector<float>({0.0f, 0.1f, 0.5f})));
+  auto pl3 = ax->line(create_data()
+                          .x(std::vector<int>({0, 1, 2}))
+                          .y(std::vector<int>({0, 2, 4})));
 
   // auto pl4 = ax->plot({0, 1, 2}, {0, 2, 4});
   //
-  REQUIRE_THROWS_WITH(ax->plot(std::vector<float>({0.0f, 0.1f}),
-                               std::vector<float>({0.0f, 0.1f, 0.5f})),
-                      Catch::Contains("x and y vector sizes do not match"));
+  REQUIRE_THROWS_WITH(
+      ax->line(create_data()
+                   .x(std::vector<float>({0.0f, 0.1f}))
+                   .y(std::vector<float>({0.0f, 0.1f, 0.5f}))),
+      Catch::Contains("columns in dataset must have identical number of rows"));
 
   std::vector<float> x = {0.0f, 0.1f, 0.5f};
   std::vector<float> y = {0.0f, 0.1f, 0.5f};
-
-  auto pl5 = ax->plot(x, y);
+  auto data = create_data().x(x).y(y);
+  auto pl5 = ax->line(data);
 }

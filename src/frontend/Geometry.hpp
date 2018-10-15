@@ -78,15 +78,6 @@ protected:
 public:
   explicit Geometry(Axis *parent);
 
-  template <typename T1, typename T2>
-  void add_frame(const std::vector<T1> &x, const std::vector<T2> &y,
-                 const float time) {
-    if (x.size() != y.size()) {
-      throw Exception("x and y vector sizes do not match");
-    }
-    return add_frame(DataWithAesthetic().x(x).y(y), time);
-  }
-
   /// Adds a new data frame to this plot
   ///
   /// The limits of the new data frame will be added to the limits of this
