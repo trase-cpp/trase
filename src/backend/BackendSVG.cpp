@@ -40,7 +40,7 @@ bool BackendSVG::mouseover() const noexcept {
          !m_onmouseout_tooltip.empty();
 }
 
-void BackendSVG::init(const float width, const float height, const char *name,
+void BackendSVG::init(const vfloat2_t &pixels, const char *name,
                       const float time_span) noexcept {
   m_time_span = time_span;
   m_out << R"del(<?xml version="1.0" encoding="utf-8" standalone="no"?>
@@ -48,7 +48,7 @@ void BackendSVG::init(const float width, const float height, const char *name,
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 )del";
 
-  m_out << "<svg width=\"" << width << "px\" height=\"" << height
+  m_out << "<svg width=\"" << pixels[0] << "px\" height=\"" << pixels[1]
         << "px\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n";
 
   m_out << "<desc>" << name << "</desc>\n";

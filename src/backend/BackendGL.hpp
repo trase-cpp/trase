@@ -66,7 +66,7 @@ class BackendGL : public Backend {
 public:
   TRASE_BACKEND_VISITABLE()
 
-  void init(int x_pixels, int y_pixels, const char *name);
+  void init(const vfloat2_t &pixels, const char *name);
   void finalise();
   vfloat2_t begin_frame();
   void end_frame();
@@ -89,87 +89,38 @@ public:
 
   inline void mouse_drag_reset_delta() { ImGui::ResetMouseDragDelta(); }
 
-  inline void scissor(const bfloat2_t &x) {
-    const auto &delta = x.delta();
-    const auto &min = x.min();
-    nvgScissor(m_vg, min[0], min[1], delta[0], delta[1]);
-  }
+  void scissor(const bfloat2_t &x);
 
-  inline void reset_scissor() { nvgResetScissor(m_vg); }
+  void reset_scissor();
 
-  inline void rotate(const float angle) { nvgRotate(m_vg, angle); }
-  inline void translate(const vfloat2_t &v) { nvgTranslate(m_vg, v[0], v[1]); }
-  inline void reset_transform() { nvgResetTransform(m_vg); }
+  void rotate(const float angle);
+  void translate(const vfloat2_t &v);
+  void reset_transform();
 
-  inline void begin_path() { nvgBeginPath(m_vg); }
-  inline void rounded_rect(const bfloat2_t &x, const float r) {
-    const auto &delta = x.delta();
-    const auto &min = x.min();
-    begin_path();
-    nvgRoundedRect(m_vg, min[0], min[1], delta[0], delta[1], r);
-    fill();
-  }
-  inline void rect(const bfloat2_t &x) {
-    const auto &delta = x.delta();
-    const auto &min = x.min();
-    begin_path();
-    nvgRect(m_vg, min[0], min[1], delta[0], delta[1]);
-    fill();
-  }
+  void begin_path();
+  void rounded_rect(const bfloat2_t &x, const float r);
+  void rect(const bfloat2_t &x);
 
-  inline void circle(const vfloat2_t &centre, float radius) {
-    begin_path();
-    nvgArc(m_vg, centre[0], centre[1], radius, 0, 2 * M_PI, NVG_CW);
-    fill();
-  }
+  void circle(const vfloat2_t &centre, float radius);
 
-  inline void move_to(const vfloat2_t &x) { nvgMoveTo(m_vg, x[0], x[1]); }
-  inline void line_to(const vfloat2_t &x) { nvgLineTo(m_vg, x[0], x[1]); }
-  inline void stroke_color(const RGBA &color) {
-    nvgStrokeColor(m_vg, nvgRGBA(color.r(), color.g(), color.b(), color.a()));
-  }
+  void move_to(const vfloat2_t &x);
+  void line_to(const vfloat2_t &x);
+  void stroke_color(const RGBA &color);
 
-  inline void stroke_width(const float lw) { nvgStrokeWidth(m_vg, lw); }
-  inline void stroke() { nvgStroke(m_vg); }
-  inline void fill() { nvgFill(m_vg); }
-  inline void font_size(float size) { nvgFontSize(m_vg, size); }
-  inline void font_face(const char *face) {
-    if (nvgFindFont(m_vg, face) == -1) {
-      auto filename = m_fm.find_font(face, "");
-      if (filename.empty()) {
-        throw Exception("Could not find font" + std::string(face));
-      }
-      int font_id = nvgCreateFont(m_vg, face, filename.c_str());
-      if (font_id == -1) {
-        throw Exception("Could not add font" + filename);
-      }
-    }
-    nvgFontFace(m_vg, face);
-  }
-  inline void font_blur(const float blur) { nvgFontBlur(m_vg, blur); }
-  inline void text_align(const int align) { nvgTextAlign(m_vg, align); }
-  inline void fill_color(const RGBA &color) {
-    nvgFillColor(m_vg, nvgRGBA(color.r(), color.g(), color.b(), color.a()));
-  }
+  void stroke_width(const float lw);
+  void stroke();
+  void fill();
+  void font_size(float size);
+  void font_face(const char *face);
+  void font_blur(const float blur);
+  void text_align(const int align);
+  void fill_color(const RGBA &color);
 
-  inline void text(const vfloat2_t &x, const char *string, const char *end) {
-    nvgText(m_vg, x[0], x[1], string, end);
-  }
+  void text(const vfloat2_t &x, const char *string, const char *end);
 
-  inline bfloat2_t text_bounds(const vfloat2_t &x, const char *string) {
-    bfloat2_t ret;
-    float bounds[4];
-    nvgTextBounds(m_vg, x[0], x[1], string, nullptr, bounds);
-    ret.bmin[0] = bounds[0];
-    ret.bmin[1] = bounds[1];
-    ret.bmax[0] = bounds[2];
-    ret.bmax[1] = bounds[3];
-    return ret;
-  }
+  bfloat2_t text_bounds(const vfloat2_t &x, const char *string);
 
-  inline bool should_close() {
-    return static_cast<bool>(glfwWindowShouldClose(m_window));
-  }
+  bool should_close();
 
 private:
   NVGcontext *init_nanovg(int x_pixels, int y_pixels);

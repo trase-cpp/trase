@@ -191,7 +191,7 @@ TEST_CASE("svg backend init and finalise work as expected", "[svg_backend]") {
 
   SECTION("init produces correct string") {
 
-    backend.init(123.4f, 234.5f, "r@ndom^name", 345.6f);
+    backend.init({123.4f, 234.5f}, "r@ndom^name", 345.6f);
 
     CHECK(is_substr_ignoring_ws(out_ss.str(), R"(width="123.4px")"));
     CHECK(is_substr_ignoring_ws(out_ss.str(), R"(height="234.5px")"));
@@ -207,7 +207,7 @@ TEST_CASE("svg backend init and finalise work as expected", "[svg_backend]") {
 
   SECTION("forms valid svg") {
 
-    backend.init(123.4f, 234.5f, "r@ndom^name", 345.6f);
+    backend.init({123.4f, 234.5f}, "r@ndom^name", 345.6f);
     backend.finalise();
 
     std::ofstream out_f;
@@ -239,7 +239,7 @@ TEST_CASE("svg backend rect works as expected", "[svg_backend]") {
 
   SECTION("basic rectangle forms valid svg") {
 
-    backend.init(10.f, 10.f, "name");
+    backend.init({10.f, 10.f}, "name");
     backend.rect({{1.23f, 2.34f}, {3.45f, 5.67f}});
     backend.finalise();
 
@@ -265,7 +265,7 @@ TEST_CASE("svg backend rect works as expected", "[svg_backend]") {
 
   SECTION("rounded rectangle forms valid svg") {
 
-    backend.init(10.f, 10.f, "name");
+    backend.init({10.f, 10.f}, "name");
     backend.rounded_rect({{1.23f, 2.34f}, {3.45f, 5.67f}}, 1.78f);
     backend.finalise();
 
@@ -296,7 +296,7 @@ TEST_CASE("svg backend circle works as expected", "[svg_backend]") {
 
   SECTION("basic circle forms valid svg") {
 
-    backend.init(10.f, 10.f, "name");
+    backend.init({10.f, 10.f}, "name");
     backend.circle({1.23f, 2.34f}, 3.45f);
     backend.finalise();
 

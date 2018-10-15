@@ -44,12 +44,96 @@ static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Error %d: %s\n", error, description);
 }
 
-void BackendGL::init(int x_pixels, int y_pixels, const char *name) {
-  m_window = create_window(x_pixels, y_pixels, name);
+void BackendGL::init(const vfloat2_t &pixels, const char *name) {
+  m_window = create_window(pixels[0], pixels[1], name);
   if (!m_window)
     throw Exception("trase: Cannot create OpenGL window");
   init_imgui(m_window);
-  m_vg = init_nanovg(x_pixels, y_pixels);
+  m_vg = init_nanovg(pixels[0], pixels[1]);
+}
+
+void BackendGL::scissor(const bfloat2_t &x) {
+  const auto &delta = x.delta();
+  const auto &min = x.min();
+  nvgScissor(m_vg, min[0], min[1], delta[0], delta[1]);
+}
+
+void BackendGL::reset_scissor() { nvgResetScissor(m_vg); }
+
+void BackendGL::rotate(const float angle) { nvgRotate(m_vg, angle); }
+void BackendGL::translate(const vfloat2_t &v) {
+  nvgTranslate(m_vg, v[0], v[1]);
+}
+void BackendGL::reset_transform() { nvgResetTransform(m_vg); }
+
+void BackendGL::begin_path() { nvgBeginPath(m_vg); }
+void BackendGL::rounded_rect(const bfloat2_t &x, const float r) {
+  const auto &delta = x.delta();
+  const auto &min = x.min();
+  begin_path();
+  nvgRoundedRect(m_vg, min[0], min[1], delta[0], delta[1], r);
+  fill();
+}
+void BackendGL::rect(const bfloat2_t &x) {
+  const auto &delta = x.delta();
+  const auto &min = x.min();
+  begin_path();
+  nvgRect(m_vg, min[0], min[1], delta[0], delta[1]);
+  fill();
+}
+
+void BackendGL::circle(const vfloat2_t &centre, float radius) {
+  begin_path();
+  nvgArc(m_vg, centre[0], centre[1], radius, 0, 2 * M_PI, NVG_CW);
+  fill();
+}
+
+void BackendGL::move_to(const vfloat2_t &x) { nvgMoveTo(m_vg, x[0], x[1]); }
+void BackendGL::line_to(const vfloat2_t &x) { nvgLineTo(m_vg, x[0], x[1]); }
+void BackendGL::stroke_color(const RGBA &color) {
+  nvgStrokeColor(m_vg, nvgRGBA(color.r(), color.g(), color.b(), color.a()));
+}
+
+void BackendGL::stroke_width(const float lw) { nvgStrokeWidth(m_vg, lw); }
+void BackendGL::stroke() { nvgStroke(m_vg); }
+void BackendGL::fill() { nvgFill(m_vg); }
+void BackendGL::font_size(float size) { nvgFontSize(m_vg, size); }
+void BackendGL::font_face(const char *face) {
+  if (nvgFindFont(m_vg, face) == -1) {
+    auto filename = m_fm.find_font(face, "");
+    if (filename.empty()) {
+      throw Exception("Could not find font" + std::string(face));
+    }
+    int font_id = nvgCreateFont(m_vg, face, filename.c_str());
+    if (font_id == -1) {
+      throw Exception("Could not add font" + filename);
+    }
+  }
+  nvgFontFace(m_vg, face);
+}
+void BackendGL::font_blur(const float blur) { nvgFontBlur(m_vg, blur); }
+void BackendGL::text_align(const int align) { nvgTextAlign(m_vg, align); }
+void BackendGL::fill_color(const RGBA &color) {
+  nvgFillColor(m_vg, nvgRGBA(color.r(), color.g(), color.b(), color.a()));
+}
+
+void BackendGL::text(const vfloat2_t &x, const char *string, const char *end) {
+  nvgText(m_vg, x[0], x[1], string, end);
+}
+
+bfloat2_t BackendGL::text_bounds(const vfloat2_t &x, const char *string) {
+  bfloat2_t ret;
+  float bounds[4];
+  nvgTextBounds(m_vg, x[0], x[1], string, nullptr, bounds);
+  ret.bmin[0] = bounds[0];
+  ret.bmin[1] = bounds[1];
+  ret.bmax[0] = bounds[2];
+  ret.bmax[1] = bounds[3];
+  return ret;
+}
+
+bool BackendGL::should_close() {
+  return static_cast<bool>(glfwWindowShouldClose(m_window));
 }
 
 void BackendGL::finalise() {
