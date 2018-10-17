@@ -33,6 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BackendGL.hpp"
 
+#include <glad.h>
+#define GLFW_INCLUDE_GLEXT
+#include <GLFW/glfw3.h>
+
+#include "imgui.h"
+#include "nanovg.h"
+
 // Needs to go in the cpp file (should only be included once)
 #define NANOVG_GL3_IMPLEMENTATION
 #include "nanovg_gl.h"
@@ -51,6 +58,24 @@ void BackendGL::init(const vfloat2_t &pixels, const char *name) {
   init_imgui(m_window);
   m_vg = init_nanovg(pixels[0], pixels[1]);
 }
+
+bool BackendGL::is_interactive() { return true; }
+
+float BackendGL::get_time() { return ImGui::GetTime(); }
+
+vfloat2_t BackendGL::get_mouse_pos() {
+  auto pos = ImGui::GetMousePos();
+  return {pos[0], pos[1]};
+}
+
+bool BackendGL::mouse_dragging() { return ImGui::IsMouseDragging(); }
+
+vfloat2_t BackendGL::mouse_drag_delta() {
+  ImVec2 delta = ImGui::GetMouseDragDelta();
+  return {delta[0], delta[1]};
+}
+
+void BackendGL::mouse_drag_reset_delta() { ImGui::ResetMouseDragDelta(); }
 
 void BackendGL::scissor(const bfloat2_t &x) {
   const auto &delta = x.delta();
