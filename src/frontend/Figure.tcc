@@ -41,7 +41,7 @@ namespace trase {
 template <typename AnimatedBackend>
 void Figure::draw(AnimatedBackend &backend) {
   auto name = "Figure " + std::to_string(m_id);
-  backend.init(m_pixels.bmax[0], m_pixels.bmax[1], name.c_str(), m_time_span);
+  backend.init(m_pixels.bmax, name.c_str(), m_time_span);
   for (const auto &i : m_children) {
     i->dispatch(backend);
   }
@@ -50,7 +50,7 @@ void Figure::draw(AnimatedBackend &backend) {
 
 template <typename Backend> void Figure::show(Backend &backend) {
   auto name = "Figure " + std::to_string(m_id);
-  backend.init(this->m_pixels.bmax[0], this->m_pixels.bmax[1], name.c_str());
+  backend.init(this->m_pixels.bmax, name.c_str());
 
   // Main loop
   while (!backend.should_close()) {
@@ -98,7 +98,7 @@ template <typename Backend> void Figure::show(Backend &backend) {
 template <typename Backend>
 void Figure::draw(Backend &backend, const float time) {
   auto name = "Figure " + std::to_string(m_id);
-  backend.init(m_pixels.bmax[0], m_pixels.bmax[1], name.c_str());
+  backend.init(m_pixels.bmax, name.c_str());
   for (const auto &i : m_children) {
     i->dispatch(backend, time);
   }

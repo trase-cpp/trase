@@ -36,17 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BACKENDGL_H_
 #define BACKENDGL_H_
 
-#include <glad.h>
-// works for you.
-#define GLFW_INCLUDE_GLEXT
-#include <GLFW/glfw3.h>
+// forward declare GL and nanovg stuff (included in BackendGL.cpp)
+struct NVGcontext;
+struct GLFWwindow;
 
 #include <array>
 #include <cstdio>
 #include <iostream>
-
-#include "imgui.h"
-#include "nanovg.h"
 
 #include "backend/Backend.hpp"
 #include "util/BBox.hpp"
@@ -66,110 +62,132 @@ class BackendGL : public Backend {
 public:
   TRASE_BACKEND_VISITABLE()
 
-  void init(int x_pixels, int y_pixels, const char *name);
+  /// Initialise this backend. Call before any drawing
+  /// @param pixels the size of the window in pixels
+  /// @param name the name of the window
+  void init(const vfloat2_t &pixels, const char *name);
+
+  /// Finalise this backend. Call after all drawing finished
   void finalise();
+
+  /// Begin a new frame. All drawing calls must be between begin_frame() and
+  /// end_frame()
   vfloat2_t begin_frame();
+
+  /// End the current frame. All drawing calls must be between begin_frame() and
+  /// end_frame()
   void end_frame();
 
-  inline bool is_interactive() { return true; }
+  /// Return true if this backend has mouse interaction
+  bool is_interactive();
 
-  inline float get_time() { return ImGui::GetTime(); }
+  /// Returns true if the current window should close (e.g. due to user
+  /// interaction)
+  bool should_close();
 
-  inline vfloat2_t get_mouse_pos() {
-    auto pos = ImGui::GetMousePos();
-    return {pos[0], pos[1]};
-  }
+  /// Get the current time
+  float get_time();
 
-  inline bool mouse_dragging() { return ImGui::IsMouseDragging(); }
+  /// Get the current position of the mouse in pixel units
+  vfloat2_t get_mouse_pos();
 
-  vfloat2_t mouse_drag_delta() {
-    ImVec2 delta = ImGui::GetMouseDragDelta();
-    return {delta[0], delta[1]};
-  }
+  /// Returns true if the mouse button is clicked and the mouse is dragging
+  bool mouse_dragging();
 
-  inline void mouse_drag_reset_delta() { ImGui::ResetMouseDragDelta(); }
+  /// Current delta position of the dragging mouse
+  vfloat2_t mouse_drag_delta();
 
-  inline void scissor(const bfloat2_t &x) {
-    const auto &delta = x.delta();
-    const auto &min = x.min();
-    nvgScissor(m_vg, min[0], min[1], delta[0], delta[1]);
-  }
+  /// Reset drag delta to zero
+  void mouse_drag_reset_delta();
 
-  inline void reset_scissor() { nvgResetScissor(m_vg); }
+  /// All subsequent drawing calls will be masked to only show within the
+  /// bounding box @p x
+  void scissor(const bfloat2_t &x);
 
-  inline void rotate(const float angle) { nvgRotate(m_vg, angle); }
-  inline void translate(const vfloat2_t &v) { nvgTranslate(m_vg, v[0], v[1]); }
-  inline void reset_transform() { nvgResetTransform(m_vg); }
+  /// Remove a previously call to scissor()
+  void reset_scissor();
 
-  inline void begin_path() { nvgBeginPath(m_vg); }
-  inline void rounded_rect(const bfloat2_t &x, const float r) {
-    const auto &delta = x.delta();
-    const auto &min = x.min();
-    begin_path();
-    nvgRoundedRect(m_vg, min[0], min[1], delta[0], delta[1], r);
-    fill();
-  }
-  inline void rect(const bfloat2_t &x) {
-    const auto &delta = x.delta();
-    const auto &min = x.min();
-    begin_path();
-    nvgRect(m_vg, min[0], min[1], delta[0], delta[1]);
-    fill();
-  }
+  /// Apply a rotation of @p angle to the current drawing transform
+  void rotate(const float angle);
 
-  inline void circle(const vfloat2_t &centre, float radius) {
-    begin_path();
-    nvgArc(m_vg, centre[0], centre[1], radius, 0, 2 * M_PI, NVG_CW);
-    fill();
-  }
+  /// Apply a translation of @p v to the current drawing transform
+  void translate(const vfloat2_t &v);
 
-  inline void move_to(const vfloat2_t &x) { nvgMoveTo(m_vg, x[0], x[1]); }
-  inline void line_to(const vfloat2_t &x) { nvgLineTo(m_vg, x[0], x[1]); }
-  inline void stroke_color(const RGBA &color) {
-    nvgStrokeColor(m_vg, nvgRGBA(color.r(), color.g(), color.b(), color.a()));
-  }
+  /// Reset the drawing transform to the identity matrix
+  void reset_transform();
 
-  inline void stroke_width(const float lw) { nvgStrokeWidth(m_vg, lw); }
-  inline void stroke() { nvgStroke(m_vg); }
-  inline void fill() { nvgFill(m_vg); }
-  inline void font_size(float size) { nvgFontSize(m_vg, size); }
-  inline void font_face(const char *face) {
-    if (nvgFindFont(m_vg, face) == -1) {
-      auto filename = m_fm.find_font(face, "");
-      if (filename.empty()) {
-        throw Exception("Could not find font" + std::string(face));
-      }
-      int font_id = nvgCreateFont(m_vg, face, filename.c_str());
-      if (font_id == -1) {
-        throw Exception("Could not add font" + filename);
-      }
-    }
-    nvgFontFace(m_vg, face);
-  }
-  inline void font_blur(const float blur) { nvgFontBlur(m_vg, blur); }
-  inline void text_align(const int align) { nvgTextAlign(m_vg, align); }
-  inline void fill_color(const RGBA &color) {
-    nvgFillColor(m_vg, nvgRGBA(color.r(), color.g(), color.b(), color.a()));
-  }
+  /// Begin a path. Subsequent calls to move_to() or line_to() defines the path
+  /// to be drawn. The current path is completed by a call to stroke() or fill()
+  void begin_path();
 
-  inline void text(const vfloat2_t &x, const char *string, const char *end) {
-    nvgText(m_vg, x[0], x[1], string, end);
-  }
+  /// Extends the current path. Moves the current "pen" position to the position
+  /// @p x
+  /// @see begin_path()
+  void move_to(const vfloat2_t &x);
 
-  inline bfloat2_t text_bounds(const vfloat2_t &x, const char *string) {
-    bfloat2_t ret;
-    float bounds[4];
-    nvgTextBounds(m_vg, x[0], x[1], string, nullptr, bounds);
-    ret.bmin[0] = bounds[0];
-    ret.bmin[1] = bounds[1];
-    ret.bmax[0] = bounds[2];
-    ret.bmax[1] = bounds[3];
-    return ret;
-  }
+  /// Extends the current path. Draws a straight line from the current "pen"
+  /// position to @p x
+  /// @see begin_path()
+  void line_to(const vfloat2_t &x);
 
-  inline bool should_close() {
-    return static_cast<bool>(glfwWindowShouldClose(m_window));
-  }
+  /// Draw a line along the completed path
+  /// @see begin_path()
+  void stroke();
+
+  /// Draw a line along the completed path and fill it in.
+  /// @see begin_path()
+  void fill();
+
+  /// Set the current stroke width
+  /// @see stroke()
+  void stroke_width(const float lw);
+
+  /// Set the current stroke color
+  /// @see stroke()
+  void stroke_color(const RGBA &color);
+
+  /// Set the current fill color
+  /// @see fill()
+  void fill_color(const RGBA &color);
+
+  /// Draw a rectangle with rounded corners
+  /// @param x the bounding box describing the rectangle
+  /// @param r the radius of the rounded corners
+  void rounded_rect(const bfloat2_t &x, const float r);
+
+  /// Draw a rectangle
+  /// @param x the bounding box describing the rectangle
+  void rect(const bfloat2_t &x);
+
+  /// Draw a circle with a given @p centre and @p radius
+  void circle(const vfloat2_t &centre, float radius);
+
+  /// Draw the given text to the screen
+  /// @param x the position to draw the text
+  /// @param a pointer to the text
+  /// @param end the end of the text to draw (use nullptr to draw entire string)
+  void text(const vfloat2_t &x, const char *string, const char *end);
+
+  /// Returns the bounding box covering the given text
+  /// @param x the drawing position of the text
+  /// @param string pointer to the text
+  bfloat2_t text_bounds(const vfloat2_t &x, const char *string);
+
+  /// Sets the current font height in pixels
+  /// @see text()
+  void font_size(float size);
+
+  /// Sets the current font name
+  /// @see text()
+  void font_face(const char *face);
+
+  /// Sets the amount of blur to apply to the drawn text
+  /// @see text()
+  void font_blur(const float blur);
+
+  /// Sets the alignment of the text to its position
+  /// @see text()
+  void text_align(const int align);
 
 private:
   NVGcontext *init_nanovg(int x_pixels, int y_pixels);
