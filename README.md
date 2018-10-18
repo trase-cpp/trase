@@ -103,7 +103,7 @@ $ cmake --build . --target install --config Release
 ```
 
 3. In your C++ project, you might link against Trase with a `CMakeLists.txt` 
-   file like so (remove `backendGL` if you don't build it):
+   file like so:
 
 ```cmake
 cmake_minimum_required(VERSION 2.8.12)
