@@ -112,7 +112,7 @@ project(test)
 find_package(trase REQUIRED)
 
 add_executable(myexe test.cpp)
-target_link_libraries(myexe trase backendGL backendSVG)
+target_link_libraries(myexe trase)
 ```
 
 4. When you build your project, you can tell CMake where you installed Trase 
