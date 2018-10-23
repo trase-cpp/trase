@@ -71,7 +71,9 @@ public:
 };
 
 class BackendSVG : public AnimatedBackend {
+  /// the output file stream that the svg is written to
   std::ostream &m_out;
+
   std::string m_linewidth;
   std::string m_line_color;
   std::string m_fill_color;
@@ -112,77 +114,105 @@ class BackendSVG : public AnimatedBackend {
   /// Add the closing rect tag to m_out
   void rect_end() noexcept;
 
+  /// returns true if any of the mouseover features of this backend have been
+  /// set
+  bool mouseover() const noexcept;
+
 public:
-  explicit BackendSVG(std::ostream &out) : m_out(out) {
-    stroke_color({0, 0, 0, 255});
-    fill_color({0, 0, 0, 255});
-    stroke_width(1);
-  }
+  /// create a new backend which will write out an animated SVG to the output
+  /// stream @p out
+  explicit BackendSVG(std::ostream &out);
 
   TRASE_BACKEND_VISITABLE()
   TRASE_ANIMATED_BACKEND_VISITABLE()
 
+  /// Initialise the backend
+  ///
+  /// This function must be called before any other drawing calls
+  ///
+  /// @param pixels the image resolution in pixels
+  /// @param name the name of the image
+  /// @param time_span the total time span of the animated svg
   void init(const vfloat2_t &pixels, const char *name,
             float time_span = 0.f) noexcept;
 
+  /// Finalise the backend.
+  ///
+  /// This function must be called after all drawing is complete
   void finalise() noexcept;
 
-  inline bool is_interactive() { return false; }
+  /// returns false
+  bool is_interactive();
 
-  inline vfloat2_t get_mouse_pos() { return vfloat2_t(0, 0); }
+  /// this backend is not interactive so return value is undefined
+  vfloat2_t get_mouse_pos();
 
-  inline void scissor(const bfloat2_t &x) {}
+  /// all subsequent drawing calls will be cut to within this box
+  void scissor(const bfloat2_t &x);
 
-  inline void reset_scissor() {}
+  /// resets any previous calls to @ref scissor()
+  void reset_scissor();
 
-  inline void rotate(const float angle) { m_transform.rotate(angle); }
-  inline void reset_transform() { m_transform.clear(); }
-  inline void translate(const vfloat2_t &v) { m_transform.translate(v); }
+  /// rotates the drawing transform by an angle given by @p angle
+  void rotate(const float angle);
 
-  inline void begin_path() { m_path.clear(); }
+  /// resets the drawing transform to identity
+  ///
+  /// @see rotate(), translate()
+  void reset_transform();
 
-  bool mouseover() const noexcept;
+  /// translates the drawing transform by an amount given by @p v
+  void translate(const vfloat2_t &v);
 
-  inline void begin_animated_path() {
-    if (m_animate_values.empty()) {
-      m_animate_values.resize(1);
-    }
-    m_animate_times = "keyTimes=\"";
-    m_animate_values[0] = "values=\"";
-    begin_path();
-  }
-  inline void add_animated_path(const float time) {
+  /// begin a drawing path
+  ///
+  /// must be called before move_to(), line_to(), or close_path()
+  void begin_path();
 
-    // if its the first frame need to write the path element
-    // TODO: not sure why need to add d attribute here, but neccessary for
-    // single frame animations. Figure out how to remove this as it doubles the
-    // required space
-    if (m_animate_times.back() == '\"') {
-      m_out << "<path " << m_line_color << ' ' << m_linewidth
-            << " fill-opacity=\"0\" d=\"" << m_path << "\">\n ";
-    }
+  /// move the "pen" to the point @p x without drawing a line
+  ///
+  /// @see begin_path()
+  void move_to(const vfloat2_t &x);
 
-    // all times are scaled by total time span (all times start at 0)
-    m_animate_times += std::to_string(time / m_time_span) + ';';
-    m_animate_values[0] += m_path + ';';
-    m_path.clear();
-  }
+  /// draw a line to the point @p x
+  ///
+  /// @see begin_path()
+  void line_to(const vfloat2_t &x);
 
-  inline void end_animated_path(const float time) {
-    add_animated_path(time);
-    m_animate_times.back() = '\"';
-    m_animate_values[0].back() = '\"';
-    m_out << "<animate attributeName=\"d\" "
-             //"calcMode=\"discrete\" "
-             "repeatCount=\"indefinite\" "
-             "begin =\"0s\" "
-             "dur=\""
-          << m_time_span << "s\" " << m_animate_values[0] << ' '
-          << m_animate_times << "/>\n";
-    m_out << "</path>\n";
-    m_animate_times.clear();
-    m_animate_values[0].clear();
-  }
+  /// draw a line to the first point of the path
+  ///
+  /// @see begin_path()
+  void close_path();
+
+  /// finalise a drawing path with a drawn line along the path
+  ///
+  /// @see begin_path()
+  void stroke();
+
+  /// finalise a drawing path with a drawn line and a filled enclosed domain
+  ///
+  /// @see begin_path()
+  void fill();
+
+  /// begin an animated path
+  ///
+  /// must be called before move_to(), line_to(), add_animated_path(), or
+  /// end_animated_path()
+  void begin_animated_path();
+
+  /// finalise the current path and add a new path at time @p time
+  ///
+  /// Note that filled paths are not currently supported by the animated path
+  ///
+  /// @see begin_animated_path()
+  void add_animated_path(const float time);
+
+  /// finalise the current animated path
+  ///
+  /// Note that filled paths are not currently supported by the animated path
+  ///
+  /// @see begin_animated_path()
+  void end_animated_path(const float time);
 
   /// draw a rectangle with rounded corners
   ///
@@ -214,196 +244,89 @@ public:
   /// @param r the radius of the circle
   void circle(const vfloat2_t &centre, float r) noexcept;
 
-  inline void add_animated_circle(const vfloat2_t &centre, float radius,
-                                  float time) {
-    // check if first circle
-    if (m_animate_times.empty()) {
-      circle_begin(centre, radius);
+  /// start/continue an animated circle
+  /// subsequent calls to this method will add extra keyframe to the animation.
+  ///
+  /// @param centre the centre of the circle
+  /// @param radius the radius of the circle
+  /// @param time the time of the keyframe
+  void add_animated_circle(const vfloat2_t &centre, float radius, float time);
 
-      if (m_animate_values.size() < 3) {
-        m_animate_values.resize(3);
-      }
-      m_animate_times =
-          "keyTimes=\"" + std::to_string(time / m_time_span) + ';';
-      m_animate_values[0] = "values=\"" + std::to_string(centre[0]) + ';';
-      m_animate_values[1] = "values=\"" + std::to_string(centre[1]) + ';';
-      m_animate_values[2] = "values=\"" + std::to_string(radius) + ';';
-    } else {
-      m_animate_times += std::to_string(time / m_time_span) + ';';
-      m_animate_values[0] += std::to_string(centre[0]) + ';';
-      m_animate_values[1] += std::to_string(centre[1]) + ';';
-      m_animate_values[2] += std::to_string(radius) + ';';
-    }
-  }
+  /// end an animated circle
+  ///
+  void end_animated_circle();
 
-  inline void end_animated_circle() {
+  /// draw a circle with with a string label
+  ///
+  /// @param centre the centre of the circle
+  /// @param radius the radius of the circle
+  /// @param string the string text
+  void circle_with_text(const vfloat2_t &centre, float radius,
+                        const char *string);
 
-    m_animate_times.back() = '\"';
-    for (int i = 0; i < 3; ++i) {
-      m_animate_values[i].back() = '\"';
-    }
-    const std::string names[3] = {"cx", "cy", "r"};
-    for (int i = 0; i < 3; ++i) {
-      m_out << "<animate attributeName=\"" + names[i] +
-                   "\" repeatCount=\"indefinite\" begin =\"0s\" dur=\""
-            << m_time_span << "s\" " << m_animate_values[i] << ' '
-            << m_animate_times << "/>\n";
-    }
-    circle_end();
-    m_animate_times.clear();
+  /// draw an arc
+  ///
+  /// @param centre the centre of the arc
+  /// @parma radius the radius of the arc
+  /// @param angle0 the start angle of the arc
+  /// @param angle1 the end angle of the arc
+  void arc(const vfloat2_t &centre, const float radius, const float angle0,
+           const float angle1);
 
-    for (int i = 0; i < 3; ++i) {
-      m_animate_values[i].clear();
-    }
-  }
+  /// set the current stroke color
+  void stroke_color(const RGBA &color);
 
-  inline void circle_with_text(const vfloat2_t &centre, float radius,
-                               const char *string) {
-    m_out << "<circle cx=\"" << centre[0] << "\" cy=\"" << centre[1]
-          << "\" r=\"" << radius << "\" " << m_fill_color << ' ' << m_line_color
-          << ' ' << m_linewidth
-          << " onmouseover=\"evt.target.setAttribute('stroke-opacity','1.0');"
-             "\" onmouseout=\"bob.setAttribute('stroke-opacity', '0.0');"
-             "\"/>\n";
-    auto text_pos = centre + 2.f * vfloat2_t(radius, -radius);
-    m_out << "<text id=\"bob\" x=\"" << text_pos[0] << "\" y=\"" << text_pos[1]
-          << "\" " << m_font_face << ' ' << m_font_size << ' ' << m_font_align
-          << ' ' << m_fill_color << '>' << string << "</text>\n";
-  }
+  /// set the current stroke color, with a different color to display on
+  /// mouseover
+  void stroke_color(const RGBA &color, const RGBA &color_mouseover);
 
-  inline void arc(const vfloat2_t &centre, const float radius,
-                  const float angle0, const float angle1) {
-    const vfloat2_t p0 =
-        centre + radius * vfloat2_t(std::cos(angle0), std::sin(angle0));
-    const vfloat2_t p1 =
-        centre + radius * vfloat2_t(std::cos(angle1), std::sin(angle1));
-    move_to(p0);
-    m_path += " A " + std::to_string(radius) + ' ' + std::to_string(radius) +
-              " 0 0 1 " + std::to_string(p1[0]) + ' ' + std::to_string(p1[1]);
-  }
+  /// Set a tooltip
+  ///
+  /// This is used in prior to a call to rect() or circle(). Sets a tooltip text
+  /// to display on mouseover on the rectangle or circle.
+  ///
+  /// @param x the position of the tooltip
+  /// @param string the text of the tooltip
+  void tooltip(const vfloat2_t &x, const char *string);
 
-  inline void move_to(const vfloat2_t &x) {
-    m_path += " M " + std::to_string(x[0]) + ' ' + std::to_string(x[1]);
-  }
-  inline void line_to(const vfloat2_t &x) {
-    m_path += " L " + std::to_string(x[0]) + ' ' + std::to_string(x[1]);
-  }
-  inline void close_path() { m_path += " Z"; }
+  /// Unset the tooltip
+  ///
+  /// @see tooltip()
+  void clear_tooltip();
 
-  inline void stroke_color(const RGBA &color) {
-    m_line_color = std::string("stroke=\"") + color.to_rgb_string() +
-                   "\" stroke-opacity=\"" + std::to_string(color.a() / 255.0) +
-                   '\"';
-    m_onmouseover_stroke.clear();
-    m_onmouseout_stroke.clear();
-  };
+  /// sets the current stroke width
+  void stroke_width(const float lw);
 
-  inline void stroke_color(const RGBA &color, const RGBA &color_mouseover) {
-    stroke_color(color);
-    m_onmouseover_stroke = "evt.target.setAttribute('stroke', '" +
-                           color_mouseover.to_rgb_string() +
-                           "'); evt.target.setAttribute('stroke-opacity','" +
-                           std::to_string(color_mouseover.a() / 255.0) + "');";
-    m_onmouseout_stroke = "evt.target.setAttribute('stroke', '" +
-                          color.to_rgb_string() +
-                          "'); evt.target.setAttribute('stroke-opacity','" +
-                          std::to_string(color.a() / 255.0) + "');";
-  }
+  /// set the current fill color
+  void fill_color(const RGBA &color);
 
-  inline void tooltip(const vfloat2_t &x, const char *string) {
-    m_onmouseover_tooltip = "tooltip(" + std::to_string(x[0]) + ',' +
-                            std::to_string(x[1]) + ",'" + string + "'," +
-                            m_font_size_base + ",'" + m_font_face_base + "');";
-    m_onmouseout_tooltip = "remove_tooltip();";
-  }
+  /// set the current fill color, with a different color on mouseover
+  void fill_color(const RGBA &color, const RGBA &color_mouseover);
 
-  inline void clear_tooltip() {
-    m_onmouseover_tooltip.clear();
-    m_onmouseout_tooltip.clear();
-  }
+  /// set the current font height
+  void font_size(float size);
 
-  inline void stroke_width(const float lw) {
-    m_linewidth =
-        std::string("stroke-width=\"") + std::to_string(lw) + std::string("\"");
-  }
-  inline void fill_color(const RGBA &color) {
-    m_fill_color = "fill=\"" + color.to_rgb_string() + "\" fill-opacity=\"" +
-                   std::to_string(color.a() / 255.0) + '\"';
-  }
+  /// sets the current font
+  void font_face(const char *face);
 
-  inline void stroke() {
-    m_out << "<path d=\"" << m_path << "\" " << m_line_color << ' '
-          << m_linewidth << " fill-opacity=\"0\"";
-    if (!m_transform.is_identity()) {
-      m_out << ' ' << m_transform.to_string();
-    }
-    m_out << "/>\n";
-  }
-  inline void fill() {
-    m_out << "<path d=\"" << m_path << "\" " << m_fill_color << ' '
-          << m_line_color << ' ' << m_linewidth;
-    if (!m_transform.is_identity()) {
-      m_out << ' ' << m_transform.to_string();
-    }
-    m_out << "/>\n";
-    m_onmouseover_fill.clear();
-    m_onmouseout_fill.clear();
-  }
+  /// sets a web font
+  ///
+  /// must be called before init()
+  void import_web_font(const std::string &url);
 
-  inline void fill_color(const RGBA &color, const RGBA &color_mouseover) {
-    fill_color(color);
-    m_onmouseover_fill = "evt.target.setAttribute('fill', '" +
-                         color_mouseover.to_rgb_string() +
-                         "'); evt.target.setAttribute('fill-opacity','" +
-                         std::to_string(color_mouseover.a() / 255.0) + "');";
-    m_onmouseout_fill = "evt.target.setAttribute('fill', '" +
-                        color.to_rgb_string() +
-                        "'); evt.target.setAttribute('fill-opacity','" +
-                        std::to_string(color.a() / 255.0) + "');";
-  }
+  /// set the amount of font blur on text
+  void font_blur(const float blur);
 
-  inline void font_size(float size) {
-    m_font_size_base = std::to_string(size);
-    m_font_size = "font-size=\"" + std::to_string(size) + '\"';
-  }
+  /// sets the current text alignment
+  void text_align(const unsigned int align);
 
-  inline void font_face(const char *face) {
-    m_font_face_base = std::string(face);
-    m_font_face = "font-family=\"" + std::string(face) + '\"';
-  }
-
-  inline void import_web_font(const std::string &url) { m_web_font = url; }
-
-  inline void font_blur(const float blur) {}
-  inline void text_align(const unsigned int align) {
-    std::string align_text;
-    if (align & ALIGN_LEFT) {
-      align_text = "start";
-    } else if (align & ALIGN_CENTER) {
-      align_text = "middle";
-    } else if (align & ALIGN_RIGHT) {
-      align_text = "end";
-    }
-    std::string vert_align_text;
-    if (align & ALIGN_TOP) {
-      vert_align_text = "hanging";
-    } else if (align & ALIGN_MIDDLE) {
-      vert_align_text = "middle";
-    } else if (align & ALIGN_BOTTOM) {
-      vert_align_text = "baseline";
-    }
-    m_font_align = "text-anchor=\"" + align_text + "\" alignment-baseline=\"" +
-                   vert_align_text + '\"';
-  }
-
-  inline void text(const vfloat2_t &x, const char *string, const char *end) {
-    m_out << "<text x=\"" << x[0] << "\" y=\"" << x[1] << "\" " << m_font_face
-          << ' ' << m_font_size << ' ' << m_font_align << ' ' << m_fill_color;
-    if (!m_transform.is_identity()) {
-      m_out << ' ' << m_transform.to_string();
-    }
-    m_out << '>' << string << "</text>\n";
-  }
+  /// draws text to a given position
+  ///
+  /// @param x the text position (see text_align())
+  /// @param string a pointer to the text string
+  /// @param end points to the end of the string. Use `nullptr` to write entire
+  /// string
+  void text(const vfloat2_t &x, const char *string, const char *end);
 };
 
 } // namespace trase
