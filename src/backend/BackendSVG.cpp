@@ -35,6 +35,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+BackendSVG::BackendSVG(std::ostream &out) : m_out(out) {
+  stroke_color({0, 0, 0, 255});
+  fill_color({0, 0, 0, 255});
+  stroke_width(1);
+}
+
 bool BackendSVG::mouseover() const noexcept {
   return !m_onmouseover_fill.empty() || !m_onmouseover_stroke.empty() ||
          !m_onmouseout_tooltip.empty();

@@ -71,7 +71,9 @@ public:
 };
 
 class BackendSVG : public AnimatedBackend {
+  /// the output file stream that the svg is written to
   std::ostream &m_out;
+
   std::string m_linewidth;
   std::string m_line_color;
   std::string m_fill_color;
@@ -112,40 +114,104 @@ class BackendSVG : public AnimatedBackend {
   /// Add the closing rect tag to m_out
   void rect_end() noexcept;
 
+  /// returns true if any of the mouseover features of this backend have been
+  /// set
+  bool mouseover() const noexcept;
+
 public:
-  explicit BackendSVG(std::ostream &out) : m_out(out) {
-    stroke_color({0, 0, 0, 255});
-    fill_color({0, 0, 0, 255});
-    stroke_width(1);
-  }
+  /// create a new backend which will write out an animated SVG to the output
+  /// stream @p out
+  explicit BackendSVG(std::ostream &out);
 
   TRASE_BACKEND_VISITABLE()
   TRASE_ANIMATED_BACKEND_VISITABLE()
 
+  /// Initialise the backend
+  ///
+  /// This function must be called before any other drawing calls
+  ///
+  /// @param pixels the image resolution in pixels
+  /// @param name the name of the image
+  /// @param time_span the total time span of the animated svg
   void init(const vfloat2_t &pixels, const char *name,
             float time_span = 0.f) noexcept;
 
+  /// Finalise the backend.
+  ///
+  /// This function must be called after all drawing is complete
   void finalise() noexcept;
 
+  /// returns false
   bool is_interactive();
 
+  /// this backend is not interactive so return value is undefined
   vfloat2_t get_mouse_pos();
 
+  /// all subsequent drawing calls will be cut to within this box
   void scissor(const bfloat2_t &x);
 
+  /// resets any previous calls to @ref scissor()
   void reset_scissor();
 
+  /// rotates the drawing transform by an angle given by @p angle
   void rotate(const float angle);
+
+  /// resets the drawing transform to identity
+  ///
+  /// @see rotate(), translate()
   void reset_transform();
+
+  /// translates the drawing transform by an amount given by @p v
   void translate(const vfloat2_t &v);
 
+  /// begin a drawing path
+  ///
+  /// must be called before move_to(), line_to(), or close_path()
   void begin_path();
 
-  bool mouseover() const noexcept;
+  /// move the "pen" to the point @p x without drawing a line
+  ///
+  /// @see begin_path()
+  void move_to(const vfloat2_t &x);
 
+  /// draw a line to the point @p x
+  ///
+  /// @see begin_path()
+  void line_to(const vfloat2_t &x);
+
+  /// draw a line to the first point of the path
+  ///
+  /// @see begin_path()
+  void close_path();
+
+  /// finalise a drawing path with a drawn line along the path
+  ///
+  /// @see begin_path()
+  void stroke();
+
+  /// finalise a drawing path with a drawn line and a filled enclosed domain
+  ///
+  /// @see begin_path()
+  void fill();
+
+  /// begin an animated path
+  ///
+  /// must be called before move_to(), line_to(), add_animated_path(), or
+  /// end_animated_path()
   void begin_animated_path();
+
+  /// finalise the current path and add a new path at time @p time
+  ///
+  /// Note that filled paths are not currently supported by the animated path
+  ///
+  /// @see begin_animated_path()
   void add_animated_path(const float time);
 
+  /// finalise the current animated path
+  ///
+  /// Note that filled paths are not currently supported by the animated path
+  ///
+  /// @see begin_animated_path()
   void end_animated_path(const float time);
 
   /// draw a rectangle with rounded corners
@@ -178,41 +244,88 @@ public:
   /// @param r the radius of the circle
   void circle(const vfloat2_t &centre, float r) noexcept;
 
+  /// start/continue an animated circle
+  /// subsequent calls to this method will add extra keyframe to the animation.
+  ///
+  /// @param centre the centre of the circle
+  /// @param radius the radius of the circle
+  /// @param time the time of the keyframe
   void add_animated_circle(const vfloat2_t &centre, float radius, float time);
 
+  /// end an animated circle
+  ///
   void end_animated_circle();
 
+  /// draw a circle with with a string label
+  ///
+  /// @param centre the centre of the circle
+  /// @param radius the radius of the circle
+  /// @param string the string text
   void circle_with_text(const vfloat2_t &centre, float radius,
                         const char *string);
 
+  /// draw an arc
+  ///
+  /// @param centre the centre of the arc
+  /// @parma radius the radius of the arc
+  /// @param angle0 the start angle of the arc
+  /// @param angle1 the end angle of the arc
   void arc(const vfloat2_t &centre, const float radius, const float angle0,
            const float angle1);
 
-  void move_to(const vfloat2_t &x);
-  void line_to(const vfloat2_t &x);
-  void close_path();
-
+  /// set the current stroke color
   void stroke_color(const RGBA &color);
 
+  /// set the current stroke color, with a different color to display on
+  /// mouseover
   void stroke_color(const RGBA &color, const RGBA &color_mouseover);
 
+  /// Set a tooltip
+  ///
+  /// This is used in prior to a call to rect() or circle(). Sets a tooltip text
+  /// to display on mouseover on the rectangle or circle.
+  ///
+  /// @param x the position of the tooltip
+  /// @param string the text of the tooltip
   void tooltip(const vfloat2_t &x, const char *string);
 
+  /// Unset the tooltip
+  ///
+  /// @see tooltip()
   void clear_tooltip();
-  void stroke_width(const float lw);
-  void fill_color(const RGBA &color);
-  void stroke();
-  void fill();
 
+  /// sets the current stroke width
+  void stroke_width(const float lw);
+
+  /// set the current fill color
+  void fill_color(const RGBA &color);
+
+  /// set the current fill color, with a different color on mouseover
   void fill_color(const RGBA &color, const RGBA &color_mouseover);
 
+  /// set the current font height
   void font_size(float size);
+
+  /// sets the current font
   void font_face(const char *face);
 
+  /// sets a web font
+  ///
+  /// must be called before init()
   void import_web_font(const std::string &url);
 
+  /// set the amount of font blur on text
   void font_blur(const float blur);
+
+  /// sets the current text alignment
   void text_align(const unsigned int align);
+
+  /// draws text to a given position
+  ///
+  /// @param x the text position (see text_align())
+  /// @param string a pointer to the text string
+  /// @param end points to the end of the string. Use `nullptr` to write entire
+  /// string
   void text(const vfloat2_t &x, const char *string, const char *end);
 };
 
