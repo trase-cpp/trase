@@ -33,49 +33,78 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BackendGL.hpp"
 
-#include <glad.h>
+//#include <glad.h>
+#define GLFW_INCLUDE_ES2
 #define GLFW_INCLUDE_GLEXT
 #include <GLFW/glfw3.h>
 
-#include "imgui.h"
 #include "nanovg.h"
 
 // Needs to go in the cpp file (should only be included once)
-#define NANOVG_GL3_IMPLEMENTATION
+//#define NANOVG_GL3_IMPLEMENTATION
+#define NANOVG_GLES2_IMPLEMENTATION
 #include "nanovg_gl.h"
-
-#include "imgui_impl_glfw_gl3.h"
+#include "nanovg_gl_utils.h"
 
 namespace trase {
 static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Error %d: %s\n", error, description);
 }
 
+bool BackendGL::m_lbutton_down = false;
+vfloat2_t BackendGL::m_lbutton_down_mouse_pos;
+
+static void glfw_mouse_callback(GLFWwindow *window, int button, int action,
+                                int mods) {
+  if (button == GLFW_MOUSE_BUTTON_LEFT) {
+    if (GLFW_PRESS == action) {
+      double xpos, ypos;
+      glfwGetCursorPos(window, &xpos, &ypos);
+      BackendGL::set_mouse_down(
+          {static_cast<float>(xpos), static_cast<float>(ypos)});
+    } else if (GLFW_RELEASE == action) {
+      BackendGL::set_mouse_up();
+    }
+  }
+}
+
 void BackendGL::init(const vfloat2_t &pixels, const char *name) {
   m_window = create_window(pixels[0], pixels[1], name);
   if (!m_window)
     throw Exception("trase: Cannot create OpenGL window");
-  init_imgui(m_window);
   m_vg = init_nanovg(pixels[0], pixels[1]);
 }
 
 bool BackendGL::is_interactive() { return true; }
 
-float BackendGL::get_time() { return ImGui::GetTime(); }
+float BackendGL::get_time() { return glfwGetTime(); }
+
+void BackendGL::set_mouse_down(const vfloat2_t &mouse_pos) {
+  m_lbutton_down = true;
+  m_lbutton_down_mouse_pos = mouse_pos;
+}
+void BackendGL::set_mouse_up() { m_lbutton_down = false; }
 
 vfloat2_t BackendGL::get_mouse_pos() {
-  auto pos = ImGui::GetMousePos();
-  return {pos[0], pos[1]};
+  double xpos, ypos;
+  glfwGetCursorPos(m_window, &xpos, &ypos);
+  return {static_cast<float>(xpos), static_cast<float>(ypos)};
 }
 
-bool BackendGL::mouse_dragging() { return ImGui::IsMouseDragging(); }
+bool BackendGL::mouse_dragging() {
+  return m_lbutton_down && (get_mouse_pos() != m_lbutton_down_mouse_pos).all();
+}
 
 vfloat2_t BackendGL::mouse_drag_delta() {
-  ImVec2 delta = ImGui::GetMouseDragDelta();
-  return {delta[0], delta[1]};
+  if (!m_lbutton_down) {
+    return {0.f, 0.f};
+  }
+  return get_mouse_pos() - m_lbutton_down_mouse_pos;
 }
 
-void BackendGL::mouse_drag_reset_delta() { ImGui::ResetMouseDragDelta(); }
+void BackendGL::mouse_drag_reset_delta() {
+  m_lbutton_down_mouse_pos = get_mouse_pos();
+}
 
 void BackendGL::scissor(const bfloat2_t &x) {
   const auto &delta = x.delta();
@@ -163,10 +192,7 @@ bool BackendGL::should_close() {
 
 void BackendGL::finalise() {
   // Cleanup
-  ImGui_ImplGlfwGL3_Shutdown();
-  ImGui::DestroyContext();
-
-  nvgDeleteGL3(m_vg);
+  nvgDeleteGLES2(m_vg);
 
   glfwDestroyWindow(m_window);
   glfwTerminate();
@@ -174,7 +200,6 @@ void BackendGL::finalise() {
 
 vfloat2_t BackendGL::begin_frame() {
   glfwPollEvents();
-  ImGui_ImplGlfwGL3_NewFrame();
 
   int winWidth, winHeight;
   int fbWidth, fbHeight;
@@ -200,8 +225,6 @@ vfloat2_t BackendGL::begin_frame() {
 
 void BackendGL::end_frame() {
   nvgEndFrame(m_vg);
-  ImGui::Render();
-  ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
   // Rendering
   glfwSwapBuffers(m_window);
 }
@@ -214,31 +237,38 @@ GLFWwindow *BackendGL::create_window(int x_pixels, int y_pixels,
   if (!glfwInit()) {
     throw Exception("Could not initialise GLFW");
   }
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#if __APPLE__
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
   GLFWwindow *window = glfwCreateWindow(x_pixels, y_pixels, name, NULL, NULL);
 
   if (!window)
     throw Exception("Could not create GLFW window");
+
+  glfwSetMouseButtonCallback(window, glfw_mouse_callback);
   glfwMakeContextCurrent(window);
   glfwSwapInterval(1); // Enable vsync
   // gl3wInit();
   // gladLoadGL();
-  if (!gladLoadGL()) {
+  /*
+#ifndef __EMSCRIPTEN__
+  // auto glad_load_result = gladLoadGLES2();
+  auto glad_load_result = gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
+#else
+  auto glad_load_result = gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
+#endif
+  if (!glad_load_result) {
     throw Exception("Could not load GL extensions");
   }
   std::cout << "OpenGL Version " << GLVersion.major << '.' << GLVersion.minor
             << std::endl;
+            */
   return window;
 }
 
 NVGcontext *BackendGL::init_nanovg(int x_pixels, int y_pixels) {
   NVGcontext *vg =
-      nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+      nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
   if (!vg)
     throw Exception("trase: Cannot init NanoVG");
   auto filename = m_fm.find_font("Roboto-Regular", "");
@@ -259,21 +289,6 @@ NVGcontext *BackendGL::init_nanovg(int x_pixels, int y_pixels) {
   nvgAddFallbackFontId(vg, fontNormal, fontEmoji);
   nvgAddFallbackFontId(vg, fontBold, fontEmoji);
   return vg;
-}
-
-void BackendGL::init_imgui(GLFWwindow *window) {
-  // Setup Dear ImGui binding
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
-  ImGuiIO &io = ImGui::GetIO();
-  (void)io;
-  // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard
-  // Controls io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable
-  // Gamepad Controls
-  ImGui_ImplGlfwGL3_Init(window, true);
-
-  // Setup style
-  ImGui::StyleColorsDark();
 }
 
 } // namespace trase

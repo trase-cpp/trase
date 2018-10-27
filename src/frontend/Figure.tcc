@@ -36,6 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "frontend/Figure.hpp"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 namespace trase {
 
 template <typename AnimatedBackend>
@@ -48,50 +52,70 @@ void Figure::draw(AnimatedBackend &backend) {
   backend.finalise();
 }
 
+template <typename Backend>
+void Figure::render_interactive_frame(Backend &backend) {
+  const vfloat2_t win_limits = backend.begin_frame();
+  if ((win_limits != m_pixels.bmax).any()) {
+    m_pixels.bmax = win_limits;
+    for (const auto &i : m_children) {
+      i->resize(m_pixels);
+    }
+  }
+
+  if (backend.mouse_dragging()) {
+    vfloat2_t delta = backend.mouse_drag_delta();
+    for (const auto &drawable : m_children) {
+      auto axis = std::dynamic_pointer_cast<Axis>(drawable);
+      // scale by axis pixel area
+      vfloat2_t ax_delta = delta / (axis->pixels().bmax * vfloat2_t(-1, 1));
+
+      // scale by axis limits
+      ax_delta[0] *= axis->limits().bmax[Aesthetic::x::index] -
+                     axis->limits().bmin[Aesthetic::x::index];
+      ax_delta[1] *= axis->limits().bmax[Aesthetic::y::index] -
+                     axis->limits().bmin[Aesthetic::y::index];
+
+      axis->limits().bmin[Aesthetic::x::index] += ax_delta[0];
+      axis->limits().bmax[Aesthetic::x::index] += ax_delta[0];
+      axis->limits().bmin[Aesthetic::y::index] += ax_delta[1];
+      axis->limits().bmax[Aesthetic::y::index] += ax_delta[1];
+    }
+    backend.mouse_drag_reset_delta();
+  }
+
+  const float time = backend.get_time();
+  const float looped_time = std::fmod(time, m_time_span);
+
+  for (const auto &i : m_children) {
+    i->dispatch(backend, looped_time);
+  }
+
+  backend.end_frame();
+}
+
+#ifdef __EMSCRIPTEN__
+template <typename Backend> void Figure::emscripten_callback(void *data) {
+  using data_t = std::pair<Figure *, Backend *>;
+  auto self = static_cast<data_t *>(data)->first;
+  auto backend = static_cast<data_t *>(data)->second;
+  self->render_interactive_frame(*backend);
+}
+#endif
+
 template <typename Backend> void Figure::show(Backend &backend) {
   auto name = "Figure " + std::to_string(m_id);
   backend.init(this->m_pixels.bmax, name.c_str());
 
-  // Main loop
+// Main loop
+#ifdef __EMSCRIPTEN__
+  auto data = std::make_pair(this, &backend);
+  emscripten_set_main_loop_arg(
+      (em_arg_callback_func)&emscripten_callback<Backend>, &data, 0, 1);
+#else
   while (!backend.should_close()) {
-    const vfloat2_t win_limits = backend.begin_frame();
-    if ((win_limits != m_pixels.bmax).any()) {
-      m_pixels.bmax = win_limits;
-      for (const auto &i : m_children) {
-        i->resize(m_pixels);
-      }
-    }
-
-    if (backend.mouse_dragging()) {
-      vfloat2_t delta = backend.mouse_drag_delta();
-      for (const auto &drawable : m_children) {
-        auto axis = std::dynamic_pointer_cast<Axis>(drawable);
-        // scale by axis pixel area
-        vfloat2_t ax_delta = delta / (axis->pixels().bmax * vfloat2_t(-1, 1));
-
-        // scale by axis limits
-        ax_delta[0] *= axis->limits().bmax[Aesthetic::x::index] -
-                       axis->limits().bmin[Aesthetic::x::index];
-        ax_delta[1] *= axis->limits().bmax[Aesthetic::y::index] -
-                       axis->limits().bmin[Aesthetic::y::index];
-
-        axis->limits().bmin[Aesthetic::x::index] += ax_delta[0];
-        axis->limits().bmax[Aesthetic::x::index] += ax_delta[0];
-        axis->limits().bmin[Aesthetic::y::index] += ax_delta[1];
-        axis->limits().bmax[Aesthetic::y::index] += ax_delta[1];
-      }
-      backend.mouse_drag_reset_delta();
-    }
-
-    const float time = backend.get_time();
-    const float looped_time = std::fmod(time, m_time_span);
-
-    for (const auto &i : m_children) {
-      i->dispatch(backend, looped_time);
-    }
-
-    backend.end_frame();
+    render_interactive_frame(backend);
   }
+#endif
   backend.finalise();
 }
 
