@@ -68,11 +68,6 @@ endif ()
 option (trase_BUILD_OPENGL "Build OpenGL backend and interactive test" ON)
 
 if (trase_BUILD_OPENGL)
-    set (glext_dir third-party/glad)
-    set (glext_source
-      ${glext_dir}/glad.c
-        ${glext_dir}/glad.h
-        )
 
     set (nanovg_dir third-party/nanovg)
     set (nanovg_source
@@ -86,7 +81,6 @@ if (trase_BUILD_OPENGL)
         )
 
     set (trase_gl_ext_headers
-        ${glext_dir}/glad.h
         ${nanovg_dir}/nanovg.h
         )
 
@@ -98,12 +92,6 @@ if (trase_BUILD_OPENGL)
         set(OPENGL_gl_LIBRARY "")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0 -s USE_WEBGL2=1 -s FULL_ES2=1  -s USE_GLFW=3 -s WASM=1 --preload-file ${trase_SOURCE_DIR}/font")
     endif()
-
-    add_library (glext ${glext_source})
-    target_include_directories (glext SYSTEM PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${glext_dir}>
-        $<INSTALL_INTERFACE:include>)
-    target_link_libraries (glext PUBLIC ${OPENGL_gl_LIBRARY})
 
 
     add_library (nanovg ${nanovg_source})
@@ -186,7 +174,7 @@ target_compile_definitions (trase PRIVATE TRASE_SOURCE_DIR="${trase_SOURCE_DIR}"
 
 if (trase_BUILD_OPENGL)
     target_compile_definitions (trase PUBLIC TRASE_BACKEND_GL)
-    target_link_libraries (trase PUBLIC glext nanovg)
+    target_link_libraries (trase PUBLIC nanovg)
 endif ()
 
 
@@ -282,7 +270,7 @@ if (WIN32)
     list (APPEND install-targets dirent)
 endif ()
 if (trase_BUILD_OPENGL)
-    list (APPEND install-targets glext nanovg)
+    list (APPEND install-targets nanovg)
 endif ()
 
 set (install-headers ${trase_headers} ${trase_svg_headers})
