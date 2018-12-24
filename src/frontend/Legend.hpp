@@ -45,9 +45,6 @@ namespace trase {
 class Legend : public Drawable {
   std::vector<std::shared_ptr<Geometry>> m_entries;
 
-  /// the color used
-  RGBA m_color;
-
 public:
   Legend(Drawable *parent, const bfloat2_t &area);
 

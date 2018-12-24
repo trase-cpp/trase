@@ -36,6 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace trase {
 
 Legend::Legend(Drawable *parent, const bfloat2_t &area)
-    : Drawable(parent, area), m_color(0, 0, 0) {}
+    : Drawable(parent, area) {}
 
 } // namespace trase

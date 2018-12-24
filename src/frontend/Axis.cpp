@@ -54,8 +54,9 @@ std::shared_ptr<Geometry> Axis::plot_impl(const std::shared_ptr<Geometry> &plot,
                                           const DataWithAesthetic &values) {
   plot->set_transform(transform);
   plot->add_frame(values, 0);
-  plot->set_color(RGBA::defaults[m_children.size()]);
   plot->resize(m_pixels);
+
+  plot->style().color(RGBA::defaults[m_children.size()]);
   m_children.push_back(plot);
   add_geometry_to_legend(plot);
   return plot;

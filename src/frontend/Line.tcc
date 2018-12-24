@@ -49,7 +49,7 @@ void Line::draw(Backend &backend, const float time) {
 
 template <typename AnimatedBackend>
 void Line::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
-  backend.stroke_color(m_color);
+  backend.stroke_color(m_style.color());
   backend.stroke_width(m_style.line_width());
   const float y_coord = 0.5f * (box.bmin[1] + box.bmax[1]);
   backend.begin_path();
@@ -69,7 +69,7 @@ template <typename AnimatedBackend>
 void Line::draw_frames(AnimatedBackend &backend) {
 
   backend.begin_animated_path();
-  backend.stroke_color(m_color);
+  backend.stroke_color(m_style.color());
   backend.stroke_width(m_style.line_width());
 
   auto to_pixel = [&](auto x, auto y) {
@@ -104,10 +104,10 @@ void Line::draw_anim_highlights(AnimatedBackend &backend) {
   // highlighted points just for frame 0 and for stationary lines
   if (m_times.size() == 1) {
     char buffer[100];
-    auto color = m_color;
+    auto color = m_style.color();
     color.a(0);
     backend.stroke_color(RGBA(0, 0, 0, 0));
-    backend.fill_color(color, m_color);
+    backend.fill_color(color, m_style.color());
 
     auto x = m_data[0].begin<Aesthetic::x>();
     auto y = m_data[0].begin<Aesthetic::y>();
@@ -157,7 +157,7 @@ template <typename Backend> void Line::draw_plot(Backend &backend) {
     }
   }
 
-  backend.stroke_color(m_color);
+  backend.stroke_color(m_style.color());
   backend.stroke_width(m_style.line_width());
   backend.stroke();
 }
@@ -202,7 +202,7 @@ template <typename Backend> void Line::draw_highlights(Backend &backend) {
     // if a point is within r2, then draw it
     if ((mouse_pos - point_pixel).squaredNorm() <
         std::pow(2.f * m_style.line_width(), 2)) {
-      backend.fill_color(m_color);
+      backend.fill_color(m_style.color());
       backend.text_align(ALIGN_LEFT | ALIGN_BOTTOM);
       char buffer[100];
       std::snprintf(buffer, sizeof(buffer), "(%f,%f)", min_point[0],

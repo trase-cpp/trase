@@ -49,9 +49,9 @@ void Histogram::draw(Backend &backend, const float time) {
 
 template <typename AnimatedBackend>
 void Histogram::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
-  backend.stroke_color(m_color);
+  backend.stroke_color(m_style.color());
   backend.stroke_width(m_style.line_width());
-  backend.fill_color(m_color);
+  backend.fill_color(m_style.color());
   backend.rect(box * vfloat2_t{0.75f, 0.75f});
 }
 
@@ -64,9 +64,9 @@ void Histogram::draw_legend(Backend &backend, const float time,
 template <typename AnimatedBackend>
 void Histogram::draw_frames(AnimatedBackend &backend) {
 
-  backend.stroke_color(m_color);
+  backend.stroke_color(m_style.color());
   backend.stroke_width(m_style.line_width());
-  backend.fill_color(m_color);
+  backend.fill_color(m_style.color());
 
   // x should be constant and regular spaced with a dx calculated by the limits
   // and the number of rows
@@ -94,9 +94,9 @@ template <typename Backend> void Histogram::draw_plot(Backend &backend) {
   const float w1 = m_frame_info.w1;
   const float w2 = m_frame_info.w2;
 
-  backend.stroke_color(m_color);
+  backend.stroke_color(m_style.color());
   backend.stroke_width(m_style.line_width());
-  backend.fill_color(m_color);
+  backend.fill_color(m_style.color());
 
   // x should be constant and regular spaced with a dx calculated by the limits
   // and the number of rows

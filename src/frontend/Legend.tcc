@@ -61,7 +61,7 @@ void Legend::draw_common(Backend &backend, const Callback &callback) {
   vfloat2_t upper_right_corner = {m_pixels.bmax[0], m_pixels.bmin[1]};
   backend.text_align(ALIGN_RIGHT | ALIGN_TOP);
   backend.stroke_width(m_style.line_width());
-  backend.fill_color(m_color);
+  backend.fill_color(m_style.color());
   for (const auto &geometry : m_entries) {
     const vfloat2_t upper_left_corner =
         upper_right_corner - vfloat2_t{sample_length, 0};
@@ -69,7 +69,7 @@ void Legend::draw_common(Backend &backend, const Callback &callback) {
         upper_right_corner + vfloat2_t{0, m_style.font_size()};
     const bfloat2_t sample_box = {upper_left_corner, lower_right_corner};
     callback(sample_box, geometry);
-    backend.fill_color(m_color);
+    backend.fill_color(m_style.color());
     backend.text(upper_right_corner +
                      vfloat2_t(-(5.f / 3.f) * sample_length, 0.f),
                  geometry->get_label().c_str(), nullptr);
