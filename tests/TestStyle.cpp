@@ -36,11 +36,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "util/Colors.hpp"
 #include "util/Style.hpp"
 
+#include "trase.hpp"
+
 TEST_CASE("style construction", "[style]") {
 
   trase::Style s{};
 
   CHECK(s.line_width() == 0.f);
+}
+
+TEST_CASE("style on drawable", "[style]") {
+
+  auto fig = trase::figure({800, 600});
+  auto ax = fig->axis();
+
+  const trase::Style &s = ax->style();
+
+  // Create a new style
+  trase::Style my_style;
+  CHECK(s.line_width() == my_style.line_width());
+
+  // Change line width in my_style and set it as new style on the axis
+  my_style.line_width(1.23);
+  ax->style() = my_style;
+  CHECK(s.line_width() == 1.23f);
 }
 
 TEST_CASE("style setting and getting", "[style]") {
