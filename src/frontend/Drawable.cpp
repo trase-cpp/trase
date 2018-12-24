@@ -82,8 +82,6 @@ void Drawable::update_time_span(const float time) {
   }
 }
 
-const Style &Drawable::style() const noexcept { return m_style; }
-
 Style &Drawable::style() noexcept { return m_style; }
 
 } // namespace trase

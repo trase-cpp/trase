@@ -161,9 +161,6 @@ public:
   /// returns this objects drawable area as a ratio of the parents drawable area
   bfloat2_t &area() { return m_area; }
 
-  /// returns current style
-  const Style &style() const noexcept;
-
   /// returns modifiable current style
   Style &style() noexcept;
 
