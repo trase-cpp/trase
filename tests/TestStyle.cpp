@@ -70,8 +70,9 @@ TEST_CASE("style setting and getting", "[style]") {
 
   trase::RGBA my_col{1, 2, 3, 4};
 
-  my_style.line_width(2.3f).color(my_col);
+  my_style.line_width(2.3f).color(my_col).font("a string");
 
   CHECK(my_style.line_width() == 2.3f);
   CHECK(my_style.color() == my_col);
+  CHECK(my_style.font() == "a string");
 }
