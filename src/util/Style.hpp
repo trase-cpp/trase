@@ -42,9 +42,14 @@ namespace trase {
 
 class Style {
 
+  /// the line width
   float m_line_width{0.f};
 
+  /// the color
   RGBA m_color{RGBA::black};
+
+  /// the font
+  std::string m_font{"Roboto"};
 
 public:
   /// constructor
@@ -56,11 +61,17 @@ public:
   /// get the current colour
   RGBA color() const noexcept;
 
+  /// get the current font
+  std::string font() const noexcept;
+
   /// set the new line width
   Style &line_width(float lineWidth) noexcept;
 
   /// set the new color
   Style &color(RGBA color) noexcept;
+
+  /// set the new font
+  Style &font(std::string font) noexcept;
 };
 
 } // namespace trase

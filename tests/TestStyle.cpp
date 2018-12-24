@@ -38,11 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "trase.hpp"
 
-TEST_CASE("style construction", "[style]") {
+TEST_CASE("style construction and deafults", "[style]") {
 
   trase::Style s{};
 
   CHECK(s.line_width() == 0.f);
+  CHECK(s.font() == "Roboto");
+  CHECK(s.color() == trase::RGBA::black);
 }
 
 TEST_CASE("style on drawable", "[style]") {
@@ -66,7 +68,7 @@ TEST_CASE("style setting and getting", "[style]") {
 
   trase::Style my_style;
 
-  trase::RGBA my_col{1,2,3,4};
+  trase::RGBA my_col{1, 2, 3, 4};
 
   my_style.line_width(2.3f).color(my_col);
 
