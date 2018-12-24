@@ -60,7 +60,7 @@ void Legend::draw_common(Backend &backend, const Callback &callback) {
   // draw legend in upper right corner
   vfloat2_t upper_right_corner = {m_pixels.bmax[0], m_pixels.bmin[1]};
   backend.text_align(ALIGN_RIGHT | ALIGN_TOP);
-  backend.stroke_width(m_line_width);
+  backend.stroke_width(m_style.line_width());
   backend.fill_color(m_color);
   for (const auto &geometry : m_entries) {
     const vfloat2_t upper_left_corner =

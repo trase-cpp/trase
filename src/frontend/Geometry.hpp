@@ -62,8 +62,6 @@ protected:
   /// colormap
   const Colormap *m_colormap;
 
-  float m_line_width;
-
   RGBA m_color;
 
   /// min/max limits of m_data across all frames
@@ -113,7 +111,6 @@ public:
 
   const std::string &get_label() const { return m_label; }
   const RGBA &get_color() const { return m_color; }
-  const float get_line_width() const { return m_line_width; }
   const Colormap &get_colormap() const { return *m_colormap; }
 
 #ifdef TRASE_BACKEND_GL

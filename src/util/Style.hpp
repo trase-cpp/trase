@@ -43,7 +43,7 @@ namespace trase {
 class Style {
 
   /// the line width
-  float m_line_width{0.f};
+  float m_line_width{3.f};
 
   /// the font size
   float m_font_size{18.f};

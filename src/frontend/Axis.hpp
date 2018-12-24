@@ -98,9 +98,6 @@ class Axis : public Drawable {
   /// the length (in pixels) of each tick
   float m_tick_len;
 
-  /// the linewidth used
-  float m_line_width;
-
   /// the label displayed on the x axis
   std::string m_xlabel;
 

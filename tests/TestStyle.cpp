@@ -42,7 +42,7 @@ TEST_CASE("style construction and defaults", "[style]") {
 
   trase::Style s{};
 
-  CHECK(s.line_width() == 0.f);
+  CHECK(s.line_width() == 3.f);
   CHECK(s.font_size() == 18.f);
   CHECK(s.font() == "Roboto");
   CHECK(s.color() == trase::RGBA::black);
