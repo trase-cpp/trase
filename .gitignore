@@ -34,3 +34,11 @@
 # Visual studio specific files
 .vs
 CMakeSettings.json
+
+# Clion specific files
+.idea
+cmake-build*
+
+# Build directories
+Debug
+Release

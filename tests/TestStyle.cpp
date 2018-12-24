@@ -59,7 +59,7 @@ TEST_CASE("style on drawable", "[style]") {
   CHECK(s.line_width() == my_style.line_width());
 
   // Change line width in my_style and set it as new style on the axis
-  my_style.line_width(1.23);
+  my_style.line_width(1.23f);
   ax->style() = my_style;
   CHECK(s.line_width() == 1.23f);
 }
