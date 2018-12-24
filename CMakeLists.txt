@@ -44,10 +44,6 @@ set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
-# CMake policies
-cmake_policy(SET CMP0072 NEW) # prefer GLVND library rather than legacy GL
-
-
 # Set global compiler warnings
 if (MSVC)
     set(common_options /W3 /WX)
