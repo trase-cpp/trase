@@ -48,12 +48,6 @@ class Legend : public Drawable {
   /// the linewidth used
   float m_line_width;
 
-  /// the font size used
-  float m_font_size;
-
-  /// the font used
-  std::string m_font_face;
-
   /// the color used
   RGBA m_color;
 

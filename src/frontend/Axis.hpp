@@ -101,9 +101,6 @@ class Axis : public Drawable {
   /// the linewidth used
   float m_line_width;
 
-  /// the font size used
-  float m_font_size;
-
   /// the label displayed on the x axis
   std::string m_xlabel;
 

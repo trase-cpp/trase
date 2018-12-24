@@ -45,6 +45,9 @@ class Style {
   /// the line width
   float m_line_width{0.f};
 
+  /// the font size
+  float m_font_size{18.f};
+
   /// the color
   RGBA m_color{RGBA::black};
 
@@ -58,6 +61,9 @@ public:
   /// get the current line width
   float line_width() const noexcept;
 
+  /// get the current font size
+  float font_size() const noexcept;
+
   /// get the current colour
   RGBA color() const noexcept;
 
@@ -66,6 +72,9 @@ public:
 
   /// set the new line width
   Style &line_width(float lineWidth) noexcept;
+
+  /// set the new font size
+  Style &font_size(float fontSize) noexcept;
 
   /// set the new color
   Style &color(RGBA color) noexcept;

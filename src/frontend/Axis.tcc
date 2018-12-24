@@ -76,7 +76,7 @@ template <typename Backend> void Axis::draw_common_ticks(Backend &backend) {
   char buffer[100];
 
   backend.begin_path();
-  backend.font_size(m_font_size);
+  backend.font_size(m_style.font_size());
   backend.font_blur(0.0f);
   backend.font_face(m_style.font().c_str());
   backend.text_align(ALIGN_CENTER | ALIGN_TOP);
