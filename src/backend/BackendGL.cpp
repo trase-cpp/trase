@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BackendGL.hpp"
 
-//#include <glad.h>
 #define GLFW_INCLUDE_ES2
 #define GLFW_INCLUDE_GLEXT
 #include <GLFW/glfw3.h>
@@ -248,21 +247,6 @@ GLFWwindow *BackendGL::create_window(int x_pixels, int y_pixels,
   glfwSetMouseButtonCallback(window, glfw_mouse_callback);
   glfwMakeContextCurrent(window);
   glfwSwapInterval(1); // Enable vsync
-  // gl3wInit();
-  // gladLoadGL();
-  /*
-#ifndef __EMSCRIPTEN__
-  // auto glad_load_result = gladLoadGLES2();
-  auto glad_load_result = gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
-#else
-  auto glad_load_result = gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
-#endif
-  if (!glad_load_result) {
-    throw Exception("Could not load GL extensions");
-  }
-  std::cout << "OpenGL Version " << GLVersion.major << '.' << GLVersion.minor
-            << std::endl;
-            */
   return window;
 }
 
