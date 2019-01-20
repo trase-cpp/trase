@@ -68,10 +68,10 @@ static void glfw_mouse_callback(GLFWwindow *window, int button, int action,
 }
 
 void BackendGL::init(const vfloat2_t &pixels, const char *name) {
-  m_window = create_window(pixels[0], pixels[1], name);
+  m_window = create_window(static_cast<vint2_t>(pixels), name);
   if (!m_window)
     throw Exception("trase: Cannot create OpenGL window");
-  m_vg = init_nanovg(pixels[0], pixels[1]);
+  m_vg = init_nanovg(static_cast<vint2_t>(pixels));
 }
 
 bool BackendGL::is_interactive() { return true; }
@@ -228,8 +228,7 @@ void BackendGL::end_frame() {
   glfwSwapBuffers(m_window);
 }
 
-GLFWwindow *BackendGL::create_window(int x_pixels, int y_pixels,
-                                     const char *name) {
+GLFWwindow *BackendGL::create_window(const vint2_t &pixels, const char *name) {
   // Setup window
   glfwSetErrorCallback(glfw_error_callback);
   // glfwSetWindowRefreshCallback(m_handle, glfw_window_refresh_callback);
@@ -239,7 +238,7 @@ GLFWwindow *BackendGL::create_window(int x_pixels, int y_pixels,
   glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-  GLFWwindow *window = glfwCreateWindow(x_pixels, y_pixels, name, NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(pixels[0], pixels[1], name, NULL, NULL);
 
   if (!window)
     throw Exception("Could not create GLFW window");
@@ -250,7 +249,7 @@ GLFWwindow *BackendGL::create_window(int x_pixels, int y_pixels,
   return window;
 }
 
-NVGcontext *BackendGL::init_nanovg(int x_pixels, int y_pixels) {
+NVGcontext *BackendGL::init_nanovg(const vint2_t &pixels) {
   NVGcontext *vg =
       nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
   if (!vg)

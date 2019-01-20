@@ -112,6 +112,15 @@ public:
     mem[3] = arg4;
   }
 
+  /// Constructs a vector with another vector of different type.
+  ///
+  /// The input vector must have same length as this one
+  ///
+  /// \param arg The vector to be copied
+  template <typename T2> explicit Vector(const Vector<T2, N> &arg) {
+    std::copy(arg.begin(), arg.end(), begin());
+  }
+
   // Iterators
   iter begin() noexcept { return iter(mem.begin()); }
   const_iter begin() const noexcept { return const_iter(mem.begin()); }

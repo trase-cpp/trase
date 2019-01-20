@@ -195,8 +195,8 @@ public:
   void text_align(const int align);
 
 private:
-  NVGcontext *init_nanovg(int x_pixels, int y_pixels);
-  GLFWwindow *create_window(int x_pixels, int y_pixels, const char *name);
+  NVGcontext *init_nanovg(const vint2_t &pixels);
+  GLFWwindow *create_window(const vint2_t &pixels, const char *name);
 };
 
 } // namespace trase
