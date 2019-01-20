@@ -109,6 +109,11 @@ private:
   /// m_axis_layout), then the subplot array is extended to cover the new
   /// position, and all existing Axis children are resized accordingly
   std::shared_ptr<Axis> update_layout(const vint2_t &new_position);
+
+  template <typename Backend> void render_interactive_frame(Backend &backend);
+#ifdef __EMSCRIPTEN__
+  template <typename Backend> static void emscripten_callback(void *data);
+#endif
 };
 
 /// create a new Figure

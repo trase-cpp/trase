@@ -58,6 +58,8 @@ class BackendGL : public Backend {
   FontManager m_fm;
   RGBA m_stroke_color_mouseover;
   RGBA m_fill_color_mouseover;
+  static bool m_lbutton_down;
+  static vfloat2_t m_lbutton_down_mouse_pos;
 
 public:
   TRASE_BACKEND_VISITABLE()
@@ -87,6 +89,9 @@ public:
 
   /// Get the current time
   float get_time();
+
+  static void set_mouse_down(const vfloat2_t &mouse_pos);
+  static void set_mouse_up();
 
   /// Get the current position of the mouse in pixel units
   vfloat2_t get_mouse_pos();
@@ -190,9 +195,8 @@ public:
   void text_align(const int align);
 
 private:
-  NVGcontext *init_nanovg(int x_pixels, int y_pixels);
-  void init_imgui(GLFWwindow *window);
-  GLFWwindow *create_window(int x_pixels, int y_pixels, const char *name);
+  NVGcontext *init_nanovg(const vint2_t &pixels);
+  GLFWwindow *create_window(const vint2_t &pixels, const char *name);
 };
 
 } // namespace trase
