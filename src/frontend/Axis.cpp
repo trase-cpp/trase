@@ -43,8 +43,7 @@ namespace trase {
 
 Axis::Axis(Drawable *parent, const bfloat2_t &area)
     : Drawable(parent, area), m_sig_digits(2), m_nx_ticks(0), m_ny_ticks(0),
-      m_tick_len(10.f), m_line_width(3.f), m_font_size(18.f),
-      m_font_face("Roboto"), m_has_legend(false) {}
+      m_tick_len(10.f), m_has_legend(false) {}
 
 std::shared_ptr<Geometry> Axis::plot(int n) {
   return std::dynamic_pointer_cast<Geometry>(m_children.at(n));
@@ -55,8 +54,9 @@ std::shared_ptr<Geometry> Axis::plot_impl(const std::shared_ptr<Geometry> &plot,
                                           const DataWithAesthetic &values) {
   plot->set_transform(transform);
   plot->add_frame(values, 0);
-  plot->set_color(RGBA::defaults[m_children.size()]);
   plot->resize(m_pixels);
+
+  plot->style().color(RGBA::defaults[m_children.size()]);
   m_children.push_back(plot);
   add_geometry_to_legend(plot);
   return plot;

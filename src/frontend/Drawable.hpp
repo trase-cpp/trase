@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 #include "util/BBox.hpp"
+#include "util/Style.hpp"
 
 namespace trase {
 
@@ -118,6 +119,9 @@ protected:
   /// stores information on the current draw time (see update_frame_info())
   FrameInfo m_frame_info;
 
+  /// fully styling information for each drawable
+  Style m_style;
+
 public:
   /// constructs a Drawable under \p parent in the tree structure, and assigns
   /// it an drawable area given by \p area_of_parent
@@ -156,6 +160,9 @@ public:
 
   /// returns this objects drawable area as a ratio of the parents drawable area
   bfloat2_t &area() { return m_area; }
+
+  /// returns modifiable current style
+  Style &style() noexcept;
 
 #ifdef TRASE_BACKEND_GL
   virtual void dispatch(BackendGL &figure, float time) = 0;

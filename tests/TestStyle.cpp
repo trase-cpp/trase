@@ -36,21 +36,45 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "util/Colors.hpp"
 #include "util/Style.hpp"
 
-TEST_CASE("style construction", "[style]") {
+#include "trase.hpp"
+
+TEST_CASE("style construction and defaults", "[style]") {
 
   trase::Style s{};
 
-  CHECK(s.line_width() == 0.f);
+  CHECK(s.line_width() == 3.f);
+  CHECK(s.font_size() == 18.f);
+  CHECK(s.font() == "Roboto");
+  CHECK(s.color() == trase::RGBA::black);
+}
+
+TEST_CASE("style on drawable", "[style]") {
+
+  auto fig = trase::figure({800, 600});
+  auto ax = fig->axis();
+
+  const trase::Style &s = ax->style();
+
+  // Create a new style
+  trase::Style my_style;
+  CHECK(s.line_width() == my_style.line_width());
+
+  // Change line width in my_style and set it as new style on the axis
+  my_style.line_width(1.23f);
+  ax->style() = my_style;
+  CHECK(s.line_width() == 1.23f);
 }
 
 TEST_CASE("style setting and getting", "[style]") {
 
   trase::Style my_style;
 
-  trase::RGBA my_col{1,2,3,4};
+  trase::RGBA my_col{1, 2, 3, 4};
 
-  my_style.line_width(2.3f).color(my_col);
+  my_style.line_width(2.3f).font_size(3.4f).color(my_col).font("a string");
 
   CHECK(my_style.line_width() == 2.3f);
+  CHECK(my_style.font_size() == 3.4f);
   CHECK(my_style.color() == my_col);
+  CHECK(my_style.font() == "a string");
 }

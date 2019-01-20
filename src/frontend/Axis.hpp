@@ -98,15 +98,6 @@ class Axis : public Drawable {
   /// the length (in pixels) of each tick
   float m_tick_len;
 
-  /// the linewidth used
-  float m_line_width;
-
-  /// the font size used
-  float m_font_size;
-
-  /// the font used
-  std::string m_font_face;
-
   /// the label displayed on the x axis
   std::string m_xlabel;
 
@@ -205,8 +196,6 @@ public:
   template <typename Aesthetic> float to_display(float i) const {
     return Aesthetic::to_display(i, m_limits, m_pixels);
   }
-
-  void font_face(const std::string &fontFace) { m_font_face = fontFace; }
 
   /// set the number of ticks on this axis
   /// \param arg a length 2 int vector with the requested number of ticks along

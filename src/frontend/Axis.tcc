@@ -65,7 +65,7 @@ template <typename Backend> void Axis::draw_common(Backend &backend) {
 }
 
 template <typename Backend> void Axis::draw_common_axis_box(Backend &backend) {
-  backend.stroke_width(m_line_width);
+  backend.stroke_width(m_style.line_width());
   backend.stroke_color(RGBA(200, 200, 200, 255));
   backend.fill_color(RGBA(200, 200, 200, 255));
   backend.rect(m_pixels);
@@ -76,9 +76,9 @@ template <typename Backend> void Axis::draw_common_ticks(Backend &backend) {
   char buffer[100];
 
   backend.begin_path();
-  backend.font_size(m_font_size);
+  backend.font_size(m_style.font_size());
   backend.font_blur(0.0f);
-  backend.font_face(m_font_face.c_str());
+  backend.font_face(m_style.font().c_str());
   backend.text_align(ALIGN_CENTER | ALIGN_TOP);
   backend.fill_color(RGBA(0, 0, 0, 255));
 
@@ -109,7 +109,7 @@ template <typename Backend> void Axis::draw_common_ticks(Backend &backend) {
   }
 
   backend.stroke_color(RGBA(0, 0, 0, 255));
-  backend.stroke_width(m_line_width / 2);
+  backend.stroke_width(m_style.line_width() / 2);
   backend.stroke();
 }
 
@@ -143,7 +143,7 @@ template <typename Backend> void Axis::draw_common_gridlines(Backend &backend) {
   }
 
   backend.stroke_color(RGBA(255, 255, 255, 255));
-  backend.stroke_width(m_line_width / 2.f);
+  backend.stroke_width(m_style.line_width() / 2.f);
   backend.stroke();
 }
 

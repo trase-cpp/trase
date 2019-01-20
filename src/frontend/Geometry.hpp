@@ -62,10 +62,6 @@ protected:
   /// colormap
   const Colormap *m_colormap;
 
-  float m_line_width;
-
-  RGBA m_color;
-
   /// min/max limits of m_data across all frames
   Limits m_limits;
 
@@ -102,8 +98,6 @@ public:
   /// before the data is stored internally
   void set_transform(const Transform &transform) { m_transform = transform; }
 
-  void set_color(const RGBA &color) { m_color = color; }
-
   /// Set the label
   ///
   /// This label describes the plot and is shown on the axis legend
@@ -112,8 +106,6 @@ public:
   void set_label(const std::string &label) { m_label = label; }
 
   const std::string &get_label() const { return m_label; }
-  const RGBA &get_color() const { return m_color; }
-  const float get_line_width() const { return m_line_width; }
   const Colormap &get_colormap() const { return *m_colormap; }
 
 #ifdef TRASE_BACKEND_GL

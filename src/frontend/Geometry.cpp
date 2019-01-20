@@ -42,7 +42,7 @@ namespace trase {
 
 Geometry::Geometry(Axis *parent)
     : Drawable(parent, bfloat2_t(vfloat2_t(0, 0), vfloat2_t(1, 1))),
-      m_colormap(&Colormaps::viridis), m_line_width(3.f), m_axis(parent) {}
+      m_colormap(&Colormaps::viridis), m_axis(parent) {}
 
 void Geometry::add_frame(const DataWithAesthetic &data, float time) {
   // add new data frame

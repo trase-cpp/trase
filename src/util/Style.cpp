@@ -37,15 +37,29 @@ namespace trase {
 
 float Style::line_width() const noexcept { return m_line_width; }
 
+float Style::font_size() const noexcept { return m_font_size; }
+
 RGBA Style::color() const noexcept { return m_color; }
+
+std::string Style::font() const noexcept { return m_font; }
 
 Style &Style::line_width(const float lineWidth) noexcept {
   m_line_width = lineWidth;
   return *this;
 }
 
+Style &Style::font_size(const float fontSize) noexcept {
+  m_font_size = fontSize;
+  return *this;
+}
+
 Style &Style::color(const RGBA color) noexcept {
   m_color = color;
+  return *this;
+}
+
+Style &Style::font(const std::string font) noexcept {
+  m_font = font;
   return *this;
 }
 

@@ -45,18 +45,6 @@ namespace trase {
 class Legend : public Drawable {
   std::vector<std::shared_ptr<Geometry>> m_entries;
 
-  /// the linewidth used
-  float m_line_width;
-
-  /// the font size used
-  float m_font_size;
-
-  /// the font used
-  std::string m_font_face;
-
-  /// the color used
-  RGBA m_color;
-
 public:
   Legend(Drawable *parent, const bfloat2_t &area);
 
