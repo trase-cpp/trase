@@ -31,24 +31,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "catch.hpp"
+/// \page line_example Line Geometry
+///  This is an example for the line geometry
+///
+/// \snippet examples/Line.cpp line example
+/// \image html example_line.svg "Output"
 
-//! [line example includes]
+/// [line example]
 #include "trase.hpp"
 #include <fstream>
-//! [line example includes]
 
 using namespace trase;
 
-TEST_CASE("line example", "[line]") {
-  /// \page line_example Example of using the line geometry
-  ///  This is an example for the line geometry
-  ///
-  /// \snippet tests/TestLine.cpp line example includes
-  /// \snippet tests/TestLine.cpp line example
-  /// \image html example_line.svg "Output"
+int main() {
 
-  /// [line example]
   // create figure and axis
   auto fig = figure();
   auto ax = fig->axis();
@@ -70,11 +66,17 @@ TEST_CASE("line example", "[line]") {
   ax->xlabel("x");
   ax->ylabel("y");
 
-  // output to svg
+  // output to chosen backend
+#ifdef TRASE_EXAMPLES_SVG_BACKEND
   std::ofstream out;
   out.open("example_line.svg");
   BackendSVG backend(out);
   fig->draw(backend);
   out.close();
-  /// [line example]
+#endif
+#ifdef TRASE_EXAMPLES_GL_BACKEND
+  BackendGL backend;
+  fig->show(backend);
+#endif
 }
+/// [line example]

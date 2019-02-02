@@ -208,38 +208,8 @@ set (trase_fonts
     )
 
 
-enable_testing ()
-
-if (trase_BUILD_OPENGL)
-    add_executable (interactive_tst tests/TestInteractive.cpp)
-    target_include_directories (interactive_tst PRIVATE tests)
-    target_link_libraries (interactive_tst PRIVATE trase)
-endif ()
-
-add_executable (
-    trase_tst
-    tests/DummyDraw.hpp
-    tests/DummyDraw.cpp
-    tests/TestAxis.cpp
-    tests/TestData.cpp
-    tests/TestBackendSVG.cpp
-    tests/TestBBox.cpp
-    tests/TestColors.cpp
-    tests/TestFigure.cpp
-    tests/TestFontManager.cpp
-    tests/TestGeometry.cpp
-    tests/TestLine.cpp
-    tests/TestHistogram.cpp
-    tests/TestPoints.cpp
-    tests/TestUserConcepts.cpp
-    tests/TestStyle.cpp
-    tests/TestTransformMatrix.cpp
-    tests/TestVector.cpp
-    tests/TestLegend.cpp
-)
-target_include_directories (trase_tst PRIVATE tests)
-target_link_libraries (trase_tst PRIVATE trase)
-add_test (the_trase_tst trase_tst)
+add_subdirectory(tests)
+add_subdirectory(examples)
 
 
 # Clang tidy as optional static analyzer
