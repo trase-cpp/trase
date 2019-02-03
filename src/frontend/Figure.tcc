@@ -41,7 +41,7 @@ namespace trase {
 template <typename AnimatedBackend>
 void Figure::draw(AnimatedBackend &backend) {
   auto name = "Figure " + std::to_string(m_id);
-  backend.init(m_pixels.bmax, name.c_str());
+  backend.init(m_pixels.bmax, name.c_str(), m_time_span);
   for (const auto &i : m_children) {
     i->dispatch(backend);
   }

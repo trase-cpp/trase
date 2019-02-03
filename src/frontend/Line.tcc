@@ -77,11 +77,26 @@ void Line::draw_frames(AnimatedBackend &backend) {
                      m_axis->to_display<Aesthetic::y>(y)};
   };
 
+  // find maximum length of all datasets
+  // AnimatedBackend requires that an animated path be the same number of
+  // points. Therefore we will find the maximum line length needed, and
+  // interpolate any smaller lines
+  const int n =
+      std::accumulate(m_data.begin(), m_data.end(), 0,
+                      [](int a, auto b) { return std::max(a, b.rows()); });
+
   auto x = m_data[0].begin<Aesthetic::x>();
   auto y = m_data[0].begin<Aesthetic::y>();
   backend.move_to(to_pixel(x[0], y[0]));
-  for (int i = 1; i < m_data[0].rows(); ++i) {
-    backend.line_to(to_pixel(x[i], y[i]));
+  const float di =
+      static_cast<float>(m_data[0].rows() - 1) / static_cast<float>(n - 1);
+  for (int ii = 1; ii < n; ++ii) {
+    const float i = ii * di;
+    const int i0 = static_cast<int>(std::floor(i));
+    const int i1 = static_cast<int>(std::ceil(i));
+    const float w0 = static_cast<float>(i1) - i;
+    const float w1 = 1.f - w0;
+    backend.line_to(w0 * to_pixel(x[i0], y[i0]) + w1 * to_pixel(x[i1], y[i1]));
   }
 
   // other frames
@@ -90,8 +105,16 @@ void Line::draw_frames(AnimatedBackend &backend) {
     auto y = m_data[f].begin<Aesthetic::y>();
     backend.add_animated_path(m_times[f - 1]);
     backend.move_to(to_pixel(x[0], y[0]));
-    for (int i = 1; i < m_data[0].rows(); ++i) {
-      backend.line_to(to_pixel(x[i], y[i]));
+    const float di =
+        static_cast<float>(m_data[f].rows() - 1) / static_cast<float>(n - 1);
+    for (int ii = 1; ii < n; ++ii) {
+      const float i = ii * di;
+      const int i0 = static_cast<int>(std::floor(i));
+      const int i1 = static_cast<int>(std::ceil(i));
+      const float w0 = static_cast<float>(i1) - i;
+      const float w1 = 1.f - w0;
+      backend.line_to(w0 * to_pixel(x[i0], y[i0]) +
+                      w1 * to_pixel(x[i1], y[i1]));
     }
   }
 
@@ -151,9 +174,14 @@ template <typename Backend> void Line::draw_plot(Backend &backend) {
     auto x1 = m_data[f].begin<Aesthetic::x>();
     auto y1 = m_data[f].begin<Aesthetic::y>();
     backend.move_to(w1 * to_pixel(x1[0], y1[0]) + w2 * to_pixel(x0[0], y0[0]));
-    for (int i = 1; i < m_data[0].rows(); ++i) {
+    const int last_i = std::min(m_data[f - 1].rows(), m_data[f].rows());
+    for (int i = 1; i < last_i; ++i) {
       backend.line_to(w1 * to_pixel(x1[i], y1[i]) +
                       w2 * to_pixel(x0[i], y0[i]));
+    }
+    if (m_data[f].rows() > last_i) {
+      backend.line_to(w1 * to_pixel(x1[last_i], y1[last_i]) +
+                      w2 * to_pixel(x0[last_i - 1], y0[last_i - 1]));
     }
   }
 

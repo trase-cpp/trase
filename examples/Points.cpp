@@ -31,45 +31,63 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \page example_line Line Geometry
-///  This is an example for the line geometry
+/// \page example_points Animated Points Geometry
+///  This is an example for the points geometry
 ///
-/// \image html example_line.svg "Output"
-/// \snippet examples/Line.cpp example line
+/// \image html example_points.svg "Output"
+/// \snippet examples/Points.cpp example points
 
-/// [example line]
+/// [example points]
 #include "trase.hpp"
 #include <fstream>
+#include <random>
 
 using namespace trase;
 
 int main() {
 
-  // create figure and axis
   auto fig = figure();
   auto ax = fig->axis();
-
-  // create x and y vectors and set y = sin(x)
   const int n = 100;
-  std::vector<float> x(n);
-  std::vector<float> y(n);
-  for (int i = 0; i < n; ++i) {
-    x[i] = 6.28f * static_cast<float>(i) / n;
-    y[i] = std::sin(x[i]);
+  std::vector<float> x(n), y(n), r(n), c(n);
+  std::default_random_engine gen;
+  std::normal_distribution<float> normal(0, 1);
+  std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+  std::generate(y.begin(), y.end(), [&]() { return normal(gen); });
+  std::generate(r.begin(), r.end(), [&]() { return normal(gen); });
+  std::generate(c.begin(), c.end(), [&]() { return normal(gen); });
+
+  auto data = create_data().x(x).y(y).size(r).color(c);
+
+  auto points = ax->points(data);
+  points->set_label("points");
+
+  float time = 0.0;
+
+  auto do_plot = [&]() {
+    time += 0.3f;
+    std::normal_distribution<float> normal(0, 1);
+    std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+    std::generate(y.begin(), y.end(), [&]() { return normal(gen); });
+    std::generate(r.begin(), r.end(), [&]() { return normal(gen); });
+    std::generate(c.begin(), c.end(), [&]() { return normal(gen); });
+    auto data = create_data().x(x).y(y).size(r).color(c);
+    points->add_frame(data, time);
+  };
+
+  for (int i = 0; i < 5; ++i) {
+    do_plot();
   }
 
-  // create a trase dataset and then plot it using a line geometry
-  auto data = create_data().x(x).y(y);
-  auto plt = ax->line(data);
-
-  // label axis
   ax->xlabel("x");
   ax->ylabel("y");
+  ax->title("points test");
+  ax->legend();
 
-  // output to chosen backend
+// output to chosen backend
 #ifdef TRASE_EXAMPLES_SVG_BACKEND
   std::ofstream out;
-  out.open("example_line.svg");
+  out.open("example_points.svg");
   BackendSVG backend(out);
   fig->draw(backend);
   out.close();
@@ -79,4 +97,4 @@ int main() {
   fig->show(backend);
 #endif
 }
-/// [example line]
+/// [example points]

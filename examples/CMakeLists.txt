@@ -1,6 +1,9 @@
 
 set (examples
   Line.cpp
+  AnimatedLine.cpp
+  Histogram.cpp
+  Points.cpp
   )
 
 foreach (file IN LISTS examples)

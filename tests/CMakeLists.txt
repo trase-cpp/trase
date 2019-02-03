@@ -1,4 +1,3 @@
-enable_testing ()
 
 if (trase_BUILD_OPENGL)
     add_executable (interactive_test TestInteractive.cpp)
