@@ -89,7 +89,8 @@ void Line::draw_frames(AnimatedBackend &backend) {
   auto y = m_data[0].begin<Aesthetic::y>();
   backend.move_to(to_pixel(x[0], y[0]));
   const float di =
-      static_cast<float>(m_data[0].rows() - 1) / static_cast<float>(n - 1);
+      static_cast<float>(m_data[0].rows() - 1) / static_cast<float>(n - 1) -
+      std::numeric_limits<float>::epsilon();
   for (int ii = 1; ii < n; ++ii) {
     const float i = ii * di;
     const int i0 = static_cast<int>(std::floor(i));
@@ -106,7 +107,9 @@ void Line::draw_frames(AnimatedBackend &backend) {
     backend.add_animated_path(m_times[f - 1]);
     backend.move_to(to_pixel(x[0], y[0]));
     const float di =
-        static_cast<float>(m_data[f].rows() - 1) / static_cast<float>(n - 1);
+        static_cast<float>(m_data[f].rows() - 1) / static_cast<float>(n - 1) -
+
+        std::numeric_limits<float>::epsilon();
     for (int ii = 1; ii < n; ++ii) {
       const float i = ii * di;
       const int i0 = static_cast<int>(std::floor(i));
