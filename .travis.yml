@@ -121,7 +121,7 @@ after_success:
   # Uploading report to CodeCov
   - bash <(curl -s https://codecov.io/bash) -X gcov || echo "Codecov did not collect coverage reports"
   # push generated files to repo
-  - if [ -n "$GITHUB_API_KEY" ] && [ -n "$DEPLOY_GENERATED_FILES" ] ; then
+  - if [ -n "$GITHUB_API_KEY" ] ; then
       # Clone the generated files repo and add all example and tests svg files
       git clone https://github.com/trase-cpp/generated_files.git
       cp examples/*.svg generated_files/examples
