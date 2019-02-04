@@ -150,8 +150,8 @@ void Points::validate_frames(const bool have_size, const bool have_color,
 
 template <typename AnimatedBackend>
 void Points::draw_frames(AnimatedBackend &backend) {
-  const bool have_color = m_data[0].has<Aesthetic::color>();
-  const bool have_size = m_data[0].has<Aesthetic::size>();
+  bool have_color = m_data[0].has<Aesthetic::color>();
+  bool have_size = m_data[0].has<Aesthetic::size>();
   const int n = m_data[0].rows();
 
   validate_frames(have_size, have_color, n);
