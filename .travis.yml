@@ -75,8 +75,8 @@ matrix:
             - clang-4.0
       env:
         - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
-        - CMAKE_OPTNS="-D trase_USE_CLANG_TIDY:BOOL=TRUE 
-                       -D trase_MEMCHECK:BOOL=TRUE 
+        - CMAKE_OPTNS="-D trase_USE_CLANG_TIDY:BOOL=TRUE
+                       -D trase_MEMCHECK:BOOL=TRUE
                        -D CMAKE_BUILD_TYPE=Debug
                        -D trase_BUILD_OPENGL:BOOL=FALSE"
 
@@ -101,7 +101,7 @@ before_install:
 
 script:
   - cmake $CMAKE_OPTNS .
-  - cmake --build . -- -j2 
+  - cmake --build . -- -j2
   - ctest -j2 --output-on-failure
   - if [ "$TEST_SVG" == true ] ; then
         pip install --user html5validator;
@@ -112,10 +112,23 @@ after_success:
   # Creating report
   - cd ${TRAVIS_BUILD_DIR}
   # capture coverage info
-  - lcov --directory . --capture --output-file coverage.info 
+  - lcov --directory . --capture --output-file coverage.info
   # filter out system and catch headers
-  - lcov --remove coverage.info '/usr/*' 'tests/catch.hpp' --output-file coverage.info 
+  - lcov --remove coverage.info '/usr/*' 'tests/catch.hpp' --output-file coverage.info
   # debug info
-  - lcov --list coverage.info 
+  - lcov --list coverage.info
   # Uploading report to CodeCov
   - bash <(curl -s https://codecov.io/bash) -X gcov || echo "Codecov did not collect coverage reports"
+  # push generated files to repo
+  - if [ -n "$GITHUB_API_KEY" ]; then
+    # Clone the generated files repo and add all example and tests svg files
+    git clone https://github.com/trase-cpp/generated_files.git
+    cp examples/*.svg generated_files/examples
+    cp tests/*.svg generated_files/tests
+    cd generated_files
+    git -c user.name='travis' -c user.email='travis' commit -a -m "update generated files"
+    # Make sure to make the output quiet, or else the API token will leak!
+    # This works because the API key can replace your password.
+    git push -q https://<me>:$GITHUB_API_KEY@github.com/trase-cpp/trase master &>/dev/null
+    cd ${TRAVIS_BUILD_DIR}
+  fi
