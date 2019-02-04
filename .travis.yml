@@ -123,8 +123,5 @@ after_success:
   # push generated files to repo
   - if [ -n "$GITHUB_API_KEY" ] ; then
       # Clone the generated files repo and add all example and tests svg files
-      git clone https://github.com/trase-cpp/generated_files.git
-      cp examples/*.svg generated_files/examples
-      cp tests/*.svg generated_files/tests
       cd generated_files
     fi
