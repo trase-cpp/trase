@@ -165,7 +165,6 @@ set (trase_source
     src/frontend/Geometry.cpp
     src/frontend/Legend.cpp
     src/frontend/Transform.cpp
-    src/frontend/Histogram.cpp
     src/util/Colors.cpp
     src/util/Style.cpp
     )
