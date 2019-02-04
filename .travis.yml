@@ -121,15 +121,12 @@ after_success:
   # Uploading report to CodeCov
   - bash <(curl -s https://codecov.io/bash) -X gcov || echo "Codecov did not collect coverage reports"
   # push generated files to repo
-  - if [ -n "$GITHUB_API_KEY" ] && [ -n "$DEPLOY_GENERATED_FILES" ] ; then
-        # Clone the generated files repo and add all example and tests svg files
+  - if [ -n "$GITHUB_API_KEY" ] && [ "$DEPLOY_GENERATED_FILES" == true ]; then
         git clone https://github.com/trase-cpp/generated_files.git;
         cp examples/*.svg generated_files/examples;
         cp tests/*.svg generated_files/tests;
         cd generated_files;
-        git -c user.name="travis" -c user.email="travis" commit -a -m "updated generated files";
-        # Make sure to make the output quiet, or else the API token will leak!
-        # This works because the API key can replace your password.
-        git push -q https://martinjrobins:${GITHUB_API_KEY}@github.com/trase-cpp/trase master &>/dev/null;
-        cd ${TRAVIS_BUILD_DIR};
+        git -c user.name='travis' -c user.email='travis' commit -a -m "updated generated files";
+        git push -q https://martinjrobins:$GITHUB_API_KEY@github.com/trase-cpp/trase master &>/dev/null;
+        cd $TRAVIS_BUILD_DIR;
     fi
