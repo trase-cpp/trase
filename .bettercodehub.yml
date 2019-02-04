@@ -11,6 +11,7 @@ languages:
   test:
     include:
       - /tests/.*\.cpp
+      - /examples/.*\.cpp
     exclude:
       - /third-party/.*
       - /docs/.*

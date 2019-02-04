@@ -43,6 +43,7 @@ namespace trase {
 class Histogram : public Geometry {
 public:
   explicit Histogram(Axis *parent) : Geometry(parent) {}
+  virtual ~Histogram() = default;
   TRASE_GEOMETRY_DISPATCH_BACKENDS
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);

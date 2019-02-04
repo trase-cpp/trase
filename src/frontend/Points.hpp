@@ -43,6 +43,9 @@ namespace trase {
 class Points : public Geometry {
 public:
   explicit Points(Axis *parent) : Geometry(parent) {}
+
+  virtual ~Points() = default;
+
   TRASE_GEOMETRY_DISPATCH_BACKENDS
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
   template <typename Backend> void draw(Backend &backend, float time);

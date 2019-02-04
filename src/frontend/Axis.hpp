@@ -120,6 +120,8 @@ public:
   /// parent size
   Axis(Drawable *parent, const bfloat2_t &area);
 
+  virtual ~Axis() = default;
+
   TRASE_DISPATCH_BACKENDS
 
   /// returns the current Aesthetic limits

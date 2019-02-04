@@ -1,8 +1,8 @@
-INPUT                  = README.md src docs docs/examples.md tests/TestUserConcepts.cpp tests/TestLine.cpp
+INPUT                  = README.md src docs docs/examples.md tests/TestUserConcepts.cpp examples
 RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = README.md
 LAYOUT_FILE            = docs/DoxygenLayout.xml
-EXAMPLE_PATH           = tests
+EXAMPLE_PATH           = examples
 GENERATE_TREEVIEW      = YES
 CITE_BIB_FILES         = docs/bibliography.bib
 HTML_EXTRA_STYLESHEET  = docs/customdoxygen.css

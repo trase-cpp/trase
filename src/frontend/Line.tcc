@@ -77,11 +77,20 @@ void Line::draw_frames(AnimatedBackend &backend) {
                      m_axis->to_display<Aesthetic::y>(y)};
   };
 
+  // find maximum length of all datasets
+  // AnimatedBackend requires that an animated path be the same number of
+  // points. Therefore we will find the maximum line length needed, and, for
+  // shorter lines, simply repeat the last point the required number of times
+  const int n =
+      std::accumulate(m_data.begin(), m_data.end(), 0,
+                      [](int a, auto b) { return std::max(a, b.rows()); });
+
   auto x = m_data[0].begin<Aesthetic::x>();
   auto y = m_data[0].begin<Aesthetic::y>();
   backend.move_to(to_pixel(x[0], y[0]));
-  for (int i = 1; i < m_data[0].rows(); ++i) {
-    backend.line_to(to_pixel(x[i], y[i]));
+  for (int i = 1; i < n; ++i) {
+    const int clip_i = std::min(m_data[0].rows() - 1, i);
+    backend.line_to(to_pixel(x[clip_i], y[clip_i]));
   }
 
   // other frames
@@ -90,8 +99,9 @@ void Line::draw_frames(AnimatedBackend &backend) {
     auto y = m_data[f].begin<Aesthetic::y>();
     backend.add_animated_path(m_times[f - 1]);
     backend.move_to(to_pixel(x[0], y[0]));
-    for (int i = 1; i < m_data[0].rows(); ++i) {
-      backend.line_to(to_pixel(x[i], y[i]));
+    for (int i = 1; i < n; ++i) {
+      const int clip_i = std::min(m_data[f].rows() - 1, i);
+      backend.line_to(to_pixel(x[clip_i], y[clip_i]));
     }
   }
 
@@ -151,9 +161,14 @@ template <typename Backend> void Line::draw_plot(Backend &backend) {
     auto x1 = m_data[f].begin<Aesthetic::x>();
     auto y1 = m_data[f].begin<Aesthetic::y>();
     backend.move_to(w1 * to_pixel(x1[0], y1[0]) + w2 * to_pixel(x0[0], y0[0]));
-    for (int i = 1; i < m_data[0].rows(); ++i) {
+    const int last_i = std::min(m_data[f - 1].rows(), m_data[f].rows());
+    for (int i = 1; i < last_i; ++i) {
       backend.line_to(w1 * to_pixel(x1[i], y1[i]) +
                       w2 * to_pixel(x0[i], y0[i]));
+    }
+    if (m_data[f].rows() > last_i) {
+      backend.line_to(w1 * to_pixel(x1[last_i], y1[last_i]) +
+                      w2 * to_pixel(x0[last_i - 1], y0[last_i - 1]));
     }
   }
 

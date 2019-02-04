@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of trase.
+This file is part of the Oxford RSE C++ Template project.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,40 +31,65 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file Line.hpp
+/// \page example_histogram Animated Histogram Geometry
+///  This is an example for the histogram geometry
+///
+/// \image html example_histogram.svg "Output"
+/// \snippet examples/Histogram.cpp example histogram
 
-#ifndef LINE_H_
-#define LINE_H_
+/// [example histogram]
+#include "trase.hpp"
+#include <fstream>
+#include <random>
 
-#include "frontend/Geometry.hpp"
+using namespace trase;
 
-namespace trase {
+int main() {
 
-class Line : public Geometry {
-public:
-  explicit Line(Axis *parent) : Geometry(parent) {}
-  virtual ~Line() = default;
+  auto fig = figure();
+  auto ax = fig->axis();
+  const int n = 100;
+  std::vector<float> x(n);
+  std::default_random_engine gen;
+  std::normal_distribution<float> normal(0, 1);
+  std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
 
-  TRASE_GEOMETRY_DISPATCH_BACKENDS
+  auto data = create_data().x(x);
 
-  template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
-  template <typename Backend> void draw(Backend &backend, float time);
-  template <typename AnimatedBackend>
-  void draw_legend(AnimatedBackend &backend, const bfloat2_t &box);
-  template <typename Backend>
-  void draw_legend(Backend &backend, float time, const bfloat2_t &box);
+  auto hist = ax->histogram(data);
+  hist->set_label("hist");
 
-private:
-  template <typename AnimatedBackend>
-  void draw_frames(AnimatedBackend &backend);
-  template <typename AnimatedBackend>
-  void draw_anim_highlights(AnimatedBackend &backend);
-  template <typename Backend> void draw_plot(Backend &backend);
-  template <typename Backend> void draw_highlights(Backend &backend);
-};
+  float time = 0.0;
 
-} // namespace trase
+  auto do_plot = [&](const float theta) {
+    time += 0.3f;
+    std::normal_distribution<float> normal(theta, 1);
+    std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+    auto data = create_data().x(x);
+    hist->add_frame(data, time);
+  };
 
-#include "frontend/Line.tcc"
+  for (int i = 0; i < 5; ++i) {
+    const float theta = i / 5.f;
+    do_plot(theta);
+  }
 
-#endif // LINE_H_
+  ax->xlabel("x");
+  ax->ylabel("y");
+  ax->title("histogram test");
+  ax->legend();
+
+  // output to chosen backend
+#ifdef TRASE_EXAMPLES_SVG_BACKEND
+  std::ofstream out;
+  out.open("example_histogram.svg");
+  BackendSVG backend(out);
+  fig->draw(backend);
+  out.close();
+#endif
+#ifdef TRASE_EXAMPLES_GL_BACKEND
+  BackendGL backend;
+  fig->show(backend);
+#endif
+}
+/// [example histogram]

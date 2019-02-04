@@ -48,6 +48,8 @@ class Legend : public Drawable {
 public:
   Legend(Drawable *parent, const bfloat2_t &area);
 
+  virtual ~Legend() = default;
+
   TRASE_DISPATCH_BACKENDS
 
   void add_entry(const std::shared_ptr<Geometry> &entry) {

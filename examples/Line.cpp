@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of trase.
+This file is part of the Oxford RSE C++ Template project.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,40 +31,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file Line.hpp
+/// \page example_line Line Geometry
+///  This is an example for the line geometry
+///
+/// \image html example_line.svg "Output"
+/// \snippet examples/Line.cpp example line
 
-#ifndef LINE_H_
-#define LINE_H_
+/// [example line]
+#include "trase.hpp"
+#include <fstream>
 
-#include "frontend/Geometry.hpp"
+using namespace trase;
 
-namespace trase {
+int main() {
 
-class Line : public Geometry {
-public:
-  explicit Line(Axis *parent) : Geometry(parent) {}
-  virtual ~Line() = default;
+  // create figure and axis
+  auto fig = figure();
+  auto ax = fig->axis();
 
-  TRASE_GEOMETRY_DISPATCH_BACKENDS
+  // create x and y vectors and set y = sin(x)
+  const int n = 100;
+  std::vector<float> x(n);
+  std::vector<float> y(n);
+  for (int i = 0; i < n; ++i) {
+    x[i] = 6.28f * static_cast<float>(i) / n;
+    y[i] = std::sin(x[i]);
+  }
 
-  template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
-  template <typename Backend> void draw(Backend &backend, float time);
-  template <typename AnimatedBackend>
-  void draw_legend(AnimatedBackend &backend, const bfloat2_t &box);
-  template <typename Backend>
-  void draw_legend(Backend &backend, float time, const bfloat2_t &box);
+  // create a trase dataset and then plot it using a line geometry
+  auto data = create_data().x(x).y(y);
+  auto plt = ax->line(data);
 
-private:
-  template <typename AnimatedBackend>
-  void draw_frames(AnimatedBackend &backend);
-  template <typename AnimatedBackend>
-  void draw_anim_highlights(AnimatedBackend &backend);
-  template <typename Backend> void draw_plot(Backend &backend);
-  template <typename Backend> void draw_highlights(Backend &backend);
-};
+  // label axis
+  ax->xlabel("x");
+  ax->ylabel("y");
 
-} // namespace trase
-
-#include "frontend/Line.tcc"
-
-#endif // LINE_H_
+  // output to chosen backend
+#ifdef TRASE_EXAMPLES_SVG_BACKEND
+  std::ofstream out;
+  out.open("example_line.svg");
+  BackendSVG backend(out);
+  fig->draw(backend);
+  out.close();
+#endif
+#ifdef TRASE_EXAMPLES_GL_BACKEND
+  BackendGL backend;
+  fig->show(backend);
+#endif
+}
+/// [example line]

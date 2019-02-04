@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="800px" height="600px" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<desc>Figure 1</desc>
+<script>
+function tooltip(x,y,string,size,face) {
+    var txtElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    txtElem.setAttributeNS(null,"id","tooltip");
+    txtElem.setAttributeNS(null,"x",x);
+    txtElem.setAttributeNS(null,"y",y);
+    txtElem.setAttributeNS(null,"font-size",size);
+    txtElem.setAttributeNS(null,"font-family",face);
+
+    txtElem.appendChild(document.createTextNode(string))
+    document.documentElement.appendChild(txtElem);
+}
+function remove_tooltip() {
+    var txtElem = document.getElementById("tooltip");
+    document.documentElement.removeChild(txtElem);
+}
+</script>
+<rect x="80" y="60" width="640" height="480" fill="#c8c8c8" fill-opacity="1.000000" stroke="#c8c8c8" stroke-opacity="1.000000" stroke-width="3.000000">
+</rect>
+<text x="140.165" y="545" font-family="Roboto" font-size="18.000000" text-anchor="middle" alignment-baseline="hanging" fill="#000000" fill-opacity="1.000000">-2</text>
+<text x="247.258" y="545" font-family="Roboto" font-size="18.000000" text-anchor="middle" alignment-baseline="hanging" fill="#000000" fill-opacity="1.000000">-1</text>
+<text x="354.35" y="545" font-family="Roboto" font-size="18.000000" text-anchor="middle" alignment-baseline="hanging" fill="#000000" fill-opacity="1.000000">0</text>
+<text x="461.443" y="545" font-family="Roboto" font-size="18.000000" text-anchor="middle" alignment-baseline="hanging" fill="#000000" fill-opacity="1.000000">1</text>
+<text x="568.536" y="545" font-family="Roboto" font-size="18.000000" text-anchor="middle" alignment-baseline="hanging" fill="#000000" fill-opacity="1.000000">2</text>
+<text x="675.629" y="545" font-family="Roboto" font-size="18.000000" text-anchor="middle" alignment-baseline="hanging" fill="#000000" fill-opacity="1.000000">3</text>
+<text x="75" y="528.578" font-family="Roboto" font-size="18.000000" text-anchor="end" alignment-baseline="middle" fill="#000000" fill-opacity="1.000000">0</text>
+<text x="75" y="433.176" font-family="Roboto" font-size="18.000000" text-anchor="end" alignment-baseline="middle" fill="#000000" fill-opacity="1.000000">7.1</text>
+<text x="75" y="337.774" font-family="Roboto" font-size="18.000000" text-anchor="end" alignment-baseline="middle" fill="#000000" fill-opacity="1.000000">14.2</text>
+<text x="75" y="242.372" font-family="Roboto" font-size="18.000000" text-anchor="end" alignment-baseline="middle" fill="#000000" fill-opacity="1.000000">21.3</text>
+<text x="75" y="146.97" font-family="Roboto" font-size="18.000000" text-anchor="end" alignment-baseline="middle" fill="#000000" fill-opacity="1.000000">28.4</text>
+<path d=" M 140.164856 545.000000 L 140.164856 540.000000 M 247.257599 545.000000 L 247.257599 540.000000 M 354.350342 545.000000 L 354.350342 540.000000 M 461.443085 545.000000 L 461.443085 540.000000 M 568.535828 545.000000 L 568.535828 540.000000 M 675.628601 545.000000 L 675.628601 540.000000 M 75.000000 528.578247 L 80.000000 528.578247 M 75.000000 433.176178 L 80.000000 433.176178 M 75.000000 337.774109 L 80.000000 337.774109 M 75.000000 242.372070 L 80.000000 242.372070 M 75.000000 146.970001 L 80.000000 146.970001" stroke="#000000" stroke-opacity="1.000000" stroke-width="1.500000" fill-opacity="0"/>
+<path d=" M 140.164856 60.000000 L 140.164856 540.000000 M 247.257599 60.000000 L 247.257599 540.000000 M 354.350342 60.000000 L 354.350342 540.000000 M 461.443085 60.000000 L 461.443085 540.000000 M 568.535828 60.000000 L 568.535828 540.000000 M 675.628601 60.000000 L 675.628601 540.000000 M 80.000000 528.578247 L 720.000000 528.578247 M 80.000000 433.176178 L 720.000000 433.176178 M 80.000000 337.774109 L 720.000000 337.774109 M 80.000000 242.372070 L 720.000000 242.372070 M 80.000000 146.970001 L 720.000000 146.970001" stroke="#ffffff" stroke-opacity="1.000000" stroke-width="1.500000" fill-opacity="0"/>
+<text x="400" y="36" font-family="Roboto" font-size="18.000000" text-anchor="middle" alignment-baseline="baseline" fill="#000000" fill-opacity="1.000000">histogram test</text>
+<text x="400" y="564" font-family="Roboto" font-size="18.000000" text-anchor="middle" alignment-baseline="hanging" fill="#000000" fill-opacity="1.000000">x</text>
+<text x="0" y="0" font-family="Roboto" font-size="18.000000" text-anchor="middle" alignment-baseline="baseline" fill="#000000" fill-opacity="1.000000" transform="matrix(-4.37114e-08 -1 1 -4.37114e-08 48 300)">y</text>
+<rect x="95.23" y="434.5" width="87.02" height="94.06" fill="#1f77b4" fill-opacity="0.784314" stroke="#1f77b4" stroke-opacity="0.784314" stroke-width="3.000000">
+<animate attributeName="x" repeatCount="indefinite" begin ="0s" dur="1.5s" values="95.229019;95.229019;95.229019;95.229019;95.229019;95.229019" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="y" repeatCount="indefinite" begin ="0s" dur="1.5s" values="434.519867;474.830597;488.267517;501.704407;501.704407;501.704407" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="width" repeatCount="indefinite" begin ="0s" dur="1.5s" values="87.023041;87.023041;87.023041;87.023041;87.023041;87.023041" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="height" repeatCount="indefinite" begin ="0s" dur="1.5s" values="94.058380;53.747650;40.310730;26.873840;26.873840;26.873840" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+</rect>
+<rect x="182.3" y="407.6" width="87.02" height="120.9" fill="#1f77b4" fill-opacity="0.784314" stroke="#1f77b4" stroke-opacity="0.784314" stroke-width="3.000000">
+<animate attributeName="x" repeatCount="indefinite" begin ="0s" dur="1.5s" values="182.252060;182.252060;182.252060;182.252060;182.252060;182.252060" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="y" repeatCount="indefinite" begin ="0s" dur="1.5s" values="407.646057;327.024597;300.150757;421.082977;407.646057;461.393707" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="width" repeatCount="indefinite" begin ="0s" dur="1.5s" values="87.023026;87.023026;87.023026;87.023026;87.023026;87.023026" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="height" repeatCount="indefinite" begin ="0s" dur="1.5s" values="120.932190;201.553650;228.427490;107.495270;120.932190;67.184540" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+</rect>
+<rect x="269.3" y="98.6" width="87.02" height="430" fill="#1f77b4" fill-opacity="0.784314" stroke="#1f77b4" stroke-opacity="0.784314" stroke-width="3.000000">
+<animate attributeName="x" repeatCount="indefinite" begin ="0s" dur="1.5s" values="269.275085;269.275085;269.275085;269.275085;269.275085;269.275085" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="y" repeatCount="indefinite" begin ="0s" dur="1.5s" values="98.597130;125.470947;206.092407;138.907867;273.276978;353.898407" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="width" repeatCount="indefinite" begin ="0s" dur="1.5s" values="87.023041;87.023041;87.023041;87.023041;87.023041;87.023041" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="height" repeatCount="indefinite" begin ="0s" dur="1.5s" values="429.981110;403.107300;322.485840;389.670380;255.301270;174.679840" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+</rect>
+<rect x="356.3" y="112" width="87.02" height="416.5" fill="#1f77b4" fill-opacity="0.784314" stroke="#1f77b4" stroke-opacity="0.784314" stroke-width="3.000000">
+<animate attributeName="x" repeatCount="indefinite" begin ="0s" dur="1.5s" values="356.298126;356.298126;356.298126;356.298126;356.298126;356.298126" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="y" repeatCount="indefinite" begin ="0s" dur="1.5s" values="112.034042;152.344772;286.713867;286.713867;71.723312;206.092407" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="width" repeatCount="indefinite" begin ="0s" dur="1.5s" values="87.023041;87.023041;87.023041;87.023041;87.023041;87.023041" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="height" repeatCount="indefinite" begin ="0s" dur="1.5s" values="416.544189;376.233459;241.864380;241.864380;456.854919;322.485840" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+</rect>
+<rect x="443.3" y="313.6" width="87.02" height="215" fill="#1f77b4" fill-opacity="0.784314" stroke="#1f77b4" stroke-opacity="0.784314" stroke-width="3.000000">
+<animate attributeName="x" repeatCount="indefinite" begin ="0s" dur="1.5s" values="443.321167;443.321167;443.321167;443.321167;443.321167;443.321167" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="y" repeatCount="indefinite" begin ="0s" dur="1.5s" values="313.587708;273.276978;125.470947;192.655502;206.092407;179.218597" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="width" repeatCount="indefinite" begin ="0s" dur="1.5s" values="87.023010;87.023010;87.023010;87.023010;87.023010;87.023010" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="height" repeatCount="indefinite" begin ="0s" dur="1.5s" values="214.990540;255.301270;403.107300;335.922729;322.485840;349.359650" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+</rect>
+<rect x="530.3" y="474.8" width="87.02" height="53.75" fill="#1f77b4" fill-opacity="0.784314" stroke="#1f77b4" stroke-opacity="0.784314" stroke-width="3.000000">
+<animate attributeName="x" repeatCount="indefinite" begin ="0s" dur="1.5s" values="530.344177;530.344177;530.344177;530.344177;530.344177;530.344177" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="y" repeatCount="indefinite" begin ="0s" dur="1.5s" values="474.830597;501.704407;447.956787;300.150757;394.209137;273.276978" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="width" repeatCount="indefinite" begin ="0s" dur="1.5s" values="87.023071;87.023071;87.023071;87.023071;87.023071;87.023071" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="height" repeatCount="indefinite" begin ="0s" dur="1.5s" values="53.747650;26.873840;80.621460;228.427490;134.369110;255.301270" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+</rect>
+<rect x="617.4" y="515.1" width="87.02" height="13.44" fill="#1f77b4" fill-opacity="0.784314" stroke="#1f77b4" stroke-opacity="0.784314" stroke-width="3.000000">
+<animate attributeName="x" repeatCount="indefinite" begin ="0s" dur="1.5s" values="617.367249;617.367249;617.367249;617.367249;617.367249;617.367249" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="y" repeatCount="indefinite" begin ="0s" dur="1.5s" values="515.141357;515.141357;515.141357;515.141357;501.704407;407.646057" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="width" repeatCount="indefinite" begin ="0s" dur="1.5s" values="87.023071;87.023071;87.023071;87.023071;87.023071;87.023071" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+<animate attributeName="height" repeatCount="indefinite" begin ="0s" dur="1.5s" values="13.436890;13.436890;13.436890;13.436890;26.873840;120.932190" keyTimes="0.000000;0.200000;0.400000;0.600000;0.800000;1.000000"/>
+</rect>
+<rect x="702.5" y="62.25" width="15.31" height="13.78" fill="#1f77b4" fill-opacity="0.784314" stroke="#1f77b4" stroke-opacity="0.784314" stroke-width="3.000000">
+</rect>
+<text x="686.667" y="60" font-family="Roboto" font-size="18.000000" text-anchor="end" alignment-baseline="hanging" fill="#000000" fill-opacity="0.784314">hist</text>
+</svg>

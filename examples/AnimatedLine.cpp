@@ -31,50 +31,59 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "catch.hpp"
+/// \page example_animated_line Animated Line Geometry
+///  This is an example for the line geometry, showing an animated plot
+///
+/// \image html example_animated_line.svg "Output"
+/// \snippet examples/AnimatedLine.cpp animated line example
 
-//! [line example includes]
+/// [animated line example]
 #include "trase.hpp"
 #include <fstream>
-//! [line example includes]
 
 using namespace trase;
 
-TEST_CASE("line example", "[line]") {
-  /// \page line_example Example of using the line geometry
-  ///  This is an example for the line geometry
-  ///
-  /// \snippet tests/TestLine.cpp line example includes
-  /// \snippet tests/TestLine.cpp line example
-  /// \image html example_line.svg "Output"
+int main() {
 
-  /// [line example]
   // create figure and axis
   auto fig = figure();
   auto ax = fig->axis();
 
-  // create x and y vectors and set y = sin(x)
+  // set x steps, logistic parameter and create x and y vectors
   const int n = 100;
-  std::vector<float> x(n);
-  std::vector<float> y(n);
-  for (int i = 0; i < n; ++i) {
-    x[i] = 6.28f * static_cast<float>(i) / n;
-    y[i] = std::sin(x[i]);
-  }
+  const float dx = 12.f / static_cast<float>(n);
+  const float k = 1.f;
+  auto logistic = [k](const float x) { return 1.f / (1.f + std::exp(-k * x)); };
+  std::vector<float> x = {-6};
+  std::vector<float> y = {logistic(x.back())};
 
-  // create a trase dataset and then plot it using a line geometry
+  // create the initial dataset and then plot it using a line geometry
   auto data = create_data().x(x).y(y);
   auto plt = ax->line(data);
+
+  // loop through rest of the points, generating a new frame for every point
+  for (int i = 1; i < n; ++i) {
+    x.push_back(x.back() + dx);
+    y.push_back(logistic(x.back()));
+    auto data = create_data().x(x).y(y);
+    plt->add_frame(data, (x.back() - x[0]) / 4.f);
+  }
 
   // label axis
   ax->xlabel("x");
   ax->ylabel("y");
 
-  // output to svg
+  // output to chosen backend
+#ifdef TRASE_EXAMPLES_SVG_BACKEND
   std::ofstream out;
-  out.open("example_line.svg");
+  out.open("example_animated_line.svg");
   BackendSVG backend(out);
   fig->draw(backend);
   out.close();
-  /// [line example]
+#endif
+#ifdef TRASE_EXAMPLES_GL_BACKEND
+  BackendGL backend;
+  fig->show(backend);
+#endif
 }
+/// [animated line example]
