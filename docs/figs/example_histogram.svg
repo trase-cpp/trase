@@ -2,7 +2,7 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="800px" height="600px" version="1.1" xmlns="http://www.w3.org/2000/svg">
-<desc>Figure 17</desc>
+<desc>Figure 1</desc>
 <script>
 function tooltip(x,y,string,size,face) {
     var txtElem = document.createElementNS("http://www.w3.org/2000/svg", "text");

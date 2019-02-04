@@ -43,6 +43,7 @@ namespace trase {
 class Line : public Geometry {
 public:
   explicit Line(Axis *parent) : Geometry(parent) {}
+  virtual ~Line() = default;
 
   TRASE_GEOMETRY_DISPATCH_BACKENDS
 

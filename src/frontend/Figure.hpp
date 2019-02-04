@@ -69,6 +69,8 @@ public:
   /// \param pixels the number of pixels along the {width, height} of the figure
   explicit Figure(const std::array<float, 2> &pixels);
 
+  virtual ~Figure() = default;
+
   TRASE_DISPATCH_BACKENDS
 
   /// Create a new axis at position (0,0) and return a shared pointer to it

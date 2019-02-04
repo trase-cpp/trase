@@ -61,6 +61,9 @@ public:
 /// a base class for all the backends that support animation over time
 class AnimatedBackend : public Backend {
 public:
+  // Can still accept a single time draw
+  using Backend::accept;
+
   // Declare overloads for each kind of a Drawable to dispatch
   virtual void accept(Drawable &drawable) = 0;
 };

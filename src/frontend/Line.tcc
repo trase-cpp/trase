@@ -79,8 +79,8 @@ void Line::draw_frames(AnimatedBackend &backend) {
 
   // find maximum length of all datasets
   // AnimatedBackend requires that an animated path be the same number of
-  // points. Therefore we will find the maximum line length needed, and
-  // interpolate any smaller lines
+  // points. Therefore we will find the maximum line length needed, and, for
+  // shorter lines, simply repeat the last point the required number of times
   const int n =
       std::accumulate(m_data.begin(), m_data.end(), 0,
                       [](int a, auto b) { return std::max(a, b.rows()); });
@@ -88,16 +88,9 @@ void Line::draw_frames(AnimatedBackend &backend) {
   auto x = m_data[0].begin<Aesthetic::x>();
   auto y = m_data[0].begin<Aesthetic::y>();
   backend.move_to(to_pixel(x[0], y[0]));
-  const float di =
-      static_cast<float>(m_data[0].rows() - 1) / static_cast<float>(n - 1) -
-      std::numeric_limits<float>::epsilon();
-  for (int ii = 1; ii < n; ++ii) {
-    const float i = ii * di;
-    const int i0 = static_cast<int>(std::floor(i));
-    const int i1 = static_cast<int>(std::ceil(i));
-    const float w0 = static_cast<float>(i1) - i;
-    const float w1 = 1.f - w0;
-    backend.line_to(w0 * to_pixel(x[i0], y[i0]) + w1 * to_pixel(x[i1], y[i1]));
+  for (int i = 1; i < n; ++i) {
+    const int clip_i = std::min(m_data[0].rows() - 1, i);
+    backend.line_to(to_pixel(x[clip_i], y[clip_i]));
   }
 
   // other frames
@@ -106,18 +99,9 @@ void Line::draw_frames(AnimatedBackend &backend) {
     auto y = m_data[f].begin<Aesthetic::y>();
     backend.add_animated_path(m_times[f - 1]);
     backend.move_to(to_pixel(x[0], y[0]));
-    const float di =
-        static_cast<float>(m_data[f].rows() - 1) / static_cast<float>(n - 1) -
-
-        std::numeric_limits<float>::epsilon();
-    for (int ii = 1; ii < n; ++ii) {
-      const float i = ii * di;
-      const int i0 = static_cast<int>(std::floor(i));
-      const int i1 = static_cast<int>(std::ceil(i));
-      const float w0 = static_cast<float>(i1) - i;
-      const float w1 = 1.f - w0;
-      backend.line_to(w0 * to_pixel(x[i0], y[i0]) +
-                      w1 * to_pixel(x[i1], y[i1]));
+    for (int i = 1; i < n; ++i) {
+      const int clip_i = std::min(m_data[f].rows() - 1, i);
+      backend.line_to(to_pixel(x[clip_i], y[clip_i]));
     }
   }
 
