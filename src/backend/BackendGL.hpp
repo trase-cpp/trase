@@ -56,8 +56,6 @@ class BackendGL : public Backend {
   GLFWwindow *m_window;
   NVGcontext *m_vg;
   FontManager m_fm;
-  RGBA m_stroke_color_mouseover;
-  RGBA m_fill_color_mouseover;
   static bool m_lbutton_down;
   static vfloat2_t m_lbutton_down_mouse_pos;
 
