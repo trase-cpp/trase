@@ -127,9 +127,9 @@ after_success:
       cp examples/*.svg generated_files/examples;
       cp tests/*.svg generated_files/tests;
       cd generated_files;
-      git -c user.name='travis' -c user.email='travis' commit -a -m "updated generated files";
+      git -c user.name="travis" -c user.email="travis" commit -a -m "updated generated files";
       # Make sure to make the output quiet, or else the API token will leak!
       # This works because the API key can replace your password.
-      git push -q https://martinjrobins:$GITHUB_API_KEY@github.com/trase-cpp/trase master &>/dev/null;
+      git push -q https://martinjrobins:${GITHUB_API_KEY}@github.com/trase-cpp/trase master &>/dev/null;
       cd ${TRAVIS_BUILD_DIR};
     fi
