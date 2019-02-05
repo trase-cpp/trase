@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "frontend/Points.hpp"
+#include "util/Exception.hpp"
 
 namespace trase {
 
@@ -62,8 +63,7 @@ void Points::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
       auto c = m_axis->to_display<Aesthetic::color>(
           limits.bmin[Aesthetic::color::index]);
 
-      backend.fill_color(m_colormap->to_color(c));
-      backend.add_animated_circle(p0, s, m_times[f]);
+      backend.add_animated_circle(p0, s, m_colormap->to_color(c), m_times[f]);
     }
     backend.end_animated_circle();
     for (size_t f = 0; f < m_times.size(); ++f) {
@@ -71,8 +71,7 @@ void Points::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
       auto c = m_axis->to_display<Aesthetic::color>(
           limits.bmax[Aesthetic::color::index]);
 
-      backend.fill_color(m_colormap->to_color(c));
-      backend.add_animated_circle(p1, s, m_times[f]);
+      backend.add_animated_circle(p1, s, m_colormap->to_color(c), m_times[f]);
     }
     backend.end_animated_circle();
   } else {
@@ -123,11 +122,40 @@ void Points::draw_legend(Backend &backend, const float time,
   backend.circle(p1, s);
 }
 
+void Points::validate_frames(const bool have_size, const bool have_color,
+                             const int n) {
+  for (size_t f = 0; f < m_times.size(); ++f) {
+    const bool this_frame_have_color = m_data[f].has<Aesthetic::color>();
+    const bool this_frame_have_size = m_data[f].has<Aesthetic::size>();
+    const int this_frame_n = m_data[f].rows();
+
+    if (this_frame_have_color != have_color) {
+      throw Exception("Frames found with and without color Aesthetic. Points "
+                      "Geometry requires that the provided Aesthetics are "
+                      "identical for every frame.");
+    }
+
+    if (this_frame_have_size != have_size) {
+      throw Exception("Frames found with and without size Aesthetic. Points "
+                      "Geometry requires that the provided Aesthetics are "
+                      "identical for every frame.");
+    }
+    if (this_frame_n != n) {
+      throw Exception("Frames found with different numbers of points. Points "
+                      "Geometry requires that the number of points for each "
+                      "frame are the same.");
+    }
+  }
+}
+
 template <typename AnimatedBackend>
 void Points::draw_frames(AnimatedBackend &backend) {
-  // TODO: assumption that same aesthetics are provided for each frame
+  // WARNING: do not make these const or gcc v5 seg faults on the lambda!!
   bool have_color = m_data[0].has<Aesthetic::color>();
   bool have_size = m_data[0].has<Aesthetic::size>();
+  const int n = m_data[0].rows();
+
+  validate_frames(have_size, have_color, n);
 
   auto to_pixel = [&](auto x, auto y, auto c, auto s) {
     // if color or size is not provided use the bottom of the scale
@@ -140,7 +168,7 @@ void Points::draw_frames(AnimatedBackend &backend) {
   };
 
   backend.stroke_width(0);
-  for (int i = 0; i < m_data[0].rows(); ++i) {
+  for (int i = 0; i < n; ++i) {
     for (size_t f = 0; f < m_times.size(); ++f) {
       auto p =
           to_pixel(m_data[f].begin<Aesthetic::x>()[i],
@@ -148,8 +176,8 @@ void Points::draw_frames(AnimatedBackend &backend) {
                    have_color ? m_data[f].begin<Aesthetic::color>()[i] : 0.f,
                    have_size ? m_data[f].begin<Aesthetic::size>()[i] : 0.f);
 
-      backend.fill_color(m_colormap->to_color(p[2]));
-      backend.add_animated_circle({p[0], p[1]}, p[3], m_times[f]);
+      backend.add_animated_circle({p[0], p[1]}, p[3],
+                                  m_colormap->to_color(p[2]), m_times[f]);
     }
     backend.end_animated_circle();
   }
@@ -163,6 +191,9 @@ template <typename Backend> void Points::draw_plot(Backend &backend) {
 
   bool have_color = m_data[f].has<Aesthetic::color>();
   bool have_size = m_data[f].has<Aesthetic::size>();
+  const int n = m_data[0].rows();
+
+  validate_frames(have_size, have_color, n);
 
   backend.stroke_width(0);
 

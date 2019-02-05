@@ -148,34 +148,38 @@ void BackendSVG::rounded_rect(const bfloat2_t &x, const float r) noexcept {
 }
 
 void BackendSVG::add_animated_circle(const vfloat2_t &centre, float radius,
-                                     float time) {
+                                     const RGBA &color, float time) {
   // check if first circle
   if (m_animate_times.empty()) {
     circle_begin(centre, radius);
 
-    if (m_animate_values.size() < 3) {
-      m_animate_values.resize(3);
+    if (m_animate_values.size() < 5) {
+      m_animate_values.resize(5);
     }
     m_animate_times = "keyTimes=\"" + std::to_string(time / m_time_span) + ';';
     m_animate_values[0] = "values=\"" + std::to_string(centre[0]) + ';';
     m_animate_values[1] = "values=\"" + std::to_string(centre[1]) + ';';
     m_animate_values[2] = "values=\"" + std::to_string(radius) + ';';
+    m_animate_values[3] = "values=\"" + color.to_rgb_string() + ';';
+    m_animate_values[4] = "values=\"" + std::to_string(color.a() / 255.0) + ';';
   } else {
     m_animate_times += std::to_string(time / m_time_span) + ';';
     m_animate_values[0] += std::to_string(centre[0]) + ';';
     m_animate_values[1] += std::to_string(centre[1]) + ';';
     m_animate_values[2] += std::to_string(radius) + ';';
+    m_animate_values[3] += color.to_rgb_string() + ';';
+    m_animate_values[4] += std::to_string(color.a() / 255.0) + ';';
   }
 }
 
 void BackendSVG::end_animated_circle() {
 
   m_animate_times.back() = '\"';
-  for (int i = 0; i < 3; ++i) {
+  for (int i = 0; i < 5; ++i) {
     m_animate_values[i].back() = '\"';
   }
-  const std::string names[3] = {"cx", "cy", "r"};
-  for (int i = 0; i < 3; ++i) {
+  const std::string names[5] = {"cx", "cy", "r", "fill", "fill-opacity"};
+  for (int i = 0; i < 5; ++i) {
     m_out << "<animate attributeName=\"" + names[i] +
                  "\" repeatCount=\"indefinite\" begin =\"0s\" dur=\""
           << m_time_span << "s\" " << m_animate_values[i] << ' '
@@ -184,7 +188,7 @@ void BackendSVG::end_animated_circle() {
   circle_end();
   m_animate_times.clear();
 
-  for (int i = 0; i < 3; ++i) {
+  for (int i = 0; i < 5; ++i) {
     m_animate_values[i].clear();
   }
 }

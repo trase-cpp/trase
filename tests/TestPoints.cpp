@@ -35,68 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DummyDraw.hpp"
 
-//! [points example includes]
 #include "trase.hpp"
 #include <fstream>
 #include <random>
-//! [points example includes]
 
 using namespace trase;
-
-TEST_CASE("points example", "[points]") {
-  /// \page line_example Example of using the points geometry
-  ///  This is an example for the points geometry
-  ///
-  /// \snippet tests/TestPoints.cpp points example includes
-  /// \snippet tests/TestPoints.cpp points example
-
-  /// [points example]
-  auto fig = figure();
-  auto ax = fig->axis();
-  const int n = 100;
-  std::vector<float> x(n), y(n), r(n), c(n);
-  std::default_random_engine gen;
-  std::normal_distribution<float> normal(0, 1);
-  std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
-  std::generate(y.begin(), y.end(), [&]() { return normal(gen); });
-  std::generate(r.begin(), r.end(), [&]() { return normal(gen); });
-  std::generate(c.begin(), c.end(), [&]() { return normal(gen); });
-
-  auto data = create_data().x(x).y(y).size(r).color(c);
-
-  auto points = ax->points(data);
-  points->set_label("points");
-
-  float time = 0.0;
-
-  auto do_plot = [&]() {
-    time += 0.3f;
-    std::normal_distribution<float> normal(0, 1);
-    std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
-    std::generate(y.begin(), y.end(), [&]() { return normal(gen); });
-    std::generate(r.begin(), r.end(), [&]() { return normal(gen); });
-    std::generate(c.begin(), c.end(), [&]() { return normal(gen); });
-    auto data = create_data().x(x).y(y).size(r).color(c);
-    points->add_frame(data, time);
-  };
-
-  for (int i = 0; i < 5; ++i) {
-    do_plot();
-  }
-
-  ax->xlabel("x");
-  ax->ylabel("y");
-  ax->title("points test");
-  ax->legend();
-
-  // output to svg
-  std::ofstream out;
-  out.open("example_points.svg");
-  BackendSVG backend(out);
-  fig->draw(backend);
-  out.close();
-  /// [points example]
-}
 
 TEST_CASE("points creation", "[points]") {
   auto fig = figure();
@@ -124,4 +67,62 @@ TEST_CASE("points creation", "[points]") {
   }
   ax->points(create_data().x(x).y(y).size(r).color(c));
   DummyDraw::draw("points", fig);
+}
+
+TEST_CASE("points animate color", "[points]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  std::vector<float> x = {0};
+  std::vector<float> y = {0};
+  std::vector<float> r = {1};
+  std::vector<float> c = {0};
+  auto pts = ax->points(create_data().x(x).y(y).size(r).color(c));
+  c[0] = 1;
+  pts->add_frame(create_data().x(x).y(y).size(r).color(c), 1);
+  DummyDraw::draw("points_animate_color", fig);
+}
+
+TEST_CASE("points color frames exception", "[points]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  std::vector<float> x = {0};
+  std::vector<float> y = {0};
+  std::vector<float> r = {1};
+  std::vector<float> c = {0};
+  auto pts = ax->points(create_data().x(x).y(y).size(r).color(c));
+  pts->add_frame(create_data().x(x).y(y).size(r), 1);
+
+  REQUIRE_THROWS_WITH(DummyDraw::draw("points_color_exception", fig),
+                      Catch::Contains("color"));
+}
+
+TEST_CASE("points size frames exception", "[points]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  std::vector<float> x = {0};
+  std::vector<float> y = {0};
+  std::vector<float> r = {1};
+  std::vector<float> c = {0};
+  auto pts = ax->points(create_data().x(x).y(y).size(r).color(c));
+  pts->add_frame(create_data().x(x).y(y).color(c), 1);
+
+  REQUIRE_THROWS_WITH(DummyDraw::draw("points_size_exception", fig),
+                      Catch::Contains("size"));
+}
+
+TEST_CASE("points number frames exception", "[points]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  std::vector<float> x = {0};
+  std::vector<float> y = {0};
+  std::vector<float> r = {1};
+  std::vector<float> c = {0};
+  auto pts = ax->points(create_data().x(x).y(y).size(r).color(c));
+  x.push_back(0);
+  y.push_back(0);
+  r.push_back(0);
+  c.push_back(0);
+  pts->add_frame(create_data().x(x).y(y).size(r).color(c), 1);
+  REQUIRE_THROWS_WITH(DummyDraw::draw("points_number_exception", fig),
+                      Catch::Contains("number"));
 }

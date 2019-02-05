@@ -91,7 +91,6 @@ class BackendSVG : public AnimatedBackend {
   std::vector<std::string> m_animate_values;
   std::string m_animate_times;
   float m_time_span;
-  float m_old_time;
   std::string m_font_size_base;
   std::string m_font_face_base;
   TransformMatrix m_transform;
@@ -249,8 +248,10 @@ public:
   ///
   /// @param centre the centre of the circle
   /// @param radius the radius of the circle
+  /// @param color the color of the circle
   /// @param time the time of the keyframe
-  void add_animated_circle(const vfloat2_t &centre, float radius, float time);
+  void add_animated_circle(const vfloat2_t &centre, float radius,
+                           const RGBA &color, float time);
 
   /// end an animated circle
   ///
