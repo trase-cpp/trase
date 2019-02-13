@@ -33,8 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /// \file Transform.hpp
 
-#ifndef TRANSFORM_H_
-#define TRANSFORM_H_
+#ifndef TRASE_TRANSFORM_H_
+#define TRASE_TRANSFORM_H_
 
 #include <functional>
 
@@ -86,4 +86,4 @@ public:
 
 } // namespace trase
 
-#endif // TRANSFORM_H_
+#endif // TRASE_TRANSFORM_H_

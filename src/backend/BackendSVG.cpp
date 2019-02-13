@@ -120,7 +120,7 @@ void BackendSVG::add_animated_path(const float time) {
   }
 
   // all times are scaled by total time span (all times start at 0)
-  m_animate_times += std::to_string(time / m_time_span) + ';';
+  m_animate_times += std::to_string(to_key_time(time)) + ';';
   m_animate_values[0] += m_path + ';';
   m_path.clear();
 }
@@ -151,19 +151,21 @@ void BackendSVG::add_animated_circle(const vfloat2_t &centre, float radius,
                                      const RGBA &color, float time) {
   // check if first circle
   if (m_animate_times.empty()) {
+
+    fill_color(color);
     circle_begin(centre, radius);
 
     if (m_animate_values.size() < 5) {
       m_animate_values.resize(5);
     }
-    m_animate_times = "keyTimes=\"" + std::to_string(time / m_time_span) + ';';
+    m_animate_times = "keyTimes=\"" + std::to_string(to_key_time(time)) + ';';
     m_animate_values[0] = "values=\"" + std::to_string(centre[0]) + ';';
     m_animate_values[1] = "values=\"" + std::to_string(centre[1]) + ';';
     m_animate_values[2] = "values=\"" + std::to_string(radius) + ';';
     m_animate_values[3] = "values=\"" + color.to_rgb_string() + ';';
     m_animate_values[4] = "values=\"" + std::to_string(color.a() / 255.0) + ';';
   } else {
-    m_animate_times += std::to_string(time / m_time_span) + ';';
+    m_animate_times += std::to_string(to_key_time(time)) + ';';
     m_animate_values[0] += std::to_string(centre[0]) + ';';
     m_animate_values[1] += std::to_string(centre[1]) + ';';
     m_animate_values[2] += std::to_string(radius) + ';';
@@ -389,13 +391,13 @@ void BackendSVG::add_animated_rect(const bfloat2_t &x, float time) {
     if (m_animate_values.size() < 4) {
       m_animate_values.resize(4);
     }
-    m_animate_times = "keyTimes=\"" + std::to_string(time / m_time_span) + ';';
+    m_animate_times = "keyTimes=\"" + std::to_string(to_key_time(time)) + ';';
     m_animate_values[0] = "values=\"" + std::to_string(min[0]) + ';';
     m_animate_values[1] = "values=\"" + std::to_string(min[1]) + ';';
     m_animate_values[2] = "values=\"" + std::to_string(delta[0]) + ';';
     m_animate_values[3] = "values=\"" + std::to_string(delta[1]) + ';';
   } else {
-    m_animate_times += std::to_string(time / m_time_span) + ';';
+    m_animate_times += std::to_string(to_key_time(time)) + ';';
     m_animate_values[0] += std::to_string(min[0]) + ';';
     m_animate_values[1] += std::to_string(min[1]) + ';';
     m_animate_values[2] += std::to_string(delta[0]) + ';';

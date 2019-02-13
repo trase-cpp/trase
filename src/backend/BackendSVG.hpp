@@ -328,6 +328,14 @@ public:
   /// @param end points to the end of the string. Use `nullptr` to write entire
   /// string
   void text(const vfloat2_t &x, const char *string, const char *end);
+
+  /// scales time by the current time span of the animation
+  ///
+  /// @param time the time to scale
+  /// @returns time / m_time_span, or time if m_time_span == 0
+  float to_key_time(const float time) {
+    return m_time_span == 0 ? time : time / m_time_span;
+  }
 };
 
 } // namespace trase
