@@ -35,8 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /// \file Vector.hpp
 
-#ifndef VECTOR_H_
-#define VECTOR_H_
+#ifndef TRASE_VECTOR_H_
+#define TRASE_VECTOR_H_
 
 #include <algorithm>
 #include <array>
@@ -639,4 +639,4 @@ struct vint2_equal {
 
 } // namespace trase
 
-#endif /* VECTOR_H_ */
+#endif /* TRASE_VECTOR_H_ */
