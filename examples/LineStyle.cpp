@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of trase.
+This file is part of the Oxford RSE C++ Template project.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,17 +31,57 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file trase.hpp
+/// \page example_line_style Line Style
+///  This is an example of using the Style class for a Line
+///
+/// \image html example_line_style.svg "Output"
+/// \snippet examples/LineStyle.cpp example line style
 
-#ifndef TRASE_H_
-#define TRASE_H_
+/// [example line style]
+#include "trase.hpp"
+#include <fstream>
 
-#include "backend/BackendSVG.hpp"
-#ifdef TRASE_BACKEND_GL
-#include "backend/BackendGL.hpp"
+using namespace trase;
+
+int main() {
+
+  // create figure and axis
+  auto fig = figure();
+  auto ax = fig->axis();
+
+  // create x and y vectors
+  const int n = 100;
+  std::vector<float> x(n);
+  std::vector<float> y(n);
+  const float k = 1.f;
+  auto logistic = [k](const float x) { return 1.f / (1.f + std::exp(-k * x)); };
+  for (int i = 0; i < n; ++i) {
+    x[i] = -6.f + 12.f * static_cast<float>(i) / n;
+    y[i] = logistic(x[i]);
+  }
+
+  // create a trase dataset and then plot it using a line geometry
+  auto data = create_data().x(x).y(y);
+  auto plt = ax->line(data);
+
+  // set line color = red and line width = 10
+  plt->style().color(RGBA(255, 0, 0)).line_width(10);
+
+  // label axis
+  ax->xlabel("x");
+  ax->ylabel("y");
+
+  // output to chosen backend
+#ifdef TRASE_EXAMPLES_SVG_BACKEND
+  std::ofstream out;
+  out.open("example_line_style.svg");
+  BackendSVG backend(out);
+  fig->draw(backend);
+  out.close();
 #endif
-
-#include "frontend/Figure.hpp"
-#include "util/CSVDownloader.hpp"
-
-#endif // TRASE_H_
+#ifdef TRASE_EXAMPLES_GL_BACKEND
+  BackendGL backend;
+  fig->show(backend);
+#endif
+}
+/// [example line style]

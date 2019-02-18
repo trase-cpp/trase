@@ -31,17 +31,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file trase.hpp
+/// \file CSVDownloader.hpp
 
-#ifndef TRASE_H_
-#define TRASE_H_
+#ifndef _CSVDownloader_H_
+#define _CSVDownloader_H_
 
-#include "backend/BackendSVG.hpp"
-#ifdef TRASE_BACKEND_GL
-#include "backend/BackendGL.hpp"
-#endif
+#include <map>
+#include <vector>
 
-#include "frontend/Figure.hpp"
-#include "util/CSVDownloader.hpp"
+namespace trase {
 
-#endif // TRASE_H_
+class CSVDownloader {
+public:
+  /// columns of csv file returned as a map from string label to a column of
+  /// data (vector of strings)
+  using data_t = std::map<std::string, std::vector<std::string>>;
+
+  /// constructs a csv downloader with default delimiter of ','
+  CSVDownloader();
+
+  ~CSVDownloader();
+
+  /// download a csv file at the url given by @p url
+  ///
+  /// @param url url to download csv file from
+  /// @param labels if empty, the first line of the csv file is assumed to
+  /// contain the column labels If not empty, this vector contains the column
+  /// labels
+  data_t download(const std::string &url,
+                  const std::vector<std::string> &labels = {});
+
+  /// set the delimiter for the csv file format
+  void set_delim(const char arg) { m_delim = arg; }
+
+private:
+  /// parse a csv file given as a `std::stringstream`
+  CSVDownloader::data_t parse_csv(std::stringstream &out,
+                                  const std::vector<std::string> &labels);
+
+  /// pointer to libcurl data
+  void *m_curl;
+
+  /// delimiter for the csv file format
+  char m_delim;
+};
+
+} // namespace trase
+
+#endif // _CSVDownloader_H_

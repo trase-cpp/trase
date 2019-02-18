@@ -111,6 +111,9 @@ if (WIN32)
         $<INSTALL_INTERFACE:include>)
 endif ()
 
+
+
+
 set (trase_headers
     src/trase.hpp
     src/backend/Backend.hpp
@@ -131,6 +134,7 @@ set (trase_headers
     src/util/Exception.hpp
     src/util/Style.hpp
     src/util/Vector.hpp
+    src/util/CSVDownloader.hpp
     )
 
 
@@ -146,6 +150,7 @@ set (trase_source
     src/frontend/Transform.cpp
     src/util/Colors.cpp
     src/util/Style.cpp
+    src/util/CSVDownloader.cpp
     )
 
 if (trase_BUILD_OPENGL)
@@ -175,6 +180,15 @@ if (trase_BUILD_OPENGL)
     target_compile_definitions (trase PUBLIC TRASE_BACKEND_GL)
     target_link_libraries (trase PUBLIC nanovg)
 endif ()
+
+
+find_package(CURL)
+if (CURL_FOUND)
+  target_compile_definitions (trase PUBLIC TRASE_HAVE_CURL)
+  target_link_libraries (trase PUBLIC ${CURL_LIBRARIES})
+  message(${CURL_INCLUDE_DIRS})
+  target_include_directories(trase PUBLIC ${CURL_INCLUDE_DIRS})
+endif (CURL_FOUND)
 
 
 set (trase_fonts

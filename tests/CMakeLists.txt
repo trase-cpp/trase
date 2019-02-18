@@ -23,6 +23,7 @@ add_executable (
     TestTransformMatrix.cpp
     TestVector.cpp
     TestLegend.cpp
+    TestCSVDownloader.cpp
 )
 target_include_directories (trase_test PRIVATE tests)
 target_link_libraries (trase_test PRIVATE trase)

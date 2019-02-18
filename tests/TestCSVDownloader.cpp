@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of trase.
+This file is part of the Oxford RSE C++ Template project.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,17 +31,48 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file trase.hpp
+#include "catch.hpp"
 
-#ifndef TRASE_H_
-#define TRASE_H_
+#include <map>
+#include <type_traits>
 
-#include "backend/BackendSVG.hpp"
-#ifdef TRASE_BACKEND_GL
-#include "backend/BackendGL.hpp"
-#endif
+#include "trase.hpp"
 
-#include "frontend/Figure.hpp"
-#include "util/CSVDownloader.hpp"
+using namespace trase;
 
-#endif // TRASE_H_
+TEST_CASE("download test file", "[csv downloader]") {
+  CSVDownloader dl;
+  dl.set_delim('\t');
+  auto data = dl.download("https://www.stat.ubc.ca/~jenny/notOcto/STAT545A/"
+                          "examples/gapminder/data/gapminderDataFiveYear.txt");
+  std::map<std::string, std::string> expected;
+  expected["country"] = "Afghanistan";
+  expected["year"] = "1952";
+  expected["pop"] = "8425333";
+  expected["continent"] = "Asia";
+  expected["lifeExp"] = "28.801";
+  expected["gdpPercap"] = "779.4453145";
+  int i = 0;
+  for (auto it = data.begin(); it != data.end(); ++it, ++i) {
+    CHECK(it->second[0] == expected[it->first]);
+  }
+  CHECK(i == 6);
+}
+
+TEST_CASE("download test file 2", "[csv downloader]") {
+  CSVDownloader dl;
+  auto data = dl.download(
+      "http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data",
+      {"sepal_length", "sepal_width", "petal_length", "petal_width", "class"});
+  std::map<std::string, std::string> expected;
+  expected["sepal_length"] = "5.1";
+  expected["sepal_width"] = "3.5";
+  expected["petal_length"] = "1.4";
+  expected["petal_width"] = "0.2";
+  expected["class"] = "Iris-setosa";
+  int i = 0;
+  for (auto it = data.begin(); it != data.end(); ++it, ++i) {
+    CHECK(it->second[0] == expected[it->first]);
+  }
+  CHECK(i == 5);
+}

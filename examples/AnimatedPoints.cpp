@@ -31,14 +31,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \page example_points Points Geometry
-///  This is an example for the points geometry which uses the classic
-///  <a href="http://archive.ics.uci.edu/ml/datasets/Iris">Iris data set</a>
+/// \page example_animated_points Animated Points Geometry
+///  This is an example for the points geometry
 ///
-/// \image html example_points.svg "Output"
-/// \snippet examples/Points.cpp example points
+/// \image html example_animated_points.svg "Output"
+/// \snippet examples/AnimatedPoints.cpp example animated points
 
-/// [example points]
+/// [example animated points]
 #include "trase.hpp"
 #include <fstream>
 #include <random>
@@ -46,26 +45,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace trase;
 
 int main() {
-  CSVDownloader dl;
-  auto csv = dl.download(
-      "http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data",
-      {"sepal_length", "sepal_width", "petal_length", "petal_width", "class"});
+
   auto fig = figure();
   auto ax = fig->axis();
-  auto data = create_data()
-                  .x(csv["sepal_length"])
-                  .y(csv["sepal_width"])
-                  .color(csv["petal_width"]);
+  const int n = 100;
+  std::vector<float> x(n), y(n), r(n), c(n);
+  std::default_random_engine gen;
+  std::normal_distribution<float> normal(0, 1);
+  std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+  std::generate(y.begin(), y.end(), [&]() { return normal(gen); });
+  std::generate(r.begin(), r.end(), [&]() { return normal(gen); });
+  std::generate(c.begin(), c.end(), [&]() { return normal(gen); });
+
+  auto data = create_data().x(x).y(y).size(r).color(c);
 
   auto points = ax->points(data);
+  points->set_label("points");
 
-  ax->xlabel("sepal length");
-  ax->ylabel("sepal width");
+  float time = 0.0;
+
+  auto do_plot = [&]() {
+    time += 0.3f;
+    std::normal_distribution<float> normal(0, 1);
+    std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
+    std::generate(y.begin(), y.end(), [&]() { return normal(gen); });
+    std::generate(r.begin(), r.end(), [&]() { return normal(gen); });
+    std::generate(c.begin(), c.end(), [&]() { return normal(gen); });
+    auto data = create_data().x(x).y(y).size(r).color(c);
+    points->add_frame(data, time);
+  };
+
+  for (int i = 0; i < 5; ++i) {
+    do_plot();
+  }
+
+  ax->xlabel("x");
+  ax->ylabel("y");
+  ax->title("points test");
+  ax->legend();
 
 // output to chosen backend
 #ifdef TRASE_EXAMPLES_SVG_BACKEND
   std::ofstream out;
-  out.open("example_points.svg");
+  out.open("example_animated_points.svg");
   BackendSVG backend(out);
   fig->draw(backend);
   out.close();
@@ -75,4 +97,4 @@ int main() {
   fig->show(backend);
 #endif
 }
-/// [example points]
+/// [example animated points]

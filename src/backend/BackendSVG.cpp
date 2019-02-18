@@ -151,6 +151,8 @@ void BackendSVG::add_animated_circle(const vfloat2_t &centre, float radius,
                                      const RGBA &color, float time) {
   // check if first circle
   if (m_animate_times.empty()) {
+
+    fill_color(color);
     circle_begin(centre, radius);
 
     if (m_animate_values.size() < 5) {
