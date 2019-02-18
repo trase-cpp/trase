@@ -80,7 +80,9 @@ CSVDownloader::download(const std::string &url, const char delim,
 #ifdef TRASE_HAVE_CURL
   // use curl to read url to a stringstream
   curl_easy_setopt(m_curl, CURLOPT_URL, url.c_str());
-  /* example.com is redirected, so we tell libcurl to follow redirection */
+  /* Do not check certificate*/
+  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+  /* tell libcurl to follow redirection */
   curl_easy_setopt(m_curl, CURLOPT_FOLLOWLOCATION, 1L);
   curl_easy_setopt(m_curl, CURLOPT_NOSIGNAL,
                    1); // Prevent "longjmp causes uninitialized stack frame" bug
