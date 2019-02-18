@@ -43,16 +43,36 @@ namespace trase {
 
 class CSVDownloader {
 public:
+  /// columns of csv file returned as a map from string label to a column of
+  /// data (vector of strings)
   using data_t = std::map<std::string, std::vector<std::string>>;
-  CSVDownloader(const char delim = ',');
+
+  /// constructs a csv downloader with default delimiter of ','
+  CSVDownloader();
+
   ~CSVDownloader();
+
+  /// download a csv file at the url given by @p url
+  ///
+  /// @param url url to download csv file from
+  /// @param labels if empty, the first line of the csv file is assumed to
+  /// contain the column labels If not empty, this vector contains the column
+  /// labels
   data_t download(const std::string &url,
                   const std::vector<std::string> &labels = {});
 
+  /// set the delimiter for the csv file format
+  void set_delim(const char arg) { m_delim = arg; }
+
 private:
+  /// parse a csv file given as a `std::stringstream`
   CSVDownloader::data_t parse_csv(std::stringstream &out,
                                   const std::vector<std::string> &labels);
+
+  /// pointer to libcurl data
   void *m_curl;
+
+  /// delimiter for the csv file format
   char m_delim;
 };
 

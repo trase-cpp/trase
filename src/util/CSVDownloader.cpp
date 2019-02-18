@@ -60,7 +60,7 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
   return size * nmemb;
 }
 
-CSVDownloader::CSVDownloader(const char delim) : m_delim(delim) {
+CSVDownloader::CSVDownloader() : m_delim(',') {
 #ifdef TRASE_HAVE_CURL
   m_curl = curl_easy_init();
 #endif

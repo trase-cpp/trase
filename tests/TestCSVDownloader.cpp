@@ -41,7 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace trase;
 
 TEST_CASE("download test file", "[csv downloader]") {
-  CSVDownloader dl('\t');
+  CSVDownloader dl;
+  dl.set_delim('\t');
   auto data = dl.download("https://www.stat.ubc.ca/~jenny/notOcto/STAT545A/"
                           "examples/gapminder/data/gapminderDataFiveYear.txt");
   std::map<std::string, std::string> expected;
