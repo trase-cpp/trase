@@ -83,7 +83,7 @@ public:
 
   // returns `static_cast<float>(arg)`, or std::stof(arg) if T is a
   // `std::string`
-  template <typename T> float cast_to_float(const T &arg) const;
+  template <typename T> static float cast_to_float(const T &arg);
 };
 
 /// Aesthetics are a collection of tag classes that represent each aesthetic

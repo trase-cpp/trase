@@ -33,12 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename T> float RawData::cast_to_float(const T &arg) const {
+template <typename T> float RawData::cast_to_float(const T &arg) {
   return static_cast<float>(arg);
 }
 
-template <>
-float RawData::cast_to_float<std::string>(const std::string &arg) const;
+template <> float RawData::cast_to_float<std::string>(const std::string &arg);
 
 template <typename T> void RawData::add_column(const std::vector<T> &new_col) {
 
@@ -71,7 +70,7 @@ template <typename T> void RawData::add_column(const std::vector<T> &new_col) {
     // copy data in (not using std::copy because visual studio complains if T
     // is not float)
     std::transform(new_col.begin(), new_col.end(), m_matrix.begin(),
-                   [this](auto i) { return cast_to_float(i); });
+                   [](auto i) { return cast_to_float(i); });
   }
   ++m_cols;
 }
@@ -105,7 +104,6 @@ void DataWithAesthetic::set(const std::vector<T> &data) {
     search = m_map.insert({Aesthetic::index, m_data->cols()}).first;
     m_data->add_column(data);
   } else {
-
     // copy data to column (TODO: move this into RawData class)
     m_data->set_column(search->second, data);
   }

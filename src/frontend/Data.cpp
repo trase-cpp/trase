@@ -35,8 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <>
-float RawData::cast_to_float<std::string>(const std::string &arg) const {
+template <> float RawData::cast_to_float<std::string>(const std::string &arg) {
   return std::stof(arg);
 }
 
