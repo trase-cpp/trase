@@ -41,10 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace trase;
 
 TEST_CASE("download test file", "[csv downloader]") {
-  CSVDownloader dl;
+  CSVDownloader dl('\t');
   auto data = dl.download("https://www.stat.ubc.ca/~jenny/notOcto/STAT545A/"
-                          "examples/gapminder/data/gapminderDataFiveYear.txt",
-                          '\t');
+                          "examples/gapminder/data/gapminderDataFiveYear.txt");
   std::map<std::string, std::string> expected;
   expected["country"] = "Afghanistan";
   expected["year"] = "1952";
@@ -63,7 +62,6 @@ TEST_CASE("download test file 2", "[csv downloader]") {
   CSVDownloader dl;
   auto data = dl.download(
       "http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data",
-      ',',
       {"sepal_length", "sepal_width", "petal_length", "petal_width", "class"});
   std::map<std::string, std::string> expected;
   expected["sepal_length"] = "5.1";

@@ -44,13 +44,16 @@ namespace trase {
 class CSVDownloader {
 public:
   using data_t = std::map<std::string, std::vector<std::string>>;
-  CSVDownloader();
+  CSVDownloader(const char delim = ',');
   ~CSVDownloader();
-  data_t download(const std::string &url, const char delim,
+  data_t download(const std::string &url,
                   const std::vector<std::string> &labels = {});
 
 private:
+  CSVDownloader::data_t parse_csv(std::stringstream &out,
+                                  const std::vector<std::string> &labels);
   void *m_curl;
+  char m_delim;
 };
 
 } // namespace trase

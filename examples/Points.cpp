@@ -49,7 +49,6 @@ int main() {
   CSVDownloader dl;
   auto csv = dl.download(
       "http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data",
-      ',',
       {"sepal_length", "sepal_width", "petal_length", "petal_width", "class"});
   auto fig = figure();
   auto ax = fig->axis();

@@ -60,28 +60,66 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
   return size * nmemb;
 }
 
-CSVDownloader::CSVDownloader() {
-
+CSVDownloader::CSVDownloader(const char delim) : m_delim(delim) {
 #ifdef TRASE_HAVE_CURL
   m_curl = curl_easy_init();
 #endif
 }
-CSVDownloader::~CSVDownloader() {
 
+CSVDownloader::~CSVDownloader() {
 #ifdef TRASE_HAVE_CURL
   curl_easy_cleanup(m_curl);
 #endif
 }
 
 CSVDownloader::data_t
-CSVDownloader::download(const std::string &url, const char delim,
-                        const std::vector<std::string> &labels_in) {
+CSVDownloader::parse_csv(std::stringstream &out,
+                         const std::vector<std::string> &labels_in) {
   CSVDownloader::data_t store;
+  // parse the stringstream as a csv with given delimiter
+  std::string line;
+  std::vector<std::string> labels;
+
+  // if input labels is empty, assume 1st line of data are labels
+  if (labels_in.empty()) {
+    std::getline(out, line);
+    split(line, m_delim, std::back_inserter(labels));
+  } else {
+    labels.resize(labels_in.size());
+    std::copy(labels_in.begin(), labels_in.end(), labels.begin());
+  }
+
+  // parse data
+  while (std::getline(out, line)) {
+    // ignore all whitespace lines
+    if (std::all_of(line.begin(), line.end(),
+                    [](unsigned char c) { return std::isspace(c); })) {
+      continue;
+    }
+
+    // split up line according to delimiter
+    std::vector<std::string> elems;
+    split(line, m_delim, std::back_inserter(elems));
+    if (elems.size() != labels.size()) {
+      throw Exception("CSVDownloader found differing line lengths");
+    }
+
+    // store individual elements from this line
+    for (size_t i = 0; i < labels.size(); ++i) {
+      store[labels[i]].push_back(elems[i]);
+    }
+  }
+  return store;
+}
+
+CSVDownloader::data_t
+CSVDownloader::download(const std::string &url,
+                        const std::vector<std::string> &labels) {
 #ifdef TRASE_HAVE_CURL
   // use curl to read url to a stringstream
   curl_easy_setopt(m_curl, CURLOPT_URL, url.c_str());
   /* Do not check certificate*/
-  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+  curl_easy_setopt(m_curl, CURLOPT_SSL_VERIFYPEER, 0L);
   /* tell libcurl to follow redirection */
   curl_easy_setopt(m_curl, CURLOPT_FOLLOWLOCATION, 1L);
   curl_easy_setopt(m_curl, CURLOPT_NOSIGNAL,
@@ -98,36 +136,11 @@ CSVDownloader::download(const std::string &url, const char delim,
             curl_easy_strerror(res));
   }
 
-  // parse the stringstream as a csv with given delimiter
-  std::string line;
-  std::vector<std::string> labels;
-
-  // if input labels is empty, assume 1st line of data are labels
-  if (labels_in.empty()) {
-    std::getline(out, line);
-    split(line, delim, std::back_inserter(labels));
-  } else {
-    labels.resize(labels_in.size());
-    std::copy(labels_in.begin(), labels_in.end(), labels.begin());
-  }
-
-  // parse data
-  while (std::getline(out, line)) {
-    if (std::all_of(line.begin(), line.end(),
-                    [](unsigned char c) { return std::isspace(c); })) {
-      continue;
-    }
-    std::vector<std::string> elems;
-    split(line, delim, std::back_inserter(elems));
-    if (elems.size() != labels.size()) {
-      throw Exception("CSVDownloader found differing line lengths");
-    }
-    for (size_t i = 0; i < labels.size(); ++i) {
-      store[labels[i]].push_back(elems[i]);
-    }
-  }
+  return parse_csv(out, labels);
+#else
+  raise Exception("TRASE_HAVE_CURL not defined: libcurl not found");
+  return CSVDownloader::data_t();
 #endif
-  return store;
 }
 
 } // namespace trase
