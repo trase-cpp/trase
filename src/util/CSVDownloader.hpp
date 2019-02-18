@@ -46,7 +46,8 @@ public:
   using data_t = std::map<std::string, std::vector<std::string>>;
   CSVDownloader();
   ~CSVDownloader();
-  data_t download(const std::string &url, const char delim);
+  data_t download(const std::string &url, const char delim,
+                  const std::vector<std::string> &labels = {});
 
 private:
   void *m_curl;

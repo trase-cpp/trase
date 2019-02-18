@@ -32,7 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /// \page example_points Points Geometry
-///  This is an example for the points geometry
+///  This is an example for the points geometry which uses the classic
+///  <a href="http://archive.ics.uci.edu/ml/datasets/Iris">Iris data set</a>
 ///
 /// \image html example_points.svg "Output"
 /// \snippet examples/Points.cpp example points
@@ -46,22 +47,21 @@ using namespace trase;
 
 int main() {
   CSVDownloader dl;
-  auto csv = dl.download("https://www.stat.ubc.ca/~jenny/notOcto/STAT545A/"
-                         "examples/gapminder/data/gapminderDataFiveYear.txt",
-                         '\t');
-
+  auto csv = dl.download(
+      "http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data",
+      ',',
+      {"sepal_length", "sepal_width", "petal_length", "petal_width", "class"});
   auto fig = figure();
   auto ax = fig->axis();
   auto data = create_data()
-                  .x(csv["gdpPercap"])
-                  .y(csv["lifeExp"])
-                  .size(csv["pop"])
-                  .color(csv["year"]);
+                  .x(csv["sepal_length"])
+                  .y(csv["sepal_width"])
+                  .color(csv["petal_width"]);
 
   auto points = ax->points(data);
 
-  ax->xlabel("gdpPercap");
-  ax->ylabel("lifeExp");
+  ax->xlabel("sepal length");
+  ax->ylabel("sepal width");
 
 // output to chosen backend
 #ifdef TRASE_EXAMPLES_SVG_BACKEND

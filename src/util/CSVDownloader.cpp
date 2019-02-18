@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <curl/easy.h>
 #endif
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 
@@ -72,8 +73,9 @@ CSVDownloader::~CSVDownloader() {
 #endif
 }
 
-CSVDownloader::data_t CSVDownloader::download(const std::string &url,
-                                              const char delim) {
+CSVDownloader::data_t
+CSVDownloader::download(const std::string &url, const char delim,
+                        const std::vector<std::string> &labels_in) {
   CSVDownloader::data_t store;
 #ifdef TRASE_HAVE_CURL
   // use curl to read url to a stringstream
@@ -97,9 +99,22 @@ CSVDownloader::data_t CSVDownloader::download(const std::string &url,
   // parse the stringstream as a csv with given delimiter
   std::string line;
   std::vector<std::string> labels;
-  std::getline(out, line);
-  split(line, delim, std::back_inserter(labels));
+
+  // if input labels is empty, assume 1st line of data are labels
+  if (labels_in.empty()) {
+    std::getline(out, line);
+    split(line, delim, std::back_inserter(labels));
+  } else {
+    labels.resize(labels_in.size());
+    std::copy(labels_in.begin(), labels_in.end(), labels.begin());
+  }
+
+  // parse data
   while (std::getline(out, line)) {
+    if (std::all_of(line.begin(), line.end(),
+                    [](unsigned char c) { return std::isspace(c); })) {
+      continue;
+    }
     std::vector<std::string> elems;
     split(line, delim, std::back_inserter(elems));
     if (elems.size() != labels.size()) {

@@ -58,3 +58,22 @@ TEST_CASE("download test file", "[csv downloader]") {
   }
   CHECK(i == 6);
 }
+
+TEST_CASE("download test file 2", "[csv downloader]") {
+  CSVDownloader dl;
+  auto data = dl.download(
+      "http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data",
+      ',',
+      {"sepal_length", "sepal_width", "petal_length", "petal_width", "class"});
+  std::map<std::string, std::string> expected;
+  expected["sepal_length"] = "5.1";
+  expected["sepal_width"] = "3.5";
+  expected["petal_length"] = "1.4";
+  expected["petal_width"] = "0.2";
+  expected["class"] = "Iris-setosa";
+  int i = 0;
+  for (auto it = data.begin(); it != data.end(); ++it, ++i) {
+    CHECK(it->second[0] == expected[it->first]);
+  }
+  CHECK(i == 5);
+}
