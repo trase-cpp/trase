@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \image html example_line_style.svg "Output"
 /// \snippet examples/LineStyle.cpp example line style
 
-/// [example line]
+/// [example line style]
 #include "trase.hpp"
 #include <fstream>
 
@@ -84,4 +84,4 @@ int main() {
   fig->show(backend);
 #endif
 }
-/// [example line]
+/// [example line style]
