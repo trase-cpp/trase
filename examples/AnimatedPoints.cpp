@@ -31,13 +31,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \page example_points Animated Points Geometry
+/// \page example_animated_points Animated Points Geometry
 ///  This is an example for the points geometry
 ///
-/// \image html example_points.svg "Output"
-/// \snippet examples/Points.cpp example points
+/// \image html example_animated_points.svg "Output"
+/// \snippet examples/AnimatedPoints.cpp example animated points
 
-/// [example points]
+/// [example animated points]
 #include "trase.hpp"
 #include <fstream>
 #include <random>
@@ -87,7 +87,7 @@ int main() {
 // output to chosen backend
 #ifdef TRASE_EXAMPLES_SVG_BACKEND
   std::ofstream out;
-  out.open("example_points.svg");
+  out.open("example_animated_points.svg");
   BackendSVG backend(out);
   fig->draw(backend);
   out.close();
@@ -97,4 +97,4 @@ int main() {
   fig->show(backend);
 #endif
 }
-/// [example points]
+/// [example animated points]

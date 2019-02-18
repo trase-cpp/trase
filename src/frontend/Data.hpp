@@ -80,6 +80,10 @@ public:
 
   /// return a ColumnIterator to the end of column i
   ColumnIterator end(int i) const;
+
+  // returns `static_cast<float>(arg)`, or std::stof(arg) if T is a
+  // `std::string`
+  template <typename T> float cast_to_float(const T &arg) const;
 };
 
 /// Aesthetics are a collection of tag classes that represent each aesthetic

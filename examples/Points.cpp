@@ -31,7 +31,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \page example_points Animated Points Geometry
+/// \page example_points Points Geometry
 ///  This is an example for the points geometry
 ///
 /// \image html example_points.svg "Output"
@@ -45,44 +45,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace trase;
 
 int main() {
+  CSVDownloader dl;
+  auto csv = dl.download("https://www.stat.ubc.ca/~jenny/notOcto/STAT545A/"
+                         "examples/gapminder/data/gapminderDataFiveYear.txt",
+                         '\t');
 
   auto fig = figure();
   auto ax = fig->axis();
-  const int n = 100;
-  std::vector<float> x(n), y(n), r(n), c(n);
-  std::default_random_engine gen;
-  std::normal_distribution<float> normal(0, 1);
-  std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
-  std::generate(y.begin(), y.end(), [&]() { return normal(gen); });
-  std::generate(r.begin(), r.end(), [&]() { return normal(gen); });
-  std::generate(c.begin(), c.end(), [&]() { return normal(gen); });
-
-  auto data = create_data().x(x).y(y).size(r).color(c);
+  auto data = create_data()
+                  .x(csv["gdpPercap"])
+                  .y(csv["lifeExp"])
+                  .size(csv["pop"])
+                  .color(csv["year"]);
 
   auto points = ax->points(data);
-  points->set_label("points");
 
-  float time = 0.0;
-
-  auto do_plot = [&]() {
-    time += 0.3f;
-    std::normal_distribution<float> normal(0, 1);
-    std::generate(x.begin(), x.end(), [&]() { return normal(gen); });
-    std::generate(y.begin(), y.end(), [&]() { return normal(gen); });
-    std::generate(r.begin(), r.end(), [&]() { return normal(gen); });
-    std::generate(c.begin(), c.end(), [&]() { return normal(gen); });
-    auto data = create_data().x(x).y(y).size(r).color(c);
-    points->add_frame(data, time);
-  };
-
-  for (int i = 0; i < 5; ++i) {
-    do_plot();
-  }
-
-  ax->xlabel("x");
-  ax->ylabel("y");
-  ax->title("points test");
-  ax->legend();
+  ax->xlabel("gdpPercap");
+  ax->ylabel("lifeExp");
 
 // output to chosen backend
 #ifdef TRASE_EXAMPLES_SVG_BACKEND

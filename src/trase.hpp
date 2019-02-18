@@ -42,5 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "frontend/Figure.hpp"
+#include "util/CSVDownloader.hpp"
 
 #endif // TRASE_H_

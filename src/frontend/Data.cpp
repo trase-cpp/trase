@@ -35,6 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+template <>
+float RawData::cast_to_float<std::string>(const std::string &arg) const {
+  return std::stof(arg);
+}
+
 ColumnIterator RawData::begin(const int i) const {
   if (i < 0 || i >= cols()) {
     throw std::out_of_range("column does not exist");

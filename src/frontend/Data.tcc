@@ -33,6 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+template <typename T> float RawData::cast_to_float(const T &arg) const {
+  return static_cast<float>(arg);
+}
+
+template <>
+float RawData::cast_to_float<std::string>(const std::string &arg) const;
+
 template <typename T> void RawData::add_column(const std::vector<T> &new_col) {
 
   // if columns already exist then add the extra memory
@@ -51,7 +58,7 @@ template <typename T> void RawData::add_column(const std::vector<T> &new_col) {
       for (int j = 0; j < m_cols; ++j) {
         m_tmp[i * (m_cols + 1) + j] = m_matrix[i * m_cols + j];
       }
-      m_tmp[i * (m_cols + 1) + m_cols] = static_cast<float>(new_col[i]);
+      m_tmp[i * (m_cols + 1) + m_cols] = cast_to_float(new_col[i]);
     }
 
     // swap data back to m_matrix
@@ -64,7 +71,7 @@ template <typename T> void RawData::add_column(const std::vector<T> &new_col) {
     // copy data in (not using std::copy because visual studio complains if T
     // is not float)
     std::transform(new_col.begin(), new_col.end(), m_matrix.begin(),
-                   [](auto i) { return static_cast<float>(i); });
+                   [this](auto i) { return cast_to_float(i); });
   }
   ++m_cols;
 }
@@ -84,7 +91,7 @@ void RawData::set_column(const int i, const std::vector<T> &new_col) {
 
   // copy column
   for (int j = 0; j < m_rows; ++j) {
-    m_matrix[j * m_cols + i] = static_cast<float>(new_col[j]);
+    m_matrix[j * m_cols + i] = cast_to_float(new_col[j]);
   }
 }
 
@@ -105,9 +112,10 @@ void DataWithAesthetic::set(const std::vector<T> &data) {
 
   if (!data.empty()) {
     // set m_limits with new data
-    auto min_max = std::minmax_element(data.begin(), data.end());
-    m_limits.bmin[Aesthetic::index] = static_cast<float>(*min_max.first);
-    m_limits.bmax[Aesthetic::index] = static_cast<float>(*min_max.second);
+    auto min_max = std::minmax_element(m_data->begin(search->second),
+                                       m_data->end(search->second));
+    m_limits.bmin[Aesthetic::index] = *min_max.first;
+    m_limits.bmax[Aesthetic::index] = *min_max.second;
 
     // if limits are equal spread them out by 2*1e4*eps to stop zeros later on
     if (m_limits.bmin[Aesthetic::index] == m_limits.bmin[Aesthetic::index]) {
