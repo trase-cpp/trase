@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \page example_animated_points Animated Points Geometry
 ///  This is an example for the points geometry
 ///
-/// \image html example_animated_points.svg "Output"
+/// \image html https://cdn.jsdelivr.net/gh/trase-cpp/generated_files@master/examples/example_animated_points.svg "Output" 
 /// \snippet examples/AnimatedPoints.cpp example animated points
 
 /// [example animated points]
