@@ -128,6 +128,6 @@ after_success:
         cd generated_files;
         git add examples/*.svg tests/*.svg;
         git -c user.name='travis' -c user.email='travis' commit -a -m "updated generated files";
-        git push -q https://martinjrobins:$GITHUB_API_KEY@github.com/trase-cpp/trase master &>/dev/null;
+        git push -q https://martinjrobins:$GITHUB_API_KEY@github.com/trase-cpp/generated_files master &>/dev/null;
         cd $TRAVIS_BUILD_DIR;
     fi
