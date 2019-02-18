@@ -4,6 +4,7 @@ set (examples
   AnimatedLine.cpp
   Histogram.cpp
   AnimatedPoints.cpp
+  LineStyle.cpp
   )
 
 
