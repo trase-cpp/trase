@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \page example_animated_line Animated Line Geometry
 ///  This is an example for the line geometry, showing an animated plot
 ///
-/// \image html example_animated_line.svg "Output"
+/// \image html https://cdn.jsdelivr.net/gh/trase-cpp/generated_files@master/examples/example_animated_line.svg "Output" 
 /// \snippet examples/AnimatedLine.cpp animated line example
 
 /// [animated line example]

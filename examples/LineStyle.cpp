@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \page example_line_style Line Style
 ///  This is an example of using the Style class for a Line
 ///
-/// \image html example_line_style.svg "Output"
+/// \image html https://cdn.jsdelivr.net/gh/trase-cpp/generated_files@master/examples/example_line_style.svg "Output" 
 /// \snippet examples/LineStyle.cpp example line style
 
 /// [example line style]

@@ -34,9 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \page example_line Line Geometry
 ///  This is an example for the line geometry
 ///
-/// \image html
-/// https://rawgit.com/trase-cpp/generated_files/master/example_line.svg
-/// "Output" \snippet examples/Line.cpp example line
+/// \image html https://cdn.jsdelivr.net/gh/trase-cpp/generated_files@master/examples/example_line.svg "Output" 
+/// \snippet examples/Line.cpp example line
 
 /// [example line]
 #include "trase.hpp"

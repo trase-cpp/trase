@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///  This is an example for the points geometry which uses the classic
 ///  <a href="http://archive.ics.uci.edu/ml/datasets/Iris">Iris data set</a>
 ///
-/// \image html example_points.svg "Output"
+/// \image html https://cdn.jsdelivr.net/gh/trase-cpp/generated_files@master/examples/example_points.svg "Output" 
 /// \snippet examples/Points.cpp example points
 
 /// [example points]

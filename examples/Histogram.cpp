@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \page example_histogram Animated Histogram Geometry
 ///  This is an example for the histogram geometry
 ///
-/// \image html example_histogram.svg "Output"
+/// \image html https://cdn.jsdelivr.net/gh/trase-cpp/generated_files@master/examples/example_histogram.svg "Output" 
 /// \snippet examples/Histogram.cpp example histogram
 
 /// [example histogram]
