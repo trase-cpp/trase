@@ -93,7 +93,7 @@ public:
 /// Each Aesthetic defines a mapping to and from a display type
 struct Aesthetic {
   // total number of Aesthetics
-  static const int N = 8;
+  static const int N = 9;
 
   /// all aethetics except for xmin,ymin,xmax,ymax have their own min/max bounds
   using Limits = bbox<float, N - 4>;
@@ -141,12 +141,23 @@ struct Aesthetic {
                               const bfloat2_t &display_lim);
   };
 
+  /// the fill color of each plotting element, scaled from 0 -> 1
+  struct fill {
+    static const int index = 4;
+    static const char *name;
+
+    static float to_display(float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim);
+    static float from_display(float display, const Limits &data_lim,
+                              const bfloat2_t &display_lim);
+  };
+
   // NOTE: xmin,ymin,xmax,ymax need to go at end so that the indices for Limits
   // work out
 
   /// the minimum x coordinate of the data
   struct xmin {
-    static const int index = 4;
+    static const int index = 5;
     static const char *name;
     static float to_display(float data, const Limits &data_lim,
                             const bfloat2_t &display_lim);
@@ -156,7 +167,7 @@ struct Aesthetic {
 
   /// the minimum y coordinate of the data
   struct ymin {
-    static const int index = 5;
+    static const int index = 6;
     static const char *name;
     static float to_display(float data, const Limits &data_lim,
                             const bfloat2_t &display_lim);
@@ -166,7 +177,7 @@ struct Aesthetic {
 
   /// the maximum x coordinate of the data
   struct xmax {
-    static const int index = 6;
+    static const int index = 7;
     static const char *name;
     static float to_display(float data, const Limits &data_lim,
                             const bfloat2_t &display_lim);
@@ -176,7 +187,7 @@ struct Aesthetic {
 
   /// the maximum y coordinate of the data
   struct ymax {
-    static const int index = 7;
+    static const int index = 8;
     static const char *name;
     static float to_display(float data, const Limits &data_lim,
                             const bfloat2_t &display_lim);
@@ -251,6 +262,9 @@ public:
 
   template <typename T> DataWithAesthetic &size(const std::vector<T> &data);
   DataWithAesthetic &size(float min, float max);
+
+  template <typename T> DataWithAesthetic &fill(const std::vector<T> &data);
+  DataWithAesthetic &fill(float min, float max);
 
   template <typename T> DataWithAesthetic &xmin(const std::vector<T> &data);
   DataWithAesthetic &xmin(float min, float max);

@@ -190,6 +190,25 @@ float Aesthetic::size::from_display(const float display, const Limits &data_lim,
   return data_lim.bmin[index] + rel_pos * len_ratio;
 }
 
+float Aesthetic::fill::to_display(const float data, const Limits &data_lim,
+                                   const bfloat2_t &display_lim) {
+  (void)display_lim;
+  float len_ratio = 1.f / (data_lim.bmax[index] - data_lim.bmin[index]);
+
+  float rel_pos = data - data_lim.bmin[index];
+  return rel_pos * len_ratio;
+}
+
+float Aesthetic::fill::from_display(const float display,
+                                     const Limits &data_lim,
+                                     const bfloat2_t &display_lim) {
+  (void)display_lim;
+  float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]);
+
+  float rel_pos = display;
+  return data_lim.bmin[index] + rel_pos * len_ratio;
+}
+
 float Aesthetic::xmin::to_display(const float data, const Limits &data_lim,
                                   const bfloat2_t &display_lim) {
   const int xindex = Aesthetic::x::index;
@@ -311,6 +330,11 @@ DataWithAesthetic &DataWithAesthetic::color(const float min, const float max) {
 
 DataWithAesthetic &DataWithAesthetic::size(const float min, const float max) {
   set<Aesthetic::size>(min, max);
+  return *this;
+}
+
+DataWithAesthetic &DataWithAesthetic::fill(const float min, const float max) {
+  set<Aesthetic::fill>(min, max);
   return *this;
 }
 

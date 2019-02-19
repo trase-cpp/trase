@@ -156,6 +156,12 @@ DataWithAesthetic &DataWithAesthetic::size(const std::vector<T> &data) {
 }
 
 template <typename T>
+DataWithAesthetic &DataWithAesthetic::fill(const std::vector<T> &data) {
+  set<Aesthetic::fill>(data);
+  return *this;
+}
+
+template <typename T>
 DataWithAesthetic &DataWithAesthetic::xmin(const std::vector<T> &data) {
   set<Aesthetic::xmin>(data);
   return *this;

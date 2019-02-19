@@ -55,7 +55,8 @@ public:
   void draw_legend(Backend &backend, float time, const bfloat2_t &box);
 
 private:
-  void validate_frames(const bool have_color, const int n);
+  void validate_frames(const bool have_color, const bool have_fill,
+                       const int n);
   template <typename AnimatedBackend>
   void draw_frames(AnimatedBackend &backend);
   template <typename Backend> void draw_plot(Backend &backend);

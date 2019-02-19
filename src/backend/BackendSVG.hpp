@@ -225,7 +225,7 @@ public:
   /// @param r the radius of the circle used to round the corners, default 0.f
   void rect(const bfloat2_t &x, float r = 0.f) noexcept;
 
-  /// start/continue an animated rectangle, optimally with rounded corners.
+  /// start/continue an animated rectangle.
   /// subsequent calls to this method will add extra keyframe to the animation.
   ///
   /// @param x the bounding box of the rectangle
