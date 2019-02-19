@@ -93,7 +93,7 @@ public:
 /// Each Aesthetic defines a mapping to and from a display type
 struct Aesthetic {
   // aesthetic indexes must be able to index a vector with size=N
-  static const int N = 4;
+  static const int N = 8;
 
   using Limits = bbox<float, N>;
 
@@ -134,6 +134,46 @@ struct Aesthetic {
     static const int index = 3;
     static const char *name;
 
+    static float to_display(float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim);
+    static float from_display(float display, const Limits &data_lim,
+                              const bfloat2_t &display_lim);
+  };
+
+  /// the minimum x coordinate of the data
+  struct xmin {
+    static const int index = 4;
+    static const char *name;
+    static float to_display(float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim);
+    static float from_display(float display, const Limits &data_lim,
+                              const bfloat2_t &display_lim);
+  };
+
+  /// the minimum y coordinate of the data
+  struct ymin {
+    static const int index = 5;
+    static const char *name;
+    static float to_display(float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim);
+    static float from_display(float display, const Limits &data_lim,
+                              const bfloat2_t &display_lim);
+  };
+
+  /// the maximum x coordinate of the data
+  struct xmax {
+    static const int index = 6;
+    static const char *name;
+    static float to_display(float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim);
+    static float from_display(float display, const Limits &data_lim,
+                              const bfloat2_t &display_lim);
+  };
+
+  /// the maximum y coordinate of the data
+  struct ymax {
+    static const int index = 7;
+    static const char *name;
     static float to_display(float data, const Limits &data_lim,
                             const bfloat2_t &display_lim);
     static float from_display(float display, const Limits &data_lim,
@@ -207,6 +247,18 @@ public:
 
   template <typename T> DataWithAesthetic &size(const std::vector<T> &data);
   DataWithAesthetic &size(float min, float max);
+
+  template <typename T> DataWithAesthetic &xmin(const std::vector<T> &data);
+  DataWithAesthetic &xmin(float min, float max);
+
+  template <typename T> DataWithAesthetic &ymin(const std::vector<T> &data);
+  DataWithAesthetic &ymin(float min, float max);
+
+  template <typename T> DataWithAesthetic &xmax(const std::vector<T> &data);
+  DataWithAesthetic &xmax(float min, float max);
+
+  template <typename T> DataWithAesthetic &ymax(const std::vector<T> &data);
+  DataWithAesthetic &ymax(float min, float max);
 };
 
 /// creates a new, empty dataset

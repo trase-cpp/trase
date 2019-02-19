@@ -155,4 +155,28 @@ DataWithAesthetic &DataWithAesthetic::size(const std::vector<T> &data) {
   return *this;
 }
 
+template <typename T>
+DataWithAesthetic &DataWithAesthetic::xmin(const std::vector<T> &data) {
+  set<Aesthetic::xmin>(data);
+  return *this;
+}
+
+template <typename T>
+DataWithAesthetic &DataWithAesthetic::ymin(const std::vector<T> &data) {
+  set<Aesthetic::ymin>(data);
+  return *this;
+}
+
+template <typename T>
+DataWithAesthetic &DataWithAesthetic::xmax(const std::vector<T> &data) {
+  set<Aesthetic::xmax>(data);
+  return *this;
+}
+
+template <typename T>
+DataWithAesthetic &DataWithAesthetic::ymax(const std::vector<T> &data) {
+  set<Aesthetic::ymax>(data);
+  return *this;
+}
+
 } // namespace trase
