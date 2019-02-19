@@ -174,12 +174,9 @@ TEST_CASE("use data with aesthetics", "[data]") {
 
 TEST_CASE("aesthetics", "[data]") {
   // x/y lims = 0->100
-  // xmin/ymin lims = 0->50
-  // xmax/ymaxlims = 100->150
   // color lims = 100->200
   // size lims = 1->2
-  Limits lim({0, 0, 100, 1, 0, 0, 100, 100},
-             {100, 100, 200, 2, 50, 50, 150, 150});
+  Limits lim({0, 0, 100, 1},{100, 100, 200, 2});
 
   // xy pixel limits = 0 -> 200
   bfloat2_t pixels({0, 0}, {200, 200});
@@ -213,28 +210,28 @@ TEST_CASE("aesthetics", "[data]") {
       Aesthetic::color::from_display(color_display, lim, pixels);
   CHECK(color_data_check == color_data);
 
-  // xmin
+  // xmin (same as x)
   float xmin_data = 1.f;
   auto xmin_display = Aesthetic::xmin::to_display(xmin_data, lim, pixels);
   CHECK(xmin_display == 2.f);
   auto xmin_data_check = Aesthetic::xmin::from_display(xmin_display, lim, pixels);
   CHECK(xmin_data_check == xmin_data);
 
-  // ymin
+  // ymin (same as y)
   float ymin_data = 2.f;
   auto ymin_display = Aesthetic::ymin::to_display(ymin_data, lim, pixels);
   CHECK(ymin_display == pixels.bmax[1] - 4.f);
   auto ymin_data_check = Aesthetic::ymin::from_display(ymin_display, lim, pixels);
   CHECK(ymin_data_check == ymin_data);
 
-  // xmax
+  // xmax (same as x)
   float xmax_data = 1.f;
   auto xmax_display = Aesthetic::xmax::to_display(xmax_data, lim, pixels);
   CHECK(xmax_display == 2.f);
   auto xmax_data_check = Aesthetic::xmax::from_display(xmax_display, lim, pixels);
   CHECK(xmax_data_check == xmax_data);
 
-  // ymax
+  // ymax (same as y)
   float ymax_data = 2.f;
   auto ymax_display = Aesthetic::ymax::to_display(ymax_data, lim, pixels);
   CHECK(ymax_display == pixels.bmax[1] - 4.f);

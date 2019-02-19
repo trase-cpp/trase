@@ -192,84 +192,106 @@ float Aesthetic::size::from_display(const float display, const Limits &data_lim,
 
 float Aesthetic::xmin::to_display(const float data, const Limits &data_lim,
                                   const bfloat2_t &display_lim) {
+  const int xindex = Aesthetic::x::index;
   float len_ratio = (display_lim.bmax[0] - display_lim.bmin[0]) /
-                    (data_lim.bmax[index] - data_lim.bmin[index]);
+                    (data_lim.bmax[xindex] - data_lim.bmin[xindex]);
 
-  float rel_pos = data - data_lim.bmin[index];
+  float rel_pos = data - data_lim.bmin[xindex];
   return display_lim.bmin[0] + rel_pos * len_ratio;
 }
 
 float Aesthetic::xmin::from_display(const float display, const Limits &data_lim,
                                     const bfloat2_t &display_lim) {
-  float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
+  const int xindex = Aesthetic::x::index;
+  float len_ratio = (data_lim.bmax[xindex] - data_lim.bmin[xindex]) /
                     (display_lim.bmax[1] - display_lim.bmin[1]);
 
   float rel_pos = display - display_lim.bmin[1];
-  return data_lim.bmin[index] + rel_pos * len_ratio;
+  return data_lim.bmin[xindex] + rel_pos * len_ratio;
 }
 
 /// the data to display on the y-axis of the plot
 float Aesthetic::ymin::to_display(const float data, const Limits &data_lim,
                                   const bfloat2_t &display_lim) {
+  const int yindex = Aesthetic::y::index;
   float len_ratio = (display_lim.bmax[1] - display_lim.bmin[1]) /
-                    (data_lim.bmax[index] - data_lim.bmin[index]);
+                    (data_lim.bmax[yindex] - data_lim.bmin[yindex]);
 
   // Get the relative position and invert y by default (e.g. limits->pixels)
-  float rel_pos = data_lim.bmax[index] - data;
+  float rel_pos = data_lim.bmax[yindex] - data;
   return display_lim.bmin[1] + rel_pos * len_ratio;
 }
 
 float Aesthetic::ymin::from_display(const float display, const Limits &data_lim,
                                     const bfloat2_t &display_lim) {
-  float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
+  const int yindex = Aesthetic::y::index;
+  float len_ratio = (data_lim.bmax[yindex] - data_lim.bmin[yindex]) /
                     (display_lim.bmax[1] - display_lim.bmin[1]);
 
   float rel_pos = display_lim.bmax[1] - display;
-  return data_lim.bmin[index] + rel_pos * len_ratio;
+  return data_lim.bmin[yindex] + rel_pos * len_ratio;
 }
 
 float Aesthetic::xmax::to_display(const float data, const Limits &data_lim,
                                   const bfloat2_t &display_lim) {
+  const int xindex = Aesthetic::x::index;
   float len_ratio = (display_lim.bmax[0] - display_lim.bmin[0]) /
-                    (data_lim.bmax[index] - data_lim.bmin[index]);
+                    (data_lim.bmax[xindex] - data_lim.bmin[xindex]);
 
-  float rel_pos = data - data_lim.bmin[index];
+  float rel_pos = data - data_lim.bmin[xindex];
   return display_lim.bmin[0] + rel_pos * len_ratio;
 }
 
 float Aesthetic::xmax::from_display(const float display, const Limits &data_lim,
                                     const bfloat2_t &display_lim) {
-  float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
+  const int xindex = Aesthetic::x::index;
+  float len_ratio = (data_lim.bmax[xindex] - data_lim.bmin[xindex]) /
                     (display_lim.bmax[1] - display_lim.bmin[1]);
 
   float rel_pos = display - display_lim.bmin[1];
-  return data_lim.bmin[index] + rel_pos * len_ratio;
+  return data_lim.bmin[xindex] + rel_pos * len_ratio;
 }
 
 /// the data to display on the y-axis of the plot
 float Aesthetic::ymax::to_display(const float data, const Limits &data_lim,
                                   const bfloat2_t &display_lim) {
+  const int yindex = Aesthetic::y::index;
   float len_ratio = (display_lim.bmax[1] - display_lim.bmin[1]) /
-                    (data_lim.bmax[index] - data_lim.bmin[index]);
+                    (data_lim.bmax[yindex] - data_lim.bmin[yindex]);
 
   // Get the relative position and invert y by default (e.g. limits->pixels)
-  float rel_pos = data_lim.bmax[index] - data;
+  float rel_pos = data_lim.bmax[yindex] - data;
   return display_lim.bmin[1] + rel_pos * len_ratio;
 }
 
 float Aesthetic::ymax::from_display(const float display, const Limits &data_lim,
                                     const bfloat2_t &display_lim) {
-  float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]) /
+  const int yindex = Aesthetic::y::index;
+  float len_ratio = (data_lim.bmax[yindex] - data_lim.bmin[yindex]) /
                     (display_lim.bmax[1] - display_lim.bmin[1]);
 
   float rel_pos = display_lim.bmax[1] - display;
-  return data_lim.bmin[index] + rel_pos * len_ratio;
+  return data_lim.bmin[yindex] + rel_pos * len_ratio;
 }
 
-template <typename Aesthetic>
-void DataWithAesthetic::set(const float min, const float max) {
-  m_limits.bmin[Aesthetic::index] = min;
-  m_limits.bmax[Aesthetic::index] = max;
+template <>
+void DataWithAesthetic::set<Aesthetic::xmin>(const float min, const float max) {
+  m_limits.bmin[Aesthetic::x::index] = min;
+}
+
+template <>
+void DataWithAesthetic::set<Aesthetic::xmax>(const float min, const float max) {
+  m_limits.bmax[Aesthetic::x::index] = max;
+}
+
+template <>
+void DataWithAesthetic::set<Aesthetic::ymin>(const float min, const float max) {
+  m_limits.bmin[Aesthetic::y::index] = min;
+}
+
+template <>
+void DataWithAesthetic::set<Aesthetic::ymax>(const float min, const float max) {
+  m_limits.bmax[Aesthetic::y::index] = max;
 }
 
 DataWithAesthetic &DataWithAesthetic::x(const float min, const float max) {

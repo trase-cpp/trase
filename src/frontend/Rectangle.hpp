@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-class Rectangle: public Geometry {
+class Rectangle : public Geometry {
 public:
   explicit Rectangle(Axis *parent) : Geometry(parent) {}
 
@@ -55,8 +55,7 @@ public:
   void draw_legend(Backend &backend, float time, const bfloat2_t &box);
 
 private:
-  void validate_frames(const bool have_size, const bool have_color,
-                       const int n);
+  void validate_frames(const bool have_color, const int n);
   template <typename AnimatedBackend>
   void draw_frames(AnimatedBackend &backend);
   template <typename Backend> void draw_plot(Backend &backend);

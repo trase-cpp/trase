@@ -45,13 +45,13 @@ TEST_CASE("rectangle creation", "[rectangle]") {
   auto fig = figure();
   auto ax = fig->axis();
   std::vector<float> xmin, ymin, xmax, ymax, c;
-  ax->points(create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax));
+  ax->rectangle(create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax));
   DummyDraw::draw("rect", fig);
   xmin.resize(1);
   ymin.resize(1);
   xmax.resize(1);
   ymax.resize(1);
-  ax->points(create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax));
+  ax->rectangle(create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax));
   DummyDraw::draw("rect", fig);
   xmin.resize(5);
   ymin.resize(5);
@@ -65,7 +65,7 @@ TEST_CASE("rectangle creation", "[rectangle]") {
     ymax[1] = 0.12f * i;
     c[1] = 0.1f * i;
   }
-  ax->points(
+  ax->rectangle(
       create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c));
   DummyDraw::draw("rect", fig);
 }
@@ -78,10 +78,10 @@ TEST_CASE("rectangle animate color", "[rectangle]") {
   std::vector<float> xmax = {1};
   std::vector<float> ymax = {1};
   std::vector<float> c = {0};
-  auto pts = ax->points(
+  auto rect = ax->rectangle(
       create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c));
   c[0] = 1;
-  pts->add_frame(
+  rect->add_frame(
       create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c), 1);
   DummyDraw::draw("rect_animate_color", fig);
 }
@@ -94,9 +94,9 @@ TEST_CASE("rectangle color frames exception", "[rectangle]") {
   std::vector<float> xmax = {1};
   std::vector<float> ymax = {1};
   std::vector<float> c = {0};
-  auto pts = ax->points(
+  auto rect = ax->rectangle(
       create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c));
-  pts->add_frame(create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax), 1);
+  rect->add_frame(create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax), 1);
   REQUIRE_THROWS_WITH(DummyDraw::draw("rect_color_exception", fig),
                       Catch::Contains("color"));
 }
@@ -109,14 +109,14 @@ TEST_CASE("rectangle number frames exception", "[rectangle]") {
   std::vector<float> xmax = {1};
   std::vector<float> ymax = {1};
   std::vector<float> c = {0};
-  auto pts = ax->points(
+  auto rect = ax->rectangle(
       create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c));
   xmin.push_back(0);
   ymin.push_back(0);
   xmax.push_back(1);
   ymax.push_back(1);
   c.push_back(0);
-  pts->add_frame(
+  rect->add_frame(
       create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c), 1);
   REQUIRE_THROWS_WITH(DummyDraw::draw("rect_number_exception", fig),
                       Catch::Contains("number"));

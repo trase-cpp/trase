@@ -92,10 +92,11 @@ public:
 ///
 /// Each Aesthetic defines a mapping to and from a display type
 struct Aesthetic {
-  // aesthetic indexes must be able to index a vector with size=N
+  // total number of Aesthetics
   static const int N = 8;
 
-  using Limits = bbox<float, N>;
+  /// all aethetics except for xmin,ymin,xmax,ymax have their own min/max bounds
+  using Limits = bbox<float, N - 4>;
 
   /// the data to display on the x-axis of the plot
   struct x {
@@ -140,6 +141,9 @@ struct Aesthetic {
                               const bfloat2_t &display_lim);
   };
 
+  // NOTE: xmin,ymin,xmax,ymax need to go at end so that the indices for Limits
+  // work out
+
   /// the minimum x coordinate of the data
   struct xmin {
     static const int index = 4;
@@ -181,8 +185,8 @@ struct Aesthetic {
   };
 };
 
-/// Each aesthetic has a set of min/max limits, or scales, that are used for
-/// plotting
+/// Each aesthetic (except for xmin/ymin/xmax/ymax) has a set of min/max limits,
+/// or scales, that are used for plotting
 using Limits = Aesthetic::Limits;
 
 /// Combination of the RawData class and Aesthetics, this class points to a

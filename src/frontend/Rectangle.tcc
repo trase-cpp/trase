@@ -63,7 +63,7 @@ void Rectangle::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
       auto c = m_axis->to_display<Aesthetic::color>(
           limits.bmin[Aesthetic::color::index]);
 
-      backend.add_animated_rect(p0, s, m_colormap->to_color(c), m_times[f]);
+      backend.add_animated_rect(bfloat2_t(p0 - s, p0 + s), m_times[f]);
     }
     backend.end_animated_circle();
     for (size_t f = 0; f < m_times.size(); ++f) {
@@ -71,13 +71,13 @@ void Rectangle::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
       auto c = m_axis->to_display<Aesthetic::color>(
           limits.bmax[Aesthetic::color::index]);
 
-      backend.add_animated_rect(p1, s, m_colormap->to_color(c), m_times[f]);
+      backend.add_animated_rect(bfloat2_t(p1 - s, p1 + s), m_times[f]);
     }
     backend.end_animated_rect();
   } else {
     backend.fill_color(m_colormap->to_color(0.f));
-    backend.rect(p0, s);
-    backend.rect(p1, s);
+    backend.rect(bfloat2_t(p0 - s, p0 + s));
+    backend.rect(bfloat2_t(p1 - s, p1 + s));
   }
 }
 
@@ -117,9 +117,9 @@ void Rectangle::draw_legend(Backend &backend, const float time,
 
   backend.stroke_width(0);
   backend.fill_color(m_colormap->to_color(c0));
-  backend.rect(p0, s);
+  backend.rect(bfloat2_t(p0 - s, p0 + s));
   backend.fill_color(m_colormap->to_color(c1));
-  backend.rect(p1, s);
+  backend.rect(bfloat2_t(p1 - s, p1 + s));
 }
 
 void Rectangle::validate_frames(const bool have_color, const int n) {
@@ -151,15 +151,14 @@ void Rectangle::draw_frames(AnimatedBackend &backend) {
 
   validate_frames(have_color, n);
 
-  auto to_pixel = [&](auto xmin, auto ymin, auto xmin, auto xmax, auto c) {
+  auto to_pixel = [&](auto xmin, auto ymin, auto xmax, auto ymax, auto c) {
     // if color is not provided use the bottom of the scale
-    return Vector<float, 4> {
-      m_axis->to_display<Aesthetic::xmin>(xmin),
-          m_axis->to_display<Aesthetic::ymin>(ymin),
-          m_axis->to_display<Aesthetic::xmax>(xmax),
-          m_axis->to_display<Aesthetic::ymax>(ymax),
-          have_color ? m_axis->to_display<Aesthetic::color>(c) : 0.f
-    }
+    return Vector<float, 5>{m_axis->to_display<Aesthetic::xmin>(xmin),
+                            m_axis->to_display<Aesthetic::ymin>(ymin),
+                            m_axis->to_display<Aesthetic::xmax>(xmax),
+                            m_axis->to_display<Aesthetic::ymax>(ymax),
+                            have_color ? m_axis->to_display<Aesthetic::color>(c)
+                                       : 0.f};
   };
 
   backend.stroke_width(0);
@@ -191,15 +190,14 @@ template <typename Backend> void Rectangle::draw_plot(Backend &backend) {
 
   backend.stroke_width(0);
 
-  auto to_pixel = [&](auto xmin, auto ymin, auto xmin, auto xmax, auto c) {
+  auto to_pixel = [&](auto xmin, auto ymin, auto xmax, auto ymax, auto c) {
     // if color is not provided use the bottom of the scale
-    return Vector<float, 4> {
-      m_axis->to_display<Aesthetic::xmin>(xmin),
-          m_axis->to_display<Aesthetic::ymin>(ymin),
-          m_axis->to_display<Aesthetic::xmax>(xmax),
-          m_axis->to_display<Aesthetic::ymax>(ymax),
-          have_color ? m_axis->to_display<Aesthetic::color>(c) : 0.f
-    }
+    return Vector<float, 5>{m_axis->to_display<Aesthetic::xmin>(xmin),
+                            m_axis->to_display<Aesthetic::ymin>(ymin),
+                            m_axis->to_display<Aesthetic::xmax>(xmax),
+                            m_axis->to_display<Aesthetic::ymax>(ymax),
+                            have_color ? m_axis->to_display<Aesthetic::color>(c)
+                                       : 0.f};
   };
 
   if (w2 == 0.0f) {
@@ -228,11 +226,11 @@ template <typename Backend> void Rectangle::draw_plot(Backend &backend) {
     auto xmax1 = m_data[f].begin<Aesthetic::xmax>();
     auto ymax1 = m_data[f].begin<Aesthetic::ymax>();
     // if color not provided give a dummy iterator here, not used
-    auto color1 = have_color ? m_data[f].begin<Aesthetic::color>() : x1;
+    auto color1 = have_color ? m_data[f].begin<Aesthetic::color>() : xmin0;
     for (int i = 0; i < m_data[0].rows(); ++i) {
       const auto p =
           w1 * to_pixel(xmin1[i], ymin1[i], xmax1[i], ymax1[i], color1[i]) +
-          w2 * to_pixel(xmin1[i], ymin1[i], xmax1[i], ymax1[i], color0[i]);
+          w2 * to_pixel(xmin0[i], ymin0[i], xmax0[i], ymax0[i], color0[i]);
       backend.fill_color(m_colormap->to_color(p[2]));
       backend.rect({{p[0], p[1]}, {p[2], p[3]}});
     }
