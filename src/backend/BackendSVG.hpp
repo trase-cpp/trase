@@ -229,9 +229,11 @@ public:
   /// subsequent calls to this method will add extra keyframe to the animation.
   ///
   /// @param x the bounding box of the rectangle
-  /// @param r the radius of the circle used to round the corners, default 0.f
+  /// @param stroke the stroke color of the circle
+  /// @param fill the fill color of the circle
   /// @param time the time of the keyframe
-  void add_animated_rect(const bfloat2_t &x, float time);
+  void add_animated_rect(const bfloat2_t &x, const RGBA &stroke,
+                         const RGBA &fill, float time);
 
   /// end an animated rectangle
   ///

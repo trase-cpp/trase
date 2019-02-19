@@ -54,7 +54,9 @@ void Rectangle::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
   backend.stroke_width(0);
   const auto box_middle = 0.5f * (box.bmin + box.bmax);
   const auto box_size = box.bmax - box.bmin;
-  auto s = 0.25f * std::min(box_size[0], box_size[1]);
+  vfloat2_t s;
+  s[0] = 0.25f * std::min(box_size[0], box_size[1]);
+  s[1] = -s[0];
   auto p0 = box_middle - vfloat2_t{0.25f * box_size[0], 0};
   auto p1 = box_middle + vfloat2_t{0.25f * box_size[0], 0};
   if (have_color) {
@@ -171,7 +173,8 @@ void Rectangle::draw_frames(AnimatedBackend &backend) {
                    m_data[f].begin<Aesthetic::ymax>()[i],
                    have_color ? m_data[f].begin<Aesthetic::color>()[i] : 0.f);
 
-      backend.add_animated_rect({{p[0], p[1]}, {p[2], p[3]}}, m_times[f]);
+      std::cout << "adding animated rect at "<< bfloat2_t({m_data[f].begin<Aesthetic::xmin>()[i],m_data[f].begin<Aesthetic::ymin>()[i]},{m_data[f].begin<Aesthetic::xmax>()[i],m_data[f].begin<Aesthetic::ymax>()[i]})<<" "<<bfloat2_t({p[0], p[1]}, {p[2], p[3]})<<std::endl;
+      backend.add_animated_rect({{p[0], p[3]}, {p[2], p[1]}}, m_times[f]);
     }
     backend.end_animated_rect();
   }
@@ -211,7 +214,7 @@ template <typename Backend> void Rectangle::draw_plot(Backend &backend) {
     for (int i = 0; i < m_data[0].rows(); ++i) {
       const auto p = to_pixel(xmin[i], ymin[i], xmax[i], ymax[i], color[i]);
       backend.fill_color(m_colormap->to_color(p[2]));
-      backend.rect({{p[0], p[1]}, {p[2], p[3]}});
+      backend.rect({{p[0], p[3]}, {p[2], p[1]}});
     }
   } else {
     // between two frames
@@ -232,7 +235,7 @@ template <typename Backend> void Rectangle::draw_plot(Backend &backend) {
           w1 * to_pixel(xmin1[i], ymin1[i], xmax1[i], ymax1[i], color1[i]) +
           w2 * to_pixel(xmin0[i], ymin0[i], xmax0[i], ymax0[i], color0[i]);
       backend.fill_color(m_colormap->to_color(p[2]));
-      backend.rect({{p[0], p[1]}, {p[2], p[3]}});
+      backend.rect({{p[0], p[3]}, {p[2], p[1]}});
     }
   }
 }

@@ -379,40 +379,53 @@ void BackendSVG::rect(const bfloat2_t &x, const float r) noexcept {
   rect_end();
 }
 
-void BackendSVG::add_animated_rect(const bfloat2_t &x, float time) {
+void BackendSVG::add_animated_rect(const bfloat2_t &x, const RGBA &stroke,
+                                   const RGBA &fill, float time) {
 
   const auto &delta = x.delta();
   vfloat2_t min = x.min();
 
   // check if first rect
   if (m_animate_times.empty()) {
+    fill_color(fill);
+    stroke_color(stroke);
     rect_begin(x, 0.f);
 
-    if (m_animate_values.size() < 4) {
-      m_animate_values.resize(4);
+    if (m_animate_values.size() < 8) {
+      m_animate_values.resize(8);
     }
     m_animate_times = "keyTimes=\"" + std::to_string(time / m_time_span) + ';';
     m_animate_values[0] = "values=\"" + std::to_string(min[0]) + ';';
     m_animate_values[1] = "values=\"" + std::to_string(min[1]) + ';';
     m_animate_values[2] = "values=\"" + std::to_string(delta[0]) + ';';
     m_animate_values[3] = "values=\"" + std::to_string(delta[1]) + ';';
+    m_animate_values[4] = "values=\"" + stroke.to_rgb_string() + ';';
+    m_animate_values[5] = "values=\"" + std::to_string(stroke.a() / 255.0) + ';';
+    m_animate_values[6] = "values=\"" + fill.to_rgb_string() + ';';
+    m_animate_values[7] = "values=\"" + std::to_string(fill.a() / 255.0) + ';';
   } else {
     m_animate_times += std::to_string(time / m_time_span) + ';';
     m_animate_values[0] += std::to_string(min[0]) + ';';
     m_animate_values[1] += std::to_string(min[1]) + ';';
     m_animate_values[2] += std::to_string(delta[0]) + ';';
     m_animate_values[3] += std::to_string(delta[1]) + ';';
+    m_animate_values[4] += stroke.to_rgb_string() + ';';
+    m_animate_values[5] += std::to_string(stroke.a() / 255.0) + ';';
+    m_animate_values[6] += fill.to_rgb_string() + ';';
+    m_animate_values[7] += std::to_string(fill.a() / 255.0) + ';';
   }
 }
 
 void BackendSVG::end_animated_rect() {
 
   m_animate_times.back() = '\"';
-  for (int i = 0; i < 4; ++i) {
+  for (int i = 0; i < 8; ++i) {
     m_animate_values[i].back() = '\"';
   }
-  const std::string names[4] = {"x", "y", "width", "height"};
-  for (int i = 0; i < 4; ++i) {
+  const std::string names[8] = {"x",      "y",           "width",
+                                "height", "stroke",      "stroke-opacity",
+                                "fill",   "fill-opacity"};
+  for (int i = 0; i < 8; ++i) {
     m_out << "<animate attributeName=\"" + names[i] +
                  "\" repeatCount=\"indefinite\" begin =\"0s\" dur=\""
           << m_time_span << "s\" " << m_animate_values[i] << ' '
@@ -421,7 +434,7 @@ void BackendSVG::end_animated_rect() {
   rect_end();
   m_animate_times.clear();
 
-  for (int i = 0; i < 4; ++i) {
+  for (int i = 0; i < 8; ++i) {
     m_animate_values[i].clear();
   }
 }

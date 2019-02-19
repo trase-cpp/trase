@@ -46,28 +46,32 @@ TEST_CASE("rectangle creation", "[rectangle]") {
   auto ax = fig->axis();
   std::vector<float> xmin, ymin, xmax, ymax, c;
   ax->rectangle(create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax));
-  DummyDraw::draw("rect", fig);
+  DummyDraw::draw("rect_zero", fig);
   xmin.resize(1);
   ymin.resize(1);
   xmax.resize(1);
   ymax.resize(1);
+  xmin[0] = 0.2f;
+  ymin[0] = 0.8f;
+  xmax[0] = 0.3f;
+  ymax[0] = 0.9f;
   ax->rectangle(create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax));
-  DummyDraw::draw("rect", fig);
+  DummyDraw::draw("rect_one", fig);
   xmin.resize(5);
   ymin.resize(5);
   xmax.resize(5);
   ymax.resize(5);
   c.resize(5);
   for (int i = 0; i < 5; ++i) {
-    xmin[1] = 0.1f * i;
-    ymin[1] = 0.1f * i;
-    xmax[1] = 0.12f * i;
-    ymax[1] = 0.12f * i;
-    c[1] = 0.1f * i;
+    xmin[i] = 0.1f * i;
+    ymin[i] = 0.1f * i;
+    xmax[i] = 0.12f * i;
+    ymax[i] = 0.12f * i;
+    c[i] = 0.1f * i;
   }
   ax->rectangle(
       create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c));
-  DummyDraw::draw("rect", fig);
+  DummyDraw::draw("rect_five", fig);
 }
 
 TEST_CASE("rectangle animate color", "[rectangle]") {
