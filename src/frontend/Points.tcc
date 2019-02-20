@@ -169,21 +169,36 @@ void Points::draw_frames(AnimatedBackend &backend) {
   };
 
   backend.stroke_width(0);
+  backend.fill_color(m_style.color());
   for (int i = 0; i < n; ++i) {
-    for (size_t f = 0; f < m_times.size(); ++f) {
-      auto p =
-          to_pixel(m_data[f].begin<Aesthetic::x>()[i],
-                   m_data[f].begin<Aesthetic::y>()[i],
-                   have_size ? m_data[f].begin<Aesthetic::size>()[i] : 0.f);
+    if (m_times.size() > 1) {
+      for (size_t f = 0; f < m_times.size(); ++f) {
+        auto p =
+            to_pixel(m_data[f].begin<Aesthetic::x>()[i],
+                     m_data[f].begin<Aesthetic::y>()[i],
+                     have_size ? m_data[f].begin<Aesthetic::size>()[i] : 0.f);
 
-      backend.add_animated_circle({p[0], p[1]}, p[2], m_times[f]);
+        backend.add_animated_circle({p[0], p[1]}, p[2], m_times[f]);
+        if (have_color) {
+          const auto color = m_axis->to_display<Aesthetic::color>(
+              m_data[f].begin<Aesthetic::color>()[i]);
+          backend.add_animated_fill(m_colormap->to_color(color));
+        }
+      }
+      backend.end_animated_circle();
+    } else {
+      auto p =
+          to_pixel(m_data[0].begin<Aesthetic::x>()[i],
+                   m_data[0].begin<Aesthetic::y>()[i],
+                   have_size ? m_data[0].begin<Aesthetic::size>()[i] : 0.f);
+
       if (have_color) {
         const auto color = m_axis->to_display<Aesthetic::color>(
-            m_data[f].begin<Aesthetic::color>()[i]);
-        backend.add_animated_fill(m_colormap->to_color(color));
+            m_data[0].begin<Aesthetic::color>()[i]);
+        backend.fill_color(m_colormap->to_color(color));
       }
+      backend.circle({p[0], p[1]}, p[2]);
     }
-    backend.end_animated_circle();
   }
 }
 

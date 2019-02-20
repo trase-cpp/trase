@@ -44,7 +44,7 @@ using namespace trase;
 TEST_CASE("rectangle creation", "[rectangle]") {
   auto fig = figure();
   auto ax = fig->axis();
-  std::vector<float> xmin, ymin, xmax, ymax, c;
+  std::vector<float> xmin, ymin, xmax, ymax, c, f;
   ax->rectangle(create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax));
   DummyDraw::draw("rect_zero", fig);
   xmin.resize(1);
@@ -72,6 +72,24 @@ TEST_CASE("rectangle creation", "[rectangle]") {
   ax->rectangle(
       create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c));
   DummyDraw::draw("rect_five", fig);
+  xmin.resize(6);
+  ymin.resize(6);
+  xmax.resize(6);
+  ymax.resize(6);
+  c.resize(6);
+  f.resize(6);
+  for (int i = 0; i < 6; ++i) {
+    xmin[i] = 0.1f * i;
+    ymin[i] = 1.f - 0.12f * i;
+    xmax[i] = 0.12f * i;
+    ymax[i] = 1.f - 0.1f * i;
+    c[i] = 0.1f * i;
+    f[i] = 0.1f * i;
+  }
+  ax->rectangle(
+      create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c).fill(
+          f));
+  DummyDraw::draw("rect_six", fig);
 }
 
 TEST_CASE("rectangle animate color", "[rectangle]") {
@@ -88,6 +106,37 @@ TEST_CASE("rectangle animate color", "[rectangle]") {
   rect->add_frame(
       create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c), 1);
   DummyDraw::draw("rect_animate_color", fig);
+}
+
+TEST_CASE("rectangle animate fill", "[rectangle]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  std::vector<float> xmin = {0};
+  std::vector<float> ymin = {0};
+  std::vector<float> xmax = {1};
+  std::vector<float> ymax = {1};
+  std::vector<float> c = {0};
+  auto rect = ax->rectangle(
+      create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).fill(c));
+  c[0] = 1;
+  rect->add_frame(
+      create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).fill(c), 1);
+  DummyDraw::draw("rect_animate_fill", fig);
+}
+
+TEST_CASE("rectangle fill frames exception", "[rectangle]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  std::vector<float> xmin = {0};
+  std::vector<float> ymin = {0};
+  std::vector<float> xmax = {1};
+  std::vector<float> ymax = {1};
+  std::vector<float> c = {0};
+  auto rect = ax->rectangle(
+      create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).fill(c));
+  rect->add_frame(create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax), 1);
+  REQUIRE_THROWS_WITH(DummyDraw::draw("rect_fill_exception", fig),
+                      Catch::Contains("fill"));
 }
 
 TEST_CASE("rectangle color frames exception", "[rectangle]") {

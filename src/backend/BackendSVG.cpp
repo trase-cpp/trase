@@ -166,7 +166,7 @@ void BackendSVG::add_animated_circle(const vfloat2_t &centre, float radius,
 void BackendSVG::end_animated_circle() {
   m_animate_times.back() = '\"';
   const std::string names[3] = {"cx", "cy", "r"};
-  for (int i = 0; i < 5; ++i) {
+  for (int i = 0; i < 3; ++i) {
     end_animate(m_animate_values[i], names[i]);
   }
   end_animate_fill();
@@ -388,10 +388,10 @@ void BackendSVG::add_animated_rect(const bfloat2_t &x, float time) {
 void BackendSVG::add_animated_stroke(const RGBA &color) {
   if (m_animate_stroke.empty()) {
     m_animate_stroke = "values=\"" + color.to_rgb_string() + ';';
-    m_animate_stroke = "values=\"" + std::to_string(color.a() / 255.0) + ';';
+    m_animate_stroke_opacity = "values=\"" + std::to_string(color.a() / 255.0) + ';';
   } else {
     m_animate_stroke += color.to_rgb_string() + ';';
-    m_animate_stroke += std::to_string(color.a() / 255.0) + ';';
+    m_animate_stroke_opacity += std::to_string(color.a() / 255.0) + ';';
   }
 }
 
@@ -408,10 +408,6 @@ void BackendSVG::end_animate_stroke() {
   if (m_animate_stroke.empty()) {
     return;
   }
-  if (m_animate_stroke.size() != m_animate_times.size()) {
-    throw Exception("number of keyframes of animate_fill different to the "
-                    "number of time points");
-  }
   end_animate(m_animate_stroke, "stroke");
   end_animate(m_animate_stroke_opacity, "stroke-opacity");
 }
@@ -419,20 +415,16 @@ void BackendSVG::end_animate_stroke() {
 void BackendSVG::add_animated_fill(const RGBA &color) {
   if (m_animate_fill.empty()) {
     m_animate_fill = "values=\"" + color.to_rgb_string() + ';';
-    m_animate_fill = "values=\"" + std::to_string(color.a() / 255.0) + ';';
+    m_animate_fill_opacity = "values=\"" + std::to_string(color.a() / 255.0) + ';';
   } else {
     m_animate_fill += color.to_rgb_string() + ';';
-    m_animate_fill += std::to_string(color.a() / 255.0) + ';';
+    m_animate_fill_opacity += std::to_string(color.a() / 255.0) + ';';
   }
 }
 
 void BackendSVG::end_animate_fill() {
   if (m_animate_fill.empty()) {
     return;
-  }
-  if (m_animate_fill.size() != m_animate_times.size()) {
-    throw Exception("number of keyframes of animate_fill different to the "
-                    "number of time points");
   }
   end_animate(m_animate_fill, "fill");
   end_animate(m_animate_fill_opacity, "fill-opacity");

@@ -125,7 +125,7 @@ public:
     mem[1] = arg2;
     mem[2] = arg3;
     mem[3] = arg4;
-    mem[4] = arg4;
+    mem[4] = arg5;
   }
 
   /// Constructs a vector with another vector of different type.

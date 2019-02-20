@@ -222,25 +222,44 @@ void Rectangle::draw_frames(AnimatedBackend &backend) {
   backend.fill_color(m_style.color());
   backend.stroke_color(m_style.color());
   for (int i = 0; i < n; ++i) {
-    for (size_t f = 0; f < m_times.size(); ++f) {
-      auto p = to_pixel(m_data[f].begin<Aesthetic::xmin>()[i],
-                        m_data[f].begin<Aesthetic::ymin>()[i],
-                        m_data[f].begin<Aesthetic::xmax>()[i],
-                        m_data[f].begin<Aesthetic::ymax>()[i]);
+    if (m_times.size() > 1) {
+      for (size_t f = 0; f < m_times.size(); ++f) {
+        auto p = to_pixel(m_data[f].begin<Aesthetic::xmin>()[i],
+                          m_data[f].begin<Aesthetic::ymin>()[i],
+                          m_data[f].begin<Aesthetic::xmax>()[i],
+                          m_data[f].begin<Aesthetic::ymax>()[i]);
 
-      backend.add_animated_rect({{p[0], p[3]}, {p[2], p[1]}}, m_times[f]);
+        backend.add_animated_rect({{p[0], p[3]}, {p[2], p[1]}}, m_times[f]);
+        if (have_color) {
+          const auto color = m_axis->to_display<Aesthetic::color>(
+              m_data[f].begin<Aesthetic::color>()[i]);
+          backend.add_animated_stroke(m_colormap->to_color(color));
+        }
+        if (have_fill) {
+          const auto fill = m_axis->to_display<Aesthetic::fill>(
+              m_data[f].begin<Aesthetic::fill>()[i]);
+          backend.add_animated_fill(m_colormap->to_color(fill));
+        }
+      }
+      backend.end_animated_rect();
+    } else {
+      auto p = to_pixel(m_data[0].begin<Aesthetic::xmin>()[i],
+                        m_data[0].begin<Aesthetic::ymin>()[i],
+                        m_data[0].begin<Aesthetic::xmax>()[i],
+                        m_data[0].begin<Aesthetic::ymax>()[i]);
+
       if (have_color) {
         const auto color = m_axis->to_display<Aesthetic::color>(
-            m_data[f].begin<Aesthetic::color>()[i]);
-        backend.add_animated_stroke(m_colormap->to_color(color));
+            m_data[0].begin<Aesthetic::color>()[i]);
+        backend.stroke_color(m_colormap->to_color(color));
       }
       if (have_fill) {
         const auto fill = m_axis->to_display<Aesthetic::fill>(
-            m_data[f].begin<Aesthetic::fill>()[i]);
-        backend.add_animated_fill(m_colormap->to_color(fill));
+            m_data[0].begin<Aesthetic::fill>()[i]);
+        backend.fill_color(m_colormap->to_color(fill));
       }
+      backend.rect({{p[0], p[3]}, {p[2], p[1]}});
     }
-    backend.end_animated_rect();
   }
 }
 

@@ -176,7 +176,8 @@ TEST_CASE("aesthetics", "[data]") {
   // x/y lims = 0->100
   // color lims = 100->200
   // size lims = 1->2
-  Limits lim({0, 0, 100, 1},{100, 100, 200, 2});
+  // fill lims = 2->3
+  Limits lim({0, 0, 100, 1, 2},{100, 100, 200, 2, 3});
 
   // xy pixel limits = 0 -> 200
   bfloat2_t pixels({0, 0}, {200, 200});
@@ -209,6 +210,14 @@ TEST_CASE("aesthetics", "[data]") {
   auto color_data_check =
       Aesthetic::color::from_display(color_display, lim, pixels);
   CHECK(color_data_check == color_data);
+
+  // fill
+  float fill_data = 2.5f;
+  auto fill_display = Aesthetic::fill::to_display(fill_data, lim, pixels);
+  CHECK(fill_display == 0.5f);
+  auto fill_data_check =
+      Aesthetic::fill::from_display(fill_display, lim, pixels);
+  CHECK(fill_data_check == fill_data);
 
   // xmin (same as x)
   float xmin_data = 1.f;
