@@ -40,17 +40,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+/// A single line made up of one or more points connected by straight lines
+///
+/// Aesthetics:
+///   - x (x-coordinates of the line points)
+///   - y (y-coordinates of the line points)
+///
+/// Default Transform:
+///   - Identity 
 class Line : public Geometry {
 public:
+  /// create a new Line, connecting it to the @p parent
   explicit Line(Axis *parent) : Geometry(parent) {}
   virtual ~Line() = default;
 
   TRASE_GEOMETRY_DISPATCH_BACKENDS
 
+  /// draw the full line animation using the AnimatedBackend
+  ///
+  /// @param backend the AnimatedBackend to use when drawing
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
+
+  /// draw the line at a snapshot in time using the Backend
+  ///
+  /// @param backend the Backend to use when drawing
+  /// @param time draw the line at this time
   template <typename Backend> void draw(Backend &backend, float time);
+
+  /// draw the full line legend animation
+  ///
+  /// @param backend the AnimatedBackend to use when drawing
   template <typename AnimatedBackend>
   void draw_legend(AnimatedBackend &backend, const bfloat2_t &box);
+
+  /// draw the line legend at a snapshot in time
+  ///
+  /// @param backend the Backend to use when drawing
+  /// @param time draw the legend at this time
   template <typename Backend>
   void draw_legend(Backend &backend, float time, const bfloat2_t &box);
 

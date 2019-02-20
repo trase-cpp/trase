@@ -40,17 +40,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+/// A collection of one or more filled circles
+///
+/// Aesthetics:
+///   - x (x-coordinate of circle centres)
+///   - y (y-coordinate of circle centres)
+///   - size (optional - radius of circles)
+///   - color (optional - fill color of circles)
+///
+/// Note that the circles have no separate stroke color for their outer
+/// circumference, they are single solid color
+///
+/// Default Transform:
+///   - Identity 
 class Points : public Geometry {
 public:
+  /// create a new Points, connecting it to the @p parent
   explicit Points(Axis *parent) : Geometry(parent) {}
 
   virtual ~Points() = default;
 
   TRASE_GEOMETRY_DISPATCH_BACKENDS
+
+  /// draw the full points animation using the AnimatedBackend
+  ///
+  /// @param backend the AnimatedBackend to use when drawing
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
+
+  /// draw the points at a snapshot in time using the Backend
+  ///
+  /// @param backend the Backend to use when drawing
+  /// @param time draw the points at this time
   template <typename Backend> void draw(Backend &backend, float time);
+
+  /// draw the full points legend animation
+  ///
+  /// @param backend the AnimatedBackend to use when drawing
   template <typename AnimatedBackend>
   void draw_legend(AnimatedBackend &backend, const bfloat2_t &box);
+
+  /// draw the points legend at a snapshot in time
+  ///
+  /// @param backend the Backend to use when drawing
+  /// @param time draw the legend at this time
   template <typename Backend>
   void draw_legend(Backend &backend, float time, const bfloat2_t &box);
 
