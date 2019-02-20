@@ -2,7 +2,7 @@
 
 [![codecov](https://codecov.io/gh/trase-cpp/trase/branch/master/graph/badge.svg)](https://codecov.io/gh/trase-cpp/trase)
 [![Build
-Status](https://travis-ci.org/trase-cpp/trase.svg?branch=master)](https://travis-ci.org/trase/trase)
+Status](https://travis-ci.org/trase-cpp/trase.svg?branch=master)](https://travis-ci.org/trase-cpp/trase)
 [![Build status](https://ci.appveyor.com/api/projects/status/ienda6x8aisuq4re/branch/master?svg=true)](https://ci.appveyor.com/project/martinjrobins/trase-ra1n2/branch/master)
 [![BCH 
 compliance](https://bettercodehub.com/edge/badge/trase-cpp/trase?branch=master)](https://bettercodehub.com/)
