@@ -89,6 +89,10 @@ class BackendSVG : public AnimatedBackend {
   std::string m_onmouseover_tooltip;
   std::string m_onmouseout_tooltip;
   std::vector<std::string> m_animate_values;
+  std::string m_animate_stroke;
+  std::string m_animate_stroke_opacity;
+  std::string m_animate_fill;
+  std::string m_animate_fill_opacity;
   std::string m_animate_times;
   float m_time_span;
   std::string m_font_size_base;
@@ -232,8 +236,23 @@ public:
   /// @param stroke the stroke color of the circle
   /// @param fill the fill color of the circle
   /// @param time the time of the keyframe
-  void add_animated_rect(const bfloat2_t &x, const RGBA &stroke,
-                         const RGBA &fill, float time);
+  void add_animated_rect(const bfloat2_t &x, float time);
+
+  /// Used in conjunction with add_animated_path, add_animated_rect,
+  /// add_animated_circle, to provide animated stroke color/opacity
+  ///
+  /// Must by called once for each of the above methods
+  ///
+  /// @param color the stroke color of the current keyframe
+  void add_animated_stroke(const RGBA &color);
+
+  /// Used in conjunction with add_animated_path, add_animated_rect,
+  /// add_animated_circle, to provide animated fill color/opacity
+  ///
+  /// Must by called once for each of the above methods
+  ///
+  /// @param color the fill color of the current keyframe
+  void add_animated_fill(const RGBA &color);
 
   /// end an animated rectangle
   ///
@@ -252,8 +271,7 @@ public:
   /// @param radius the radius of the circle
   /// @param color the color of the circle
   /// @param time the time of the keyframe
-  void add_animated_circle(const vfloat2_t &centre, float radius,
-                           const RGBA &color, float time);
+  void add_animated_circle(const vfloat2_t &centre, float radius, float time);
 
   /// end an animated circle
   ///
@@ -330,6 +348,11 @@ public:
   /// @param end points to the end of the string. Use `nullptr` to write entire
   /// string
   void text(const vfloat2_t &x, const char *string, const char *end);
+
+private:
+  void end_animate(std::string &animate, const std::string &name);
+  void end_animate_stroke();
+  void end_animate_fill();
 };
 
 } // namespace trase
