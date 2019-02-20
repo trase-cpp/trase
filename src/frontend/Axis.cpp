@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "frontend/Legend.hpp"
 #include "frontend/Line.hpp"
 #include "frontend/Points.hpp"
+#include "frontend/Rectangle.hpp"
 #include "util/Vector.hpp"
 
 namespace trase {
@@ -65,6 +66,11 @@ std::shared_ptr<Geometry> Axis::plot_impl(const std::shared_ptr<Geometry> &plot,
 std::shared_ptr<Geometry> Axis::points(const DataWithAesthetic &data,
                                        const Transform &transform) {
   return plot_impl(std::make_shared<Points>(this), transform, data);
+}
+
+std::shared_ptr<Geometry> Axis::rectangle(const DataWithAesthetic &data,
+                                          const Transform &transform) {
+  return plot_impl(std::make_shared<Rectangle>(this), transform, data);
 }
 
 std::shared_ptr<Geometry> Axis::line(const DataWithAesthetic &data,

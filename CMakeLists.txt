@@ -126,6 +126,7 @@ set (trase_headers
     src/frontend/Transform.hpp
     src/frontend/Line.hpp
     src/frontend/Points.hpp
+    src/frontend/Rectangle.hpp
     src/frontend/Histogram.hpp
     src/frontend/Legend.hpp
     src/util/ColumnIterator.hpp

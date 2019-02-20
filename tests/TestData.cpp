@@ -176,7 +176,8 @@ TEST_CASE("aesthetics", "[data]") {
   // x/y lims = 0->100
   // color lims = 100->200
   // size lims = 1->2
-  Limits lim({0, 0, 100, 1}, {100, 100, 200, 2});
+  // fill lims = 2->3
+  Limits lim({0, 0, 100, 1, 2},{100, 100, 200, 2, 3});
 
   // xy pixel limits = 0 -> 200
   bfloat2_t pixels({0, 0}, {200, 200});
@@ -209,4 +210,84 @@ TEST_CASE("aesthetics", "[data]") {
   auto color_data_check =
       Aesthetic::color::from_display(color_display, lim, pixels);
   CHECK(color_data_check == color_data);
+
+  // fill
+  float fill_data = 2.5f;
+  auto fill_display = Aesthetic::fill::to_display(fill_data, lim, pixels);
+  CHECK(fill_display == 0.5f);
+  auto fill_data_check =
+      Aesthetic::fill::from_display(fill_display, lim, pixels);
+  CHECK(fill_data_check == fill_data);
+
+  // xmin (same as x)
+  float xmin_data = 1.f;
+  auto xmin_display = Aesthetic::xmin::to_display(xmin_data, lim, pixels);
+  CHECK(xmin_display == 2.f);
+  auto xmin_data_check = Aesthetic::xmin::from_display(xmin_display, lim, pixels);
+  CHECK(xmin_data_check == xmin_data);
+
+  // ymin (same as y)
+  float ymin_data = 2.f;
+  auto ymin_display = Aesthetic::ymin::to_display(ymin_data, lim, pixels);
+  CHECK(ymin_display == pixels.bmax[1] - 4.f);
+  auto ymin_data_check = Aesthetic::ymin::from_display(ymin_display, lim, pixels);
+  CHECK(ymin_data_check == ymin_data);
+
+  // xmax (same as x)
+  float xmax_data = 1.f;
+  auto xmax_display = Aesthetic::xmax::to_display(xmax_data, lim, pixels);
+  CHECK(xmax_display == 2.f);
+  auto xmax_data_check = Aesthetic::xmax::from_display(xmax_display, lim, pixels);
+  CHECK(xmax_data_check == xmax_data);
+
+  // ymax (same as y)
+  float ymax_data = 2.f;
+  auto ymax_display = Aesthetic::ymax::to_display(ymax_data, lim, pixels);
+  CHECK(ymax_display == pixels.bmax[1] - 4.f);
+  auto ymax_data_check = Aesthetic::ymax::from_display(ymax_display, lim, pixels);
+  CHECK(ymax_data_check == ymax_data);
 }
+
+
+TEST_CASE("test set limits", "[data]") {
+
+  DataWithAesthetic data;
+
+  data.x(0.f,1.f);
+  CHECK(data.limits().bmin[Aesthetic::x::index] == 0.f);
+  CHECK(data.limits().bmax[Aesthetic::x::index] == 1.f);
+
+  data.y(1.f,2.f);
+  CHECK(data.limits().bmin[Aesthetic::y::index] == 1.f);
+  CHECK(data.limits().bmax[Aesthetic::y::index] == 2.f);
+
+  data.color(2.f,3.f);
+  CHECK(data.limits().bmin[Aesthetic::color::index] == 2.f);
+  CHECK(data.limits().bmax[Aesthetic::color::index] == 3.f);
+
+  data.size(3.f,4.f);
+  CHECK(data.limits().bmin[Aesthetic::size::index] == 3.f);
+  CHECK(data.limits().bmax[Aesthetic::size::index] == 4.f);
+
+  data.fill(4.f,5.f);
+  CHECK(data.limits().bmin[Aesthetic::fill::index] == 4.f);
+  CHECK(data.limits().bmax[Aesthetic::fill::index] == 5.f);
+
+  data.fill(5.f,6.f);
+  CHECK(data.limits().bmin[Aesthetic::fill::index] == 5.f);
+  CHECK(data.limits().bmax[Aesthetic::fill::index] == 6.f);
+
+  data.xmin(5.f,6.f);
+  CHECK(data.limits().bmin[Aesthetic::x::index] == 5.f);
+
+  data.ymin(7.f,8.f);
+  CHECK(data.limits().bmin[Aesthetic::y::index] == 7.f);
+
+  data.xmax(9.f,10.f);
+  CHECK(data.limits().bmax[Aesthetic::x::index] == 10.f);
+
+  data.ymax(10.f,11.f);
+  CHECK(data.limits().bmax[Aesthetic::y::index] == 11.f);
+
+}
+

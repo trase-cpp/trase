@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <iterator>
+#include <cctype>
 
 namespace trase {
 template <typename Out>
@@ -138,7 +140,7 @@ CSVDownloader::download(const std::string &url,
 
   return parse_csv(out, labels);
 #else
-  raise Exception("TRASE_HAVE_CURL not defined: libcurl not found");
+  throw Exception("TRASE_HAVE_CURL not defined: libcurl not found");
   return CSVDownloader::data_t();
 #endif
 }

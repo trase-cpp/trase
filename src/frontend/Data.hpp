@@ -92,10 +92,11 @@ public:
 ///
 /// Each Aesthetic defines a mapping to and from a display type
 struct Aesthetic {
-  // aesthetic indexes must be able to index a vector with size=N
-  static const int N = 4;
+  // total number of Aesthetics
+  static const int N = 9;
 
-  using Limits = bbox<float, N>;
+  /// all aethetics except for xmin,ymin,xmax,ymax have their own min/max bounds
+  using Limits = bbox<float, N - 4>;
 
   /// the data to display on the x-axis of the plot
   struct x {
@@ -139,10 +140,64 @@ struct Aesthetic {
     static float from_display(float display, const Limits &data_lim,
                               const bfloat2_t &display_lim);
   };
+
+  /// the fill color of each plotting element, scaled from 0 -> 1
+  struct fill {
+    static const int index = 4;
+    static const char *name;
+
+    static float to_display(float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim);
+    static float from_display(float display, const Limits &data_lim,
+                              const bfloat2_t &display_lim);
+  };
+
+  // NOTE: xmin,ymin,xmax,ymax need to go at end so that the indices for Limits
+  // work out
+
+  /// the minimum x coordinate of the data
+  struct xmin {
+    static const int index = 5;
+    static const char *name;
+    static float to_display(float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim);
+    static float from_display(float display, const Limits &data_lim,
+                              const bfloat2_t &display_lim);
+  };
+
+  /// the minimum y coordinate of the data
+  struct ymin {
+    static const int index = 6;
+    static const char *name;
+    static float to_display(float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim);
+    static float from_display(float display, const Limits &data_lim,
+                              const bfloat2_t &display_lim);
+  };
+
+  /// the maximum x coordinate of the data
+  struct xmax {
+    static const int index = 7;
+    static const char *name;
+    static float to_display(float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim);
+    static float from_display(float display, const Limits &data_lim,
+                              const bfloat2_t &display_lim);
+  };
+
+  /// the maximum y coordinate of the data
+  struct ymax {
+    static const int index = 8;
+    static const char *name;
+    static float to_display(float data, const Limits &data_lim,
+                            const bfloat2_t &display_lim);
+    static float from_display(float display, const Limits &data_lim,
+                              const bfloat2_t &display_lim);
+  };
 };
 
-/// Each aesthetic has a set of min/max limits, or scales, that are used for
-/// plotting
+/// Each aesthetic (except for xmin/ymin/xmax/ymax) has a set of min/max limits,
+/// or scales, that are used for plotting
 using Limits = Aesthetic::Limits;
 
 /// Combination of the RawData class and Aesthetics, this class points to a
@@ -207,6 +262,21 @@ public:
 
   template <typename T> DataWithAesthetic &size(const std::vector<T> &data);
   DataWithAesthetic &size(float min, float max);
+
+  template <typename T> DataWithAesthetic &fill(const std::vector<T> &data);
+  DataWithAesthetic &fill(float min, float max);
+
+  template <typename T> DataWithAesthetic &xmin(const std::vector<T> &data);
+  DataWithAesthetic &xmin(float min, float max);
+
+  template <typename T> DataWithAesthetic &ymin(const std::vector<T> &data);
+  DataWithAesthetic &ymin(float min, float max);
+
+  template <typename T> DataWithAesthetic &xmax(const std::vector<T> &data);
+  DataWithAesthetic &xmax(float min, float max);
+
+  template <typename T> DataWithAesthetic &ymax(const std::vector<T> &data);
+  DataWithAesthetic &ymax(float min, float max);
 };
 
 /// creates a new, empty dataset

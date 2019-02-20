@@ -189,7 +189,11 @@ public:
 
 #define TRASE_ANIMATED_DISPATCH(backend_type)                                  \
   void dispatch(backend_type &backend) override {                              \
-    draw(backend);                                                             \
+    if (m_times.size() == 1) {                                                 \
+      draw(backend, 0);                                                        \
+    } else {                                                                   \
+      draw(backend);                                                           \
+    }                                                                          \
     for (auto &i : m_children) {                                               \
       i->dispatch(backend);                                                    \
     }                                                                          \

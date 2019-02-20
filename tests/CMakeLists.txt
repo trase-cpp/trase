@@ -18,6 +18,7 @@ add_executable (
     TestGeometry.cpp
     TestHistogram.cpp
     TestPoints.cpp
+    TestRectangle.cpp
     TestUserConcepts.cpp
     TestStyle.cpp
     TestTransformMatrix.cpp

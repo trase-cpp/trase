@@ -128,17 +128,11 @@ void BackendSVG::add_animated_path(const float time) {
 void BackendSVG::end_animated_path(const float time) {
   add_animated_path(time);
   m_animate_times.back() = '\"';
-  m_animate_values[0].back() = '\"';
-  m_out << "<animate attributeName=\"d\" "
-           //"calcMode=\"discrete\" "
-           "repeatCount=\"indefinite\" "
-           "begin =\"0s\" "
-           "dur=\""
-        << m_time_span << "s\" " << m_animate_values[0] << ' '
-        << m_animate_times << "/>\n";
+  end_animate(m_animate_values[0], "d");
+  end_animate_fill();
+  end_animate_stroke();
   m_out << "</path>\n";
   m_animate_times.clear();
-  m_animate_values[0].clear();
 }
 
 void BackendSVG::begin_path() { m_path.clear(); }
@@ -148,51 +142,37 @@ void BackendSVG::rounded_rect(const bfloat2_t &x, const float r) noexcept {
 }
 
 void BackendSVG::add_animated_circle(const vfloat2_t &centre, float radius,
-                                     const RGBA &color, float time) {
+                                     float time) {
   // check if first circle
   if (m_animate_times.empty()) {
 
-    fill_color(color);
     circle_begin(centre, radius);
 
-    if (m_animate_values.size() < 5) {
-      m_animate_values.resize(5);
+    if (m_animate_values.size() < 3) {
+      m_animate_values.resize(3);
     }
     m_animate_times = "keyTimes=\"" + std::to_string(time / m_time_span) + ';';
     m_animate_values[0] = "values=\"" + std::to_string(centre[0]) + ';';
     m_animate_values[1] = "values=\"" + std::to_string(centre[1]) + ';';
     m_animate_values[2] = "values=\"" + std::to_string(radius) + ';';
-    m_animate_values[3] = "values=\"" + color.to_rgb_string() + ';';
-    m_animate_values[4] = "values=\"" + std::to_string(color.a() / 255.0) + ';';
   } else {
     m_animate_times += std::to_string(time / m_time_span) + ';';
     m_animate_values[0] += std::to_string(centre[0]) + ';';
     m_animate_values[1] += std::to_string(centre[1]) + ';';
     m_animate_values[2] += std::to_string(radius) + ';';
-    m_animate_values[3] += color.to_rgb_string() + ';';
-    m_animate_values[4] += std::to_string(color.a() / 255.0) + ';';
   }
 }
 
 void BackendSVG::end_animated_circle() {
-
   m_animate_times.back() = '\"';
-  for (int i = 0; i < 5; ++i) {
-    m_animate_values[i].back() = '\"';
+  const std::string names[3] = {"cx", "cy", "r"};
+  for (int i = 0; i < 3; ++i) {
+    end_animate(m_animate_values[i], names[i]);
   }
-  const std::string names[5] = {"cx", "cy", "r", "fill", "fill-opacity"};
-  for (int i = 0; i < 5; ++i) {
-    m_out << "<animate attributeName=\"" + names[i] +
-                 "\" repeatCount=\"indefinite\" begin =\"0s\" dur=\""
-          << m_time_span << "s\" " << m_animate_values[i] << ' '
-          << m_animate_times << "/>\n";
-  }
+  end_animate_fill();
+  end_animate_stroke();
   circle_end();
   m_animate_times.clear();
-
-  for (int i = 0; i < 5; ++i) {
-    m_animate_values[i].clear();
-  }
 }
 
 void BackendSVG::circle_with_text(const vfloat2_t &centre, float radius,
@@ -405,25 +385,61 @@ void BackendSVG::add_animated_rect(const bfloat2_t &x, float time) {
   }
 }
 
-void BackendSVG::end_animated_rect() {
-
-  m_animate_times.back() = '\"';
-  for (int i = 0; i < 4; ++i) {
-    m_animate_values[i].back() = '\"';
+void BackendSVG::add_animated_stroke(const RGBA &color) {
+  if (m_animate_stroke.empty()) {
+    m_animate_stroke = "values=\"" + color.to_rgb_string() + ';';
+    m_animate_stroke_opacity = "values=\"" + std::to_string(color.a() / 255.0) + ';';
+  } else {
+    m_animate_stroke += color.to_rgb_string() + ';';
+    m_animate_stroke_opacity += std::to_string(color.a() / 255.0) + ';';
   }
+}
+
+void BackendSVG::end_animate(std::string &animate, const std::string &name) {
+  animate.back() = '\"';
+  m_out << "<animate attributeName=\"" + name +
+               "\" repeatCount=\"indefinite\" begin =\"0s\" dur=\""
+        << m_time_span << "s\" " << animate << ' ' << m_animate_times << "/>\n";
+
+  animate.clear();
+}
+
+void BackendSVG::end_animate_stroke() {
+  if (m_animate_stroke.empty()) {
+    return;
+  }
+  end_animate(m_animate_stroke, "stroke");
+  end_animate(m_animate_stroke_opacity, "stroke-opacity");
+}
+
+void BackendSVG::add_animated_fill(const RGBA &color) {
+  if (m_animate_fill.empty()) {
+    m_animate_fill = "values=\"" + color.to_rgb_string() + ';';
+    m_animate_fill_opacity = "values=\"" + std::to_string(color.a() / 255.0) + ';';
+  } else {
+    m_animate_fill += color.to_rgb_string() + ';';
+    m_animate_fill_opacity += std::to_string(color.a() / 255.0) + ';';
+  }
+}
+
+void BackendSVG::end_animate_fill() {
+  if (m_animate_fill.empty()) {
+    return;
+  }
+  end_animate(m_animate_fill, "fill");
+  end_animate(m_animate_fill_opacity, "fill-opacity");
+}
+
+void BackendSVG::end_animated_rect() {
+  m_animate_times.back() = '\"';
   const std::string names[4] = {"x", "y", "width", "height"};
   for (int i = 0; i < 4; ++i) {
-    m_out << "<animate attributeName=\"" + names[i] +
-                 "\" repeatCount=\"indefinite\" begin =\"0s\" dur=\""
-          << m_time_span << "s\" " << m_animate_values[i] << ' '
-          << m_animate_times << "/>\n";
+    end_animate(m_animate_values[i], names[i]);
   }
+  end_animate_fill();
+  end_animate_stroke();
   rect_end();
   m_animate_times.clear();
-
-  for (int i = 0; i < 4; ++i) {
-    m_animate_values[i].clear();
-  }
 }
 
 void BackendSVG::circle_begin(const vfloat2_t &centre, const float r) noexcept {

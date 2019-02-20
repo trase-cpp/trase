@@ -52,6 +52,7 @@ void Points::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
   bool have_color = m_data[0].has<Aesthetic::color>();
 
   backend.stroke_width(0);
+  backend.fill_color(m_style.color());
   const auto box_middle = 0.5f * (box.bmin + box.bmax);
   const auto box_size = box.bmax - box.bmin;
   auto s = 0.25f * std::min(box_size[0], box_size[1]);
@@ -63,7 +64,8 @@ void Points::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
       auto c = m_axis->to_display<Aesthetic::color>(
           limits.bmin[Aesthetic::color::index]);
 
-      backend.add_animated_circle(p0, s, m_colormap->to_color(c), m_times[f]);
+      backend.add_animated_circle(p0, s, m_times[f]);
+      backend.add_animated_fill(m_colormap->to_color(c));
     }
     backend.end_animated_circle();
     for (size_t f = 0; f < m_times.size(); ++f) {
@@ -71,11 +73,11 @@ void Points::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
       auto c = m_axis->to_display<Aesthetic::color>(
           limits.bmax[Aesthetic::color::index]);
 
-      backend.add_animated_circle(p1, s, m_colormap->to_color(c), m_times[f]);
+      backend.add_animated_circle(p1, s, m_times[f]);
+      backend.add_animated_fill(m_colormap->to_color(c));
     }
     backend.end_animated_circle();
   } else {
-    backend.fill_color(m_colormap->to_color(0.f));
     backend.circle(p0, s);
     backend.circle(p1, s);
   }
@@ -116,9 +118,15 @@ void Points::draw_legend(Backend &backend, const float time,
   c1 = m_axis->to_display<Aesthetic::color>(c1);
 
   backend.stroke_width(0);
-  backend.fill_color(m_colormap->to_color(c0));
+  if (have_color) {
+    backend.fill_color(m_colormap->to_color(c0));
+  } else {
+    backend.fill_color(m_style.color());
+  }
   backend.circle(p0, s);
-  backend.fill_color(m_colormap->to_color(c1));
+  if (have_color) {
+    backend.fill_color(m_colormap->to_color(c1));
+  }
   backend.circle(p1, s);
 }
 
@@ -157,27 +165,30 @@ void Points::draw_frames(AnimatedBackend &backend) {
 
   validate_frames(have_size, have_color, n);
 
-  auto to_pixel = [&](auto x, auto y, auto c, auto s) {
+  auto to_pixel = [&](auto x, auto y, auto s) {
     // if color or size is not provided use the bottom of the scale
-    return Vector<float, 4>{
-        m_axis->to_display<Aesthetic::x>(x),
-        m_axis->to_display<Aesthetic::y>(y),
-        have_color ? m_axis->to_display<Aesthetic::color>(c) : 0.f,
-        have_size ? m_axis->to_display<Aesthetic::size>(s)
-                  : (m_pixels.bmax[1] - m_pixels.bmin[1]) / 80.f};
+    return Vector<float, 3>{m_axis->to_display<Aesthetic::x>(x),
+                            m_axis->to_display<Aesthetic::y>(y),
+                            have_size
+                                ? m_axis->to_display<Aesthetic::size>(s)
+                                : (m_pixels.bmax[1] - m_pixels.bmin[1]) / 80.f};
   };
 
   backend.stroke_width(0);
+  backend.fill_color(m_style.color());
   for (int i = 0; i < n; ++i) {
     for (size_t f = 0; f < m_times.size(); ++f) {
       auto p =
           to_pixel(m_data[f].begin<Aesthetic::x>()[i],
                    m_data[f].begin<Aesthetic::y>()[i],
-                   have_color ? m_data[f].begin<Aesthetic::color>()[i] : 0.f,
                    have_size ? m_data[f].begin<Aesthetic::size>()[i] : 0.f);
 
-      backend.add_animated_circle({p[0], p[1]}, p[3],
-                                  m_colormap->to_color(p[2]), m_times[f]);
+      backend.add_animated_circle({p[0], p[1]}, p[2], m_times[f]);
+      if (have_color) {
+        const auto color = m_axis->to_display<Aesthetic::color>(
+            m_data[f].begin<Aesthetic::color>()[i]);
+        backend.add_animated_fill(m_colormap->to_color(color));
+      }
     }
     backend.end_animated_circle();
   }
@@ -196,15 +207,15 @@ template <typename Backend> void Points::draw_plot(Backend &backend) {
   validate_frames(have_size, have_color, n);
 
   backend.stroke_width(0);
+  backend.fill_color(m_style.color());
 
-  auto to_pixel = [&](auto x, auto y, auto c, auto s) {
+  auto to_pixel = [&](auto x, auto y, auto s) {
     // if color or size is not provided use the bottom of the scale
-    return Vector<float, 4>{
-        m_axis->to_display<Aesthetic::x>(x),
-        m_axis->to_display<Aesthetic::y>(y),
-        have_color ? m_axis->to_display<Aesthetic::color>(c) : 0.f,
-        have_size ? m_axis->to_display<Aesthetic::size>(s)
-                  : (m_pixels.bmax[1] - m_pixels.bmin[1]) / 80.f};
+    return Vector<float, 3>{m_axis->to_display<Aesthetic::x>(x),
+                            m_axis->to_display<Aesthetic::y>(y),
+                            have_size
+                                ? m_axis->to_display<Aesthetic::size>(s)
+                                : (m_pixels.bmax[1] - m_pixels.bmin[1]) / 80.f};
   };
 
   if (w2 == 0.0f) {
@@ -215,9 +226,12 @@ template <typename Backend> void Points::draw_plot(Backend &backend) {
     auto color = have_color ? m_data[f].begin<Aesthetic::color>() : x;
     auto size = have_size ? m_data[f].begin<Aesthetic::size>() : x;
     for (int i = 0; i < m_data[0].rows(); ++i) {
-      const auto p = to_pixel(x[i], y[i], color[i], size[i]);
-      backend.fill_color(m_colormap->to_color(p[2]));
-      backend.circle({p[0], p[1]}, p[3]);
+      const auto p = to_pixel(x[i], y[i], size[i]);
+      if (have_color) {
+        const auto c = m_axis->to_display<Aesthetic::color>(color[i]);
+        backend.fill_color(m_colormap->to_color(c));
+      }
+      backend.circle({p[0], p[1]}, p[2]);
     }
   } else {
     // between two frames
@@ -232,9 +246,13 @@ template <typename Backend> void Points::draw_plot(Backend &backend) {
     auto color1 = have_color ? m_data[f].begin<Aesthetic::color>() : x1;
     auto size1 = have_size ? m_data[f].begin<Aesthetic::size>() : x1;
     for (int i = 0; i < m_data[0].rows(); ++i) {
-      const auto p = w1 * to_pixel(x1[i], y1[i], color1[i], size1[i]) +
-                     w2 * to_pixel(x0[i], y0[i], color0[i], size0[i]);
-      backend.fill_color(m_colormap->to_color(p[2]));
+      const auto p = w1 * to_pixel(x1[i], y1[i], size1[i]) +
+                     w2 * to_pixel(x0[i], y0[i], size0[i]);
+      if (have_color) {
+        const auto c = m_axis->to_display<Aesthetic::color>(w1 * color1[i] +
+                                                            w2 * color0[i]);
+        backend.fill_color(m_colormap->to_color(c));
+      }
       backend.circle({p[0], p[1]}, p[3]);
     }
   }

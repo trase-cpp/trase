@@ -162,6 +162,14 @@ public:
   points(const DataWithAesthetic &data,
          const Transform &transform = Transform(Identity()));
 
+  /// Create a new Rectangle plot and return a shared pointer to it.
+  /// \param data the `DataWithAesthetic` dataset to use
+  /// \param transform (optional) the transform to apply
+  /// \return shared pointer to the new plot
+  std::shared_ptr<Geometry>
+  rectangle(const DataWithAesthetic &data,
+            const Transform &transform = Transform(Identity()));
+
   /// Create a new Line and return a shared pointer to it.
   /// \param data the `DataWithAesthetic` dataset to use
   /// \param transform (optional) the transform to apply

@@ -112,16 +112,16 @@ void DataWithAesthetic::set(const std::vector<T> &data) {
     // set m_limits with new data
     auto min_max = std::minmax_element(m_data->begin(search->second),
                                        m_data->end(search->second));
-    m_limits.bmin[Aesthetic::index] = *min_max.first;
-    m_limits.bmax[Aesthetic::index] = *min_max.second;
+    float min = *min_max.first;
+    float max = *min_max.second;
 
     // if limits are equal spread them out by 2*1e4*eps to stop zeros later on
-    if (m_limits.bmin[Aesthetic::index] == m_limits.bmin[Aesthetic::index]) {
-      m_limits.bmin[Aesthetic::index] -=
-          1e4f * std::numeric_limits<float>::epsilon();
-      m_limits.bmax[Aesthetic::index] +=
-          1e4f * std::numeric_limits<float>::epsilon();
+    if (min == max) {
+      min -= 1e4f * std::numeric_limits<float>::epsilon();
+      max += 1e4f * std::numeric_limits<float>::epsilon();
     }
+
+    set<Aesthetic>(min, max);
   }
 }
 
@@ -154,5 +154,55 @@ DataWithAesthetic &DataWithAesthetic::size(const std::vector<T> &data) {
   set<Aesthetic::size>(data);
   return *this;
 }
+
+template <typename T>
+DataWithAesthetic &DataWithAesthetic::fill(const std::vector<T> &data) {
+  set<Aesthetic::fill>(data);
+  return *this;
+}
+
+template <typename T>
+DataWithAesthetic &DataWithAesthetic::xmin(const std::vector<T> &data) {
+  set<Aesthetic::xmin>(data);
+  return *this;
+}
+
+template <typename T>
+DataWithAesthetic &DataWithAesthetic::ymin(const std::vector<T> &data) {
+  set<Aesthetic::ymin>(data);
+  return *this;
+}
+
+template <typename T>
+DataWithAesthetic &DataWithAesthetic::xmax(const std::vector<T> &data) {
+  set<Aesthetic::xmax>(data);
+  return *this;
+}
+
+template <typename T>
+DataWithAesthetic &DataWithAesthetic::ymax(const std::vector<T> &data) {
+  set<Aesthetic::ymax>(data);
+  return *this;
+}
+
+template <typename Aesthetic>
+void DataWithAesthetic::set(const float min, const float max) {
+  m_limits.bmin[Aesthetic::index] = min;
+  m_limits.bmax[Aesthetic::index] = max;
+}
+
+// specialisations of set here for xmin,xmax,ymin,ymax (these set the x/y
+// aesthetic bounds accordingly)
+template <>
+void DataWithAesthetic::set<Aesthetic::xmin>(const float min, const float max);
+
+template <>
+void DataWithAesthetic::set<Aesthetic::xmax>(const float min, const float max);
+
+template <>
+void DataWithAesthetic::set<Aesthetic::ymin>(const float min, const float max);
+
+template <>
+void DataWithAesthetic::set<Aesthetic::ymax>(const float min, const float max);
 
 } // namespace trase

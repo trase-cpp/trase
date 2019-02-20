@@ -69,6 +69,34 @@ TEST_CASE("points creation", "[points]") {
   DummyDraw::draw("points", fig);
 }
 
+TEST_CASE("points legend", "[points]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  {
+    std::vector<float> x = {0, 1, 2, 3};
+    std::vector<float> y = {0, 0, 0, 0};
+    std::vector<float> r = {1, 2, 3, 4};
+    std::vector<float> c = {0, 1, 2, 3};
+    auto pts = ax->points(create_data().x(x).y(y).size(r).color(c));
+    pts->set_label("y=0");
+  }
+  {
+    std::vector<float> x = {0, 1, 2, 3};
+    std::vector<float> y = {1, 1, 1, 1};
+    std::vector<float> r = {1, 2, 3, 4};
+    auto pts = ax->points(create_data().x(x).y(y).size(r));
+    pts->set_label("y=1");
+  }
+  {
+    std::vector<float> x = {0, 1, 2, 3};
+    std::vector<float> y = {2, 2, 2, 2};
+    auto pts = ax->points(create_data().x(x).y(y));
+    pts->set_label("y=2");
+  }
+  ax->legend();
+  DummyDraw::draw("points_legend", fig);
+}
+
 TEST_CASE("points animate color", "[points]") {
   auto fig = figure();
   auto ax = fig->axis();

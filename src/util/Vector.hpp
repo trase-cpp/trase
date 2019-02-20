@@ -112,6 +112,22 @@ public:
     mem[3] = arg4;
   }
 
+  /// Constructs an vector with initial values.
+  ///
+  /// \param arg1 The first element is set to this value
+  /// \param arg2 The second element is set to this value
+  /// \param arg3 The third element is set to this value
+  /// \param arg4 The fourth element is set to this value
+  /// \param arg5 The fourth element is set to this value
+  Vector(T arg1, T arg2, T arg3, T arg4, T arg5) {
+    static_assert(N == 5, "Vector must have 5 elements");
+    mem[0] = arg1;
+    mem[1] = arg2;
+    mem[2] = arg3;
+    mem[3] = arg4;
+    mem[4] = arg5;
+  }
+
   /// Constructs a vector with another vector of different type.
   ///
   /// The input vector must have same length as this one

@@ -83,11 +83,21 @@ template ColumnIterator DataWithAesthetic::begin<Aesthetic::x>() const;
 template ColumnIterator DataWithAesthetic::begin<Aesthetic::y>() const;
 template ColumnIterator DataWithAesthetic::begin<Aesthetic::color>() const;
 template ColumnIterator DataWithAesthetic::begin<Aesthetic::size>() const;
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::fill>() const;
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::xmin>() const;
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::ymin>() const;
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::xmax>() const;
+template ColumnIterator DataWithAesthetic::begin<Aesthetic::ymax>() const;
 
 template ColumnIterator DataWithAesthetic::end<Aesthetic::x>() const;
 template ColumnIterator DataWithAesthetic::end<Aesthetic::y>() const;
 template ColumnIterator DataWithAesthetic::end<Aesthetic::color>() const;
 template ColumnIterator DataWithAesthetic::end<Aesthetic::size>() const;
+template ColumnIterator DataWithAesthetic::end<Aesthetic::fill>() const;
+template ColumnIterator DataWithAesthetic::end<Aesthetic::xmin>() const;
+template ColumnIterator DataWithAesthetic::end<Aesthetic::ymin>() const;
+template ColumnIterator DataWithAesthetic::end<Aesthetic::xmax>() const;
+template ColumnIterator DataWithAesthetic::end<Aesthetic::ymax>() const;
 
 const int Aesthetic::N;
 const int Aesthetic::x::index;
@@ -98,6 +108,16 @@ const int Aesthetic::color::index;
 const char *Aesthetic::color::name = "color";
 const int Aesthetic::size::index;
 const char *Aesthetic::size::name = "size";
+const int Aesthetic::fill::index;
+const char *Aesthetic::fill::name = "fill";
+const int Aesthetic::xmin::index;
+const char *Aesthetic::xmin::name = "xmin";
+const int Aesthetic::ymin::index;
+const char *Aesthetic::ymin::name = "ymin";
+const int Aesthetic::xmax::index;
+const char *Aesthetic::xmax::name = "xmax";
+const int Aesthetic::ymax::index;
+const char *Aesthetic::ymax::name = "ymax";
 
 float Aesthetic::x::to_display(const float data, const Limits &data_lim,
                                const bfloat2_t &display_lim) {
@@ -174,10 +194,127 @@ float Aesthetic::size::from_display(const float display, const Limits &data_lim,
   return data_lim.bmin[index] + rel_pos * len_ratio;
 }
 
-template <typename Aesthetic>
-void DataWithAesthetic::set(const float min, const float max) {
-  m_limits.bmin[Aesthetic::index] = min;
-  m_limits.bmax[Aesthetic::index] = max;
+float Aesthetic::fill::to_display(const float data, const Limits &data_lim,
+                                   const bfloat2_t &display_lim) {
+  (void)display_lim;
+  float len_ratio = 1.f / (data_lim.bmax[index] - data_lim.bmin[index]);
+
+  float rel_pos = data - data_lim.bmin[index];
+  return rel_pos * len_ratio;
+}
+
+float Aesthetic::fill::from_display(const float display,
+                                     const Limits &data_lim,
+                                     const bfloat2_t &display_lim) {
+  (void)display_lim;
+  float len_ratio = (data_lim.bmax[index] - data_lim.bmin[index]);
+
+  float rel_pos = display;
+  return data_lim.bmin[index] + rel_pos * len_ratio;
+}
+
+float Aesthetic::xmin::to_display(const float data, const Limits &data_lim,
+                                  const bfloat2_t &display_lim) {
+  const int xindex = Aesthetic::x::index;
+  float len_ratio = (display_lim.bmax[0] - display_lim.bmin[0]) /
+                    (data_lim.bmax[xindex] - data_lim.bmin[xindex]);
+
+  float rel_pos = data - data_lim.bmin[xindex];
+  return display_lim.bmin[0] + rel_pos * len_ratio;
+}
+
+float Aesthetic::xmin::from_display(const float display, const Limits &data_lim,
+                                    const bfloat2_t &display_lim) {
+  const int xindex = Aesthetic::x::index;
+  float len_ratio = (data_lim.bmax[xindex] - data_lim.bmin[xindex]) /
+                    (display_lim.bmax[1] - display_lim.bmin[1]);
+
+  float rel_pos = display - display_lim.bmin[1];
+  return data_lim.bmin[xindex] + rel_pos * len_ratio;
+}
+
+/// the data to display on the y-axis of the plot
+float Aesthetic::ymin::to_display(const float data, const Limits &data_lim,
+                                  const bfloat2_t &display_lim) {
+  const int yindex = Aesthetic::y::index;
+  float len_ratio = (display_lim.bmax[1] - display_lim.bmin[1]) /
+                    (data_lim.bmax[yindex] - data_lim.bmin[yindex]);
+
+  // Get the relative position and invert y by default (e.g. limits->pixels)
+  float rel_pos = data_lim.bmax[yindex] - data;
+  return display_lim.bmin[1] + rel_pos * len_ratio;
+}
+
+float Aesthetic::ymin::from_display(const float display, const Limits &data_lim,
+                                    const bfloat2_t &display_lim) {
+  const int yindex = Aesthetic::y::index;
+  float len_ratio = (data_lim.bmax[yindex] - data_lim.bmin[yindex]) /
+                    (display_lim.bmax[1] - display_lim.bmin[1]);
+
+  float rel_pos = display_lim.bmax[1] - display;
+  return data_lim.bmin[yindex] + rel_pos * len_ratio;
+}
+
+float Aesthetic::xmax::to_display(const float data, const Limits &data_lim,
+                                  const bfloat2_t &display_lim) {
+  const int xindex = Aesthetic::x::index;
+  float len_ratio = (display_lim.bmax[0] - display_lim.bmin[0]) /
+                    (data_lim.bmax[xindex] - data_lim.bmin[xindex]);
+
+  float rel_pos = data - data_lim.bmin[xindex];
+  return display_lim.bmin[0] + rel_pos * len_ratio;
+}
+
+float Aesthetic::xmax::from_display(const float display, const Limits &data_lim,
+                                    const bfloat2_t &display_lim) {
+  const int xindex = Aesthetic::x::index;
+  float len_ratio = (data_lim.bmax[xindex] - data_lim.bmin[xindex]) /
+                    (display_lim.bmax[1] - display_lim.bmin[1]);
+
+  float rel_pos = display - display_lim.bmin[1];
+  return data_lim.bmin[xindex] + rel_pos * len_ratio;
+}
+
+/// the data to display on the y-axis of the plot
+float Aesthetic::ymax::to_display(const float data, const Limits &data_lim,
+                                  const bfloat2_t &display_lim) {
+  const int yindex = Aesthetic::y::index;
+  float len_ratio = (display_lim.bmax[1] - display_lim.bmin[1]) /
+                    (data_lim.bmax[yindex] - data_lim.bmin[yindex]);
+
+  // Get the relative position and invert y by default (e.g. limits->pixels)
+  float rel_pos = data_lim.bmax[yindex] - data;
+  return display_lim.bmin[1] + rel_pos * len_ratio;
+}
+
+float Aesthetic::ymax::from_display(const float display, const Limits &data_lim,
+                                    const bfloat2_t &display_lim) {
+  const int yindex = Aesthetic::y::index;
+  float len_ratio = (data_lim.bmax[yindex] - data_lim.bmin[yindex]) /
+                    (display_lim.bmax[1] - display_lim.bmin[1]);
+
+  float rel_pos = display_lim.bmax[1] - display;
+  return data_lim.bmin[yindex] + rel_pos * len_ratio;
+}
+
+template <>
+void DataWithAesthetic::set<Aesthetic::xmin>(const float min, const float max) {
+  m_limits.bmin[Aesthetic::x::index] = min;
+}
+
+template <>
+void DataWithAesthetic::set<Aesthetic::xmax>(const float min, const float max) {
+  m_limits.bmax[Aesthetic::x::index] = max;
+}
+
+template <>
+void DataWithAesthetic::set<Aesthetic::ymin>(const float min, const float max) {
+  m_limits.bmin[Aesthetic::y::index] = min;
+}
+
+template <>
+void DataWithAesthetic::set<Aesthetic::ymax>(const float min, const float max) {
+  m_limits.bmax[Aesthetic::y::index] = max;
 }
 
 DataWithAesthetic &DataWithAesthetic::x(const float min, const float max) {
@@ -197,6 +334,31 @@ DataWithAesthetic &DataWithAesthetic::color(const float min, const float max) {
 
 DataWithAesthetic &DataWithAesthetic::size(const float min, const float max) {
   set<Aesthetic::size>(min, max);
+  return *this;
+}
+
+DataWithAesthetic &DataWithAesthetic::fill(const float min, const float max) {
+  set<Aesthetic::fill>(min, max);
+  return *this;
+}
+
+DataWithAesthetic &DataWithAesthetic::xmin(const float min, const float max) {
+  set<Aesthetic::xmin>(min, max);
+  return *this;
+}
+
+DataWithAesthetic &DataWithAesthetic::ymin(const float min, const float max) {
+  set<Aesthetic::ymin>(min, max);
+  return *this;
+}
+
+DataWithAesthetic &DataWithAesthetic::xmax(const float min, const float max) {
+  set<Aesthetic::xmax>(min, max);
+  return *this;
+}
+
+DataWithAesthetic &DataWithAesthetic::ymax(const float min, const float max) {
+  set<Aesthetic::ymax>(min, max);
   return *this;
 }
 
