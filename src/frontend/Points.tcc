@@ -253,7 +253,7 @@ template <typename Backend> void Points::draw_plot(Backend &backend) {
                                                             w2 * color0[i]);
         backend.fill_color(m_colormap->to_color(c));
       }
-      backend.circle({p[0], p[1]}, p[3]);
+      backend.circle({p[0], p[1]}, p[2]);
     }
   }
 }
