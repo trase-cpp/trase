@@ -52,6 +52,7 @@ void Points::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
   bool have_color = m_data[0].has<Aesthetic::color>();
 
   backend.stroke_width(0);
+  backend.fill_color(m_style.color());
   const auto box_middle = 0.5f * (box.bmin + box.bmax);
   const auto box_size = box.bmax - box.bmin;
   auto s = 0.25f * std::min(box_size[0], box_size[1]);
@@ -77,7 +78,6 @@ void Points::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
     }
     backend.end_animated_circle();
   } else {
-    backend.fill_color(m_style.color());
     backend.circle(p0, s);
     backend.circle(p1, s);
   }
@@ -118,9 +118,15 @@ void Points::draw_legend(Backend &backend, const float time,
   c1 = m_axis->to_display<Aesthetic::color>(c1);
 
   backend.stroke_width(0);
-  backend.fill_color(m_colormap->to_color(c0));
+  if (have_color) {
+    backend.fill_color(m_colormap->to_color(c0));
+  } else {
+    backend.fill_color(m_style.color());
+  }
   backend.circle(p0, s);
-  backend.fill_color(m_colormap->to_color(c1));
+  if (have_color) {
+    backend.fill_color(m_colormap->to_color(c1));
+  }
   backend.circle(p1, s);
 }
 
