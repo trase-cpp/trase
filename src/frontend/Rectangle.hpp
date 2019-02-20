@@ -40,17 +40,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+/// A collection of one or more filled rectangles 
+///
+/// Aesthetics:
+///   - xmin (minimum x-coordinate of rectangles)
+///   - ymin (minimum y-coordinate of rectangles)
+///   - xmax (maximum x-coordinate of rectangles)
+///   - ymax (maximum y-coordinate of rectangles)
+///   - color (optional - stroke color of circles)
+///   - fill (optional - fill color of circles)
+///
 class Rectangle : public Geometry {
 public:
+  /// create a new Rectangle, connecting it to the @p parent
   explicit Rectangle(Axis *parent) : Geometry(parent) {}
 
   virtual ~Rectangle() = default;
 
   TRASE_GEOMETRY_DISPATCH_BACKENDS
+
+  /// draw the full rectangles animation using the AnimatedBackend
+  ///
+  /// @param backend the AnimatedBackend to use when drawing
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
+
+  /// draw the rectangles at a snapshot in time using the Backend
+  ///
+  /// @param backend the Backend to use when drawing
+  /// @param time draw the points at this time
   template <typename Backend> void draw(Backend &backend, float time);
+
+  /// draw the full rectangle legend animation
+  ///
+  /// @param backend the AnimatedBackend to use when drawing
   template <typename AnimatedBackend>
   void draw_legend(AnimatedBackend &backend, const bfloat2_t &box);
+
+  /// draw the rectangles legend at a snapshot in time
+  ///
+  /// @param backend the Backend to use when drawing
+  /// @param time draw the legend at this time
   template <typename Backend>
   void draw_legend(Backend &backend, float time, const bfloat2_t &box);
 
