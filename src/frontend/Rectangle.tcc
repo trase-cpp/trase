@@ -283,7 +283,7 @@ template <typename Backend> void Rectangle::draw_plot(Backend &backend) {
         backend.stroke_color(m_colormap->to_color(c));
       }
       if (have_fill) {
-        const auto f = m_axis->to_display<Aesthetic::color>(fill[i]);
+        const auto f = m_axis->to_display<Aesthetic::fill>(fill[i]);
         backend.fill_color(m_colormap->to_color(f));
       }
       backend.rect({{p[0], p[3]}, {p[2], p[1]}});
@@ -303,7 +303,7 @@ template <typename Backend> void Rectangle::draw_plot(Backend &backend) {
     auto ymax1 = m_data[f].begin<Aesthetic::ymax>();
     // if color not provided give a dummy iterator here, not used
     auto color1 = have_color ? m_data[f].begin<Aesthetic::color>() : xmin0;
-    auto fill1 = have_color ? m_data[f].begin<Aesthetic::fill>() : xmin0;
+    auto fill1 = have_fill ? m_data[f].begin<Aesthetic::fill>() : xmin0;
     for (int i = 0; i < m_data[0].rows(); ++i) {
       const auto p = w1 * to_pixel(xmin1[i], ymin1[i], xmax1[i], ymax1[i]) +
                      w2 * to_pixel(xmin0[i], ymin0[i], xmax0[i], ymax0[i]);
@@ -314,11 +314,9 @@ template <typename Backend> void Rectangle::draw_plot(Backend &backend) {
       }
       if (have_fill) {
         const auto fill =
-            m_axis->to_display<Aesthetic::color>(w1 * fill1[i] + w2 * fill0[i]);
+            m_axis->to_display<Aesthetic::fill>(w1 * fill1[i] + w2 * fill0[i]);
         backend.fill_color(m_colormap->to_color(fill));
       }
-      backend.stroke_color(m_colormap->to_color(p[4]));
-      backend.fill_color(m_colormap->to_color(p[5]));
       backend.rect({{p[0], p[3]}, {p[2], p[1]}});
     }
   }
