@@ -52,7 +52,9 @@ void Rectangle::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
   bool have_color = m_data[0].has<Aesthetic::color>();
   bool have_fill = m_data[0].has<Aesthetic::fill>();
 
-  backend.stroke_width(0);
+  backend.stroke_width(m_style.line_width());
+  backend.stroke_color(m_style.color());
+  backend.fill_color(m_style.color());
   const auto box_middle = 0.5f * (box.bmin + box.bmax);
   const auto box_size = box.bmax - box.bmin;
   vfloat2_t s;
@@ -94,8 +96,6 @@ void Rectangle::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
     }
     backend.end_animated_rect();
   } else {
-    backend.fill_color(m_colormap->to_color(0.f));
-    backend.stroke_color(m_colormap->to_color(0.f));
     backend.rect(bfloat2_t(p0 - s, p0 + s));
     backend.rect(bfloat2_t(p1 - s, p1 + s));
   }
@@ -151,6 +151,7 @@ void Rectangle::draw_legend(Backend &backend, const float time,
     f1 = m_axis->to_display<Aesthetic::fill>(f1);
   }
 
+  backend.stroke_width(m_style.line_width());
   if (have_fill) {
     backend.fill_color(m_colormap->to_color(f0));
   } else {

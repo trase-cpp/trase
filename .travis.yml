@@ -123,8 +123,10 @@ after_success:
   # push generated files to repo
   - if [ -n "$GITHUB_API_KEY" ] && [ "$DEPLOY_GENERATED_FILES" == true ]; then
         git clone https://github.com/trase-cpp/generated_files.git;
-        cp examples/*.svg generated_files/examples;
-        cp tests/*.svg generated_files/tests;
+        rm generated_files/examples/*.svg;
+        rm generated_files/tests/*.svg;
+        cp examples/*.svg generated_files/examples/;
+        cp tests/*.svg generated_files/tests/;
         cd generated_files;
         git add examples/*.svg tests/*.svg;
         git -c user.name='travis' -c user.email='travis' commit -a -m "updated generated files";
