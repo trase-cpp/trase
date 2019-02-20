@@ -50,6 +50,9 @@ namespace trase {
 ///
 /// Note that the circles have no separate stroke color for their outer
 /// circumference, they are single solid color
+///
+/// Default Transform:
+///   - Identity 
 class Points : public Geometry {
 public:
   /// create a new Points, connecting it to the @p parent

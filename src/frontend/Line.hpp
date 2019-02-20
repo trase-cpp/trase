@@ -45,6 +45,9 @@ namespace trase {
 /// Aesthetics:
 ///   - x (x-coordinates of the line points)
 ///   - y (y-coordinates of the line points)
+///
+/// Default Transform:
+///   - Identity 
 class Line : public Geometry {
 public:
   /// create a new Line, connecting it to the @p parent

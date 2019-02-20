@@ -40,15 +40,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+/// A collection of rectangles arranged evenly along the x-axis, with
+/// varying heights (i.e. a histogram with regular bins)
+///
+/// Aesthetics:
+///   - y (the heights of each rectangle)
+///   - x (this geometry uses min/max limits only)
+///
+/// Default Transform:
+///   - BinX
 class Histogram : public Geometry {
 public:
+  /// create a new Histogram, connecting it to the @p parent
   explicit Histogram(Axis *parent) : Geometry(parent) {}
   virtual ~Histogram() = default;
   TRASE_GEOMETRY_DISPATCH_BACKENDS
+
+  /// draw the full histogram animation using the AnimatedBackend
+  ///
+  /// @param backend the AnimatedBackend to use when drawing
   template <typename AnimatedBackend> void draw(AnimatedBackend &backend);
+
+  /// draw the histogram at a snapshot in time using the Backend
+  ///
+  /// @param backend the Backend to use when drawing
+  /// @param time draw the histogram at this time
   template <typename Backend> void draw(Backend &backend, float time);
+
+  /// draw the full histogram legend animation
+  ///
+  /// @param backend the AnimatedBackend to use when drawing
   template <typename AnimatedBackend>
   void draw_legend(AnimatedBackend &backend, const bfloat2_t &box);
+
+  /// draw the histogram legend at a snapshot in time
+  ///
+  /// @param backend the Backend to use when drawing
+  /// @param time draw the legend at this time
   template <typename Backend>
   void draw_legend(Backend &backend, float time, const bfloat2_t &box);
 

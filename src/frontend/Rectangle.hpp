@@ -50,6 +50,8 @@ namespace trase {
 ///   - color (optional - stroke color of circles)
 ///   - fill (optional - fill color of circles)
 ///
+/// Default Transform:
+///   - Identity 
 class Rectangle : public Geometry {
 public:
   /// create a new Rectangle, connecting it to the @p parent
@@ -67,7 +69,7 @@ public:
   /// draw the rectangles at a snapshot in time using the Backend
   ///
   /// @param backend the Backend to use when drawing
-  /// @param time draw the points at this time
+  /// @param time draw the rectangles at this time
   template <typename Backend> void draw(Backend &backend, float time);
 
   /// draw the full rectangle legend animation
