@@ -5,6 +5,7 @@ set (examples
   Histogram.cpp
   AnimatedPoints.cpp
   LineStyle.cpp
+  Rectangle.cpp
   )
 
 
