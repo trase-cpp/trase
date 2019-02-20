@@ -92,6 +92,47 @@ TEST_CASE("rectangle creation", "[rectangle]") {
   DummyDraw::draw("rect_six", fig);
 }
 
+TEST_CASE("rectangle legend", "[rectangle]") {
+  auto fig = figure();
+  auto ax = fig->axis();
+  {
+    std::vector<float> xmin = {0, 1, 2, 3};
+    std::vector<float> ymin = {0, 0, 0, 0};
+    std::vector<float> xmax = {0.1, 1.1, 2.1, 3.1};
+    std::vector<float> ymax = {0.1, 0.1, 0.1, 0.1};
+    std::vector<float> c = {0, 1, 2, 3};
+    std::vector<float> f = {3, 2, 1, 0};
+    auto rect = ax->rectangle(
+        create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c).fill(
+            f));
+    rect->set_label("y=0");
+  }
+  {
+    std::vector<float> xmin = {0, 1, 2, 3};
+    std::vector<float> ymin = {1, 1, 1, 1};
+    std::vector<float> xmax = {0.1, 1.1, 2.1, 3.1};
+    std::vector<float> ymax = {1.1, 1.1, 1.1, 1.1};
+    std::vector<float> c = {3, 4, 5, 7};
+    std::vector<float> f = {3, 4, 5, 7};
+    auto rect = ax->rectangle(
+        create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c).fill(
+            f));
+    rect->set_label("y=1");
+  }
+  {
+  std::vector<float> xmin = {0, 1, 2, 3};
+    std::vector<float> ymin = {2, 2, 2, 2};
+    std::vector<float> xmax = {0.1, 1.1, 2.1, 3.1};
+    std::vector<float> ymax = {2.1, 2.1, 2.1, 2.1};
+    auto rect = ax->rectangle(
+        create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax));
+    rect->set_label("y=2");
+    
+  }
+  ax->legend();
+  DummyDraw::draw("rect_legend", fig);
+}
+
 TEST_CASE("rectangle animate color", "[rectangle]") {
   auto fig = figure();
   auto ax = fig->axis();

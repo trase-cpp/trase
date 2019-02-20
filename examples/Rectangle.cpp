@@ -34,9 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \page example_rectangle Rectangle Geometry
 ///  This is an example for the Rectangle geometry
 ///
-/// \image html
-/// https://cdn.jsdelivr.net/gh/trase-cpp/generated_files@master/examples/example_rectangle.svg
-/// "Output" \snippet examples/Rectangle.cpp example rectangle
+/// \image html https://cdn.jsdelivr.net/gh/trase-cpp/generated_files@master/examples example_rectangle.svg "Output" 
+/// \snippet examples/Rectangle.cpp example rectangle
 
 /// [example rectangle]
 #include "trase.hpp"

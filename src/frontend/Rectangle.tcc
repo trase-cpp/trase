@@ -52,7 +52,9 @@ void Rectangle::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
   bool have_color = m_data[0].has<Aesthetic::color>();
   bool have_fill = m_data[0].has<Aesthetic::fill>();
 
-  backend.stroke_width(0);
+  backend.stroke_width(m_style.line_width());
+  backend.stroke_color(m_style.color());
+  backend.fill_color(m_style.color());
   const auto box_middle = 0.5f * (box.bmin + box.bmax);
   const auto box_size = box.bmax - box.bmin;
   vfloat2_t s;
@@ -94,8 +96,6 @@ void Rectangle::draw_legend(AnimatedBackend &backend, const bfloat2_t &box) {
     }
     backend.end_animated_rect();
   } else {
-    backend.fill_color(m_colormap->to_color(0.f));
-    backend.stroke_color(m_colormap->to_color(0.f));
     backend.rect(bfloat2_t(p0 - s, p0 + s));
     backend.rect(bfloat2_t(p1 - s, p1 + s));
   }
@@ -151,6 +151,7 @@ void Rectangle::draw_legend(Backend &backend, const float time,
     f1 = m_axis->to_display<Aesthetic::fill>(f1);
   }
 
+  backend.stroke_width(m_style.line_width());
   if (have_fill) {
     backend.fill_color(m_colormap->to_color(f0));
   } else {
@@ -283,7 +284,7 @@ template <typename Backend> void Rectangle::draw_plot(Backend &backend) {
         backend.stroke_color(m_colormap->to_color(c));
       }
       if (have_fill) {
-        const auto f = m_axis->to_display<Aesthetic::color>(fill[i]);
+        const auto f = m_axis->to_display<Aesthetic::fill>(fill[i]);
         backend.fill_color(m_colormap->to_color(f));
       }
       backend.rect({{p[0], p[3]}, {p[2], p[1]}});
@@ -303,7 +304,7 @@ template <typename Backend> void Rectangle::draw_plot(Backend &backend) {
     auto ymax1 = m_data[f].begin<Aesthetic::ymax>();
     // if color not provided give a dummy iterator here, not used
     auto color1 = have_color ? m_data[f].begin<Aesthetic::color>() : xmin0;
-    auto fill1 = have_color ? m_data[f].begin<Aesthetic::fill>() : xmin0;
+    auto fill1 = have_fill ? m_data[f].begin<Aesthetic::fill>() : xmin0;
     for (int i = 0; i < m_data[0].rows(); ++i) {
       const auto p = w1 * to_pixel(xmin1[i], ymin1[i], xmax1[i], ymax1[i]) +
                      w2 * to_pixel(xmin0[i], ymin0[i], xmax0[i], ymax0[i]);
@@ -314,11 +315,9 @@ template <typename Backend> void Rectangle::draw_plot(Backend &backend) {
       }
       if (have_fill) {
         const auto fill =
-            m_axis->to_display<Aesthetic::color>(w1 * fill1[i] + w2 * fill0[i]);
+            m_axis->to_display<Aesthetic::fill>(w1 * fill1[i] + w2 * fill0[i]);
         backend.fill_color(m_colormap->to_color(fill));
       }
-      backend.stroke_color(m_colormap->to_color(p[4]));
-      backend.fill_color(m_colormap->to_color(p[5]));
       backend.rect({{p[0], p[3]}, {p[2], p[1]}});
     }
   }

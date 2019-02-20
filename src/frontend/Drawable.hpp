@@ -164,6 +164,9 @@ public:
   /// returns modifiable current style
   Style &style() noexcept;
 
+  /// returns time span of the animation
+  const float &time_span() const { return m_time_span; }
+
 #ifdef TRASE_BACKEND_GL
   virtual void dispatch(BackendGL &figure, float time) = 0;
 #endif

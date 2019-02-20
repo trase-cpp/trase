@@ -9,4 +9,5 @@ This should be a list of examples:
 -   @subpage example_histogram
 -   @subpage example_points
 -   @subpage example_animated_points
+-   @subpage example_rectangle 
 

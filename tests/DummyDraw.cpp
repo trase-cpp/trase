@@ -47,6 +47,10 @@ void DummyDraw::draw(const std::string &base_name,
   BackendSVG backend_single(out);
   fig->draw(backend_single, 0);
   out.close();
+  out.open("test_" + base_name + std::to_string(++m_num_dummy_draw) + ".svg");
+  BackendSVG backend_single2(out);
+  fig->draw(backend_single2, fig->time_span()/2.f);
+  out.close();
 }
 
 } // namespace trase
