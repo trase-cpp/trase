@@ -47,18 +47,18 @@ TEST_CASE("points creation", "[points]") {
   std::vector<float> x, y, r, c;
   ax->points(create_data().x(x).y(y));
   DummyDraw::draw("points", fig);
-  x.resize(1.f);
-  y.resize(1.f);
-  r.resize(1.f);
+  x.resize(1);
+  y.resize(1);
+  r.resize(1);
   x[0] = 0.1f;
   y[0] = 0.2f;
   r[0] = 1.0f;
   ax->points(create_data().x(x).y(y).size(r));
   DummyDraw::draw("points", fig);
-  x.resize(5.f);
-  y.resize(5.f);
-  r.resize(5.f);
-  c.resize(5.f);
+  x.resize(5);
+  y.resize(5);
+  r.resize(5);
+  c.resize(5);
   for (int i = 0; i < 5; ++i) {
     x[1] = 0.1f * i;
     y[1] = 0.1f * i;
