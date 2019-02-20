@@ -247,3 +247,47 @@ TEST_CASE("aesthetics", "[data]") {
   auto ymax_data_check = Aesthetic::ymax::from_display(ymax_display, lim, pixels);
   CHECK(ymax_data_check == ymax_data);
 }
+
+
+TEST_CASE("test set limits", "[data]") {
+
+  DataWithAesthetic data;
+
+  data.x(0.f,1.f);
+  CHECK(data.limits().bmin[Aesthetic::x::index] == 0.f);
+  CHECK(data.limits().bmax[Aesthetic::x::index] == 1.f);
+
+  data.y(1.f,2.f);
+  CHECK(data.limits().bmin[Aesthetic::y::index] == 1.f);
+  CHECK(data.limits().bmax[Aesthetic::y::index] == 2.f);
+
+  data.color(2.f,3.f);
+  CHECK(data.limits().bmin[Aesthetic::color::index] == 2.f);
+  CHECK(data.limits().bmax[Aesthetic::color::index] == 3.f);
+
+  data.size(3.f,4.f);
+  CHECK(data.limits().bmin[Aesthetic::size::index] == 3.f);
+  CHECK(data.limits().bmax[Aesthetic::size::index] == 4.f);
+
+  data.fill(4.f,5.f);
+  CHECK(data.limits().bmin[Aesthetic::fill::index] == 4.f);
+  CHECK(data.limits().bmax[Aesthetic::fill::index] == 5.f);
+
+  data.fill(5.f,6.f);
+  CHECK(data.limits().bmin[Aesthetic::fill::index] == 5.f);
+  CHECK(data.limits().bmax[Aesthetic::fill::index] == 6.f);
+
+  data.xmin(5.f,6.f);
+  CHECK(data.limits().bmin[Aesthetic::x::index] == 5.f);
+
+  data.ymin(7.f,8.f);
+  CHECK(data.limits().bmin[Aesthetic::y::index] == 7.f);
+
+  data.xmax(9.f,10.f);
+  CHECK(data.limits().bmax[Aesthetic::x::index] == 10.f);
+
+  data.ymax(10.f,11.f);
+  CHECK(data.limits().bmax[Aesthetic::y::index] == 11.f);
+
+}
+

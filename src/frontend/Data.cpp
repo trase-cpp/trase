@@ -353,12 +353,12 @@ DataWithAesthetic &DataWithAesthetic::ymin(const float min, const float max) {
 }
 
 DataWithAesthetic &DataWithAesthetic::xmax(const float min, const float max) {
-  set<Aesthetic::xmin>(min, max);
+  set<Aesthetic::xmax>(min, max);
   return *this;
 }
 
 DataWithAesthetic &DataWithAesthetic::ymax(const float min, const float max) {
-  set<Aesthetic::ymin>(min, max);
+  set<Aesthetic::ymax>(min, max);
   return *this;
 }
 
