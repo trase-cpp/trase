@@ -43,6 +43,7 @@ using namespace trase;
 TEST_CASE("download test file", "[csv downloader]") {
   CSVDownloader dl;
   dl.set_delim('\t');
+#ifdef TRASE_HAVE_CURL
   auto data = dl.download("https://www.stat.ubc.ca/~jenny/notOcto/STAT545A/"
                           "examples/gapminder/data/gapminderDataFiveYear.txt");
   std::map<std::string, std::string> expected;
@@ -57,10 +58,17 @@ TEST_CASE("download test file", "[csv downloader]") {
     CHECK(it->second[0] == expected[it->first]);
   }
   CHECK(i == 6);
+#else
+  REQUIRE_THROWS_WITH(
+      dl.download("https://www.stat.ubc.ca/~jenny/notOcto/STAT545A/"
+                  "examples/gapminder/data/gapminderDataFiveYear.txt"),
+      Catch::Contains("libcurl not found"));
+#endif
 }
 
 TEST_CASE("download test file 2", "[csv downloader]") {
   CSVDownloader dl;
+#ifdef TRASE_HAVE_CURL
   auto data = dl.download(
       "http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data",
       {"sepal_length", "sepal_width", "petal_length", "petal_width", "class"});
@@ -75,4 +83,5 @@ TEST_CASE("download test file 2", "[csv downloader]") {
     CHECK(it->second[0] == expected[it->first]);
   }
   CHECK(i == 5);
+#endif
 }
