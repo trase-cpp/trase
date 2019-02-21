@@ -73,23 +73,23 @@ TEST_CASE("points legend", "[points]") {
   auto fig = figure();
   auto ax = fig->axis();
   {
-    std::vector<float> x = {0, 1, 2, 3};
-    std::vector<float> y = {0, 0, 0, 0};
-    std::vector<float> r = {1, 2, 3, 4};
-    std::vector<float> c = {0, 1, 2, 3};
+    std::vector<float> x = {0.f, 1.f, 2.f, 3.f};
+    std::vector<float> y = {0.f, 0.f, 0.f, 0.f};
+    std::vector<float> r = {1.f, 2.f, 3.f, 4.f};
+    std::vector<float> c = {0.f, 1.f, 2.f, 3.f};
     auto pts = ax->points(create_data().x(x).y(y).size(r).color(c));
     pts->set_label("y=0");
   }
   {
-    std::vector<float> x = {0, 1, 2, 3};
-    std::vector<float> y = {1, 1, 1, 1};
-    std::vector<float> r = {1, 2, 3, 4};
+    std::vector<float> x = {0.f, 1.f, 2.f, 3.f};
+    std::vector<float> y = {1.f, 1.f, 1.f, 1.f};
+    std::vector<float> r = {1.f, 2.f, 3.f, 4.f};
     auto pts = ax->points(create_data().x(x).y(y).size(r));
     pts->set_label("y=1");
   }
   {
-    std::vector<float> x = {0, 1, 2, 3};
-    std::vector<float> y = {2, 2, 2, 2};
+    std::vector<float> x = {0.f, 1.f, 2.f, 3.f};
+    std::vector<float> y = {2.f, 2.f, 2.f, 2.f};
     auto pts = ax->points(create_data().x(x).y(y));
     pts->set_label("y=2");
   }
@@ -100,10 +100,10 @@ TEST_CASE("points legend", "[points]") {
 TEST_CASE("points animate color", "[points]") {
   auto fig = figure();
   auto ax = fig->axis();
-  std::vector<float> x = {0};
-  std::vector<float> y = {0};
-  std::vector<float> r = {1};
-  std::vector<float> c = {0};
+  std::vector<float> x = {0.f};
+  std::vector<float> y = {0.f};
+  std::vector<float> r = {1.f};
+  std::vector<float> c = {0.f};
   auto pts = ax->points(create_data().x(x).y(y).size(r).color(c));
   c[0] = 1;
   pts->add_frame(create_data().x(x).y(y).size(r).color(c), 1);
@@ -113,10 +113,10 @@ TEST_CASE("points animate color", "[points]") {
 TEST_CASE("points color frames exception", "[points]") {
   auto fig = figure();
   auto ax = fig->axis();
-  std::vector<float> x = {0};
-  std::vector<float> y = {0};
-  std::vector<float> r = {1};
-  std::vector<float> c = {0};
+  std::vector<float> x = {0.f};
+  std::vector<float> y = {0.f};
+  std::vector<float> r = {1.f};
+  std::vector<float> c = {0.f};
   auto pts = ax->points(create_data().x(x).y(y).size(r).color(c));
   pts->add_frame(create_data().x(x).y(y).size(r), 1);
 
@@ -127,10 +127,10 @@ TEST_CASE("points color frames exception", "[points]") {
 TEST_CASE("points size frames exception", "[points]") {
   auto fig = figure();
   auto ax = fig->axis();
-  std::vector<float> x = {0};
-  std::vector<float> y = {0};
-  std::vector<float> r = {1};
-  std::vector<float> c = {0};
+  std::vector<float> x = {0.f};
+  std::vector<float> y = {0.f};
+  std::vector<float> r = {1.f};
+  std::vector<float> c = {0.f};
   auto pts = ax->points(create_data().x(x).y(y).size(r).color(c));
   pts->add_frame(create_data().x(x).y(y).color(c), 1);
 
@@ -141,15 +141,15 @@ TEST_CASE("points size frames exception", "[points]") {
 TEST_CASE("points number frames exception", "[points]") {
   auto fig = figure();
   auto ax = fig->axis();
-  std::vector<float> x = {0};
-  std::vector<float> y = {0};
-  std::vector<float> r = {1};
-  std::vector<float> c = {0};
+  std::vector<float> x = {0.f};
+  std::vector<float> y = {0.f};
+  std::vector<float> r = {1.f};
+  std::vector<float> c = {0.f};
   auto pts = ax->points(create_data().x(x).y(y).size(r).color(c));
-  x.push_back(0);
-  y.push_back(0);
-  r.push_back(0);
-  c.push_back(0);
+  x.push_back(0.f);
+  y.push_back(0.f);
+  r.push_back(0.f);
+  c.push_back(0.f);
   pts->add_frame(create_data().x(x).y(y).size(r).color(c), 1);
   REQUIRE_THROWS_WITH(DummyDraw::draw("points_number_exception", fig),
                       Catch::Contains("number"));
