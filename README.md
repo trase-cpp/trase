@@ -75,7 +75,7 @@ For example, the above svg image was generated with the following code.
 
 We welcome community pull requests for Trase, please see the guidelines
 [here](CONTRIBUTING.md). Potential areas for changes are:
-- Bug-fix
+- Bug-fixes. Please add a relevant test in `tests/` demonstrating the fixed bug.
 - New geometry, aesthetic or transform. The design of Trase roughly follows the
   Grammer of Graphics, so looking at existing GOG packages such as
   [ggplot](https://ggplot2.tidyverse.org/reference) could give you some good
