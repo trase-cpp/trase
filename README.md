@@ -82,8 +82,7 @@ We welcome community pull requests for Trase, please see the guidelines
   ideas
 - New example showing how to use Trase. All the examples shown in the documentation
   are in `examples/`.
-- New drawing backend. There are two backend base classes, `Backend` (e.g.
-  `BackendGL`) and `AnimatedBackend` (e.g. `BackendSVG`). Classes derived from
+- New drawing backend. There are two main types of backend. Classes derived from
   `Backend` are "pure" drawing classes in the same vein as
   [NanoVG](https://github.com/memononen/nanovg), while those derived from
   `AnimatedBackend` can also draw shapes or paths that have properties which
