@@ -83,7 +83,11 @@ We welcome community pull requests for Trase, please see the guidelines
 - New example showing how to use Trase. All the examples shown in the documentation
   are in `examples/`.
 - New drawing backend. There are two backend base classes, `Backend` (e.g.
-  `BackendGL`) and `AnimatedBackend` (e.g. `BackendSVG`). 
+  `BackendGL`) and `AnimatedBackend` (e.g. `BackendSVG`). Classes derived from
+  `Backend` are "pure" drawing classes in the same vein as
+  [NanoVG](https://github.com/memononen/nanovg), while those derived from
+  `AnimatedBackend` can also draw shapes or paths that have properties which
+  animate over time.
 - Or consult the [issues](https://github.com/trase-cpp/trase/issues) for more
   ideas
 
