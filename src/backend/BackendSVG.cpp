@@ -357,15 +357,7 @@ void BackendSVG::rect_begin(const bfloat2_t &x, float r) noexcept {
     m_out << m_att("rx", r) << m_att("ry", r);
   }
 
-  // Styling
-  m_out << m_fill_color << ' ' << m_line_color << ' ' << m_linewidth;
-
-  if (mouseover()) {
-    m_out << " onmouseover=\"" << m_onmouseover_fill << m_onmouseover_stroke
-          << m_onmouseover_tooltip << '\"';
-    m_out << " onmouseout=\"" << m_onmouseout_fill << m_onmouseout_stroke
-          << m_onmouseout_tooltip << '\"';
-  }
+  shape_styling();
 
   m_out << ">\n";
 }
@@ -462,11 +454,7 @@ void BackendSVG::end_animated_rect() {
   m_animate_times.clear();
 }
 
-void BackendSVG::circle_begin(const vfloat2_t &centre, const float r) noexcept {
-
-  m_out << "<circle ";
-  m_out << m_att("cx", centre[0]) << m_att("cy", centre[1]) << m_att("r", r);
-
+void BackendSVG::shape_styling() {
   // Styling
   m_out << m_fill_color << ' ' << m_line_color << ' ' << m_linewidth;
 
@@ -476,6 +464,14 @@ void BackendSVG::circle_begin(const vfloat2_t &centre, const float r) noexcept {
     m_out << " onmouseout=\"" << m_onmouseout_fill << m_onmouseout_stroke
           << m_onmouseout_tooltip << '\"';
   }
+}
+
+void BackendSVG::circle_begin(const vfloat2_t &centre, const float r) noexcept {
+
+  m_out << "<circle ";
+  m_out << m_att("cx", centre[0]) << m_att("cy", centre[1]) << m_att("r", r);
+
+  shape_styling();
 
   m_out << ">\n";
 }

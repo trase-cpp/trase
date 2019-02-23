@@ -380,6 +380,7 @@ private:
   void end_animate(std::string &animate, const std::string &name);
   void end_animate_stroke();
   void end_animate_fill();
+  void shape_styling();
 };
 
 } // namespace trase
