@@ -71,6 +71,25 @@ For example, the above svg image was generated with the following code.
   out.close();
 ```
 
+## Contributing to Trase
+
+We welcome community pull requests for Trase, please see the guidelines
+[here](CONTRIBUTING.md). Potential areas for changes are:
+- Bug-fixes. Please add a relevant test in `tests/` demonstrating the fixed bug.
+- New geometry, aesthetic or transform. The design of Trase roughly follows the
+  Grammer of Graphics, so looking at existing GOG packages such as
+  [ggplot](https://ggplot2.tidyverse.org/reference) could give you some good
+  ideas
+- New example showing how to use Trase. All the examples shown in the documentation
+  are in `examples/`.
+- New drawing backend. There are two main types of backend. Classes derived from
+  `Backend` are "pure" drawing classes in the same vein as
+  [NanoVG](https://github.com/memononen/nanovg), while those derived from
+  `AnimatedBackend` can also draw shapes or paths that have properties which
+  animate over time.
+- Or consult the [issues](https://github.com/trase-cpp/trase/issues) for more
+  ideas
+
 ## Usage
 
 1. Clone this repository
@@ -125,7 +144,6 @@ $ make
 
 ## Acknowledgments
 
-Trase uses [Dear ImGui](https://github.com/ocornut/imgui) and 
-[NanoVG](https://github.com/memononen/nanovg) for the OpenGL backend. The 
-[Dirent port](https://github.com/tronkko/dirent) for Windows is used for finding 
-local font files.
+Trase uses [NanoVG](https://github.com/memononen/nanovg) for the OpenGL
+backend. The [Dirent port](https://github.com/tronkko/dirent) for Windows is
+used for finding local font files.
