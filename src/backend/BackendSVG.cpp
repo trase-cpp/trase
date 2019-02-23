@@ -85,7 +85,25 @@ function remove_tooltip() {
 
 bool BackendSVG::is_interactive() { return false; }
 
+bool BackendSVG::should_close() { return true; }
+
+vfloat2_t BackendSVG::begin_frame() { return vfloat2_t(); }
+
+void BackendSVG::end_frame() {}
+
 vfloat2_t BackendSVG::get_mouse_pos() { return vfloat2_t(0, 0); }
+
+float BackendSVG::get_time() { return 0.f; }
+
+void BackendSVG::set_mouse_down(const vfloat2_t &mouse_pos) {}
+
+void BackendSVG::set_mouse_up() {}
+
+bool BackendSVG::mouse_dragging() { return false; }
+
+vfloat2_t BackendSVG::mouse_drag_delta() { return vfloat2_t(); }
+
+void BackendSVG::mouse_drag_reset_delta() {}
 
 void BackendSVG::scissor(const bfloat2_t &x) {}
 
@@ -388,7 +406,8 @@ void BackendSVG::add_animated_rect(const bfloat2_t &x, float time) {
 void BackendSVG::add_animated_stroke(const RGBA &color) {
   if (m_animate_stroke.empty()) {
     m_animate_stroke = "values=\"" + color.to_rgb_string() + ';';
-    m_animate_stroke_opacity = "values=\"" + std::to_string(color.a() / 255.0) + ';';
+    m_animate_stroke_opacity =
+        "values=\"" + std::to_string(color.a() / 255.0) + ';';
   } else {
     m_animate_stroke += color.to_rgb_string() + ';';
     m_animate_stroke_opacity += std::to_string(color.a() / 255.0) + ';';
@@ -415,7 +434,8 @@ void BackendSVG::end_animate_stroke() {
 void BackendSVG::add_animated_fill(const RGBA &color) {
   if (m_animate_fill.empty()) {
     m_animate_fill = "values=\"" + color.to_rgb_string() + ';';
-    m_animate_fill_opacity = "values=\"" + std::to_string(color.a() / 255.0) + ';';
+    m_animate_fill_opacity =
+        "values=\"" + std::to_string(color.a() / 255.0) + ';';
   } else {
     m_animate_fill += color.to_rgb_string() + ';';
     m_animate_fill_opacity += std::to_string(color.a() / 255.0) + ';';

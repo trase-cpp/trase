@@ -49,6 +49,14 @@ TEST_CASE("check figure can be created", "[figure]") {
   auto fig2 = figure({800, 600});
 }
 
+TEST_CASE("check show throws", "[figure]") {
+  auto fig = figure();
+  std::ofstream out;
+  out.open("test.svg");
+  BackendSVG backend(out);
+  REQUIRE_THROWS_WITH(fig->show(backend), Catch::Contains("Figure::show()"));
+}
+
 TEST_CASE("adding a single Axis object to Figure", "[figure]") {
   auto fig = figure();
 
