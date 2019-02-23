@@ -68,11 +68,16 @@ public:
   /// return the number of rows
   int rows() const { return m_rows; };
 
+  /// add a new column to the matrix using begin/end iterators. the data is
+  /// copied into the new column
+  template <typename T> void add_column(T new_col_begin, T new_col_end);
+
   /// add a new column to the matrix. the data in `new_col` is copied into the
   /// new column
   template <typename T> void add_column(const std::vector<T> &new_col);
 
-  /// set a column in the matrix. the data in `new_col` is copied into column i
+  /// set a column in the matrix. the data in `new_col` is copied into column
+  /// i
   template <typename T> void set_column(int i, const std::vector<T> &new_col);
 
   /// return a ColumnIterator to the beginning of column i
@@ -95,7 +100,8 @@ struct Aesthetic {
   // total number of Aesthetics
   static const int N = 9;
 
-  /// all aethetics except for xmin,ymin,xmax,ymax have their own min/max bounds
+  /// all aethetics except for xmin,ymin,xmax,ymax have their own min/max
+  /// bounds
   using Limits = bbox<float, N - 4>;
 
   /// the data to display on the x-axis of the plot
@@ -152,8 +158,8 @@ struct Aesthetic {
                               const bfloat2_t &display_lim);
   };
 
-  // NOTE: xmin,ymin,xmax,ymax need to go at end so that the indices for Limits
-  // work out
+  // NOTE: xmin,ymin,xmax,ymax need to go at end so that the indices for
+  // Limits work out
 
   /// the minimum x coordinate of the data
   struct xmin {
@@ -196,8 +202,8 @@ struct Aesthetic {
   };
 };
 
-/// Each aesthetic (except for xmin/ymin/xmax/ymax) has a set of min/max limits,
-/// or scales, that are used for plotting
+/// Each aesthetic (except for xmin/ymin/xmax/ymax) has a set of min/max
+/// limits, or scales, that are used for plotting
 using Limits = Aesthetic::Limits;
 
 /// Combination of the RawData class and Aesthetics, this class points to a
@@ -218,8 +224,11 @@ public:
   explicit DataWithAesthetic(std::shared_ptr<RawData> data)
       : m_data(std::move(data)) {}
 
-  /// return a ColumnIterator to the beginning of the data column for aesthetic
-  /// a, throws if a has not yet been set
+  /// returns the underlying RawData object
+  const RawData &get_raw_data() const { return *m_data; }
+
+  /// return a ColumnIterator to the beginning of the data column for
+  /// aesthetic a, throws if a has not yet been set
   template <typename Aesthetic> ColumnIterator begin() const;
 
   /// return a ColumnIterator to the end of the data column for aesthetic a,
@@ -235,8 +244,8 @@ public:
 
   /// rather than adding new data, this allows the limits of a given aesthetic
   /// to be manually set. This is used, for example, with geometries where the
-  /// data is implicitly defined over a range (e.g. histograms with regular bin
-  /// widths)
+  /// data is implicitly defined over a range (e.g. histograms with regular
+  /// bin widths)
   template <typename Aesthetic> void set(float min, float max);
 
   /// returns true if Aesthetic has been set
