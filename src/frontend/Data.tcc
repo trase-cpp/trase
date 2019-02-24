@@ -42,12 +42,13 @@ template <typename T> float RawData::cast_to_float(const T &arg) {
 template <> float RawData::cast_to_float<std::string>(const std::string &arg);
 
 template <typename T> void RawData::add_column(T new_col_begin, T new_col_end) {
+  const size_t n = std::distance(new_col_begin, new_col_end);
 
   // if columns already exist then add the extra memory
   if (m_cols > 0) {
 
     // check number of rows in new column match
-    if (static_cast<int>(std::distance(new_col_begin, new_col_end)) != m_rows) {
+    if (static_cast<int>(n) != m_rows) {
       throw Exception("columns in dataset must have identical number of rows");
     }
 
@@ -66,7 +67,7 @@ template <typename T> void RawData::add_column(T new_col_begin, T new_col_end) {
     m_matrix.swap(m_tmp);
   } else {
     // first column for matrix, set num rows and cols to match it
-    m_rows = new_col.size();
+    m_rows = n;
     m_matrix.resize(m_rows);
 
     // copy data in (not using std::copy because visual studio complains if T
@@ -78,7 +79,7 @@ template <typename T> void RawData::add_column(T new_col_begin, T new_col_end) {
 }
 
 template <typename T> void RawData::add_column(const std::vector<T> &new_col) {
-  add_column(new_col.begin(),new_col.end());
+  add_column(new_col.begin(), new_col.end());
 }
 
 template <typename T>
@@ -101,6 +102,24 @@ void RawData::set_column(const int i, const std::vector<T> &new_col) {
 }
 
 template <typename Aesthetic, typename T>
+void DataWithAesthetic::calculate_limits(T begin, T end) {
+  if (begin != end) {
+    // set m_limits with new data
+    auto min_max = std::minmax_element(begin, end);
+    float min = *min_max.first;
+    float max = *min_max.second;
+
+    // if limits are equal spread them out by 2*1e4*eps to stop zeros later on
+    if (min == max) {
+      min -= 1e4f * std::numeric_limits<float>::epsilon();
+      max += 1e4f * std::numeric_limits<float>::epsilon();
+    }
+
+    set<Aesthetic>(min, max);
+  }
+}
+
+template <typename Aesthetic, typename T>
 void DataWithAesthetic::set(const std::vector<T> &data) {
 
   auto search = m_map.find(Aesthetic::index);
@@ -114,21 +133,8 @@ void DataWithAesthetic::set(const std::vector<T> &data) {
     m_data->set_column(search->second, data);
   }
 
-  if (!data.empty()) {
-    // set m_limits with new data
-    auto min_max = std::minmax_element(m_data->begin(search->second),
-                                       m_data->end(search->second));
-    float min = *min_max.first;
-    float max = *min_max.second;
-
-    // if limits are equal spread them out by 2*1e4*eps to stop zeros later on
-    if (min == max) {
-      min -= 1e4f * std::numeric_limits<float>::epsilon();
-      max += 1e4f * std::numeric_limits<float>::epsilon();
-    }
-
-    set<Aesthetic>(min, max);
-  }
+  calculate_limits<Aesthetic>(m_data->begin(search->second),
+                              m_data->end(search->second));
 }
 
 /// returns true if Aesthetic has been set

@@ -6,7 +6,7 @@ University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
 
-This file is part of trase.
+This file is part of the Oxford RSE C++ Template project.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,41 +31,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Facets.hpp"
-#include <vector>
+/// \page example_facet_points Facet 
+///  This is an example of faceting a data set for an animation
+///
+/// \image html https://cdn.jsdelivr.net/gh/trase-cpp/generated_files@master/examples/example_facet_points.svg "Output" 
+/// \snippet examples/FacetPoints.cpp example facet points
 
-namespace trase {
+/// [example facet points]
+#include "trase.hpp"
+#include <fstream>
+#include <random>
 
-template <Aesthetic>
-std::vector<DataWithAesthetics> facet(const DataWithAesthetic &data) {
-  std::vector<DataWithAesthetic> fdata;
+using namespace trase;
 
-  auto aes_data = data.begin<Aesthetic>();
-  std::vector<std::size_t> row_indices(data.rows());
-  std::iota(row_indices.begin(), row_indices.end(), 0);
-  std::sort(
-      row_indices.begin(), row_indices.end(),
-      [&](std::size_t i, std::size_t j) { return aes_data[i] < aes_data[j]; });
+int main() {
+  CSVDownloader dl;
+  dl.set_delim('\t');
+  auto csv = dl.download("https://www.stat.ubc.ca/~jenny/notOcto/STAT545A/"
+                         "examples/gapminder/data/gapminderDataFiveYear.txt");
 
-  auto i = row_indices.begin();
-  while (i != row_indices.end()) {
-    auto j = i;
-    while (aes_data[*(j + 1)] <= aes_data[*j]) {
-      ++j;
-    }
+  auto fig = figure();
+  auto ax = fig->axis();
+  auto data =
+      create_data().x(csv["gdpPercap"]).y(csv["lifeExp"]).size(csv["pop"]);
 
-    RawData raw_data;
-    for (int k = 0; k < data.get_raw_data().cols(); ++i) {
-      std::vector<float> tmp(j - i);
-      std::transform(i, j, tmp.begin(),
-                     [row = data.get_raw_data().begin(k)](std::size_t i) {
-                       return row[i];
-                     });
-      raw_data.add_column(tmp);
-    }
+  auto facet_data = data.facet(csv["year"]);
+
+  auto points = ax->points(facet_data[0]);
+  for (size_t i = 1; i < facet_data.size(); ++i) {
+    points->add_frame(facet_data[i], i);
   }
 
-  fdata.emplace_back(data.get_map(),raw_data);
-}
+  ax->xlabel("gdpPercap");
+  ax->ylabel("lifeExp");
 
-} // namespace trase
+// output to chosen backend
+#ifdef TRASE_EXAMPLES_SVG_BACKEND
+  std::ofstream out;
+  out.open("example_facet_points.svg");
+  BackendSVG backend(out);
+  fig->draw(backend);
+  out.close();
+#endif
+#ifdef TRASE_EXAMPLES_GL_BACKEND
+  BackendGL backend;
+  fig->show(backend);
+#endif
+}
+/// [example facet points]

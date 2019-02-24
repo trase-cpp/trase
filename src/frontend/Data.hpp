@@ -221,11 +221,14 @@ class DataWithAesthetic {
 
 public:
   DataWithAesthetic() : m_data(std::make_shared<RawData>()) {}
+
   explicit DataWithAesthetic(std::shared_ptr<RawData> data)
       : m_data(std::move(data)) {}
 
-  /// returns the underlying RawData object
-  const RawData &get_raw_data() const { return *m_data; }
+  DataWithAesthetic(std::shared_ptr<RawData> data,
+                    const std::unordered_map<int, int> &map,
+                    const Limits &limits)
+      : m_data(std::move(data)), m_map(map), m_limits(limits) {}
 
   /// return a ColumnIterator to the beginning of the data column for
   /// aesthetic a, throws if a has not yet been set
@@ -286,6 +289,39 @@ public:
 
   template <typename T> DataWithAesthetic &ymax(const std::vector<T> &data);
   DataWithAesthetic &ymax(float min, float max);
+
+  template <typename T>
+  std::vector<DataWithAesthetic> facet(const std::vector<T> &data) {
+    std::vector<DataWithAesthetic> fdata;
+
+    std::vector<std::size_t> row_indices(rows());
+    std::iota(row_indices.begin(), row_indices.end(), 0);
+    std::stable_sort(
+        row_indices.begin(), row_indices.end(),
+        [&](std::size_t i, std::size_t j) { return data[i] < data[j]; });
+
+    auto i = row_indices.begin();
+    for (auto j = i; i != row_indices.end(); i = j) {
+      while (j != row_indices.end() && data[*j] <= data[*i]) {
+        ++j;
+      }
+
+      std::vector<float> tmp(j - i);
+      auto raw_data = std::make_shared<RawData>();
+      for (int k = 0; k < m_data->cols(); ++k) {
+        std::transform(
+            i, j, tmp.begin(),
+            [row = m_data->begin(k)](std::size_t i) { return row[i]; });
+        raw_data->add_column(tmp);
+      }
+      fdata.emplace_back(raw_data, m_map, m_limits);
+    }
+    return fdata;
+  }
+
+private:
+  template <typename Aesthetic, typename T>
+  void calculate_limits(T begin, T end);
 };
 
 /// creates a new, empty dataset
