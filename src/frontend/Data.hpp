@@ -89,6 +89,9 @@ public:
   // returns `static_cast<float>(arg)`, or std::stof(arg) if T is a
   // `std::string`
   template <typename T> static float cast_to_float(const T &arg);
+
+  template <typename T>
+  std::vector<std::shared_ptr<RawData>> facet(const std::vector<T> &data) const;
 };
 
 /// Aesthetics are a collection of tag classes that represent each aesthetic
@@ -291,33 +294,7 @@ public:
   DataWithAesthetic &ymax(float min, float max);
 
   template <typename T>
-  std::vector<DataWithAesthetic> facet(const std::vector<T> &data) {
-    std::vector<DataWithAesthetic> fdata;
-
-    std::vector<std::size_t> row_indices(rows());
-    std::iota(row_indices.begin(), row_indices.end(), 0);
-    std::stable_sort(
-        row_indices.begin(), row_indices.end(),
-        [&](std::size_t i, std::size_t j) { return data[i] < data[j]; });
-
-    auto i = row_indices.begin();
-    for (auto j = i; i != row_indices.end(); i = j) {
-      while (j != row_indices.end() && data[*j] <= data[*i]) {
-        ++j;
-      }
-
-      std::vector<float> tmp(j - i);
-      auto raw_data = std::make_shared<RawData>();
-      for (int k = 0; k < m_data->cols(); ++k) {
-        std::transform(
-            i, j, tmp.begin(),
-            [row = m_data->begin(k)](std::size_t i) { return row[i]; });
-        raw_data->add_column(tmp);
-      }
-      fdata.emplace_back(raw_data, m_map, m_limits);
-    }
-    return fdata;
-  }
+  std::vector<DataWithAesthetic> facet(const std::vector<T> &data) const;
 
 private:
   template <typename Aesthetic, typename T>

@@ -101,6 +101,48 @@ void RawData::set_column(const int i, const std::vector<T> &new_col) {
   }
 }
 
+template <typename T>
+std::vector<std::shared_ptr<RawData>>
+RawData::facet(const std::vector<T> &data) const {
+  std::vector<std::shared_ptr<RawData>> fdata;
+
+  std::vector<std::size_t> row_indices(rows());
+  std::iota(row_indices.begin(), row_indices.end(), 0);
+  std::stable_sort(
+      row_indices.begin(), row_indices.end(),
+      [&](std::size_t i, std::size_t j) { return data[i] < data[j]; });
+
+  auto i = row_indices.begin();
+  for (auto j = i; i != row_indices.end(); i = j) {
+    while (j != row_indices.end() && data[*j] <= data[*i]) {
+      ++j;
+    }
+
+    std::vector<float> tmp(j - i);
+    fdata.emplace_back(std::make_shared<RawData>());
+    for (int k = 0; k < cols(); ++k) {
+      std::transform(i, j, tmp.begin(),
+                     [row = begin(k)](std::size_t i) { return row[i]; });
+      fdata.back()->add_column(tmp);
+    }
+  }
+  return fdata;
+}
+
+template <typename T>
+std::vector<DataWithAesthetic>
+DataWithAesthetic::facet(const std::vector<T> &data) const {
+  std::vector<DataWithAesthetic> faceted_data;
+  const std::vector<std::shared_ptr<RawData>> &faceted_raw_data =
+      m_data->facet(data);
+
+  for (auto raw_data : faceted_raw_data) {
+    faceted_data.emplace_back(raw_data, m_map, m_limits);
+  }
+
+  return faceted_data;
+}
+
 template <typename Aesthetic, typename T>
 void DataWithAesthetic::calculate_limits(T begin, T end) {
   if (begin != end) {
