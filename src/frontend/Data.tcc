@@ -35,6 +35,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
+// helper function to cast type T to a float
+//
+// by default, will use static_cast to cast T to float
+// if T is a std::string, then:
+//   if string_data is not empty: returns a float equal to the index of arg in
+//   the set if string_data is empty: returns stof(arg)
 template <typename T>
 float cast_to_float(const T &arg, const std::set<std::string> &string_data) {
   return static_cast<float>(arg);
@@ -44,6 +50,18 @@ template <>
 float cast_to_float<std::string>(const std::string &arg,
                                  const std::set<std::string> &string_data);
 
+// helper function to parse a column of data given by the two iterators
+// new_col_begin and new_col_end
+//
+// if the value_type of the data is a std::string, and the first element cannot
+// be converted to a float by stof, then the strings in the data column are
+// copied to the set string_data
+template <typename T>
+void store_non_numeric_strings(T new_col_begin, T new_col_end,
+                               std::set<std::string> &string_data);
+
+// the function above uses tag dispatching based on the value_type of the data
+// column. This function is chosen if the value_type is a std::string
 template <typename T>
 void store_non_numeric_strings(T new_col_begin, T new_col_end,
                                std::set<std::string> &string_data,
@@ -69,11 +87,14 @@ void store_non_numeric_strings(T new_col_begin, T new_col_end,
   }
 }
 
+// the function above uses tag dispatching based on the value_type of the data
+// column. This function is chosen if the value_type is not a std::string
 template <typename T>
 void store_non_numeric_strings(T new_col_begin, T new_col_end,
                                std::set<std::string> &string_data,
                                std::false_type) {}
 
+// see declaration above
 template <typename T>
 void store_non_numeric_strings(T new_col_begin, T new_col_end,
                                std::set<std::string> &string_data) {
@@ -152,9 +173,14 @@ void RawData::set_column(const int i, const std::vector<T> &new_col) {
 }
 
 template <typename T>
-std::vector<std::shared_ptr<RawData>>
+std::map<T, std::shared_ptr<RawData>>
 RawData::facet(const std::vector<T> &data) const {
-  std::vector<std::shared_ptr<RawData>> fdata;
+  // check number of rows in new column match
+  if (m_cols > 0 && static_cast<int>(data.size()) != m_rows) {
+    throw Exception("facet column must have an identical number of rows to the dataset");
+  }
+
+  std::map<T, std::shared_ptr<RawData>> fdata;
 
   std::vector<std::size_t> row_indices(rows());
   std::iota(row_indices.begin(), row_indices.end(), 0);
@@ -169,25 +195,24 @@ RawData::facet(const std::vector<T> &data) const {
     }
 
     std::vector<float> tmp(j - i);
-    fdata.emplace_back(std::make_shared<RawData>());
+    auto &facet = fdata[data[*i]];
+    facet = std::make_shared<RawData>();
     for (int k = 0; k < cols(); ++k) {
       std::transform(i, j, tmp.begin(),
                      [row = begin(k)](std::size_t i) { return row[i]; });
-      fdata.back()->add_column(tmp);
+      facet->add_column(tmp);
     }
   }
   return fdata;
 }
 
 template <typename T>
-std::vector<DataWithAesthetic>
+std::map<T, DataWithAesthetic>
 DataWithAesthetic::facet(const std::vector<T> &data) const {
-  std::vector<DataWithAesthetic> faceted_data;
-  const std::vector<std::shared_ptr<RawData>> &faceted_raw_data =
-      m_data->facet(data);
+  std::map<T, DataWithAesthetic> faceted_data;
 
-  for (auto raw_data : faceted_raw_data) {
-    faceted_data.emplace_back(raw_data, m_map, m_limits);
+  for (auto raw_data : m_data->facet(data)) {
+    faceted_data[raw_data.first] = DataWithAesthetic(raw_data.second, m_map, m_limits);
   }
 
   return faceted_data;

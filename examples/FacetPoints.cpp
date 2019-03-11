@@ -60,9 +60,12 @@ int main() {
 
   auto faceted_data = data.facet(csv["year"]);
 
-  auto points = ax->points(faceted_data[0]);
-  for (size_t i = 1; i < faceted_data.size(); ++i) {
-    points->add_frame(faceted_data[i], i);
+  auto facet = faceted_data.begin();
+  auto points = ax->points(facet->second);
+
+  int i = 0;
+  for (;facet != faceted_data.end(); ++facet, ++i) {
+    points->add_frame(facet->second, i);
   }
 
   ax->xlabel("gdpPercap");

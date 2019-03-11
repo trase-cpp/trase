@@ -177,6 +177,62 @@ TEST_CASE("string data conversion", "[data]") {
   CHECK_THROWS_AS(data.set_column(0, bad_col), std::invalid_argument);
 }
 
+TEST_CASE("data faceting", "[data]") {
+  RawData data;
+  std::vector<float> first_col = {1, 2, 3, 4, 5, 6};
+  data.add_column(first_col);
+
+  auto faceted = data.facet(std::vector<int>({3, 3, 1, 2, 1, 3}));
+  auto facet = faceted.begin();
+  CHECK(facet->first == 1);
+  auto faceted_data = facet->second->begin(0);
+
+  CHECK(*faceted_data++ == 3);
+  CHECK(*faceted_data++ == 5);
+  ++facet;
+  CHECK(facet->first == 2);
+  faceted_data = facet->second->begin(0);
+  CHECK(*faceted_data++ == 4);
+  ++facet;
+  CHECK(facet->first == 3);
+  faceted_data = facet->second->begin(0);
+  CHECK(*faceted_data++ == 1);
+  CHECK(*faceted_data++ == 2);
+  CHECK(*faceted_data++ == 6);
+
+  CHECK_THROWS_WITH(
+      data.facet(std::vector<int>({3, 3, 1, 2, 1})),
+      "facet column must have an identical number of rows to the dataset");
+}
+
+TEST_CASE("data faceting with aesthetics", "[data]") {
+  DataWithAesthetic data;
+  std::vector<float> x = {1, 2, 3, 4, 5, 6};
+  data.x(x);
+
+  auto faceted = data.facet(std::vector<int>({3, 3, 1, 2, 1, 3}));
+  auto facet = faceted.begin();
+  CHECK(facet->first == 1);
+  auto faceted_data = facet->second.begin<Aesthetic::x>();
+
+  CHECK(*faceted_data++ == 3);
+  CHECK(*faceted_data++ == 5);
+  ++facet;
+  CHECK(facet->first == 2);
+  faceted_data = facet->second.begin<Aesthetic::x>();
+  CHECK(*faceted_data++ == 4);
+  ++facet;
+  CHECK(facet->first == 3);
+  faceted_data = facet->second.begin<Aesthetic::x>();
+  CHECK(*faceted_data++ == 1);
+  CHECK(*faceted_data++ == 2);
+  CHECK(*faceted_data++ == 6);
+
+  CHECK_THROWS_WITH(
+      data.facet(std::vector<int>({3, 3, 1, 2, 1})),
+      "facet column must have an identical number of rows to the dataset");
+}
+
 TEST_CASE("create data with aesthetics", "[data]") {
   DataWithAesthetic data_w_aes(std::make_shared<RawData>());
 

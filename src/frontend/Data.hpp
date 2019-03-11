@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 #include <functional>
+#include <map>
 #include <memory>
 #include <set>
 #include <unordered_map>
@@ -93,14 +94,15 @@ public:
   /// return the set of strings for column i
   ///
   /// the returned set will be empty if column i contains numeric data
-  const std::set<std::string>& string_data(int i) const;
+  const std::set<std::string> &string_data(int i) const;
 
+  /// facets the data based on the input data column
+  ///
+  /// The input data column (of the same number of rows as this dataset)
+  /// contains N unique values. This function returns a map of each of these N
+  /// values to a dataset containing all the rows that have this value
   template <typename T>
-  std::vector<std::shared_ptr<RawData>> facet(const std::vector<T> &data) const;
-
-  template <typename T>
-  std::vector<std::shared_ptr<RawData>>
-  facet(const std::vector<T> &row_data, const std::vector<T> &col_data) const;
+  std::map<T, std::shared_ptr<RawData>> facet(const std::vector<T> &data) const;
 };
 
 /// Aesthetics are a collection of tag classes that represent each aesthetic
@@ -302,8 +304,13 @@ public:
   template <typename T> DataWithAesthetic &ymax(const std::vector<T> &data);
   DataWithAesthetic &ymax(float min, float max);
 
+  /// facets the data based on the input data column
+  ///
+  /// The input data column (of the same number of rows as this dataset)
+  /// contains N unique values. This function returns a map of each of these N
+  /// values to a dataset containing all the rows that have this value
   template <typename T>
-  std::vector<DataWithAesthetic> facet(const std::vector<T> &data) const;
+  std::map<T, DataWithAesthetic> facet(const std::vector<T> &data) const;
 
 private:
   template <typename Aesthetic, typename T>
