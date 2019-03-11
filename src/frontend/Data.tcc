@@ -35,22 +35,67 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <typename T> float RawData::cast_to_float(const T &arg) {
+template <typename T>
+float cast_to_float(const T &arg, const std::set<std::string> &string_data) {
   return static_cast<float>(arg);
 }
 
-template <> float RawData::cast_to_float<std::string>(const std::string &arg);
+template <>
+float cast_to_float<std::string>(const std::string &arg,
+                                 const std::set<std::string> &string_data);
+
+template <typename T>
+void store_non_numeric_strings(T new_col_begin, T new_col_end,
+                               std::set<std::string> &string_data,
+                               std::true_type) {
+
+  if (new_col_begin == new_col_end)
+    return;
+
+  size_t pos;
+  bool failed = false;
+  try {
+    std::stof(*new_col_begin, &pos);
+  } catch (std::invalid_argument) {
+    failed = true;
+  }
+
+  // if exception caught or if not all characters convered, then the first
+  // element is a non-numeric string.  if the first element is a non-numeric
+  // string, assume the rest are and process them into string_data
+  if (failed || pos < new_col_begin->size()) {
+    std::copy(new_col_begin, new_col_end,
+              std::inserter(string_data, string_data.begin()));
+  }
+}
+
+template <typename T>
+void store_non_numeric_strings(T new_col_begin, T new_col_end,
+                               std::set<std::string> &string_data,
+                               std::false_type) {}
+
+template <typename T>
+void store_non_numeric_strings(T new_col_begin, T new_col_end,
+                               std::set<std::string> &string_data) {
+  store_non_numeric_strings(
+      new_col_begin, new_col_end, string_data,
+      std::is_same<typename std::iterator_traits<T>::value_type,
+                   std::string>());
+}
 
 template <typename T> void RawData::add_column(T new_col_begin, T new_col_end) {
   const size_t n = std::distance(new_col_begin, new_col_end);
 
+  // check number of rows in new column match
+  if (m_cols > 0 && static_cast<int>(n) != m_rows) {
+    throw Exception("columns in dataset must have identical number of rows");
+  }
+
+  m_string_data.emplace_back();
+  store_non_numeric_strings(new_col_begin, new_col_end, m_string_data.back());
+
   // if columns already exist then add the extra memory
   if (m_cols > 0) {
-
-    // check number of rows in new column match
-    if (static_cast<int>(n) != m_rows) {
-      throw Exception("columns in dataset must have identical number of rows");
-    }
 
     // resize tmp vector
     m_tmp.resize(m_rows * (m_cols + 1));
@@ -60,7 +105,8 @@ template <typename T> void RawData::add_column(T new_col_begin, T new_col_end) {
       for (int j = 0; j < m_cols; ++j) {
         m_tmp[i * (m_cols + 1) + j] = m_matrix[i * m_cols + j];
       }
-      m_tmp[i * (m_cols + 1) + m_cols] = cast_to_float(*new_col_begin++);
+      m_tmp[i * (m_cols + 1) + m_cols] =
+          cast_to_float(*new_col_begin++, m_string_data.back());
     }
 
     // swap data back to m_matrix
@@ -72,8 +118,9 @@ template <typename T> void RawData::add_column(T new_col_begin, T new_col_end) {
 
     // copy data in (not using std::copy because visual studio complains if T
     // is not float)
-    std::transform(new_col_begin, new_col_end, m_matrix.begin(),
-                   [](auto i) { return cast_to_float(i); });
+    std::transform(
+        new_col_begin, new_col_end, m_matrix.begin(),
+        [this](auto i) { return cast_to_float(i, m_string_data.back()); });
   }
   ++m_cols;
 }
@@ -95,9 +142,12 @@ void RawData::set_column(const int i, const std::vector<T> &new_col) {
     throw Exception("columns in dataset must have identical number of rows");
   }
 
+  m_string_data[i].clear();
+  store_non_numeric_strings(new_col.begin(), new_col.end(), m_string_data[i]);
+
   // copy column
   for (int j = 0; j < m_rows; ++j) {
-    m_matrix[j * m_cols + i] = cast_to_float(new_col[j]);
+    m_matrix[j * m_cols + i] = cast_to_float(new_col[j], m_string_data[i]);
   }
 }
 

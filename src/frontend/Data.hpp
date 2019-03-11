@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <functional>
 #include <memory>
+#include <set>
 #include <unordered_map>
 #include <vector>
 
@@ -54,6 +55,9 @@ namespace trase {
 class RawData {
   // raw data set, in row major order
   std::vector<float> m_matrix;
+
+  // sets for non-numeric string data
+  std::vector<std::set<std::string>> m_string_data;
 
   /// temporary data
   std::vector<float> m_tmp;
@@ -86,12 +90,17 @@ public:
   /// return a ColumnIterator to the end of column i
   ColumnIterator end(int i) const;
 
-  // returns `static_cast<float>(arg)`, or std::stof(arg) if T is a
-  // `std::string`
-  template <typename T> static float cast_to_float(const T &arg);
+  /// return the set of strings for column i
+  ///
+  /// the returned set will be empty if column i contains numeric data
+  const std::set<std::string>& string_data(int i) const;
 
   template <typename T>
   std::vector<std::shared_ptr<RawData>> facet(const std::vector<T> &data) const;
+
+  template <typename T>
+  std::vector<std::shared_ptr<RawData>>
+  facet(const std::vector<T> &row_data, const std::vector<T> &col_data) const;
 };
 
 /// Aesthetics are a collection of tag classes that represent each aesthetic

@@ -31,11 +31,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \page example_facet_points Facet 
+/// \page example_facet_points Facet
 ///  This is an example of faceting a data set for an animation
 ///
-/// \image html https://cdn.jsdelivr.net/gh/trase-cpp/generated_files@master/examples/example_facet_points.svg "Output" 
-/// \snippet examples/FacetPoints.cpp example facet points
+/// \image html
+/// https://cdn.jsdelivr.net/gh/trase-cpp/generated_files@master/examples/example_facet_points.svg
+/// "Output" \snippet examples/FacetPoints.cpp example facet points
 
 /// [example facet points]
 #include "trase.hpp"
@@ -53,13 +54,15 @@ int main() {
   auto fig = figure();
   auto ax = fig->axis();
   auto data =
-      create_data().x(csv["gdpPercap"]).y(csv["lifeExp"]).size(csv["pop"]);
+      create_data().x(csv["gdpPercap"]).y(csv["lifeExp"]).size(csv["pop"]).color(csv["continent"]);
 
-  auto facet_data = data.facet(csv["year"]);
+  data.x(0, 4e4).y(20, 84);
 
-  auto points = ax->points(facet_data[0]);
-  for (size_t i = 1; i < facet_data.size(); ++i) {
-    points->add_frame(facet_data[i], i);
+  auto faceted_data = data.facet(csv["year"]);
+
+  auto points = ax->points(faceted_data[0]);
+  for (size_t i = 1; i < faceted_data.size(); ++i) {
+    points->add_frame(faceted_data[i], i);
   }
 
   ax->xlabel("gdpPercap");
