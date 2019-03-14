@@ -42,7 +42,8 @@ float cast_to_float<std::string>(const std::string &arg,
   if (string_data.empty()) {
     return std::stof(arg);
   } else {
-    return std::distance(string_data.begin(), string_data.find(arg));
+    return static_cast<float>(
+        std::distance(string_data.begin(), string_data.find(arg)));
   }
 }
 
@@ -60,7 +61,9 @@ ColumnIterator RawData::end(const int i) const {
   return {m_matrix.cend() + i, m_cols};
 }
 
-const std::set<std::string>& RawData::string_data(int i) const { return m_string_data[i];}
+const std::set<std::string> &RawData::string_data(int i) const {
+  return m_string_data[i];
+}
 
 int DataWithAesthetic::rows() const { return m_data->rows(); }
 
