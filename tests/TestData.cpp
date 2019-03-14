@@ -110,6 +110,39 @@ TEST_CASE("add some cols to raw data", "[data]") {
   }
 }
 
+TEST_CASE("add some rows to raw data", "[data]") {
+  RawData data;
+  std::vector<int> first_row = {1, 2, 3};
+  data.add_row(first_row);
+
+  CHECK(data.rows() == 1);
+  CHECK(data.cols() == 3);
+
+  {
+    for (int i = 0; i < 3; ++i) {
+      CHECK(data.begin(i)[0] == first_row[i]);
+    }
+  }
+
+  CHECK_THROWS_AS(data.begin(3), std::out_of_range);
+  CHECK_THROWS_AS(data.end(3), std::out_of_range);
+  CHECK_THROWS_AS(data.begin(-1), std::out_of_range);
+  CHECK_THROWS_AS(data.end(-1), std::out_of_range);
+
+  std::vector<float> second_row_incorrect = {3, 2, 1, 0};
+  std::vector<float> second_row = {3, 2, 1};
+
+  CHECK_THROWS_AS(data.add_row(second_row_incorrect), Exception);
+
+  data.add_row(second_row);
+
+  {
+    for (int i = 0; i < 3; ++i) {
+      CHECK(data.begin(i)[1] == second_row[i]);
+    }
+  }
+}
+
 TEST_CASE("string data conversion", "[data]") {
   RawData data;
   std::vector<std::string> first_col = {"1", "2", "3"};
@@ -205,6 +238,43 @@ TEST_CASE("data faceting", "[data]") {
       "facet column must have an identical number of rows to the dataset");
 }
 
+TEST_CASE("data dual faceting", "[data]") {
+  RawData data;
+  std::vector<float> first_col = {1, 2, 3, 4, 5, 6};
+  data.add_column(first_col);
+
+  auto faceted = data.facet(std::vector<int>({3, 2, 1, 2, 1, 3}),
+                            std::vector<int>({3, 3, 1, 2, 1, 3}));
+  auto facet = faceted.begin();
+  CHECK(facet->first == std::make_pair(1, 1));
+  auto faceted_data = facet->second->begin(0);
+
+  CHECK(*faceted_data++ == 3);
+  CHECK(*faceted_data++ == 5);
+  ++facet;
+  CHECK(facet->first == std::make_pair(2, 2));
+  faceted_data = facet->second->begin(0);
+  CHECK(*faceted_data++ == 4);
+  ++facet;
+  CHECK(facet->first == std::make_pair(2, 3));
+  faceted_data = facet->second->begin(0);
+  CHECK(*faceted_data++ == 2);
+  ++facet;
+  CHECK(facet->first == std::make_pair(3, 3));
+  faceted_data = facet->second->begin(0);
+  CHECK(*faceted_data++ == 1);
+  CHECK(*faceted_data++ == 6);
+
+  CHECK_THROWS_WITH(
+      data.facet(std::vector<int>({3, 3, 1, 2, 1, 1}),
+                 std::vector<int>({3, 3, 1, 2, 1})),
+      "facet column 2 must have an identical number of rows to the dataset");
+  CHECK_THROWS_WITH(
+      data.facet(std::vector<int>({3, 3, 1, 2, 1}),
+                 std::vector<int>({3, 3, 1, 2, 1, 1})),
+      "facet column 1 must have an identical number of rows to the dataset");
+}
+
 TEST_CASE("data faceting with aesthetics", "[data]") {
   DataWithAesthetic data;
   std::vector<float> x = {1, 2, 3, 4, 5, 6};
@@ -231,6 +301,43 @@ TEST_CASE("data faceting with aesthetics", "[data]") {
   CHECK_THROWS_WITH(
       data.facet(std::vector<int>({3, 3, 1, 2, 1})),
       "facet column must have an identical number of rows to the dataset");
+}
+
+TEST_CASE("data dual faceting with aesthetics", "[data]") {
+  DataWithAesthetic data;
+  std::vector<float> x= {1, 2, 3, 4, 5, 6};
+  data.x(x);
+
+  auto faceted = data.facet(std::vector<int>({3, 2, 1, 2, 1, 3}),
+                            std::vector<int>({3, 3, 1, 2, 1, 3}));
+  auto facet = faceted.begin();
+  CHECK(facet->first == std::make_pair(1, 1));
+  auto faceted_data = facet->second.begin<Aesthetic::x>();
+
+  CHECK(*faceted_data++ == 3);
+  CHECK(*faceted_data++ == 5);
+  ++facet;
+  CHECK(facet->first == std::make_pair(2, 2));
+  faceted_data = facet->second.begin<Aesthetic::x>();
+  CHECK(*faceted_data++ == 4);
+  ++facet;
+  CHECK(facet->first == std::make_pair(2, 3));
+  faceted_data = facet->second.begin<Aesthetic::x>();
+  CHECK(*faceted_data++ == 2);
+  ++facet;
+  CHECK(facet->first == std::make_pair(3, 3));
+  faceted_data = facet->second.begin<Aesthetic::x>();
+  CHECK(*faceted_data++ == 1);
+  CHECK(*faceted_data++ == 6);
+
+  CHECK_THROWS_WITH(
+      data.facet(std::vector<int>({3, 3, 1, 2, 1, 1}),
+                 std::vector<int>({3, 3, 1, 2, 1})),
+      "facet column 2 must have an identical number of rows to the dataset");
+  CHECK_THROWS_WITH(
+      data.facet(std::vector<int>({3, 3, 1, 2, 1}),
+                 std::vector<int>({3, 3, 1, 2, 1, 1})),
+      "facet column 1 must have an identical number of rows to the dataset");
 }
 
 TEST_CASE("create data with aesthetics", "[data]") {

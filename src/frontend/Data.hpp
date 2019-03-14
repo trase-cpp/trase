@@ -77,9 +77,17 @@ public:
   /// copied into the new column
   template <typename T> void add_column(T new_col_begin, T new_col_end);
 
+  /// add a new row to the matrix using begin/end iterators. the data is
+  /// copied into the new column
+  template <typename T> void add_row(T new_row_begin, T new_row_end);
+
   /// add a new column to the matrix. the data in `new_col` is copied into the
   /// new column
   template <typename T> void add_column(const std::vector<T> &new_col);
+
+  /// add a new row to the matrix. the data in `new_row` is copied into the
+  /// new row
+  template <typename T> void add_row(const std::vector<T> &new_row);
 
   /// set a column in the matrix. the data in `new_col` is copied into column
   /// i
@@ -103,6 +111,15 @@ public:
   /// values to a dataset containing all the rows that have this value
   template <typename T>
   std::map<T, std::shared_ptr<RawData>> facet(const std::vector<T> &data) const;
+
+  /// facets the data based on the dual input data columns
+  ///
+  /// The input data columns (of the same number of rows as this dataset)
+  /// contains NxM unique value pairs. This function returns a map of each of
+  /// these NxM values to a dataset containing all the rows that have this value
+  template <typename T1, typename T2>
+  std::map<std::pair<T1, T2>, std::shared_ptr<RawData>>
+  facet(const std::vector<T1> &data1, const std::vector<T2> &data2) const;
 };
 
 /// Aesthetics are a collection of tag classes that represent each aesthetic
@@ -311,6 +328,15 @@ public:
   /// values to a dataset containing all the rows that have this value
   template <typename T>
   std::map<T, DataWithAesthetic> facet(const std::vector<T> &data) const;
+
+  /// facets the data based on the dual input data columns
+  ///
+  /// The input data columns (of the same number of rows as this dataset)
+  /// contains NxM unique value pairs. This function returns a map of each of
+  /// these NxM values to a dataset containing all the rows that have this value
+  template <typename T1, typename T2>
+  std::map<std::pair<T1, T2>, DataWithAesthetic>
+  facet(const std::vector<T1> &data1, const std::vector<T2> &data2) const;
 
 private:
   template <typename Aesthetic, typename T>

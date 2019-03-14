@@ -146,8 +146,25 @@ template <typename T> void RawData::add_column(T new_col_begin, T new_col_end) {
   ++m_cols;
 }
 
+template <typename T> void RawData::add_row(T new_row_begin, T new_row_end) {
+  const size_t n = std::distance(new_row_begin, new_row_end);
+  // check number of cols in new row match
+  if (m_rows > 0 && static_cast<int>(n) != m_cols) {
+    throw Exception("rows in dataset must have identical number of columns");
+  }
+  m_cols = n;
+  ++m_rows;
+  const size_t oldn = m_matrix.size();
+  m_matrix.resize(oldn + n);
+  std::copy(new_row_begin, new_row_end, m_matrix.begin() + oldn);
+}
+
 template <typename T> void RawData::add_column(const std::vector<T> &new_col) {
   add_column(new_col.begin(), new_col.end());
+}
+
+template <typename T> void RawData::add_row(const std::vector<T> &new_row) {
+  add_row(new_row.begin(), new_row.end());
 }
 
 template <typename T>
@@ -177,7 +194,8 @@ std::map<T, std::shared_ptr<RawData>>
 RawData::facet(const std::vector<T> &data) const {
   // check number of rows in new column match
   if (m_cols > 0 && static_cast<int>(data.size()) != m_rows) {
-    throw Exception("facet column must have an identical number of rows to the dataset");
+    throw Exception(
+        "facet column must have an identical number of rows to the dataset");
   }
 
   std::map<T, std::shared_ptr<RawData>> fdata;
@@ -206,13 +224,60 @@ RawData::facet(const std::vector<T> &data) const {
   return fdata;
 }
 
+template <typename T1, typename T2>
+std::map<std::pair<T1, T2>, std::shared_ptr<RawData>>
+RawData::facet(const std::vector<T1> &data1,
+               const std::vector<T2> &data2) const {
+  // check number of rows in new column match
+  if (m_cols > 0 && static_cast<int>(data1.size()) != m_rows) {
+    throw Exception(
+        "facet column 1 must have an identical number of rows to the dataset");
+  }
+  // check number of rows in new column match
+  if (m_cols > 0 && static_cast<int>(data2.size()) != m_rows) {
+    throw Exception(
+        "facet column 2 must have an identical number of rows to the dataset");
+  }
+
+  std::map<std::pair<T1, T2>, std::shared_ptr<RawData>> fdata;
+
+  // insert all rows into map, with key given by pair(data1,data2)
+  for (size_t i = 0; i < data1.size(); ++i) {
+    auto &facet = fdata[std::make_pair(data1[i], data2[i])];
+    if (!facet) {
+      facet = std::make_shared<RawData>();
+    }
+    std::vector<float> row(cols());
+    for (int k = 0; k < cols(); ++k) {
+      row[k] = begin(k)[i];
+    }
+    facet->add_row(row);
+  }
+
+  return fdata;
+}
+
 template <typename T>
 std::map<T, DataWithAesthetic>
 DataWithAesthetic::facet(const std::vector<T> &data) const {
   std::map<T, DataWithAesthetic> faceted_data;
 
   for (auto raw_data : m_data->facet(data)) {
-    faceted_data[raw_data.first] = DataWithAesthetic(raw_data.second, m_map, m_limits);
+    faceted_data[raw_data.first] =
+        DataWithAesthetic(raw_data.second, m_map, m_limits);
+  }
+
+  return faceted_data;
+}
+
+template <typename T1, typename T2>
+std::map<std::pair<T1, T2>, DataWithAesthetic>
+DataWithAesthetic::facet(const std::vector<T1> &data1, const std::vector<T2> &data2) const {
+  std::map<std::pair<T1, T2>, DataWithAesthetic> faceted_data;
+
+  for (auto raw_data : m_data->facet(data1, data2)) {
+    faceted_data[raw_data.first] =
+        DataWithAesthetic(raw_data.second, m_map, m_limits);
   }
 
   return faceted_data;
