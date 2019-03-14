@@ -147,8 +147,35 @@ public:
   /// returns false
   bool is_interactive();
 
+  /// returns true
+  bool should_close();
+
+  /// not used (only used for interactive backends)
+  vfloat2_t begin_frame();
+
+  /// not used (only used for interactive backends)
+  void end_frame();
+
   /// this backend is not interactive so return value is undefined
   vfloat2_t get_mouse_pos();
+
+  /// not used (only used for interactive backends)
+  float get_time();
+
+  /// not used (only used for interactive backends)
+  static void set_mouse_down(const vfloat2_t &mouse_pos);
+
+  /// not used (only used for interactive backends)
+  static void set_mouse_up();
+
+  /// not used (only used for interactive backends)
+  bool mouse_dragging();
+
+  /// not used (only used for interactive backends)
+  vfloat2_t mouse_drag_delta();
+
+  /// not used (only used for interactive backends)
+  void mouse_drag_reset_delta();
 
   /// all subsequent drawing calls will be cut to within this box
   void scissor(const bfloat2_t &x);
@@ -353,6 +380,7 @@ private:
   void end_animate(std::string &animate, const std::string &name);
   void end_animate_stroke();
   void end_animate_fill();
+  void shape_styling();
 };
 
 } // namespace trase

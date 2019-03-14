@@ -106,6 +106,11 @@ template <typename Backend> void Figure::show(Backend &backend) {
   auto name = "Figure " + std::to_string(m_id);
   backend.init(this->m_pixels.bmax, name.c_str());
 
+  if (!backend.is_interactive()) {
+    throw Exception("Figure::show() should only be called with interactive "
+                    "backends. Use Figure::draw() instead");
+  }
+
 // Main loop
 #ifdef __EMSCRIPTEN__
   auto data = std::make_pair(this, &backend);
