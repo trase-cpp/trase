@@ -187,7 +187,8 @@ TEST_CASE("string data conversion", "[data]") {
       CHECK(*i == fourth_col_should_be[ii]);
     }
     ii = 0;
-    for (auto i = data.string_data(2).begin(); i != data.string_data(2).begin();
+    CHECK(data.string_data(2).size() == 3);
+    for (auto i = data.string_data(2).begin(); i != data.string_data(2).end();
          ++i, ++ii) {
       CHECK(*i == fourth_col_sorted[ii]);
     }
