@@ -156,7 +156,10 @@ template <typename T> void RawData::add_row(T new_row_begin, T new_row_end) {
   ++m_rows;
   const size_t oldn = m_matrix.size();
   m_matrix.resize(oldn + n);
-  std::copy(new_row_begin, new_row_end, m_matrix.begin() + oldn);
+  // copy data in (not using std::copy because visual studio complains if T
+  // is not float)
+  std::transform(new_row_begin, new_row_end, m_matrix.begin() + oldn,
+                 [this](auto i) { return static_cast<float>(i); });
 }
 
 template <typename T> void RawData::add_column(const std::vector<T> &new_col) {
@@ -272,7 +275,8 @@ DataWithAesthetic::facet(const std::vector<T> &data) const {
 
 template <typename T1, typename T2>
 std::map<std::pair<T1, T2>, DataWithAesthetic>
-DataWithAesthetic::facet(const std::vector<T1> &data1, const std::vector<T2> &data2) const {
+DataWithAesthetic::facet(const std::vector<T1> &data1,
+                         const std::vector<T2> &data2) const {
   std::map<std::pair<T1, T2>, DataWithAesthetic> faceted_data;
 
   for (auto raw_data : m_data->facet(data1, data2)) {
