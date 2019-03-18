@@ -14,6 +14,7 @@ find_package(CURL)
 if (CURL_FOUND)
   list(APPEND examples
     Points.cpp
+    FacetPoints.cpp
     )
 endif(CURL_FOUND)
 

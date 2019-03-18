@@ -101,7 +101,7 @@ std::shared_ptr<Axis> Figure::update_layout(const vint2_t &new_position) {
 std::shared_ptr<Axis> Figure::axis() { return axis(0, 0); }
 
 std::shared_ptr<Axis> Figure::axis(int i, int j) {
-  auto new_axis = update_layout({i, j});
+  auto new_axis = update_layout({j, i});
   m_children.push_back(new_axis);
   return new_axis;
 }

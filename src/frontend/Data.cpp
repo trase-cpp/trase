@@ -35,8 +35,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace trase {
 
-template <> float RawData::cast_to_float<std::string>(const std::string &arg) {
-  return std::stof(arg);
+template <>
+float cast_to_float<std::string>(const std::string &arg,
+                                 const std::set<std::string> &string_data) {
+  // if string_data is empty, then assume the string can be converted to a float
+  if (string_data.empty()) {
+    return std::stof(arg);
+  } else {
+    return static_cast<float>(
+        std::distance(string_data.begin(), string_data.find(arg)));
+  }
 }
 
 ColumnIterator RawData::begin(const int i) const {
@@ -51,6 +59,10 @@ ColumnIterator RawData::end(const int i) const {
     throw std::out_of_range("column does not exist");
   }
   return {m_matrix.cend() + i, m_cols};
+}
+
+const std::set<std::string> &RawData::string_data(int i) const {
+  return m_string_data[i];
 }
 
 int DataWithAesthetic::rows() const { return m_data->rows(); }
