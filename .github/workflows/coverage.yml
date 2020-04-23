@@ -18,6 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: install dependencies
+        run: sudo apt install lcov
+
       - name: make build directory
         run: mkdir build_dir
 
