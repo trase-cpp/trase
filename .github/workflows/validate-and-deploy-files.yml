@@ -35,6 +35,7 @@ jobs:
 
       - name: validate svg
         run: |
+          pip3 install --upgrade pip setuptools wheel
           pip3 install html5validator
           html5validator --root . --match "*.svg" --also-check-svg
         working-directory: build_dir
