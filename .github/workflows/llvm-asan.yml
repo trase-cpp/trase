@@ -1,4 +1,4 @@
-name: coverage
+name: llvm asan
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
 jobs:
 
   build-and-test:
-    name: coverage
+    name: llvm asan
     runs-on: ubuntu-latest
 
     steps:
@@ -22,8 +22,11 @@ jobs:
         run: mkdir build_dir
 
       - name: cmake configure
-        run: cmake .. -DCMAKE_BUILD_TYPE=Debug -Dtrase_BUILD_OPENGL:BOOL=FALSE -Dtrase_ENABLE_COVERAGE:BOOL=TRUE
+        run: cmake .. -DCMAKE_BUILD_TYPE=Debug -Dtrase_BUILD_OPENGL:BOOL=FALSE -Dtrase_MEMCHECK:BOOL=TRUE
         working-directory: build_dir
+        env:
+          CC: clang-9
+          CXX: clang++-9
 
       - name: cmake build
         run: cmake --build . --parallel 2
@@ -31,12 +34,4 @@ jobs:
 
       - name: cmake test
         run: ctest -j2 --output-on-failure
-        working-directory: build_dir
-
-      - name: upload coverage results
-        run: |
-          lcov --directory . --capture --output-file coverage.info
-          lcov --remove coverage.info '/usr/*' '*/tests/*' --output-file coverage.info
-          lcov --list coverage.info
-          bash <(curl https://codecov.io/bash) -f coverage.info -t 3e6f4afd-ffb4-4b78-8dff-9b62b545cffd
         working-directory: build_dir
