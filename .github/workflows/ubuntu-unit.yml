@@ -12,29 +12,23 @@ on:
 jobs:
 
   build-and-test:
-    name: Ubuntu unit ${{matrix.compiler}}
+    name: Ubuntu unit ${{matrix.CC}}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: [gcc-7, gcc-8, gcc-9, clang-6, clang-8, clang-9]
+#        compiler: [gcc-7, gcc-8, gcc-9, clang-6, clang-8, clang-9]
         include:
-          - compiler: gcc-7
-            CC: gcc-7
+          - CC: gcc-7
             CXX: g++-7
-          - compiler: gcc-8
-            CC: gcc-8
+          - CC: gcc-8
             CXX: g++-8
-          - compiler: gcc-9
-            CC: gcc-9
+          - CC: gcc-9
             CXX: g++-9
-          - compiler: clang-6
-            CC: clang-6
+          - CC: clang-6
             CXX: clang++-6
-          - compiler: clang-8
-            CC: clang-8
+          - CC: clang-8
             CXX: clang++-8
-          - compiler: clang-9
-            CC: clang-9
+          - CC: clang-9
             CXX: clang++-9
 
     steps:
