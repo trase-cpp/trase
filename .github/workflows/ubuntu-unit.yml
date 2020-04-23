@@ -15,6 +15,7 @@ jobs:
     name: Ubuntu unit ${{matrix.CC}}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - CC: gcc-7
@@ -23,8 +24,8 @@ jobs:
             CXX: g++-8
           - CC: gcc-9
             CXX: g++-9
-          - CC: clang-6
-            CXX: clang++-6
+          - CC: clang-6.0
+            CXX: clang++-6.0
           - CC: clang-8
             CXX: clang++-8
           - CC: clang-9
