@@ -152,7 +152,7 @@ template <typename T> void RawData::add_row(T new_row_begin, T new_row_end) {
   if (m_rows > 0 && static_cast<int>(n) != m_cols) {
     throw Exception("rows in dataset must have identical number of columns");
   }
-  m_cols = n;
+  m_cols = static_cast<int>(n);
   ++m_rows;
   const size_t oldn = m_matrix.size();
   m_matrix.resize(oldn + n);
@@ -203,7 +203,7 @@ RawData::facet(const std::vector<T> &data) const {
 
   std::map<T, std::shared_ptr<RawData>> fdata;
 
-  std::vector<std::size_t> row_indices(rows());
+  std::vector<std::size_t> row_indices(static_cast<size_t>(rows()));
   std::iota(row_indices.begin(), row_indices.end(), 0);
   std::stable_sort(
       row_indices.begin(), row_indices.end(),
@@ -215,7 +215,8 @@ RawData::facet(const std::vector<T> &data) const {
       ++j;
     }
 
-    std::vector<float> tmp(j - i);
+    const auto ji_diff = static_cast<size_t>(j - i);
+    std::vector<float> tmp(ji_diff);
     auto &facet = fdata[data[*i]];
     facet = std::make_shared<RawData>();
     for (int k = 0; k < cols(); ++k) {
@@ -250,9 +251,9 @@ RawData::facet(const std::vector<T1> &data1,
     if (!facet) {
       facet = std::make_shared<RawData>();
     }
-    std::vector<float> row(cols());
+    std::vector<float> row(static_cast<size_t>(cols()));
     for (int k = 0; k < cols(); ++k) {
-      row[k] = begin(k)[i];
+      row[static_cast<size_t>(k)] = begin(k)[i];
     }
     facet->add_row(row);
   }
