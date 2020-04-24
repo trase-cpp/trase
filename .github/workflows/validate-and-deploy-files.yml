@@ -50,7 +50,7 @@ jobs:
           cd generated_files
           git add examples/*.svg tests/*.svg
           git -c user.name='github-action' -c user.email='github-action' commit -a -m "updated generated files"
-          git push -q https://martinjrobins:$GITHUB_API_KEY@github.com/trase-cpp/generated_files master &>/dev/null
+          git push -q https://martinjrobins:$DEPLOY_ACCESS_TOKEN@github.com/trase-cpp/generated_files master &>/dev/null
         working-directory: build_dir
         env:
-          GITHUB_API_KEY: ${{ secrets.GITHUB_API_KEY }}
+          DEPLOY_ACCESS_TOKEN: ${{ secrets.DEPLOY_ACCESS_TOKEN }}
