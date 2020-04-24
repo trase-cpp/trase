@@ -175,8 +175,9 @@ TEST_CASE("rectangle fill frames exception", "[rectangle]") {
   auto rect = ax->rectangle(
       create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).fill(c));
   rect->add_frame(create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax), 1);
-  REQUIRE_THROWS_WITH(DummyDraw::draw("rect_fill_exception", fig),
-                      Catch::Contains("fill"));
+  REQUIRE_THROWS_WITH(
+      DummyDraw::draw("rect_fill_exception_trase_invalid_svg", fig),
+      Catch::Contains("fill"));
 }
 
 TEST_CASE("rectangle color frames exception", "[rectangle]") {
@@ -190,8 +191,9 @@ TEST_CASE("rectangle color frames exception", "[rectangle]") {
   auto rect = ax->rectangle(
       create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c));
   rect->add_frame(create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax), 1);
-  REQUIRE_THROWS_WITH(DummyDraw::draw("rect_color_exception", fig),
-                      Catch::Contains("color"));
+  REQUIRE_THROWS_WITH(
+      DummyDraw::draw("rect_color_exception_trase_invalid_svg", fig),
+      Catch::Contains("color"));
 }
 
 TEST_CASE("rectangle number frames exception", "[rectangle]") {
@@ -211,6 +213,7 @@ TEST_CASE("rectangle number frames exception", "[rectangle]") {
   c.push_back(0);
   rect->add_frame(
       create_data().xmin(xmin).ymin(ymin).xmax(xmax).ymax(ymax).color(c), 1);
-  REQUIRE_THROWS_WITH(DummyDraw::draw("rect_number_exception", fig),
-                      Catch::Contains("number"));
+  REQUIRE_THROWS_WITH(
+      DummyDraw::draw("rect_number_exception_trase_invalid_svg", fig),
+      Catch::Contains("number"));
 }

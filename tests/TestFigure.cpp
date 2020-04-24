@@ -52,7 +52,7 @@ TEST_CASE("check figure can be created", "[figure]") {
 TEST_CASE("check show throws", "[figure]") {
   auto fig = figure();
   std::ofstream out;
-  out.open("test.svg");
+  out.open("test_show_exception_trase_invalid_svg.svg");
   BackendSVG backend(out);
   REQUIRE_THROWS_WITH(fig->show(backend), Catch::Contains("Figure::show()"));
 }

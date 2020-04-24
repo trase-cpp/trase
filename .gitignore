@@ -42,3 +42,6 @@ cmake-build*
 # Build directories
 Debug
 Release
+
+# Python virtual environments
+venv
