@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _CSVDownloader_H_
 
 #include <map>
+#include <string>
 #include <vector>
 
 namespace trase {

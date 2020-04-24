@@ -134,7 +134,7 @@ template <typename T> void RawData::add_column(T new_col_begin, T new_col_end) {
     m_matrix.swap(m_tmp);
   } else {
     // first column for matrix, set num rows and cols to match it
-    m_rows = n;
+    m_rows = static_cast<int>(n);
     m_matrix.resize(m_rows);
 
     // copy data in (not using std::copy because visual studio complains if T
