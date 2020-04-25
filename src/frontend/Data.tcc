@@ -203,7 +203,7 @@ RawData::facet(const std::vector<T> &data) const {
 
   std::map<T, std::shared_ptr<RawData>> fdata;
 
-  std::vector<std::size_t> row_indices(static_cast<size_t>(rows()));
+  std::vector<std::size_t> row_indices(rows());
   std::iota(row_indices.begin(), row_indices.end(), 0);
   std::stable_sort(
       row_indices.begin(), row_indices.end(),
@@ -220,8 +220,9 @@ RawData::facet(const std::vector<T> &data) const {
     auto &facet = fdata[data[*i]];
     facet = std::make_shared<RawData>();
     for (int k = 0; k < cols(); ++k) {
-      std::transform(i, j, tmp.begin(),
-                     [row = begin(k)](std::size_t i) { return row[i]; });
+      std::transform(i, j, tmp.begin(), [row = begin(k)](size_t i) {
+        return row[static_cast<int>(i)];
+      });
       facet->add_column(tmp);
     }
   }
@@ -251,9 +252,9 @@ RawData::facet(const std::vector<T1> &data1,
     if (!facet) {
       facet = std::make_shared<RawData>();
     }
-    std::vector<float> row(static_cast<size_t>(cols()));
+    std::vector<float> row(cols());
     for (int k = 0; k < cols(); ++k) {
-      row[static_cast<size_t>(k)] = begin(k)[i];
+      row[k] = begin(k)[static_cast<int>(i)];
     }
     facet->add_row(row);
   }
