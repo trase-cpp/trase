@@ -1,0 +1,39 @@
+name: llvm asan
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+
+  build-and-test:
+    name: llvm asan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install dependencies
+        run: sudo apt install libcurl4-openssl-dev
+
+      - name: make build directory
+        run: mkdir build_dir
+
+      - name: cmake configure
+        run: cmake .. -DCMAKE_BUILD_TYPE=Debug -Dtrase_BUILD_OPENGL:BOOL=FALSE -Dtrase_MEMCHECK:BOOL=TRUE
+        working-directory: build_dir
+        env:
+          CC: clang-9
+          CXX: clang++-9
+
+      - name: cmake build
+        run: cmake --build . --parallel 2
+        working-directory: build_dir
+
+      - name: cmake test
+        run: ctest -j2 --output-on-failure
+        working-directory: build_dir

@@ -120,8 +120,9 @@ TEST_CASE("points color frames exception", "[points]") {
   auto pts = ax->points(create_data().x(x).y(y).size(r).color(c));
   pts->add_frame(create_data().x(x).y(y).size(r), 1);
 
-  REQUIRE_THROWS_WITH(DummyDraw::draw("points_color_exception", fig),
-                      Catch::Contains("color"));
+  REQUIRE_THROWS_WITH(
+      DummyDraw::draw("points_color_exception_trase_invalid_svg", fig),
+      Catch::Contains("color"));
 }
 
 TEST_CASE("points size frames exception", "[points]") {
@@ -134,8 +135,9 @@ TEST_CASE("points size frames exception", "[points]") {
   auto pts = ax->points(create_data().x(x).y(y).size(r).color(c));
   pts->add_frame(create_data().x(x).y(y).color(c), 1);
 
-  REQUIRE_THROWS_WITH(DummyDraw::draw("points_size_exception", fig),
-                      Catch::Contains("size"));
+  REQUIRE_THROWS_WITH(
+      DummyDraw::draw("points_size_exception_trase_invalid_svg", fig),
+      Catch::Contains("size"));
 }
 
 TEST_CASE("points number frames exception", "[points]") {
@@ -151,6 +153,7 @@ TEST_CASE("points number frames exception", "[points]") {
   r.push_back(0.f);
   c.push_back(0.f);
   pts->add_frame(create_data().x(x).y(y).size(r).color(c), 1);
-  REQUIRE_THROWS_WITH(DummyDraw::draw("points_number_exception", fig),
-                      Catch::Contains("number"));
+  REQUIRE_THROWS_WITH(
+      DummyDraw::draw("points_number_exception_trase_invalid_svg", fig),
+      Catch::Contains("number"));
 }

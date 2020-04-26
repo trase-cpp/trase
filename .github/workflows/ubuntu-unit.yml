@@ -1,0 +1,55 @@
+name: Ubuntu unit
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+
+  build-and-test:
+    name: Ubuntu unit ${{matrix.CC}}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - CC: gcc-7
+            CXX: g++-7
+          - CC: gcc-8
+            CXX: g++-8
+          - CC: gcc-9
+            CXX: g++-9
+          - CC: clang-6.0
+            CXX: clang++-6.0
+          - CC: clang-8
+            CXX: clang++-8
+          - CC: clang-9
+            CXX: clang++-9
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install dependencies
+        run: sudo apt install libcurl4-openssl-dev
+
+      - name: make build directory
+        run: mkdir build_dir
+
+      - name: cmake configure
+        run: cmake .. -DCMAKE_BUILD_TYPE=Debug -Dtrase_BUILD_OPENGL:BOOL=FALSE
+        working-directory: build_dir
+        env:
+          CC: ${{matrix.CC}}
+          CXX: ${{matrix.CXX}}
+
+      - name: cmake build
+        run: cmake --build . --parallel 2
+        working-directory: build_dir
+
+      - name: cmake test
+        run: ctest -j2 --output-on-failure
+        working-directory: build_dir

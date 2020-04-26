@@ -1,11 +1,11 @@
 # trase
 
+[![Ubuntu unit](https://github.com/trase-cpp/trase/workflows/Ubuntu%20unit/badge.svg)](https://github.com/trase-cpp/trase/actions)
+[![macOS unit](https://github.com/trase-cpp/trase/workflows/macOS%20unit/badge.svg)](https://github.com/trase-cpp/trase/actions)
+[![Windows unit](https://github.com/trase-cpp/trase/workflows/Windows%20unit/badge.svg)](https://github.com/trase-cpp/trase/actions)
+
 [![codecov](https://codecov.io/gh/trase-cpp/trase/branch/master/graph/badge.svg)](https://codecov.io/gh/trase-cpp/trase)
-[![Build
-Status](https://travis-ci.org/trase-cpp/trase.svg?branch=master)](https://travis-ci.org/trase-cpp/trase)
-[![Build status](https://ci.appveyor.com/api/projects/status/ienda6x8aisuq4re/branch/master?svg=true)](https://ci.appveyor.com/project/martinjrobins/trase-ra1n2/branch/master)
-[![BCH 
-compliance](https://bettercodehub.com/edge/badge/trase-cpp/trase?branch=master)](https://bettercodehub.com/)
+[![BCH compliance](https://bettercodehub.com/edge/badge/trase-cpp/trase?branch=master)](https://bettercodehub.com/)
 [![codedocs.xyz](https://codedocs.xyz/trase-cpp/trase.svg)](https://codedocs.xyz/trase-cpp/trase/)
 
 Trase is a lightweight scientific plotting library for C++ with animation 

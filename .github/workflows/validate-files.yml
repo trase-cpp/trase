@@ -1,0 +1,43 @@
+name: validate svg files
+
+on:
+  push:
+    branches-ignore:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+
+  build-and-test:
+    name: validate svg files
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install dependencies
+        run: sudo apt install libcurl4-openssl-dev
+
+      - name: make build directory
+        run: mkdir build_dir
+
+      - name: cmake configure
+        run: cmake .. -DCMAKE_BUILD_TYPE=Debug -Dtrase_BUILD_OPENGL:BOOL=FALSE
+        working-directory: build_dir
+
+      - name: cmake build
+        run: cmake --build . --parallel 2
+        working-directory: build_dir
+
+      - name: cmake test
+        run: ctest -j2 --output-on-failure
+        working-directory: build_dir
+
+      - name: validate svg
+        run: |
+          pip3 install --upgrade pip setuptools wheel
+          pip3 install html5validator
+          /home/runner/.local/bin/html5validator --root . --match "*.svg" --also-check-svg --ignore "exception_trase_invalid_svg"
+        working-directory: build_dir

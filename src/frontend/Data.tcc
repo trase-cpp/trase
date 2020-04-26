@@ -134,7 +134,7 @@ template <typename T> void RawData::add_column(T new_col_begin, T new_col_end) {
     m_matrix.swap(m_tmp);
   } else {
     // first column for matrix, set num rows and cols to match it
-    m_rows = n;
+    m_rows = static_cast<int>(n);
     m_matrix.resize(m_rows);
 
     // copy data in (not using std::copy because visual studio complains if T
@@ -152,7 +152,7 @@ template <typename T> void RawData::add_row(T new_row_begin, T new_row_end) {
   if (m_rows > 0 && static_cast<int>(n) != m_cols) {
     throw Exception("rows in dataset must have identical number of columns");
   }
-  m_cols = n;
+  m_cols = static_cast<int>(n);
   ++m_rows;
   const size_t oldn = m_matrix.size();
   m_matrix.resize(oldn + n);
@@ -215,12 +215,14 @@ RawData::facet(const std::vector<T> &data) const {
       ++j;
     }
 
-    std::vector<float> tmp(j - i);
+    const auto ji_diff = static_cast<size_t>(j - i);
+    std::vector<float> tmp(ji_diff);
     auto &facet = fdata[data[*i]];
     facet = std::make_shared<RawData>();
     for (int k = 0; k < cols(); ++k) {
-      std::transform(i, j, tmp.begin(),
-                     [row = begin(k)](std::size_t i) { return row[i]; });
+      std::transform(i, j, tmp.begin(), [row = begin(k)](size_t i) {
+        return row[static_cast<int>(i)];
+      });
       facet->add_column(tmp);
     }
   }
@@ -252,7 +254,7 @@ RawData::facet(const std::vector<T1> &data1,
     }
     std::vector<float> row(cols());
     for (int k = 0; k < cols(); ++k) {
-      row[k] = begin(k)[i];
+      row[k] = begin(k)[static_cast<int>(i)];
     }
     facet->add_row(row);
   }
