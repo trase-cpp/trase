@@ -136,6 +136,9 @@ set (trase_headers
     src/util/Style.hpp
     src/util/Vector.hpp
     src/util/CSVDownloader.hpp
+    src/fmt/core.h
+    src/fmt/format.h
+    src/fmt/format-inl.h
     )
 
 
@@ -152,6 +155,7 @@ set (trase_source
     src/util/Colors.cpp
     src/util/Style.cpp
     src/util/CSVDownloader.cpp
+    src/fmt/format.cc
     )
 
 if (trase_BUILD_OPENGL)
