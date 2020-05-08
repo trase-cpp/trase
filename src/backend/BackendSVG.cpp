@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "backend/BackendSVG.hpp"
 
+#include "fmt/format.h"
+
 namespace trase {
 
 BackendSVG::BackendSVG(std::ostream &out) : m_out(out) {
@@ -54,14 +56,16 @@ void BackendSVG::init(const vfloat2_t &pixels, const char *name,
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 )del";
 
-  m_out << "<svg width=\"" << pixels[0] << "px\" height=\"" << pixels[1]
-        << "px\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n";
+  m_out << fmt::format(
+      R"(<svg width="{}px" height="{}px" version="1.1" xmlns="http://www.w3.org/2000/svg">)",
+      pixels[0], pixels[1]) << '\n';
 
-  m_out << "<desc>" << name << "</desc>\n";
+  m_out << fmt::format("<desc>{}</desc>\n", name);
 
   if (!m_web_font.empty()) {
-    m_out << "<style type=\"text/css\">@import url('" + m_web_font +
-                 "');</style>\n";
+
+    m_out << fmt::format(R"(<style type="text/css">@import url('{}');</style>)",
+                         m_web_font);
   }
   m_out << R"del(<script>
 function tooltip(x,y,string,size,face) {
