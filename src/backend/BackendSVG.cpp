@@ -385,7 +385,7 @@ void BackendSVG::add_animated_rect(const bfloat2_t &x, float time) {
     if (m_animate_values.size() < 4) {
       m_animate_values.resize(4);
     }
-    m_animate_times = "keyTimes=\"" + std::to_string(time / m_time_span) + ';';
+    m_animate_times = fmt::format(R"(keyTimes="{:.3f};)", time / m_time_span);
     m_animate_values[0] = "values=\"" + std::to_string(min[0]) + ';';
     m_animate_values[1] = "values=\"" + std::to_string(min[1]) + ';';
     m_animate_values[2] = "values=\"" + std::to_string(delta[0]) + ';';
