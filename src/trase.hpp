@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "frontend/Figure.hpp"
+#ifdef TRASE_HAVE_CURL
 #include "util/CSVDownloader.hpp"
+#endif
 
 #endif // TRASE_H_

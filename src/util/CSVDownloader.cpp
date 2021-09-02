@@ -34,10 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CSVDownloader.hpp"
 #include "util/Exception.hpp"
 
-#ifdef TRASE_HAVE_CURL
 #include <curl/curl.h>
 #include <curl/easy.h>
-#endif
 
 #include <algorithm>
 #include <iostream>
@@ -63,15 +61,11 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
 }
 
 CSVDownloader::CSVDownloader() : m_delim(',') {
-#ifdef TRASE_HAVE_CURL
   m_curl = curl_easy_init();
-#endif
 }
 
 CSVDownloader::~CSVDownloader() {
-#ifdef TRASE_HAVE_CURL
   curl_easy_cleanup(m_curl);
-#endif
 }
 
 CSVDownloader::data_t
@@ -117,7 +111,6 @@ CSVDownloader::parse_csv(std::stringstream &out,
 CSVDownloader::data_t
 CSVDownloader::download(const std::string &url,
                         const std::vector<std::string> &labels) {
-#ifdef TRASE_HAVE_CURL
   // use curl to read url to a stringstream
   curl_easy_setopt(m_curl, CURLOPT_URL, url.c_str());
   /* Do not check certificate*/
@@ -139,10 +132,6 @@ CSVDownloader::download(const std::string &url,
   }
 
   return parse_csv(out, labels);
-#else
-  throw Exception("TRASE_HAVE_CURL not defined: libcurl not found");
-  return CSVDownloader::data_t();
-#endif
 }
 
 } // namespace trase
