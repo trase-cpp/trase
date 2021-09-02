@@ -216,6 +216,10 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     option (trase_BUILD_TESTS "Compiling trase with tests" ON)
     option (trase_BUILD_EXAMPLES "Compiling trase with examples" ON)
     option (trase_INSTALL "Install trase after compiling the library" ON)
+    
+    option (trase_USE_CLANG_TIDY "Use clang tidy for static analysis" OFF)
+    option (trase_MEMCHECK "Use LLVM AddressSanitizer to detecting memory errors" OFF)
+    option (trase_ENABLE_COVERAGE "Enable coverage reporting for GCC or Clang" OFF)
 endif ()
 
 if (trase_BUILD_TESTS)
@@ -229,7 +233,6 @@ endif (trase_BUILD_EXAMPLES)
 
 
 # Clang tidy as optional static analyzer
-option (trase_USE_CLANG_TIDY "Use clang tidy for static analysis" OFF)
 if (trase_USE_CLANG_TIDY)
     find_program (CLANG_TIDY_EXE NAMES "clang-tidy" "clang-tidy-6.0" "clang-tidy-5.0" "clang-tidy-4.0"
         DOC "Path to clang-tidy executable")
@@ -244,7 +247,6 @@ endif ()
 # LLVM AddressSanitizer to detecting memory errors
 # Note that there are many other sanitizers in LLVM to help detect errors, see
 # http://travistoptips.blogspot.co.uk/2015/11/sanitize-all-things.html
-option (trase_MEMCHECK "Use LLVM AddressSanitizer to detecting memory errors" OFF)
 if (trase_MEMCHECK)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         message (STATUS "Configuring with LLVM AddressSanitizer")
@@ -260,7 +262,6 @@ if (trase_MEMCHECK)
 endif ()
 
 # Setup coverage testing for GCC or Clang
-option (trase_ENABLE_COVERAGE "Enable coverage reporting for GCC or Clang" FALSE)
 if (trase_ENABLE_COVERAGE)
     if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
         message (STATUS "Configuring with coverage")
