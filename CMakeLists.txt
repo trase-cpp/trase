@@ -67,6 +67,14 @@ endif ()
 
 option (trase_BUILD_OPENGL "Build OpenGL backend and interactive test" ON)
 
+if (NOT trase_Emscripten)
+    find_package (glfw3 3.2 QUIET)
+    if (NOT glfw3_FOUND AND trase_BUILD_OPENGL)
+        set(trase_BUILD_OPENGL OFF CACHE BOOL INTERNAL FORCE)
+        message("The glfw not found, the option trase_BUILD_OPENGL turned off")
+    endif ()
+endif ()
+
 if (trase_BUILD_OPENGL)
 
     set (nanovg_dir third-party/nanovg)
@@ -85,7 +93,6 @@ if (trase_BUILD_OPENGL)
         )
 
     if (NOT trase_Emscripten)
-        find_package (glfw3 3.2 REQUIRED)
         find_package (OpenGL REQUIRED)
     else()
         set(CMAKE_EXECUTABLE_SUFFIX ".html")
@@ -100,6 +107,8 @@ if (trase_BUILD_OPENGL)
         $<INSTALL_INTERFACE:include>)
     target_link_libraries (nanovg PUBLIC ${OPENGL_gl_LIBRARY} glfw dl)
 endif (trase_BUILD_OPENGL)
+
+find_package(CURL)
 
 if (WIN32)
     set (dirent_dir third-party/dirent)
@@ -135,7 +144,6 @@ set (trase_headers
     src/util/Exception.hpp
     src/util/Style.hpp
     src/util/Vector.hpp
-    src/util/CSVDownloader.hpp
     )
 
 
@@ -151,13 +159,17 @@ set (trase_source
     src/frontend/Transform.cpp
     src/util/Colors.cpp
     src/util/Style.cpp
-    src/util/CSVDownloader.cpp
     )
 
 if (trase_BUILD_OPENGL)
     list(APPEND trase_headers src/backend/BackendGL.hpp)
     list(APPEND trase_source src/backend/BackendGL.cpp)
 endif()
+
+if (CURL_FOUND)
+    list(APPEND trase_headers src/util/CSVDownloader.hpp)
+    list(APPEND trase_source src/util/CSVDownloader.cpp)
+endif (CURL_FOUND)
 
 
 add_library (trase
@@ -183,12 +195,11 @@ if (trase_BUILD_OPENGL)
 endif ()
 
 
-find_package(CURL)
 if (CURL_FOUND)
-  target_compile_definitions (trase PUBLIC TRASE_HAVE_CURL)
-  target_link_libraries (trase PUBLIC ${CURL_LIBRARIES})
-  message(${CURL_INCLUDE_DIRS})
-  target_include_directories(trase PUBLIC ${CURL_INCLUDE_DIRS})
+    target_compile_definitions (trase PUBLIC TRASE_HAVE_CURL)
+    target_link_libraries (trase PUBLIC ${CURL_LIBRARIES})
+    message("The CURL path: " ${CURL_INCLUDE_DIRS})
+    target_include_directories(trase PUBLIC ${CURL_INCLUDE_DIRS})
 endif (CURL_FOUND)
 
 
@@ -201,13 +212,27 @@ set (trase_fonts
     )
 
 
-enable_testing ()
-add_subdirectory(tests)
-add_subdirectory(examples)
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    option (trase_BUILD_TESTS "Compiling trase with tests" ON)
+    option (trase_BUILD_EXAMPLES "Compiling trase with examples" ON)
+    option (trase_INSTALL "Install trase after compiling the library" ON)
+    
+    option (trase_USE_CLANG_TIDY "Use clang tidy for static analysis" OFF)
+    option (trase_MEMCHECK "Use LLVM AddressSanitizer to detecting memory errors" OFF)
+    option (trase_ENABLE_COVERAGE "Enable coverage reporting for GCC or Clang" OFF)
+endif ()
+
+if (trase_BUILD_TESTS)
+    enable_testing ()
+    add_subdirectory(tests)
+endif (trase_BUILD_TESTS)
+
+if (trase_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif (trase_BUILD_EXAMPLES)
 
 
 # Clang tidy as optional static analyzer
-option (trase_USE_CLANG_TIDY "Use clang tidy for static analysis" OFF)
 if (trase_USE_CLANG_TIDY)
     find_program (CLANG_TIDY_EXE NAMES "clang-tidy" "clang-tidy-6.0" "clang-tidy-5.0" "clang-tidy-4.0"
         DOC "Path to clang-tidy executable")
@@ -222,7 +247,6 @@ endif ()
 # LLVM AddressSanitizer to detecting memory errors
 # Note that there are many other sanitizers in LLVM to help detect errors, see
 # http://travistoptips.blogspot.co.uk/2015/11/sanitize-all-things.html
-option (trase_MEMCHECK "Use LLVM AddressSanitizer to detecting memory errors" OFF)
 if (trase_MEMCHECK)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         message (STATUS "Configuring with LLVM AddressSanitizer")
@@ -238,7 +262,6 @@ if (trase_MEMCHECK)
 endif ()
 
 # Setup coverage testing for GCC or Clang
-option (trase_ENABLE_COVERAGE "Enable coverage reporting for GCC or Clang" FALSE)
 if (trase_ENABLE_COVERAGE)
     if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
         message (STATUS "Configuring with coverage")
@@ -249,32 +272,35 @@ if (trase_ENABLE_COVERAGE)
     endif ()
 endif ()
 
+
 # install stuff
-set (install-targets trase)
-if (WIN32)
-    list (APPEND install-targets dirent)
-endif ()
-if (trase_BUILD_OPENGL)
-    list (APPEND install-targets nanovg)
-endif ()
-
-set (install-headers ${trase_headers} ${trase_svg_headers})
-if (trase_BUILD_OPENGL)
-    list (APPEND install-headers ${trase_gl_headers} ${trase_gl_ext_headers})
-endif ()
-
-
-install (TARGETS ${install-targets}
-    EXPORT trase-targets
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-    )
-
-install (EXPORT trase-targets
-    FILE trase-config.cmake
-    DESTINATION lib/cmake/trase
-    )
-
-install (FILES ${install-headers} DESTINATION include)
-install (FILES ${trase_fonts} DESTINATION font)
+if (trase_INSTALL)
+    set (install-targets trase)
+    if (WIN32)
+        list (APPEND install-targets dirent)
+    endif ()
+    if (trase_BUILD_OPENGL)
+        list (APPEND install-targets nanovg)
+    endif ()
+    
+    set (install-headers ${trase_headers} ${trase_svg_headers})
+    if (trase_BUILD_OPENGL)
+        list (APPEND install-headers ${trase_gl_headers} ${trase_gl_ext_headers})
+    endif ()
+    
+    
+    install (TARGETS ${install-targets}
+        EXPORT trase-targets
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+        )
+    
+    install (EXPORT trase-targets
+        FILE trase-config.cmake
+        DESTINATION lib/cmake/trase
+        )
+    
+    install (FILES ${install-headers} DESTINATION include)
+    install (FILES ${trase_fonts} DESTINATION font)
+endif (trase_INSTALL)

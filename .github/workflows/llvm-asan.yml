@@ -20,6 +20,9 @@ jobs:
       - name: install dependencies
         run: sudo apt install libcurl4-openssl-dev
 
+      - name: install compiler
+        run: sudo apt install clang-9
+
       - name: make build directory
         run: mkdir build_dir
 
