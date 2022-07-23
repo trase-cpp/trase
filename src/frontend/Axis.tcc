@@ -108,7 +108,6 @@ template <typename Backend> void Axis::draw_common_ticks(Backend &backend) {
     backend.move_to(vfloat2_t(m_pixels.bmin[0] - m_tick_len / 2, pos));
     backend.line_to(vfloat2_t(m_pixels.bmin[0], pos));
     std::snprintf(buffer, sizeof(buffer), "%.*g", m_sig_digits + 1, val);
-    std::cout << "buffer: " << buffer << ", size of buffer = " << strlen(buffer) << std::endl;
     
     if (strlen(buffer) > max_char_len) {
       max_char_len = strlen(buffer);
