@@ -99,16 +99,16 @@ template <typename Backend> void Axis::draw_common_ticks(Backend &backend) {
   backend.text_align(ALIGN_RIGHT | ALIGN_MIDDLE);
 
   size_t max_char_len = 0;
-
   // y ticks
   for (std::size_t i = 0; i < m_tick_info.y_pos.size(); ++i) {
+
     const float pos = m_tick_info.y_pos[i];
     const float val = m_tick_info.y_val[i];
 
     backend.move_to(vfloat2_t(m_pixels.bmin[0] - m_tick_len / 2, pos));
     backend.line_to(vfloat2_t(m_pixels.bmin[0], pos));
     std::snprintf(buffer, sizeof(buffer), "%.*g", m_sig_digits + 1, val);
-    
+
     if (strlen(buffer) > max_char_len) {
       max_char_len = strlen(buffer);
     }
@@ -117,8 +117,9 @@ template <typename Backend> void Axis::draw_common_ticks(Backend &backend) {
                  NULL);
   }
 
-  /// TODO: Convertion from length * font_size to pixels
-  m_max_ytick_len = max_char_len * m_style.font_size() / 96.0 * 72.0;
+  /// Convertion from length * font_size to pixels
+  /// The scale factor, i.e., 1.25, is for Roboto font (https://bugbox.clickteam.com/threads/82514-Useful-Roboto-Font-Size-Pixel-Heights!)
+  m_max_ytick_len = int(max_char_len * m_style.font_size() / 1.25);
 
   backend.stroke_color(RGBA(0, 0, 0, 255));
   backend.stroke_width(m_style.line_width() / 2);

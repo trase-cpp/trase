@@ -222,6 +222,9 @@ public:
   /// gets the number of ticks on this axis
   Vector<int, 2> get_ticks() const { return {m_nx_ticks, m_ny_ticks}; }
 
+  /// get the number of maximum yticks length (in pixels)
+  int max_ytick_len() const { return m_max_ytick_len; }
+
 private:
   /// Create a new Geometry on this axis and return a shared pointer to it.
   ///
