@@ -25,6 +25,7 @@ add_executable (
     TestVector.cpp
     TestLegend.cpp
 )
+
 if (CURL_FOUND)
     target_sources(trase_test PRIVATE TestCSVDownloader.cpp)
 endif (CURL_FOUND)
@@ -33,4 +34,8 @@ target_include_directories (trase_test PRIVATE tests)
 target_link_libraries (trase_test PRIVATE trase)
 add_test (the_trase_test trase_test)
 
+add_executable(test_trase_ylabel
+    TestYlabel.cpp
+)
 
+target_link_libraries(test_trase_ylabel PRIVATE trase)

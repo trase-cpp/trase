@@ -95,6 +95,9 @@ class Axis : public Drawable {
   /// the number of ticks displayed on the y axis
   int m_ny_ticks;
 
+  /// the length of maximum yticks length (in pixels)
+  int m_max_ytick_len;
+
   /// the length (in pixels) of each tick
   float m_tick_len;
 

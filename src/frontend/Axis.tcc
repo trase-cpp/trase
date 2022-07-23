@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "frontend/Axis.hpp"
 #include "frontend/Geometry.hpp"
 #include "frontend/Line.hpp"
+#include <iostream>
+#include <cstring>
 
 namespace trase {
 
@@ -96,6 +98,8 @@ template <typename Backend> void Axis::draw_common_ticks(Backend &backend) {
 
   backend.text_align(ALIGN_RIGHT | ALIGN_MIDDLE);
 
+  size_t max_char_len = 0;
+
   // y ticks
   for (std::size_t i = 0; i < m_tick_info.y_pos.size(); ++i) {
     const float pos = m_tick_info.y_pos[i];
@@ -104,9 +108,18 @@ template <typename Backend> void Axis::draw_common_ticks(Backend &backend) {
     backend.move_to(vfloat2_t(m_pixels.bmin[0] - m_tick_len / 2, pos));
     backend.line_to(vfloat2_t(m_pixels.bmin[0], pos));
     std::snprintf(buffer, sizeof(buffer), "%.*g", m_sig_digits + 1, val);
+    std::cout << "buffer: " << buffer << ", size of buffer = " << strlen(buffer) << std::endl;
+    
+    if (strlen(buffer) > max_char_len) {
+      max_char_len = strlen(buffer);
+    }
+
     backend.text(vfloat2_t(m_pixels.bmin[0] - m_tick_len / 2, pos), buffer,
                  NULL);
   }
+
+  /// TODO: Convertion from length * font_size to pixels
+  m_max_ytick_len = max_char_len * m_style.font_size() / 96.0 * 72.0;
 
   backend.stroke_color(RGBA(0, 0, 0, 255));
   backend.stroke_width(m_style.line_width() / 2);
@@ -167,8 +180,7 @@ template <typename Backend> void Axis::draw_common_ylabel(Backend &backend) {
   }
 
   backend.text_align(ALIGN_CENTER | ALIGN_BOTTOM);
-  const vfloat2_t point = vfloat2_t(
-      m_pixels.bmin[0] - 0.05f * (m_pixels.bmax[0] - m_pixels.bmin[0]),
+  const vfloat2_t point = vfloat2_t(m_pixels.bmin[0] - m_max_ytick_len,
       0.5f * (m_pixels.bmax[1] + m_pixels.bmin[1]));
   backend.translate(point);
   backend.rotate(-pi / 2.0f);
