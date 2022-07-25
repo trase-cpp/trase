@@ -95,8 +95,9 @@ class Axis : public Drawable {
   /// the number of ticks displayed on the y axis
   int m_ny_ticks;
 
-  /// the length of maximum yticks length (in pixels)
-  int m_max_ytick_len;
+  /// the length of maximum yticks char length
+  int m_max_ytick_char_len = 0;
+  std::string m_max_ytick_char = "";
 
   /// the length (in pixels) of each tick
   float m_tick_len;
@@ -223,7 +224,20 @@ public:
   Vector<int, 2> get_ticks() const { return {m_nx_ticks, m_ny_ticks}; }
 
   /// get the number of maximum yticks length (in pixels)
-  int max_ytick_len() const { return m_max_ytick_len; }
+  int max_ytick_pixels() const {
+    /// Convertion from length * font_size to pixels
+    /// The scale factor, i.e., 1.25, is for Roboto font (https://bugbox.clickteam.com/threads/82514-Useful-Roboto-Font-Size-Pixel-Heights!)
+    return int(this->max_ytick_char_len() * m_style.font_size() / 1.25);
+  }
+
+  // get the number of maximum char length of yticks
+  int max_ytick_char_len() const { return m_max_ytick_char_len; }
+
+  // get default font size
+  float font_size() const { return m_style.font_size(); }
+
+  // get maximum char 
+  std::string max_ytick_char() const { return m_max_ytick_char; }
 
 private:
   /// Create a new Geometry on this axis and return a shared pointer to it.

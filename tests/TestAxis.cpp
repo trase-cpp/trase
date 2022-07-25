@@ -141,78 +141,39 @@ TEST_CASE("set number of ticks", "[axis]") {
 
 TEST_CASE("ylabel position: case 1", "[axis]") {
   std::vector<double> predicted_data = {
-        -13.8881, -13.8671, -13.8361, -13.7881, -13.7681, -13.7381, -12.6881, -12.661, -12.6481
-    };
-    std::vector<double> exp_data = {
-        -13.8881, -13.8671, -13.8361, -13.7881, -13.7681, -13.7381, -12.6881, -12.661, -12.6481
-    };
+      -13.8881, -13.8671, -13.8361, -13.7881, -13.7681, -13.7381, -12.6881, -12.661, -12.6481
+  };
+  std::vector<double> exp_data = {
+      -13.8881, -13.8671, -13.8361, -13.7881, -13.7681, -13.7381, -12.6881, -12.661, -12.6481
+  };
 
-    auto fig = figure();
-    auto ax = fig->axis();
-    int predicted_size = predicted_data.size();
-    int exp_size = exp_data.size();
+  auto fig = figure();
+  auto ax = fig->axis();
+  int predicted_size = predicted_data.size();
+  int exp_size = exp_data.size();
 
-    std::vector<float> x(predicted_size);
-    std::vector<float> y(exp_size);
-    for (int i = 0; i < predicted_size; ++i) {
-        x[i] = predicted_data[i];
-    }
-    for (int i = 0; i < exp_size; ++i) {
-        y[i] = exp_data[i];
-    }
+  std::vector<float> x(predicted_size);
+  std::vector<float> y(exp_size);
+  for (int i = 0; i < predicted_size; ++i) {
+      x[i] = predicted_data[i];
+  }
+  for (int i = 0; i < exp_size; ++i) {
+      y[i] = exp_data[i];
+  }
 
-    auto data = create_data().x(x).y(y);
-    auto plt = ax->points(data);
+  auto data = create_data().x(x).y(y);
+  auto plt = ax->points(data);
 
-    ax->xlabel("Pred. Target");
-    ax->ylabel("Exp. Target");
+  ax->xlabel("Pred. Target");
+  ax->ylabel("Exp. Target");
 
-    // the default number of digits for the labels is set as 2
-    CHECK(ax->max_ytick_len() == int(5 * 18.0 / 1.25));
+  // the default number of digits for the labels is set as 2
+  std::cout << "ytick char: " << ax->max_ytick_char() << std::endl;
+  std::cout << "max_ytick_char_len: " << ax->max_ytick_char_len() << std::endl;
+  CHECK(ax->max_ytick_char_len() == 5);
+  CHECK(ax->font_size() == 18.0f);
+  CHECK(ax->max_ytick_pixels() == int(ax->max_ytick_char_len() * 18.0 / 1.25));
 
-    // output to svg
-    std::ofstream out;
-    out.open("test_axis_ylabel_position_case1.svg");
-    BackendSVG backend(out);
-    fig->draw(backend);
-    out.close();
+  DummyDraw::draw("axis", fig);
 }
 
-TEST_CASE("ylabel position: case 2", "[axis]") {
-  std::vector<double> predicted_data = {
-        -13.8881, -13.8671, -13.8361, -13.7881, -13.7681, -13.7381, -12.6881, -12.661, -12.6481
-    };
-    std::vector<double> exp_data = {
-        -13.8881, -13.8671, -13.8361, -13.7881, -13.7681, -13.7381, -12.6881, -12.661, -12.6481
-    };
-
-    auto fig = figure();
-    auto ax = fig->axis();
-    int predicted_size = predicted_data.size();
-    int exp_size = exp_data.size();
-
-    std::vector<float> x(predicted_size);
-    std::vector<float> y(exp_size);
-    for (int i = 0; i < predicted_size; ++i) {
-        x[i] = predicted_data[i] * 10.0;
-    }
-    for (int i = 0; i < exp_size; ++i) {
-        y[i] = exp_data[i] * 10.0;
-    }
-
-    auto data = create_data().x(x).y(y);
-    auto plt = ax->points(data);
-
-    ax->xlabel("Pred. Target");
-    ax->ylabel("Exp. Target");
-
-    // the default number of digits for the labels is set as 2
-    CHECK(ax->max_ytick_len() == int(4 * 18.0 / 1.25));
-
-    // output to svg
-    std::ofstream out;
-    out.open("test_axis_ylabel_position_case2.svg");
-    BackendSVG backend(out);
-    fig->draw(backend);
-    out.close();
-}
