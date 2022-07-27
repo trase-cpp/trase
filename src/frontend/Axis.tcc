@@ -114,15 +114,11 @@ template <typename Backend> void Axis::draw_common_ticks(Backend &backend) {
       m_max_ytick_char = std::string(buffer);
     }
 
-    // std::cout << "buffer: " << buffer << std::endl;
     backend.text(vfloat2_t(m_pixels.bmin[0] - m_tick_len / 2, pos), buffer,
                  NULL);
   }
 
   m_max_ytick_char_len = max_char_len;
-
-  // std::cout << "max_ytick_char_len: " << max_char_len << std::endl;
-  // std::cout << "max_ytick_char: " << m_max_ytick_char << std::endl;
 
   backend.stroke_color(RGBA(0, 0, 0, 255));
   backend.stroke_width(m_style.line_width() / 2);
@@ -181,12 +177,6 @@ template <typename Backend> void Axis::draw_common_ylabel(Backend &backend) {
   if (m_ylabel.empty()) {
     return;
   }
-
-
-  // std::cout << "ylabel: " << m_ylabel << std::endl;
-  // std::cout << "max_ytick_char: " << m_max_ytick_char << std::endl;
-  // std::cout << "max_ytick_pixels: " << this->max_ytick_pixels() << std::endl;
-  // std::cout << "max_ytick_char_len: " << this->max_ytick_char_len() << std::endl;
 
   backend.text_align(ALIGN_CENTER | ALIGN_BOTTOM);
   const vfloat2_t point = vfloat2_t(m_pixels.bmin[0] - this->max_ytick_pixels(),

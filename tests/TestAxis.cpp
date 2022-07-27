@@ -167,13 +167,6 @@ TEST_CASE("ylabel position: case 1", "[axis]") {
   ax->xlabel("Pred. Target");
   ax->ylabel("Exp. Target");
 
-  // the default number of digits for the labels is set as 2
-  std::cout << "ytick char: " << ax->max_ytick_char() << std::endl;
-  std::cout << "max_ytick_char_len: " << ax->max_ytick_char_len() << std::endl;
-  CHECK(ax->max_ytick_char_len() == 5);
-  CHECK(ax->font_size() == 18.0f);
-  CHECK(ax->max_ytick_pixels() == int(ax->max_ytick_char_len() * 18.0 / 1.25));
-
   DummyDraw::draw("axis", fig);
 }
 
