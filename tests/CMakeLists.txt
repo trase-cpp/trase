@@ -24,6 +24,7 @@ add_executable (
     TestTransformMatrix.cpp
     TestVector.cpp
     TestLegend.cpp
+    TestLines.cpp
 )
 
 if (CURL_FOUND)

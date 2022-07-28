@@ -258,6 +258,10 @@ void BackendSVG::clear_tooltip() {
   m_onmouseout_tooltip.clear();
 }
 
+void BackendSVG::stroke_style(const std::string &style) {
+  m_line_style = "stroke-dasharray=\"" + style + "\"";
+}
+
 void BackendSVG::stroke_width(const float lw) {
   m_linewidth =
       std::string("stroke-width=\"") + std::to_string(lw) + std::string("\"");
@@ -269,7 +273,7 @@ void BackendSVG::fill_color(const RGBA &color) {
 
 void BackendSVG::stroke() {
   m_out << "<path d=\"" << m_path << "\" " << m_line_color << ' ' << m_linewidth
-        << " fill-opacity=\"0\"";
+        << " fill-opacity=\"0\" " << m_line_style;
   if (!m_transform.is_identity()) {
     m_out << ' ' << m_transform.to_string();
   }
