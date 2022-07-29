@@ -24,7 +24,9 @@ add_executable (
     TestTransformMatrix.cpp
     TestVector.cpp
     TestLegend.cpp
+    TestLines.cpp
 )
+
 if (CURL_FOUND)
     target_sources(trase_test PRIVATE TestCSVDownloader.cpp)
 endif (CURL_FOUND)
@@ -32,5 +34,3 @@ endif (CURL_FOUND)
 target_include_directories (trase_test PRIVATE tests)
 target_link_libraries (trase_test PRIVATE trase)
 add_test (the_trase_test trase_test)
-
-

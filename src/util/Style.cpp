@@ -37,6 +37,17 @@ namespace trase {
 
 float Style::line_width() const noexcept { return m_line_width; }
 
+std::string Style::line_style() const noexcept {
+  if (m_line_style == "solid")
+    return "0";
+  else if (m_line_style == "dashed")
+    return "10,5";
+  else if (m_line_style == "dotted")
+    return "10,3,2";
+  else
+    return "0";
+}
+
 float Style::font_size() const noexcept { return m_font_size; }
 
 RGBA Style::color() const noexcept { return m_color; }
@@ -45,6 +56,11 @@ std::string Style::font() const noexcept { return m_font; }
 
 Style &Style::line_width(const float lineWidth) noexcept {
   m_line_width = lineWidth;
+  return *this;
+}
+
+Style &Style::line_style(const std::string lineStyle) noexcept {
+  m_line_style = lineStyle;
   return *this;
 }
 

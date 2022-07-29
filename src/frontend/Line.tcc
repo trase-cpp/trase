@@ -174,6 +174,7 @@ template <typename Backend> void Line::draw_plot(Backend &backend) {
 
   backend.stroke_color(m_style.color());
   backend.stroke_width(m_style.line_width());
+  backend.stroke_style(m_style.line_style());
   backend.stroke();
 }
 

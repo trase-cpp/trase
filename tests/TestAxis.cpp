@@ -137,3 +137,36 @@ TEST_CASE("set number of ticks", "[axis]") {
   CHECK(ax->get_ticks()[0] == 10);
   CHECK(ax->get_ticks()[1] == 10);
 }
+
+
+TEST_CASE("ylabel position: case 1", "[axis]") {
+  std::vector<double> predicted_data = {
+      -13.8881, -13.8671, -13.8361, -13.7881, -13.7681, -13.7381, -12.6881, -12.661, -12.6481
+  };
+  std::vector<double> exp_data = {
+      -13.8881, -13.8671, -13.8361, -13.7881, -13.7681, -13.7381, -12.6881, -12.661, -12.6481
+  };
+
+  auto fig = figure();
+  auto ax = fig->axis();
+  int predicted_size = predicted_data.size();
+  int exp_size = exp_data.size();
+
+  std::vector<float> x(predicted_size);
+  std::vector<float> y(exp_size);
+  for (int i = 0; i < predicted_size; ++i) {
+      x[i] = predicted_data[i];
+  }
+  for (int i = 0; i < exp_size; ++i) {
+      y[i] = exp_data[i];
+  }
+
+  auto data = create_data().x(x).y(y);
+  auto plt = ax->points(data);
+
+  ax->xlabel("Pred. Target");
+  ax->ylabel("Exp. Target");
+
+  DummyDraw::draw("axis", fig);
+}
+

@@ -76,6 +76,7 @@ class BackendSVG : public AnimatedBackend {
 
   std::string m_linewidth;
   std::string m_line_color;
+  std::string m_line_style;
   std::string m_fill_color;
   std::string m_path;
   std::string m_font_face;
@@ -341,6 +342,9 @@ public:
   ///
   /// @see tooltip()
   void clear_tooltip();
+
+  /// sets the current line style
+  void stroke_style(const std::string &style);
 
   /// sets the current stroke width
   void stroke_width(const float lw);
