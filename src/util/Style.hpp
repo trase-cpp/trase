@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define STYLE_H_
 
 #include "util/Colors.hpp"
+#include <string>
 
 namespace trase {
 
@@ -46,7 +47,7 @@ class Style {
   float m_line_width{3.f};
 
   /// the line style
-  float m_line_style{0.f};
+  std::string m_line_style{"solid"};
 
   /// the font size
   float m_font_size{18.f};
@@ -65,7 +66,7 @@ public:
   float line_width() const noexcept;
 
   /// get the current line width
-  float line_style() const noexcept;
+  std::string line_style() const noexcept;
 
   /// get the current font size
   float font_size() const noexcept;
@@ -80,7 +81,7 @@ public:
   Style &line_width(float lineWidth) noexcept;
 
   /// set the new line style
-  Style &line_style(float lineStyle) noexcept;
+  Style &line_style(std::string lineStyle) noexcept;
 
   /// set the new font size
   Style &font_size(float fontSize) noexcept;

@@ -62,7 +62,7 @@ TEST_CASE("Lines creation", "[lines]") {
   auto plt = ax->line(data);
 
   // set line color = red and line width = 10
-  plt->style().color(RGBA(255, 0, 0)).line_width(10).line_style(1.0);
+  plt->style().color(RGBA(255, 0, 0)).line_width(10).line_style("dashed");
 
   // label axis
   ax->xlabel("x");
@@ -79,19 +79,19 @@ TEST_CASE("Hybrids lines creation", "[lines]") {
   {
     auto data = create_data().x(std::vector<float>{0, 1}).y(std::vector<float>{0, 1});
     auto plt = ax->line(data);
-    plt->style().color(RGBA(255, 0, 0)).line_width(5).line_style(0.0);
+    plt->style().color(RGBA(255, 0, 0)).line_width(5).line_style("solid");
   }
 
   {
     auto data = create_data().x(std::vector<float>{0, 1}).y(std::vector<float>{0.5, 1.5});
     auto plt = ax->line(data);
-    plt->style().color(RGBA(255, 0, 0)).line_width(5).line_style(2.0);
+    plt->style().color(RGBA(255, 0, 0)).line_width(5).line_style("dashed");
   }
 
   {
     auto data = create_data().x(std::vector<float>{0, 1}).y(std::vector<float>{-0.5, 0.5});
     auto plt = ax->line(data);
-    plt->style().color(RGBA(255, 0, 0)).line_width(5).line_style(2.0);
+    plt->style().color(RGBA(255, 0, 0)).line_width(5).line_style("dotted");
   }
 
   ax->xlabel("Pred. Target");
